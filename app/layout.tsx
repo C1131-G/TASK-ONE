@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Geist_Mono, Noto_Sans } from "next/font/google";
 
 import "./globals.css";
-import { PushNotificationsControl } from "@/components/push-notifications-control";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
@@ -19,8 +18,20 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description: "A starter workspace ready for your next project.",
-  title: "Project ready!",
+  description: "The Metsys team workspace.",
+  title: "Metsys",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+  themeColor: [
+    { color: "#f4f7f9", media: "(prefers-color-scheme: light)" },
+    { color: "#0d1a21", media: "(prefers-color-scheme: dark)" },
+  ],
+  viewportFit: "cover",
+  width: "device-width",
 };
 
 const RootLayout = ({
@@ -40,12 +51,7 @@ const RootLayout = ({
     )}
   >
     <body>
-      <ThemeProvider>
-        {children}
-        <PushNotificationsControl
-          publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
-        />
-      </ThemeProvider>
+      <ThemeProvider>{children}</ThemeProvider>
     </body>
   </html>
 );
