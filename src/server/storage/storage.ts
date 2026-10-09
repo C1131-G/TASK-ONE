@@ -57,15 +57,28 @@ const storageError = () =>
 const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
 
 const endpoint = process.env["S3_ENDPOINT"];
+const publicEndpoint = process.env["S3_PUBLIC_ENDPOINT"] ?? endpoint;
 const accessKeyId = process.env["S3_ACCESS_KEY_ID"];
 const secretAccessKey = process.env["S3_SECRET_ACCESS_KEY"];
-const s3 = new S3Client({
-  region: process.env["S3_REGION"] ?? "us-east-1",
-  ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
-  ...(accessKeyId && secretAccessKey
-    ? { credentials: { accessKeyId, secretAccessKey } }
-    : {}),
-});
+if (Boolean(accessKeyId) !== Boolean(secretAccessKey)) {
+  throw new Error(
+    "S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY must be configured together."
+  );
+}
+
+const createS3Client = (clientEndpoint?: string): S3Client =>
+  new S3Client({
+    region: process.env["S3_REGION"] ?? "us-east-1",
+    ...(clientEndpoint
+      ? { endpoint: clientEndpoint, forcePathStyle: true }
+      : {}),
+    ...(accessKeyId && secretAccessKey
+      ? { credentials: { accessKeyId, secretAccessKey } }
+      : {}),
+  });
+const s3 = createS3Client(endpoint);
+const signingS3 =
+  publicEndpoint === endpoint ? s3 : createS3Client(publicEndpoint);
 
 const encodeDispositionFileName = (fileName: string): string => {
   const sanitized = [...fileName]
@@ -134,7 +147,7 @@ export const StorageLive = Layer.succeed(
         catch: storageError,
         try: () =>
           getSignedUrl(
-            s3,
+            signingS3,
             new GetObjectCommand({
               Bucket: bucket,
               Key: key,
@@ -149,7 +162,7 @@ export const StorageLive = Layer.succeed(
         catch: storageError,
         try: () =>
           getSignedUrl(
-            s3,
+            signingS3,
             new GetObjectCommand({
               Bucket: bucket,
               Key: key,
@@ -164,7 +177,7 @@ export const StorageLive = Layer.succeed(
         catch: storageError,
         try: () =>
           getSignedUrl(
-            s3,
+            signingS3,
             new PutObjectCommand({
               Bucket: bucket,
               ContentLength: sizeBytes,

@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { MimeTypeSchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 import { Storage } from "./storage";
 import type { StorageApi } from "./storage";
 
@@ -202,12 +203,7 @@ const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "The file or upload request already exists.",
@@ -1554,7 +1550,6 @@ const makeUploads = (storage: StorageApi) => {
       });
       let intentsRemoved = 0;
       for (const intent of expiredIntents) {
-        yield* storage.deleteObject(intent.objectKey);
         const updated = yield* Effect.tryPromise({
           catch: mapError,
           try: () =>
@@ -1568,6 +1563,7 @@ const makeUploads = (storage: StorageApi) => {
             }),
         });
         if (updated) {
+          yield* storage.deleteObject(intent.objectKey);
           intentsRemoved += 1;
         }
       }
@@ -1602,7 +1598,6 @@ const makeUploads = (storage: StorageApi) => {
         if (activeUndo) {
           continue;
         }
-        yield* storage.deleteObject(file.storageKey);
         const deleted = yield* Effect.tryPromise({
           catch: mapError,
           try: () =>
@@ -1611,6 +1606,7 @@ const makeUploads = (storage: StorageApi) => {
             ).delete(),
         });
         if (deleted) {
+          yield* storage.deleteObject(file.storageKey);
           filesRemoved += 1;
         }
       }
