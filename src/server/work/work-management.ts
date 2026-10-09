@@ -10,12 +10,32 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
 
+const TaskStatusSchema = Schema.Literals([
+  "backlog",
+  "todo",
+  "progress",
+  "review",
+  "done",
+]);
+const TaskPrioritySchema = Schema.Literals([
+  "urgent",
+  "high",
+  "medium",
+  "low",
+  "none",
+]);
+
+const decodeTaskStatus = (status: string): UpdateTaskInput["status"] =>
+  Schema.decodeUnknownSync(TaskStatusSchema)(status);
+const decodeTaskPriority = (priority: string): CreateTaskInput["priority"] =>
+  Schema.decodeUnknownSync(TaskPrioritySchema)(priority);
+
 export const UpdateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(CalendarDateSchema),
-  priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
-  status: Schema.Literals(["backlog", "todo", "progress", "review", "done"]),
+  priority: TaskPrioritySchema,
+  status: TaskStatusSchema,
   title: Schema.String,
 });
 
@@ -25,7 +45,7 @@ export const CreateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(CalendarDateSchema),
-  priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
+  priority: TaskPrioritySchema,
   projectId: Schema.String.check(Schema.isUUID()),
   title: Schema.String,
 });
@@ -1107,7 +1127,7 @@ const updateTask = (
             entityType: "task",
             expiresAt,
             id: undoId,
-            snapshot: { status: task.status, version },
+            snapshot: { status: decodeTaskStatus(task.status), version },
           });
           completionUndo = { expiresAt: expiresAt.toISOString(), undoId };
         }
@@ -1296,10 +1316,10 @@ const moveTask = (
           description: task.description,
           dueDate: task.dueDate,
           id: taskId,
-          priority: task.priority,
+          priority: decodeTaskPriority(task.priority),
           projectId: destinationProjectId,
           projectTaskNumber,
-          status: task.status,
+          status: decodeTaskStatus(task.status),
           title: task.title,
           version,
         };
@@ -1408,7 +1428,7 @@ const duplicateTask = (
           estimate: source.estimate,
           id,
           position,
-          priority: source.priority,
+          priority: decodeTaskPriority(source.priority),
           projectId: source.projectId,
           projectTaskNumber,
           startDate: source.startDate,
@@ -1466,7 +1486,7 @@ const duplicateTask = (
           description: source.description,
           dueDate: source.dueDate,
           id,
-          priority: source.priority,
+          priority: decodeTaskPriority(source.priority),
           projectId: source.projectId,
           projectTaskNumber,
           status: "todo" as const,
@@ -1838,10 +1858,10 @@ const restoreTask = (
           description: task.description,
           dueDate: task.dueDate,
           id: task.id,
-          priority: task.priority,
+          priority: decodeTaskPriority(task.priority),
           projectId: task.projectId,
           projectTaskNumber: task.projectTaskNumber,
-          status: task.status,
+          status: decodeTaskStatus(task.status),
           title: task.title,
           version,
         };
@@ -2039,10 +2059,10 @@ const bulkUpdateTasks = (
           description: task.description,
           dueDate: task.dueDate,
           id: task.id,
-          priority: task.priority,
+          priority: decodeTaskPriority(task.priority),
           projectId: task.projectId,
           projectTaskNumber: task.projectTaskNumber,
-          status: task.status,
+          status: decodeTaskStatus(task.status),
           title: task.title,
           version: task.version,
         }));
@@ -2074,7 +2094,7 @@ const changeTaskStatus = (
         assigneeIds: assignments.map(({ userId }) => userId),
         description: task.description,
         dueDate: task.dueDate,
-        priority: task.priority,
+        priority: decodeTaskPriority(task.priority),
         status,
         title: task.title,
       });
@@ -2198,11 +2218,11 @@ const listProjectTasks = (
           id: task.id,
           labelIds: taskLabels,
           position: task.position,
-          priority: task.priority,
+          priority: decodeTaskPriority(task.priority),
           projectId: task.projectId,
           projectTaskNumber: task.projectTaskNumber,
           startDate: task.startDate,
-          status: task.status,
+          status: decodeTaskStatus(task.status),
           subtaskCount: taskSubtasks.length,
           title: task.title,
           version: task.version,

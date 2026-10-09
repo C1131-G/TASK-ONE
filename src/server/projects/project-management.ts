@@ -239,7 +239,7 @@ const toSummary = (
   id: project.id,
   key: project.key,
   name: project.name,
-  status: project.status,
+  status: Schema.decodeUnknownSync(ProjectStatusSchema)(project.status),
   version: project.version,
 });
 

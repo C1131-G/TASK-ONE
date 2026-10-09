@@ -1,5 +1,5 @@
 import { and } from "@prisma/orm-postgres/orm-client";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
@@ -27,6 +27,21 @@ export interface DashboardOverview {
     readonly openTaskCount: number;
   }[];
 }
+
+const ProjectStatusSchema = Schema.Literals([
+  "active",
+  "complete",
+  "hold",
+  "planning",
+  "risk",
+]);
+const TaskStatusSchema = Schema.Literals([
+  "backlog",
+  "done",
+  "progress",
+  "review",
+  "todo",
+]);
 
 export class Dashboard extends Context.Service<
   Dashboard,
@@ -115,7 +130,10 @@ const getOverview = (
         risk: 0,
       };
       for (const project of projects) {
-        projectCounts[project.status] += 1;
+        const status = Schema.decodeUnknownSync(ProjectStatusSchema)(
+          project.status
+        );
+        projectCounts[status] += 1;
       }
       const taskCounts = {
         backlog: 0,
@@ -126,7 +144,8 @@ const getOverview = (
       };
       let overdueCount = 0;
       for (const task of activeTasks) {
-        taskCounts[task.status] += 1;
+        const status = Schema.decodeUnknownSync(TaskStatusSchema)(task.status);
+        taskCounts[status] += 1;
         if (task.status !== "done" && task.dueDate && task.dueDate < today) {
           overdueCount += 1;
         }

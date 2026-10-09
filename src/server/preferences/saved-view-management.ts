@@ -15,6 +15,14 @@ export type SavedViewType =
   | "calendar"
   | "timeline";
 
+const SavedViewTypeSchema = Schema.Literals([
+  "board",
+  "list",
+  "table",
+  "calendar",
+  "timeline",
+]);
+
 export interface SavedViewInput {
   readonly name: string;
   readonly type: SavedViewType;
@@ -43,7 +51,7 @@ export const SavedViewSummarySchema = Schema.Struct({
   name: Schema.String,
   projectId: Schema.NullOr(Schema.String),
   sort: Schema.Unknown,
-  type: Schema.Literals(["board", "list", "table", "calendar", "timeline"]),
+  type: SavedViewTypeSchema,
   updatedAt: Schema.String,
   userId: Schema.String,
 });
@@ -148,7 +156,7 @@ const toSummary = (view: {
   readonly id: string;
   readonly userId: string;
   readonly name: string;
-  readonly type: SavedViewType;
+  readonly type: string;
   readonly projectId: string | null;
   readonly filters: unknown;
   readonly sort: unknown;
@@ -167,7 +175,7 @@ const toSummary = (view: {
   name: view.name,
   projectId: view.projectId,
   sort: view.sort,
-  type: view.type,
+  type: Schema.decodeUnknownSync(SavedViewTypeSchema)(view.type),
   updatedAt: view.updatedAt.toISOString(),
   userId: view.userId,
 });
