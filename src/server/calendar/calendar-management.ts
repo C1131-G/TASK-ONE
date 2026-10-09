@@ -37,6 +37,7 @@ export const CalendarEventSummarySchema = Schema.Struct({
   title: Schema.String,
   updatedAt: Schema.String,
 });
+export const CalendarEventListSchema = Schema.Array(CalendarEventSummarySchema);
 
 const requireActor = async (
   userId: string,

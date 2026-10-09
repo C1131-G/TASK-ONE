@@ -37,6 +37,19 @@ export const CreatedCommentSchema = Schema.Struct({
   taskId: Schema.String,
 });
 
+export const CommentViewSchema = Schema.Struct({
+  ...CreatedCommentSchema.fields,
+  authorName: Schema.String,
+  reactions: Schema.Array(
+    Schema.Struct({
+      count: Schema.Number,
+      emoji: Schema.String,
+      reacted: Schema.Boolean,
+    })
+  ),
+});
+export const CommentListSchema = Schema.Array(CommentViewSchema);
+
 export const UndoReceiptSchema = Schema.Struct({
   expiresAt: Schema.String,
   undoId: Schema.String,

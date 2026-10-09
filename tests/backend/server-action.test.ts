@@ -60,3 +60,40 @@ it("preserves supported Date values in Server Action results", async () => {
     requestId: "req-date-output",
   });
 });
+
+it("rejects Server Action results that do not match their output schema", async () => {
+  const result = await runServerAction(
+    {},
+    Schema.Struct({}),
+    () => Effect.succeed({ id: 42 }),
+    "req-invalid-output-shape",
+    Schema.Struct({ id: Schema.String })
+  );
+
+  expect(result).toEqual({
+    error: {
+      code: "UNAVAILABLE",
+      message: "The request could not be completed.",
+      requestId: "req-invalid-output-shape",
+    },
+    ok: false,
+  });
+});
+
+it("rejects values outside the serializable Server Action output contract", async () => {
+  const result = await runServerAction(
+    {},
+    Schema.Struct({}),
+    () => Effect.succeed({ invalid: () => "not serializable" }),
+    "req-nonserializable-output"
+  );
+
+  expect(result).toEqual({
+    error: {
+      code: "UNAVAILABLE",
+      message: "The request could not be completed.",
+      requestId: "req-nonserializable-output",
+    },
+    ok: false,
+  });
+});

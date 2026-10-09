@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import {
+  CalendarEventListSchema,
   CalendarEventSummarySchema,
   CalendarManagement,
   CalendarManagementLive,
@@ -62,7 +63,9 @@ export async function listCalendarEventsAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(CalendarManagementLive)
-      )
+      ),
+    undefined,
+    CalendarEventListSchema
   );
 }
 

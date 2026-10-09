@@ -28,6 +28,31 @@ export interface DashboardOverview {
   }[];
 }
 
+export const DashboardOverviewSchema = Schema.Struct({
+  overdueCount: Schema.Number,
+  projects: Schema.Struct({
+    active: Schema.Number,
+    complete: Schema.Number,
+    hold: Schema.Number,
+    planning: Schema.Number,
+    risk: Schema.Number,
+  }),
+  tasks: Schema.Struct({
+    backlog: Schema.Number,
+    done: Schema.Number,
+    progress: Schema.Number,
+    review: Schema.Number,
+    todo: Schema.Number,
+  }),
+  workload: Schema.Array(
+    Schema.Struct({
+      employeeId: Schema.String,
+      employeeName: Schema.String,
+      openTaskCount: Schema.Number,
+    })
+  ),
+});
+
 const ProjectStatusSchema = Schema.Literals([
   "active",
   "complete",

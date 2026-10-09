@@ -24,7 +24,8 @@ export const runServerAction = <
   input: unknown,
   schema: InputSchema,
   execute: (validated: InputSchema["Type"]) => Effect.Effect<Result, ErrorType>,
-  requestId?: string
+  requestId?: string,
+  outputSchema?: Schema.Codec<unknown, unknown, never, never>
 ) => {
   const program = Schema.decodeUnknownEffect(schema)(input).pipe(
     Effect.mapError(
@@ -36,7 +37,9 @@ export const runServerAction = <
     ),
     Effect.flatMap(execute),
     Effect.flatMap((result) =>
-      Schema.decodeUnknownEffect(ServerActionOutputSchema)(result).pipe(
+      Schema.decodeUnknownEffect(outputSchema ?? ServerActionOutputSchema)(
+        result
+      ).pipe(
         Effect.mapError(
           () =>
             new AppError({

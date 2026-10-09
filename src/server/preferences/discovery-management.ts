@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { and, or } from "@prisma/orm-postgres/orm-client";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
@@ -26,6 +26,34 @@ export interface WorkspaceSearchResults {
     readonly projectName: string;
   }[];
 }
+
+export const PersonalWorkspaceSchema = Schema.Struct({
+  projects: Schema.Array(
+    Schema.Struct({ id: Schema.String, name: Schema.String })
+  ),
+  recentSearches: Schema.Array(Schema.String),
+  tasks: Schema.Array(
+    Schema.Struct({
+      id: Schema.String,
+      projectId: Schema.String,
+      title: Schema.String,
+    })
+  ),
+});
+
+export const WorkspaceSearchResultsSchema = Schema.Struct({
+  projects: Schema.Array(
+    Schema.Struct({ id: Schema.String, name: Schema.String })
+  ),
+  tasks: Schema.Array(
+    Schema.Struct({
+      id: Schema.String,
+      projectId: Schema.String,
+      projectName: Schema.String,
+      title: Schema.String,
+    })
+  ),
+});
 
 export class DiscoveryManagement extends Context.Service<
   DiscoveryManagement,

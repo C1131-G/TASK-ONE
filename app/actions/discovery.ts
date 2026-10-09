@@ -15,6 +15,8 @@ import { runServerAction } from "@/src/server/core/server-action";
 import {
   DiscoveryManagement,
   DiscoveryManagementLive,
+  PersonalWorkspaceSchema,
+  WorkspaceSearchResultsSchema,
 } from "@/src/server/preferences/discovery-management";
 
 const getRequestHeaders = () =>
@@ -29,17 +31,22 @@ const getRequestHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function getPersonalWorkspaceAction(input: unknown) {
-  const result = await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* getPersonalWorkspace() {
-      const requestHeaders = yield* getRequestHeaders();
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      const discovery = yield* DiscoveryManagement;
-      return yield* discovery.listPersonalWorkspace(user.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(DiscoveryManagementLive)
-    )
+  const result = await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getPersonalWorkspace() {
+        const requestHeaders = yield* getRequestHeaders();
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const discovery = yield* DiscoveryManagement;
+        return yield* discovery.listPersonalWorkspace(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(DiscoveryManagementLive)
+      ),
+    undefined,
+    PersonalWorkspaceSchema
   );
   return result;
 }
@@ -141,7 +148,9 @@ export async function searchWorkspaceAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(DiscoveryManagementLive)
-      )
+      ),
+    undefined,
+    WorkspaceSearchResultsSchema
   );
   return result;
 }

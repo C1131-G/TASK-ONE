@@ -8,6 +8,7 @@ import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import {
   Collaboration,
   CollaborationLive,
+  CommentListSchema,
   CommentReactionResultSchema,
   CommentUndoneResultSchema,
   CreatedCommentSchema,
@@ -31,25 +32,31 @@ const runCollaborationAction = <
   execute: (
     actorId: string,
     validated: InputSchema["Type"]
-  ) => Effect.Effect<Result, AppError, Collaboration | Idempotency>
+  ) => Effect.Effect<Result, AppError, Collaboration | Idempotency>,
+  outputSchema?: Schema.Codec<unknown, unknown, never, never>
 ): Promise<ActionResult<Result>> =>
-  runServerAction(input, schema, (validated) =>
-    Effect.gen(function* authorizeCommentAction() {
-      const requestHeaders = yield* Effect.tryPromise({
-        catch: () =>
-          new AppError({
-            code: "UNAVAILABLE",
-            message: "The request could not be completed.",
-          }),
-        try: () => headers(),
-      });
-      const sessions = yield* AuthSession;
-      const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      return yield* execute(actor.id, validated).pipe(
-        Effect.provide(CollaborationLive),
-        Effect.provide(IdempotencyLive)
-      );
-    }).pipe(Effect.provide(AuthSessionLive))
+  runServerAction(
+    input,
+    schema,
+    (validated) =>
+      Effect.gen(function* authorizeCommentAction() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        return yield* execute(actor.id, validated).pipe(
+          Effect.provide(CollaborationLive),
+          Effect.provide(IdempotencyLive)
+        );
+      }).pipe(Effect.provide(AuthSessionLive)),
+    undefined,
+    outputSchema
   );
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -61,7 +68,8 @@ export async function listTaskCommentsAction(input: unknown) {
       Effect.gen(function* listTaskComments() {
         const collaboration = yield* Collaboration;
         return yield* collaboration.listComments(actorId, validated.taskId);
-      })
+      }),
+    CommentListSchema
   );
 }
 
