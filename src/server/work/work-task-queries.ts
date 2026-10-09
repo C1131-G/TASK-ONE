@@ -8,7 +8,11 @@ import type {
   ProjectTaskListItem,
   UpdateTaskInput,
 } from "./work-contracts";
-import { decodeTaskPriority, decodeTaskStatus } from "./work-contracts";
+import {
+  TaskRecurrenceInputSchema,
+  decodeTaskPriority,
+  decodeTaskStatus,
+} from "./work-contracts";
 import { databaseError } from "./work-internal";
 import { updateTask } from "./work-task-update";
 
@@ -117,20 +121,24 @@ export const listProjectTasks = (
       if (taskIds.length === 0) {
         return [];
       }
-      const [assignments, labels, dependencies, subtasks] = await Promise.all([
-        db.orm.public.TaskAssignee.include("user")
-          .where((assignment) => assignment.taskId.in(taskIds))
-          .all(),
-        db.orm.public.TaskLabel.where((label) =>
-          label.taskId.in(taskIds)
-        ).all(),
-        db.orm.public.TaskDependency.where((dependency) =>
-          dependency.taskId.in(taskIds)
-        ).all(),
-        db.orm.public.TaskSubtask.where((subtask) =>
-          subtask.taskId.in(taskIds)
-        ).all(),
-      ]);
+      const [assignments, labels, dependencies, subtasks, recurrences] =
+        await Promise.all([
+          db.orm.public.TaskAssignee.include("user")
+            .where((assignment) => assignment.taskId.in(taskIds))
+            .all(),
+          db.orm.public.TaskLabel.where((label) =>
+            label.taskId.in(taskIds)
+          ).all(),
+          db.orm.public.TaskDependency.where((dependency) =>
+            dependency.taskId.in(taskIds)
+          ).all(),
+          db.orm.public.TaskSubtask.where((subtask) =>
+            subtask.taskId.in(taskIds)
+          ).all(),
+          db.orm.public.TaskRecurrence.where((recurrence) =>
+            recurrence.taskId.in(taskIds)
+          ).all(),
+        ]);
       const assignmentsByTask = new Map<string, typeof assignments>();
       for (const assignment of assignments) {
         const rows = assignmentsByTask.get(assignment.taskId) ?? [];
@@ -155,11 +163,15 @@ export const listProjectTasks = (
         rows.push(subtask);
         subtasksByTask.set(subtask.taskId, rows);
       }
+      const recurrencesByTask = new Map(
+        recurrences.map((recurrence) => [recurrence.taskId, recurrence])
+      );
       return tasks.map((task) => {
         const taskAssignments = assignmentsByTask.get(task.id) ?? [];
         const taskLabels = labelsByTask.get(task.id) ?? [];
         const taskDependencies = dependenciesByTask.get(task.id) ?? [];
         const taskSubtasks = subtasksByTask.get(task.id) ?? [];
+        const taskRecurrence = recurrencesByTask.get(task.id);
         return {
           archivedAt: task.archivedAt?.toISOString() ?? null,
           assigneeIds: taskAssignments.map(({ userId }) => userId),
@@ -182,6 +194,16 @@ export const listProjectTasks = (
           priority: decodeTaskPriority(task.priority),
           projectId: task.projectId,
           projectTaskNumber: task.projectTaskNumber,
+          recurrence: taskRecurrence
+            ? Schema.decodeUnknownSync(TaskRecurrenceInputSchema)({
+                endsOn: taskRecurrence.endsOn,
+                frequency: taskRecurrence.frequency,
+                interval: taskRecurrence.interval,
+                weekDays: Array.isArray(taskRecurrence.weekDays)
+                  ? taskRecurrence.weekDays
+                  : [],
+              })
+            : null,
           startDate: task.startDate,
           status: decodeTaskStatus(task.status),
           subtaskCount: taskSubtasks.length,

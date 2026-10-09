@@ -149,9 +149,15 @@ export async function updateProjectAction(input: unknown) {
               updateInput.projectId,
               updateInput.expectedVersion,
               {
+                color: updateInput.color,
                 description: updateInput.description,
+                dueDate: updateInput.dueDate,
+                icon: updateInput.icon,
                 name: updateInput.name,
+                position: updateInput.position,
+                startDate: updateInput.startDate,
                 status: updateInput.status,
+                teamId: updateInput.teamId,
               }
             ),
           input: updateInput,

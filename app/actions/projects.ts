@@ -12,6 +12,7 @@ import {
 import {
   restoreProjectAction as restoreProject,
   saveProjectMilestonesAction as saveMilestones,
+  listProjectMilestonesAction as listMilestones,
   setProjectPeopleAction as setProjectPeople,
 } from "./projects-part-2";
 
@@ -45,4 +46,8 @@ export async function setProjectPeopleAction(input: unknown) {
 
 export async function saveProjectMilestonesAction(input: unknown) {
   return await saveMilestones(input);
+}
+
+export async function listProjectMilestonesAction(input: unknown) {
+  return await listMilestones(input);
 }

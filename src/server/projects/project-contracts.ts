@@ -202,5 +202,9 @@ export class ProjectManagement extends Context.Service<
       expectedVersion: number,
       milestones: readonly ProjectMilestoneInput[]
     ) => Effect.Effect<ProjectMilestonesResult, AppError>;
+    readonly listProjectMilestones: (
+      requesterId: string,
+      projectId: string
+    ) => Effect.Effect<ProjectMilestonesResult, AppError>;
   }
 >()("metsys/server/ProjectManagement") {}

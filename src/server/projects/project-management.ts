@@ -3,7 +3,10 @@ import { Layer } from "effect";
 import { ProjectManagement } from "./project-contracts";
 import { createProject } from "./project-create";
 import { duplicateProject } from "./project-duplicate";
-import { saveProjectMilestones } from "./project-milestones";
+import {
+  listProjectMilestones,
+  saveProjectMilestones,
+} from "./project-milestones";
 import {
   archiveProject,
   restoreProject,
@@ -18,6 +21,7 @@ export const ProjectManagementLive = Layer.succeed(
     archiveProject,
     createProject,
     duplicateProject,
+    listProjectMilestones,
     listProjects,
     restoreProject,
     saveProjectMilestones,

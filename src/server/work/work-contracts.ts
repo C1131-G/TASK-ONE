@@ -155,6 +155,7 @@ export interface ProjectTaskListItem extends CreatedTask {
   readonly assignees: readonly { readonly id: string; readonly name: string }[];
   readonly labelIds: readonly string[];
   readonly dependencyIds: readonly string[];
+  readonly recurrence: TaskRecurrenceInput | null;
   readonly subtaskCount: number;
   readonly completedSubtaskCount: number;
 }
@@ -171,6 +172,7 @@ export const ProjectTaskListItemSchema = Schema.Struct({
   estimate: Schema.NullOr(Schema.String),
   labelIds: Schema.Array(Schema.String),
   position: Schema.Number,
+  recurrence: Schema.NullOr(TaskRecurrenceInputSchema),
   startDate: Schema.NullOr(Schema.String),
   subtaskCount: Schema.Number,
 });

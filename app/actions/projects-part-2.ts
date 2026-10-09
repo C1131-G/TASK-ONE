@@ -1,9 +1,9 @@
 "use server";
 
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { revalidatePath } from "next/cache";
 
-import { AuthSessionLive } from "@/src/server/auth/session";
+import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
 import {
@@ -152,4 +152,28 @@ export async function saveProjectMilestonesAction(input: unknown) {
     revalidatePath(`/projects/${result.data.projectId}`);
   }
   return result;
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function listProjectMilestonesAction(input: unknown) {
+  return await runServerAction(
+    input,
+    Schema.Struct({ projectId: Schema.String.check(Schema.isUUID()) }),
+    (validated) =>
+      Effect.gen(function* listProjectMilestones() {
+        const requestHeaders = yield* requestHeadersOrFail;
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const projects = yield* ProjectManagement;
+        return yield* projects.listProjectMilestones(
+          actor.id,
+          validated.projectId
+        );
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(ProjectManagementLive)
+      ),
+    undefined,
+    ProjectMilestonesResultSchema
+  );
 }

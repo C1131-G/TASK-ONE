@@ -17,6 +17,58 @@ import {
   writeActivity,
 } from "./project-internal";
 
+export const listProjectMilestones = (
+  requesterId: string,
+  projectId: string
+): Effect.Effect<ProjectMilestonesResult, AppError> =>
+  Effect.tryPromise({
+    catch: mapError,
+    try: async () => {
+      const user = await db.orm.public.User.where({ id: requesterId })
+        .select("deactivatedAt", "mustChangePassword")
+        .first();
+      if (!user || user.deactivatedAt) {
+        throw new AppError({
+          code: "UNAUTHENTICATED",
+          message: "Sign in to continue.",
+        });
+      }
+      if (user.mustChangePassword) {
+        throw new AppError({
+          code: "FORBIDDEN",
+          message: "Change your password before continuing.",
+        });
+      }
+      const project = await db.orm.public.Project.where({
+        id: projectId,
+      }).first();
+      if (!project || project.archivedAt) {
+        throw new AppError({
+          code: "NOT_FOUND",
+          message: "The project was not found.",
+        });
+      }
+      const milestones = await db.orm.public.ProjectMilestone.where({
+        projectId,
+      })
+        .orderBy((milestone) => milestone.position.asc())
+        .all();
+      return {
+        milestones: milestones.map(
+          ({ completedAt, dueDate, id, name, position }) => ({
+            completed: completedAt !== null,
+            dueDate,
+            id,
+            name,
+            position,
+          })
+        ),
+        projectId,
+        version: project.version,
+      };
+    },
+  });
+
 const validateMilestones = (milestones: readonly ProjectMilestoneInput[]) => {
   if (milestones.length > 100) {
     throw new AppError({

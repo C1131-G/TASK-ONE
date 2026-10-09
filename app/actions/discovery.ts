@@ -151,7 +151,14 @@ export async function searchWorkspaceAction(input: unknown) {
         const sessions = yield* AuthSession;
         const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
         const discovery = yield* DiscoveryManagement;
-        return yield* discovery.searchWorkspace(user.id, validated.query);
+        const results = yield* discovery.searchWorkspace(
+          user.id,
+          validated.query
+        );
+        if (validated.query.trim()) {
+          yield* discovery.addRecentSearch(user.id, validated.query);
+        }
+        return results;
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(DiscoveryManagementLive)
