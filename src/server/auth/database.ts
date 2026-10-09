@@ -2,9 +2,9 @@ import "dotenv/config";
 import { Schema } from "effect";
 import { Pool } from "pg";
 
-const globalForDatabase = globalThis as typeof globalThis & {
-  authPool?: Pool;
-};
+declare global {
+  var authPool: Pool | undefined;
+}
 
 const databaseUrl = process.env["DATABASE_URL"];
 
@@ -24,7 +24,7 @@ const poolMax = Schema.decodeUnknownSync(poolMaxSchema)(
 );
 
 export const authPool =
-  globalForDatabase.authPool ??
+  globalThis.authPool ??
   new Pool({
     connectionString: databaseUrl,
     idleTimeoutMillis: 30_000,
@@ -32,5 +32,5 @@ export const authPool =
   });
 
 if (process.env["NODE_ENV"] !== "production") {
-  globalForDatabase.authPool = authPool;
+  globalThis.authPool = authPool;
 }

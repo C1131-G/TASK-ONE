@@ -16,9 +16,9 @@ if (!databaseUrl) {
 
 const client = postgres<Contract>({
   contractJson,
-  pg: authPool as unknown as NonNullable<
-    NonNullable<Parameters<typeof postgres<Contract>>[0]>["pg"]
-  >,
+  // Prisma bundles a second @types/pg copy; Pool is runtime-compatible but
+  // structurally incompatible because its transitive Node declarations differ.
+  pg: authPool as NonNullable<Parameters<typeof postgres<Contract>>[0]["pg"]>,
 });
 
 type TransactionContext = Parameters<
@@ -47,6 +47,7 @@ export const db = new Proxy(client, {
         );
       };
     }
-    return Reflect.get(target, property, receiver) as unknown;
+    const forwardedProperty: unknown = Reflect.get(target, property, receiver);
+    return forwardedProperty;
   },
 });

@@ -38,11 +38,12 @@ export type Persona =
   | "outsider"
   | "owner";
 
-export interface ActionResultLike {
-  readonly ok: boolean;
-  readonly data?: unknown;
-  readonly error?: { readonly code: string; readonly message: string };
-}
+export type ActionResultLike =
+  | { readonly ok: true; readonly data: unknown }
+  | {
+      readonly ok: false;
+      readonly error: { readonly code: string; readonly message: string };
+    };
 
 export type ActionFunction = (input: unknown) => Promise<ActionResultLike>;
 
@@ -66,7 +67,7 @@ export const EMAIL_DOMAIN = "action-harness.example";
 const personas = new Map<Persona, PersonaRecord>();
 let bootstrapAdminId = "";
 let keyCounter = 0;
-let signInCounter = 10;
+let signInCounter = Number.parseInt(randomUUID().slice(0, 8), 16) % 254;
 let originalCompanySettings: Record<string, unknown> | null = null;
 let startedAt = new Date();
 
@@ -122,7 +123,7 @@ export const createPersona = async (
     [email.toLowerCase()]
   );
   const userId: string = userRow.rows[0]?.id;
-  signInCounter += 1;
+  signInCounter = (signInCounter % 254) + 1;
   const signIn = await auth.handler(
     new Request("http://localhost:3000/api/auth/sign-in/email", {
       body: JSON.stringify({ email, password: created.temporaryPassword }),

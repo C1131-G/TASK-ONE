@@ -11,9 +11,9 @@ import {
 } from "../../src/server/core/idempotency";
 import {
   ProjectManagement,
-  ProjectManagementLive,
   ProjectSummarySchema,
-} from "../../src/server/projects/project-management";
+} from "../../src/server/projects/project-contracts";
+import { ProjectManagementLive } from "../../src/server/projects/project-management";
 
 const seedAdministrator = async (actorId: string): Promise<void> => {
   await authPool.query(

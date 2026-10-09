@@ -134,12 +134,12 @@ it("rolls back a command when its idempotency result cannot be serialized", asyn
             kind: "test.idempotency-rollback",
             payload: {},
           });
-          return { value: (() => "not-json") as unknown as string };
+          return { value: () => "not-json" };
         }),
       input: {},
       key: `rollback-${jobId}`,
       operation: "test.rollback",
-      resultSchema: Schema.Struct({ value: Schema.String }),
+      resultSchema: Schema.Struct({ value: Schema.Unknown }),
     });
   });
 

@@ -7,7 +7,8 @@ import {
 } from "../notifications/push";
 import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
-import { Uploads, UploadsLive } from "../storage/uploads";
+import { UploadsLive } from "../storage/uploads";
+import { Uploads } from "../storage/uploads-contracts";
 import { JobHandlers } from "./job-handlers";
 
 const EmptyPayloadSchema = Schema.Struct({});
