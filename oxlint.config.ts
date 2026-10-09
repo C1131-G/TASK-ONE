@@ -7,10 +7,25 @@ import react from "ultracite/oxlint/react";
 import shadcn from "ultracite/oxlint/shadcn";
 
 const jsPlugins = selectJsPlugins(["react-doctor"]);
+const generatedAndVendorPaths = [
+  ".agents/**",
+  ".claude/**",
+  ".cursor/**",
+  ".devin/**",
+  "migrations/**",
+  "src/prisma/contract.d.ts",
+  "src/prisma/contract.json",
+  "src/prisma/migration.json",
+  "src/prisma/ops.json",
+];
 
 export default defineConfig({
   extends: [core, react, next, nextJsPlugins, shadcn, jsPlugins],
-  ignorePatterns: [...(core.ignorePatterns ?? []), "components/ui/**"],
+  ignorePatterns: [
+    ...(core.ignorePatterns ?? []),
+    "components/ui/**",
+    ...generatedAndVendorPaths,
+  ],
   jsPlugins: [...jsPlugins.jsPlugins, ...shadcn.jsPlugins],
   rules: {
     complexity: ["warn", { max: 20 }],
