@@ -27,10 +27,10 @@ export interface SavedViewInput {
   readonly name: string;
   readonly type: SavedViewType;
   readonly projectId: string | null;
-  readonly filters: unknown;
-  readonly sort: unknown;
+  readonly filters: typeof Schema.Json.Type;
+  readonly sort: typeof Schema.Json.Type;
   readonly groupBy: string | null;
-  readonly hiddenColumns: unknown;
+  readonly hiddenColumns: typeof Schema.Json.Type;
   readonly isShared: boolean;
 }
 
@@ -43,14 +43,14 @@ export interface SavedViewSummary extends SavedViewInput {
 
 export const SavedViewSummarySchema = Schema.Struct({
   createdAt: Schema.String,
-  filters: Schema.Unknown,
+  filters: Schema.Json,
   groupBy: Schema.NullOr(Schema.String),
-  hiddenColumns: Schema.Unknown,
+  hiddenColumns: Schema.Json,
   id: Schema.String,
   isShared: Schema.Boolean,
   name: Schema.String,
   projectId: Schema.NullOr(Schema.String),
-  sort: Schema.Unknown,
+  sort: Schema.Json,
   type: SavedViewTypeSchema,
   updatedAt: Schema.String,
   userId: Schema.String,
@@ -167,14 +167,16 @@ const toSummary = (view: {
   readonly updatedAt: Date;
 }): SavedViewSummary => ({
   createdAt: view.createdAt.toISOString(),
-  filters: view.filters,
+  filters: Schema.decodeUnknownSync(SavedViewJsonSchema)(view.filters),
   groupBy: view.groupBy,
-  hiddenColumns: view.hiddenColumns,
+  hiddenColumns: Schema.decodeUnknownSync(SavedViewJsonSchema)(
+    view.hiddenColumns
+  ),
   id: view.id,
   isShared: view.isShared,
   name: view.name,
   projectId: view.projectId,
-  sort: view.sort,
+  sort: Schema.decodeUnknownSync(SavedViewJsonSchema)(view.sort),
   type: Schema.decodeUnknownSync(SavedViewTypeSchema)(view.type),
   updatedAt: view.updatedAt.toISOString(),
   userId: view.userId,

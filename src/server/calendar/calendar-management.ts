@@ -247,7 +247,10 @@ export const CalendarManagementLive = Layer.succeed(CalendarManagement, {
         const events = await db.orm.public.CalendarEvent.where((event) =>
           and(
             event.startsAt.lt(to),
-            or(event.endsAt.isNull(), event.endsAt.gte(from))
+            or(
+              event.startsAt.gte(from),
+              and(event.endsAt.isNotNull(), event.endsAt.gte(from))
+            )
           )
         )
           .orderBy((event) => event.startsAt.asc())

@@ -1,14 +1,34 @@
 import { expect, it } from "bun:test";
 import { randomUUID } from "node:crypto";
 
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 
 import { authPool } from "../../src/server/auth/database";
 import { runEffectResult } from "../../src/server/core/action-result";
 import {
   SavedViewManagement,
   SavedViewManagementLive,
+  SavedViewSummarySchema,
 } from "../../src/server/preferences/saved-view-management";
+
+it("rejects non-JSON values in saved-view output settings", () => {
+  expect(() =>
+    Schema.decodeUnknownSync(SavedViewSummarySchema)({
+      createdAt: new Date().toISOString(),
+      filters: { handler: () => false },
+      groupBy: null,
+      hiddenColumns: [],
+      id: randomUUID(),
+      isShared: false,
+      name: "Invalid saved view",
+      projectId: null,
+      sort: {},
+      type: "board",
+      updatedAt: new Date().toISOString(),
+      userId: randomUUID(),
+    })
+  ).toThrow();
+});
 
 it("shares admin views with employees while keeping personal views private", async () => {
   const administratorId = randomUUID();

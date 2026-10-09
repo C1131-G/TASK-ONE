@@ -3,6 +3,10 @@ import { randomUUID } from "node:crypto";
 
 import { Effect, Layer } from "effect";
 
+import {
+  ActivityManagement,
+  ActivityManagementLive,
+} from "../../src/server/activity/activity-management";
 import { authPool } from "../../src/server/auth/database";
 import {
   Collaboration,
@@ -53,10 +57,15 @@ it("creates a plain-text comment on a visible active task", async () => {
       );
       yield* collaboration.toggleReaction(actorId, comment.id, "👍");
       const comments = yield* collaboration.listComments(actorId, taskId);
-      return { comment, comments };
+      const activity = yield* ActivityManagement;
+      const feed = yield* activity.list(actorId, { taskId }, 10);
+      return { activity: feed, comment, comments };
     });
     const result = await Effect.runPromise(
-      Effect.provide(program, CollaborationLive)
+      Effect.provide(
+        program,
+        Layer.mergeAll(CollaborationLive, ActivityManagementLive)
+      )
     );
 
     expect(result.comment.taskId).toBe(taskId);
@@ -72,6 +81,14 @@ it("creates a plain-text comment on a visible active task", async () => {
         taskId,
       },
     ]);
+    expect(result.activity).toContainEqual(
+      expect.objectContaining({
+        action: "comment.created",
+        actorId,
+        actorName: "Comment Author",
+        taskId,
+      })
+    );
   } finally {
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       actorId,

@@ -47,8 +47,17 @@ it("lets admins manage calendar events and gives employees read access", async (
         startsAt: start,
         title: "Sprint review",
       });
+      const historical = yield* calendar.createEvent(adminId, {
+        attendeeIds: [],
+        description: null,
+        endsAt: null,
+        location: null,
+        projectId: null,
+        startsAt: new Date("2000-01-01T00:00:00.000Z"),
+        title: "Historical reminder",
+      });
       const events = yield* calendar.listEvents(employeeId, start, end);
-      return { event, events };
+      return { event, events, historicalId: historical.id };
     });
     const result = await Effect.runPromise(
       Effect.provide(create, CalendarManagementLive)
@@ -90,6 +99,7 @@ it("lets admins manage calendar events and gives employees read access", async (
     const deleteEvent = Effect.gen(function* deleteEvent() {
       const calendar = yield* CalendarManagement;
       yield* calendar.deleteEvent(adminId, result.event.id);
+      yield* calendar.deleteEvent(adminId, result.historicalId);
       return yield* calendar.listEvents(employeeId, start, end);
     });
     const eventsAfterDelete = await Effect.runPromise(
