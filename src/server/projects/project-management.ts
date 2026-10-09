@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema, ProjectKeySchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 
 export const DuplicateProjectInputSchema = Schema.Struct({
   key: ProjectKeySchema,
@@ -15,10 +16,15 @@ export const DuplicateProjectInputSchema = Schema.Struct({
 export type DuplicateProjectInput = typeof DuplicateProjectInputSchema.Type;
 
 export const CreateProjectInputSchema = Schema.Struct({
+  color: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   description: Schema.NullOr(Schema.String),
+  dueDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
+  icon: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   key: ProjectKeySchema,
   name: Schema.String,
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   status: Schema.Literals(["planning", "active", "risk", "hold", "complete"]),
+  teamId: Schema.optional(Schema.NullOr(Schema.String.check(Schema.isUUID()))),
   templateId: Schema.optional(
     Schema.Literals([
       "blank",
@@ -33,9 +39,17 @@ export const CreateProjectInputSchema = Schema.Struct({
 });
 export type CreateProjectInput = typeof CreateProjectInputSchema.Type;
 export const UpdateProjectInputSchema = Schema.Struct({
+  color: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   description: Schema.NullOr(Schema.String),
+  dueDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
+  icon: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   name: Schema.String,
+  position: Schema.optional(
+    Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0))
+  ),
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   status: Schema.Literals(["planning", "active", "risk", "hold", "complete"]),
+  teamId: Schema.optional(Schema.NullOr(Schema.String.check(Schema.isUUID()))),
 });
 export type UpdateProjectInput = typeof UpdateProjectInputSchema.Type;
 
@@ -49,11 +63,17 @@ const ProjectStatusSchema = Schema.Literals([
 
 export const ProjectSummarySchema = Schema.Struct({
   archivedAt: Schema.NullOr(Schema.String),
+  color: Schema.String,
   description: Schema.NullOr(Schema.String),
+  dueDate: Schema.NullOr(Schema.String),
+  icon: Schema.String,
   id: Schema.String,
   key: Schema.String,
   name: Schema.String,
+  position: Schema.Number,
+  startDate: Schema.NullOr(Schema.String),
   status: ProjectStatusSchema,
+  teamId: Schema.NullOr(Schema.String),
   version: Schema.Number,
 });
 
@@ -92,6 +112,12 @@ export interface ProjectSummary {
   readonly status: CreateProjectInput["status"];
   readonly version: number;
   readonly archivedAt: string | null;
+  readonly color: string;
+  readonly dueDate: string | null;
+  readonly icon: string;
+  readonly position: number;
+  readonly startDate: string | null;
+  readonly teamId: string | null;
 }
 export interface ProjectWithPeople extends ProjectSummary {
   readonly leadId: string | null;
@@ -172,7 +198,8 @@ export class ProjectManagement extends Context.Service<
       input: SetProjectPeopleInput
     ) => Effect.Effect<ProjectWithPeople, AppError>;
     readonly listProjects: (
-      requesterId: string
+      requesterId: string,
+      options?: { readonly includeArchived?: boolean }
     ) => Effect.Effect<readonly ProjectListItem[], AppError>;
     readonly saveProjectMilestones: (
       actorId: string,
@@ -238,15 +265,33 @@ const PROJECT_STARTER_TASKS = {
 const toSummary = (
   project: Pick<
     ProjectRecord,
-    "id" | "key" | "name" | "description" | "status" | "version" | "archivedAt"
+    | "id"
+    | "key"
+    | "name"
+    | "description"
+    | "status"
+    | "version"
+    | "archivedAt"
+    | "color"
+    | "dueDate"
+    | "icon"
+    | "position"
+    | "startDate"
+    | "teamId"
   >
 ): ProjectSummary => ({
   archivedAt: project.archivedAt?.toISOString() ?? null,
+  color: project.color,
   description: project.description,
+  dueDate: project.dueDate,
+  icon: project.icon,
   id: project.id,
   key: project.key,
   name: project.name,
+  position: project.position,
+  startDate: project.startDate,
   status: Schema.decodeUnknownSync(ProjectStatusSchema)(project.status),
+  teamId: project.teamId,
   version: project.version,
 });
 
@@ -254,12 +299,7 @@ const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "A project with that key already exists.",
@@ -297,6 +337,24 @@ const validateAdmin = async (
     throw new AppError({
       code: "FORBIDDEN",
       message: "An admin account with a changed password is required.",
+    });
+  }
+};
+
+const validateProjectTeam = async (
+  transaction: Transaction,
+  teamId: string | null | undefined
+): Promise<void> => {
+  if (!teamId) {
+    return;
+  }
+  const team = await transaction.orm.public.Team.where({ id: teamId })
+    .select("id")
+    .first();
+  if (!team) {
+    throw new AppError({
+      code: "VALIDATION_FAILED",
+      message: "Choose an existing team for the project.",
     });
   }
 };
@@ -360,24 +418,25 @@ const createProject = (
       const input = validateProjectInput(raw) as CreateProjectInput;
       return db.transaction(async (transaction) => {
         await validateAdmin(transaction, actorId);
+        await validateProjectTeam(transaction, input.teamId);
         const now = new Date();
         const id = randomUUID();
         const project = await transaction.orm.public.Project.create({
           archivedAt: null,
           archivedById: null,
-          color: "slate",
+          color: input.color ?? "slate",
           createdAt: now,
           description: input.description,
-          dueDate: null,
-          icon: "folder",
+          dueDate: input.dueDate ?? null,
+          icon: input.icon ?? "folder",
           id,
           key: input.key,
           leadId: null,
           name: input.name,
           position: 0,
-          startDate: null,
+          startDate: input.startDate ?? null,
           status: input.status,
-          teamId: null,
+          teamId: input.teamId ?? null,
           updatedAt: now,
           version: 1,
         });
@@ -652,6 +711,78 @@ const duplicateProject = (
     },
   });
 
+const validateProjectMutationState = (
+  operation: "update" | "archive" | "restore",
+  project: { readonly archivedAt: Date | null }
+): void => {
+  if (operation === "archive" && project.archivedAt) {
+    throw new AppError({
+      code: "CONFLICT",
+      message: "The project is already archived.",
+    });
+  }
+  if (operation === "restore" && !project.archivedAt) {
+    throw new AppError({
+      code: "CONFLICT",
+      message: "The project is already active.",
+    });
+  }
+  if (operation !== "restore" && project.archivedAt) {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "Archived projects are read only.",
+    });
+  }
+};
+
+const projectMutationAction = (
+  operation: "update" | "archive" | "restore"
+): string => {
+  switch (operation) {
+    case "update": {
+      return "project.updated";
+    }
+    case "archive": {
+      return "project.archived";
+    }
+    case "restore": {
+      return "project.restored";
+    }
+    default: {
+      throw new Error("Unsupported project operation.");
+    }
+  }
+};
+
+const projectMutationValues = (
+  operation: "update" | "archive" | "restore",
+  input: UpdateProjectInput | null,
+  actorId: string,
+  nextVersion: number
+) => {
+  if (operation === "update" && input) {
+    return {
+      description: input.description,
+      ...(input.color === undefined ? {} : { color: input.color }),
+      ...(input.dueDate === undefined ? {} : { dueDate: input.dueDate }),
+      ...(input.icon === undefined ? {} : { icon: input.icon }),
+      name: input.name,
+      ...(input.position === undefined ? {} : { position: input.position }),
+      ...(input.startDate === undefined ? {} : { startDate: input.startDate }),
+      status: input.status,
+      ...(input.teamId === undefined ? {} : { teamId: input.teamId }),
+      updatedAt: new Date(),
+      version: nextVersion,
+    };
+  }
+  return {
+    archivedAt: operation === "archive" ? new Date() : null,
+    archivedById: operation === "archive" ? actorId : null,
+    updatedAt: new Date(),
+    version: nextVersion,
+  };
+};
+
 const mutateProject = (
   actorId: string,
   projectId: string,
@@ -671,6 +802,9 @@ const mutateProject = (
           : null;
       return db.transaction(async (transaction) => {
         await validateAdmin(transaction, actorId);
+        if (input) {
+          await validateProjectTeam(transaction, input.teamId);
+        }
         const project = await transaction.orm.public.Project.where({
           id: projectId,
         }).first();
@@ -686,43 +820,13 @@ const mutateProject = (
             message: "The project changed. Refresh and try again.",
           });
         }
-        if (operation === "archive" && project.archivedAt) {
-          throw new AppError({
-            code: "CONFLICT",
-            message: "The project is already archived.",
-          });
-        }
-        if (operation === "restore" && !project.archivedAt) {
-          throw new AppError({
-            code: "CONFLICT",
-            message: "The project is already active.",
-          });
-        }
-        if (operation !== "restore" && project.archivedAt) {
-          throw new AppError({
-            code: "FORBIDDEN",
-            message: "Archived projects are read only.",
-          });
-        }
+        validateProjectMutationState(operation, project);
         const nextVersion = expectedVersion + 1;
         const updatedCount = await transaction.orm.public.Project.where({
           id: projectId,
           version: expectedVersion,
         }).updateAndCount(
-          operation === "update" && input
-            ? {
-                description: input.description,
-                name: input.name,
-                status: input.status,
-                updatedAt: new Date(),
-                version: nextVersion,
-              }
-            : {
-                archivedAt: operation === "archive" ? new Date() : null,
-                archivedById: operation === "archive" ? actorId : null,
-                updatedAt: new Date(),
-                version: nextVersion,
-              }
+          projectMutationValues(operation, input, actorId, nextVersion)
         );
         if (!updatedCount) {
           throw new AppError({
@@ -739,17 +843,15 @@ const mutateProject = (
             message: "The project was not found.",
           });
         }
-        let action: string;
-        if (operation === "update") {
-          action = "project.updated";
-        } else if (operation === "archive") {
-          action = "project.archived";
-        } else {
-          action = "project.restored";
-        }
-        await writeActivity(transaction, actorId, projectId, action, {
-          version: nextVersion,
-        });
+        await writeActivity(
+          transaction,
+          actorId,
+          projectId,
+          projectMutationAction(operation),
+          {
+            version: nextVersion,
+          }
+        );
         return toSummary(updated);
       });
     },
@@ -874,7 +976,8 @@ const setProjectPeople = (
   });
 
 const listProjects = (
-  requesterId: string
+  requesterId: string,
+  options: { readonly includeArchived?: boolean } = {}
 ): Effect.Effect<readonly ProjectListItem[], AppError> =>
   Effect.tryPromise({
     catch: mapError,
@@ -894,7 +997,9 @@ const listProjects = (
           message: "Change your password before continuing.",
         });
       }
-      const projects = await db.orm.public.Project.where({ archivedAt: null })
+      const projects = await db.orm.public.Project.where(
+        options.includeArchived ? {} : { archivedAt: null }
+      )
         .orderBy((project) => project.position.asc())
         .all();
       const projectIds = projects.map(({ id }) => id);

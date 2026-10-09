@@ -51,9 +51,13 @@ it("creates a project for an admin and rejects employee project creation", async
     const create = Effect.gen(function* createProject() {
       const projects = yield* ProjectManagement;
       return yield* projects.createProject(adminId, {
+        color: "violet",
         description: "Studio launch board",
+        dueDate: "2026-12-31",
+        icon: "rocket",
         key: projectKey,
         name: "Studio launch",
+        startDate: "2026-10-01",
         status: "active",
       });
     });
@@ -65,6 +69,10 @@ it("creates a project for an admin and rejects employee project creation", async
     expect(project.name).toBe("Studio launch");
     expect(project.status).toBe("active");
     expect(project.version).toBe(1);
+    expect(project.color).toBe("violet");
+    expect(project.icon).toBe("rocket");
+    expect(project.startDate).toBe("2026-10-01");
+    expect(project.dueDate).toBe("2026-12-31");
 
     const people = Effect.gen(function* setPeople() {
       const projects = yield* ProjectManagement;
@@ -90,9 +98,15 @@ it("creates a project for an admin and rejects employee project creation", async
     const update = Effect.gen(function* updateProject() {
       const projects = yield* ProjectManagement;
       return yield* projects.updateProject(adminId, project.id, 2, {
+        color: "emerald",
         description: "Updated studio launch board",
+        dueDate: null,
+        icon: "sparkles",
         name: "Studio launch v2",
+        position: 4,
+        startDate: "2026-10-15",
         status: "risk",
+        teamId: null,
       });
     });
     const updated = await Effect.runPromise(
@@ -112,6 +126,11 @@ it("creates a project for an admin and rejects employee project creation", async
 
     expect(updated.name).toBe("Studio launch v2");
     expect(updated.version).toBe(3);
+    expect(updated.color).toBe("emerald");
+    expect(updated.icon).toBe("sparkles");
+    expect(updated.position).toBe(4);
+    expect(updated.startDate).toBe("2026-10-15");
+    expect(updated.dueDate).toBeNull();
     expect(stale).toMatchObject({
       error: { code: "CONFLICT" },
       ok: false,
@@ -123,6 +142,21 @@ it("creates a project for an admin and rejects employee project creation", async
     });
     const archived = await Effect.runPromise(
       Effect.provide(archive, ProjectManagementLive)
+    );
+    const archivedProjectList = Effect.gen(function* listArchivedProjects() {
+      const projects = yield* ProjectManagement;
+      return yield* projects.listProjects(employeeId, {
+        includeArchived: true,
+      });
+    });
+    const archivedProjects = await Effect.runPromise(
+      Effect.provide(archivedProjectList, ProjectManagementLive)
+    );
+    expect(archivedProjects).toContainEqual(
+      expect.objectContaining({
+        archivedAt: expect.any(String),
+        id: project.id,
+      })
     );
     const restore = Effect.gen(function* restoreProject() {
       const projects = yield* ProjectManagement;
