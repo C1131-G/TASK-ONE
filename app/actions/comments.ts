@@ -21,11 +21,16 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 
 const runCollaborationAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
   Result,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never> =
+    typeof ServerActionOutputSchema,
 >(
   input: unknown,
   schema: InputSchema,
@@ -33,7 +38,7 @@ const runCollaborationAction = <
     actorId: string,
     validated: InputSchema["Type"]
   ) => Effect.Effect<Result, AppError, Collaboration | Idempotency>,
-  outputSchema?: Schema.Codec<unknown, unknown, never, never>
+  outputSchema: OutputSchema = ServerActionOutputSchema as unknown as OutputSchema
 ): Promise<ActionResult<Result>> =>
   runServerAction(
     input,
@@ -57,7 +62,7 @@ const runCollaborationAction = <
       }).pipe(Effect.provide(AuthSessionLive)),
     undefined,
     outputSchema
-  );
+  ) as Promise<ActionResult<Result>>;
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listTaskCommentsAction(input: unknown) {

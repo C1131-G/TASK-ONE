@@ -9,10 +9,14 @@ import { AppError } from "@/src/server/core/action-result";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
 import {
+  CalendarDateSchema,
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   CreateProjectInputSchema,
   DuplicateProjectInputSchema,
@@ -26,12 +30,20 @@ import {
 } from "@/src/server/projects/project-management";
 
 const UpdateProjectActionInputSchema = Schema.Struct({
+  color: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   description: Schema.NullOr(Schema.String),
+  dueDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   expectedVersion: Schema.Number,
+  icon: Schema.optional(Schema.String.check(Schema.isMaxLength(40))),
   idempotencyKey: IdempotencyKeySchema,
   name: Schema.String,
+  position: Schema.optional(
+    Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0))
+  ),
   projectId: UUIDSchema,
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   status: Schema.Literals(["planning", "active", "risk", "hold", "complete"]),
+  teamId: Schema.optional(Schema.NullOr(UUIDSchema)),
 });
 
 const VersionedProjectActionInputSchema = Schema.Struct({
@@ -77,14 +89,16 @@ const requestHeadersOrFail = Effect.tryPromise({
 export async function listProjectsAction(input: unknown) {
   return await runServerAction(
     input,
-    Schema.Struct({}),
-    () =>
+    Schema.Struct({ includeArchived: Schema.optional(Schema.Boolean) }),
+    (validated) =>
       Effect.gen(function* listProjects() {
         const requestHeaders = yield* requestHeadersOrFail;
         const sessions = yield* AuthSession;
         const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
         const projects = yield* ProjectManagement;
-        return yield* projects.listProjects(actor.id);
+        return yield* projects.listProjects(actor.id, {
+          includeArchived: validated.includeArchived ?? false,
+        });
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive)
@@ -118,7 +132,9 @@ export async function createProjectAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (result.ok) {
@@ -156,7 +172,9 @@ export async function duplicateProjectAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");
@@ -199,7 +217,9 @@ export async function updateProjectAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");
@@ -237,7 +257,9 @@ export async function archiveProjectAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");
@@ -275,7 +297,9 @@ export async function restoreProjectAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");
@@ -317,7 +341,9 @@ export async function setProjectPeopleAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");
@@ -356,7 +382,9 @@ export async function saveProjectMilestonesAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(ProjectManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/projects");

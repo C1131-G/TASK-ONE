@@ -6,7 +6,10 @@ import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { AppError } from "@/src/server/core/action-result";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
 import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   PersonalPreferenceSchema,
   PersonalPreferences,
@@ -74,7 +77,9 @@ export async function savePersonalPreferencesAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(PersonalPreferencesLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   return result;
 }

@@ -11,7 +11,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   DiscoveryManagement,
   DiscoveryManagementLive,
@@ -79,7 +82,9 @@ export async function toggleProjectFavoriteAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(DiscoveryManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
@@ -116,7 +121,9 @@ export async function toggleTaskFavoriteAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(DiscoveryManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");

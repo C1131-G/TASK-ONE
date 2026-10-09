@@ -461,8 +461,16 @@ it("replays every subtask and comment mutation", async () => {
       title: "Replay subtask two",
     }
   );
-  await replay("promoteSubtaskAction", "owner", subtasks.promoteSubtaskAction, {
+  const reordered = await replay<{
+    parentVersion: number;
+    subtasks: readonly { id: string }[];
+  }>("reorderSubtasksAction", "owner", subtasks.reorderSubtasksAction, {
     expectedTaskVersion: second.parentVersion,
+    subtaskIds: [second.subtask.id, first.subtask.id],
+    taskId: state.taskId,
+  });
+  await replay("promoteSubtaskAction", "owner", subtasks.promoteSubtaskAction, {
+    expectedTaskVersion: reordered.parentVersion,
     subtaskId: second.subtask.id,
   });
   await replay("removeSubtaskAction", "owner", subtasks.removeSubtaskAction, {

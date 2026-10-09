@@ -17,7 +17,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   TeamManagement,
   TeamManagementLive,
@@ -102,7 +105,9 @@ export async function createTeamAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(TeamManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/settings/teams");
@@ -142,7 +147,9 @@ export async function updateTeamAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(TeamManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/settings/teams");
@@ -179,7 +186,9 @@ export async function deleteTeamAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(TeamManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/settings/teams");

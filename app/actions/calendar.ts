@@ -21,7 +21,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 
 const InputSchema = Schema.Struct({
   attendeeIds: Schema.Array(UUIDSchema),
@@ -97,7 +100,9 @@ export async function createCalendarEventAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(CalendarManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/calendar");
@@ -143,7 +148,9 @@ export async function updateCalendarEventAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(CalendarManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/calendar");
@@ -182,7 +189,9 @@ export async function deleteCalendarEventAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(CalendarManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/calendar");

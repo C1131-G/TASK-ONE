@@ -5,6 +5,11 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "./action-result";
+import {
+  IdempotencyResponseStore,
+  IdempotencyResponseStoreLive,
+} from "./idempotency-response-store";
+import { isUniqueConstraintViolation } from "./prisma-errors";
 
 const KEY_SCHEMA = Schema.String.check(
   Schema.isMinLength(8),
@@ -42,12 +47,7 @@ const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "This request is already being processed.",
@@ -64,8 +64,11 @@ const hashRequest = (operation: string, input: unknown): string =>
     .update(JSON.stringify({ input, operation }))
     .digest("hex");
 
-const run = <ResultSchema extends Schema.Codec<unknown, unknown, never, never>>(
-  input: IdempotencyRunInput<ResultSchema>
+const runInTransaction = <
+  ResultSchema extends Schema.Codec<unknown, unknown, never, never>,
+>(
+  input: IdempotencyRunInput<ResultSchema>,
+  responseStore: IdempotencyResponseStore["Service"]
 ): Effect.Effect<ResultSchema["Type"], AppError> =>
   Effect.gen(function* executeIdempotently() {
     const key = yield* Effect.try({
@@ -165,21 +168,7 @@ const run = <ResultSchema extends Schema.Codec<unknown, unknown, never, never>>(
           Schema.encodeUnknownSync(input.resultSchema)(result)
         ),
     });
-    yield* Effect.tryPromise({
-      catch: mapError,
-      try: async () => {
-        const updated = await db.orm.public.IdempotencyKey.where({
-          id: reservation.record.id,
-          requestHash,
-        }).updateAndCount({ response });
-        if (!updated) {
-          throw new AppError({
-            code: "CONFLICT",
-            message: "The request reservation changed before it completed.",
-          });
-        }
-      },
-    });
+    yield* responseStore.persist(reservation.record.id, requestHash, response);
     // Return what a replay would return, so a client never sees a different
     // shape on the first call than on a retry.
     return yield* Effect.try({
@@ -192,7 +181,27 @@ const run = <ResultSchema extends Schema.Codec<unknown, unknown, never, never>>(
     });
   });
 
-export const IdempotencyLive = Layer.succeed(
+const makeRun =
+  (responseStore: IdempotencyResponseStore["Service"]) =>
+  <ResultSchema extends Schema.Codec<unknown, unknown, never, never>>(
+    input: IdempotencyRunInput<ResultSchema>
+  ): Effect.Effect<ResultSchema["Type"], AppError> =>
+    Effect.tryPromise({
+      catch: mapError,
+      try: () =>
+        db.transaction(() =>
+          Effect.runPromise(runInTransaction(input, responseStore))
+        ),
+    });
+
+export const IdempotencyServiceLive = Layer.effect(
   Idempotency,
-  Idempotency.of({ run })
+  Effect.map(Effect.service(IdempotencyResponseStore), (responseStore) =>
+    Idempotency.of({ run: makeRun(responseStore) })
+  )
+);
+
+export const IdempotencyLive = Layer.provide(
+  IdempotencyServiceLive,
+  IdempotencyResponseStoreLive
 );

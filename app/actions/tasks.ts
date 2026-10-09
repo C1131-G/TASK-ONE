@@ -17,7 +17,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   TaskOrdering,
   TaskOrderingLive,
@@ -57,13 +60,18 @@ const CreateTaskActionInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(UUIDSchema),
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(CalendarDateSchema),
+  estimate: Schema.optional(
+    Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))
+  ),
   idempotencyKey: IdempotencyKeySchema,
   priority: TaskPriorityInputSchema,
   projectId: UUIDSchema,
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   title: Schema.String,
 });
 
 const ListProjectTasksInputSchema = Schema.Struct({
+  includeArchived: Schema.optional(Schema.Boolean),
   limit: Schema.Number.check(
     Schema.isInt(),
     Schema.isGreaterThanOrEqualTo(1),
@@ -94,11 +102,11 @@ export async function listProjectTasksAction(input: unknown) {
           yield* requestHeadersOrFail
         );
         const work = yield* WorkManagement;
-        return yield* work.listProjectTasks(
-          actor.id,
-          validated.projectId,
-          validated
-        );
+        return yield* work.listProjectTasks(actor.id, validated.projectId, {
+          includeArchived: validated.includeArchived ?? false,
+          limit: validated.limit,
+          offset: validated.offset,
+        });
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive)
@@ -134,7 +142,9 @@ export async function createTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (result.ok) {
@@ -152,9 +162,13 @@ export async function updateTaskAction(input: unknown) {
       assigneeIds: Schema.Array(UUIDSchema),
       description: Schema.NullOr(Schema.String),
       dueDate: Schema.NullOr(CalendarDateSchema),
+      estimate: Schema.optional(
+        Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))
+      ),
       expectedVersion: Schema.Number,
       idempotencyKey: IdempotencyKeySchema,
       priority: TaskPriorityInputSchema,
+      startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
       status: TaskStatusInputSchema,
       taskId: UUIDSchema,
       title: Schema.String,
@@ -186,7 +200,9 @@ export async function updateTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath(`/projects/${result.data.projectId}`);
@@ -238,7 +254,9 @@ export async function changeTaskColumnAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath(`/projects/${result.data.projectId}`);
@@ -290,7 +308,9 @@ export async function setTaskRecurrenceAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -339,7 +359,9 @@ export async function moveTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath(`/projects/${result.data.projectId}`);
@@ -385,7 +407,9 @@ export async function duplicateTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath(`/projects/${result.data.projectId}`);
@@ -429,7 +453,9 @@ export async function archiveTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -473,7 +499,9 @@ export async function restoreTaskAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -511,7 +539,9 @@ export async function undoTaskArchiveAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -551,7 +581,9 @@ export async function undoTaskCompletionAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -604,7 +636,9 @@ export async function bulkUpdateTasksAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -658,7 +692,9 @@ export async function setTaskRelationsAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(TaskRelationsLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");
@@ -701,7 +737,9 @@ export async function reorderTasksAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(TaskOrderingLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/tasks");

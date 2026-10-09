@@ -12,14 +12,47 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   CreatedSubtaskSchema,
   RemovedSubtaskSchema,
+  ReorderedSubtasksSchema,
+  SubtaskEntrySchema,
   SubtaskManagement,
   SubtaskManagementLive,
 } from "@/src/server/tasks/subtask-management";
 import { CreatedTaskSchema } from "@/src/server/work/work-management";
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function listTaskSubtasksAction(input: unknown) {
+  return await runServerAction(
+    input,
+    Schema.Struct({ taskId: UUIDSchema }),
+    (validated) =>
+      Effect.gen(function* listTaskSubtasks() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const subtasks = yield* SubtaskManagement;
+        return yield* subtasks.listSubtasks(user.id, validated.taskId);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(SubtaskManagementLive)
+      ),
+    undefined,
+    Schema.Array(SubtaskEntrySchema)
+  );
+}
 
 const runSubtaskAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
@@ -32,23 +65,28 @@ const runSubtaskAction = <
     validated: InputSchema["Type"]
   ) => Effect.Effect<Result, AppError, SubtaskManagement | Idempotency>
 ) =>
-  runServerAction(input, schema, (validated) =>
-    Effect.gen(function* authorizeSubtaskAction() {
-      const requestHeaders = yield* Effect.tryPromise({
-        catch: () =>
-          new AppError({
-            code: "UNAVAILABLE",
-            message: "The request could not be completed.",
-          }),
-        try: () => headers(),
-      });
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      return yield* execute(user.id, validated).pipe(
-        Effect.provide(SubtaskManagementLive),
-        Effect.provide(IdempotencyLive)
-      );
-    }).pipe(Effect.provide(AuthSessionLive))
+  runServerAction(
+    input,
+    schema,
+    (validated) =>
+      Effect.gen(function* authorizeSubtaskAction() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        return yield* execute(user.id, validated).pipe(
+          Effect.provide(SubtaskManagementLive),
+          Effect.provide(IdempotencyLive)
+        );
+      }).pipe(Effect.provide(AuthSessionLive)),
+    undefined,
+    ServerActionOutputSchema
   );
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -92,6 +130,43 @@ export async function createSubtaskAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePath(`/tasks/${result.data.subtask.taskId}`);
+    revalidatePath("/tasks");
+  }
+  return result;
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function reorderSubtasksAction(input: unknown) {
+  const result = await runSubtaskAction(
+    input,
+    Schema.Struct({
+      expectedTaskVersion: Schema.Number,
+      idempotencyKey: IdempotencyKeySchema,
+      subtaskIds: Schema.Array(UUIDSchema).check(Schema.isMaxLength(100)),
+      taskId: UUIDSchema,
+    }),
+    (userId, validated) =>
+      Effect.gen(function* reorderSubtasks() {
+        const subtasks = yield* SubtaskManagement;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...reorderInput } = validated;
+        return yield* idempotency.run({
+          actorId: userId,
+          execute: () =>
+            subtasks.reorderSubtasks(
+              userId,
+              reorderInput.taskId,
+              reorderInput.expectedTaskVersion,
+              reorderInput.subtaskIds
+            ),
+          input: reorderInput,
+          key: idempotencyKey,
+          operation: "subtask.reorder",
+          resultSchema: ReorderedSubtasksSchema,
+        });
+      })
+  );
+  if (result.ok) {
     revalidatePath("/tasks");
   }
   return result;

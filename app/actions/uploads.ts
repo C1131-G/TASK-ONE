@@ -17,7 +17,10 @@ import {
   MimeTypeSchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import { StorageLive } from "@/src/server/storage/storage";
 import {
   AvatarUploadResultSchema,
@@ -33,6 +36,8 @@ import {
 const runUploadAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
   Result,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never> =
+    typeof ServerActionOutputSchema,
 >(
   input: unknown,
   schema: InputSchema,
@@ -40,7 +45,7 @@ const runUploadAction = <
     userId: string,
     validated: InputSchema["Type"]
   ) => Effect.Effect<Result, AppError, Uploads | Idempotency>,
-  outputSchema?: Schema.Codec<unknown, unknown, never, never>
+  outputSchema: OutputSchema = ServerActionOutputSchema as unknown as OutputSchema
 ): Promise<ActionResult<Result>> =>
   runServerAction(
     input,
@@ -64,7 +69,7 @@ const runUploadAction = <
       }).pipe(Effect.provide(AuthSessionLive)),
     undefined,
     outputSchema
-  );
+  ) as Promise<ActionResult<Result>>;
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function requestTaskUploadAction(input: unknown) {

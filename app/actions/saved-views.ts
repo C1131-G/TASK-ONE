@@ -15,7 +15,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   SavedViewManagement,
   SavedViewManagementLive,
@@ -92,7 +95,9 @@ export async function createSavedViewAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(SavedViewManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
@@ -131,7 +136,9 @@ export async function updateSavedViewAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(SavedViewManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
@@ -171,7 +178,9 @@ export async function deleteSavedViewAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(SavedViewManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");

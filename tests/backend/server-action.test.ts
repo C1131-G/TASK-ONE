@@ -2,7 +2,10 @@ import { expect, it } from "bun:test";
 
 import { Effect, Schema } from "effect";
 
-import { runServerAction } from "../../src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "../../src/server/core/server-action";
 
 it("validates untrusted input before running a Server Action", async () => {
   let operationWasRun = false;
@@ -13,7 +16,8 @@ it("validates untrusted input before running a Server Action", async () => {
       operationWasRun = true;
       return Effect.succeed("created");
     },
-    "req-invalid-action"
+    "req-invalid-action",
+    ServerActionOutputSchema
   );
 
   expect(result).toEqual({
@@ -32,7 +36,8 @@ it("rejects Server Action results that cannot be serialized safely", async () =>
     {},
     Schema.Struct({}),
     () => Effect.succeed(() => "not serializable"),
-    "req-invalid-output"
+    "req-invalid-output",
+    ServerActionOutputSchema
   );
 
   expect(result).toEqual({
@@ -51,7 +56,8 @@ it("preserves supported Date values in Server Action results", async () => {
     {},
     Schema.Struct({}),
     () => Effect.succeed({ createdAt: timestamp }),
-    "req-date-output"
+    "req-date-output",
+    ServerActionOutputSchema
   );
 
   expect(result).toEqual({
@@ -80,12 +86,29 @@ it("rejects Server Action results that do not match their output schema", async 
   });
 });
 
+it("returns only the validated output projection", async () => {
+  const result = await runServerAction(
+    {},
+    Schema.Struct({}),
+    () => Effect.succeed({ id: "visible", secret: () => "not serializable" }),
+    "req-output-projection",
+    Schema.Struct({ id: Schema.String })
+  );
+
+  expect(result).toEqual({
+    data: { id: "visible" },
+    ok: true,
+    requestId: "req-output-projection",
+  });
+});
+
 it("rejects values outside the serializable Server Action output contract", async () => {
   const result = await runServerAction(
     {},
     Schema.Struct({}),
     () => Effect.succeed({ invalid: () => "not serializable" }),
-    "req-nonserializable-output"
+    "req-nonserializable-output",
+    ServerActionOutputSchema
   );
 
   expect(result).toEqual({

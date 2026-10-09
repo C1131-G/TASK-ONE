@@ -17,7 +17,10 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   CreatedEmployeeSchema,
   CreateEmployeeInputSchema,
@@ -133,7 +136,9 @@ export async function deactivateEmployeeAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (action.ok) {
@@ -179,7 +184,9 @@ export async function reactivateEmployeeAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (action.ok) {
@@ -230,7 +237,9 @@ export async function changeEmployeeRoleAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (action.ok) {
@@ -325,7 +334,9 @@ export async function updateEmployeeDetailsAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   if (action.ok) {
@@ -369,7 +380,9 @@ export async function updateOwnProfileAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (action.ok) {
     revalidatePath("/settings/profile");

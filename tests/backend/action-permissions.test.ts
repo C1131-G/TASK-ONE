@@ -15,6 +15,7 @@ import type {
 } from "./support/action-harness";
 
 const calendar = await import("../../app/actions/calendar");
+const activity = await import("../../app/actions/activity");
 const comments = await import("../../app/actions/comments");
 const companySettings = await import("../../app/actions/company-settings");
 const dashboard = await import("../../app/actions/dashboard");
@@ -31,6 +32,7 @@ const savedViews = await import("../../app/actions/saved-views");
 const sessions = await import("../../app/actions/sessions");
 const subtasks = await import("../../app/actions/subtasks");
 const tasks = await import("../../app/actions/tasks");
+const taskCalendar = await import("../../app/actions/task-calendar");
 const teams = await import("../../app/actions/teams");
 const uploads = await import("../../app/actions/uploads");
 
@@ -95,6 +97,19 @@ const taskBody = () => ({
 });
 
 const allActions: readonly ActionEntry[] = [
+  entry("listTaskCalendarAction", taskCalendar.listTaskCalendarAction, () => ({
+    from: "2026-10-01",
+    groupBy: "status",
+    limit: 100,
+    priorities: [],
+    sortBy: "dueDate",
+    sortDirection: "asc",
+    statuses: [],
+    to: "2026-12-31",
+  })),
+  entry("listActivityAction", activity.listActivityAction, () => ({
+    taskId: ids.taskId,
+  })),
   entry("listCalendarEventsAction", calendar.listCalendarEventsAction, () => ({
     from: "2026-01-01T00:00:00.000Z",
     to: "2026-02-01T00:00:00.000Z",
@@ -251,6 +266,11 @@ const allActions: readonly ActionEntry[] = [
     labelId: ids.random,
   })),
   entry(
+    "listNotificationInboxAction",
+    notifications.listNotificationInboxAction,
+    () => ({ limit: 10, unreadOnly: false })
+  ),
+  entry(
     "markNotificationReadAction",
     notifications.markNotificationReadAction,
     () => ({
@@ -392,6 +412,15 @@ const allActions: readonly ActionEntry[] = [
     () => ({ sessionId: "not-a-real-session" }),
     true
   ),
+  entry("listTaskSubtasksAction", subtasks.listTaskSubtasksAction, () => ({
+    taskId: ids.taskId,
+  })),
+  entry("reorderSubtasksAction", subtasks.reorderSubtasksAction, () => ({
+    expectedTaskVersion: 1,
+    idempotencyKey: nextKey(),
+    subtaskIds: [],
+    taskId: ids.taskId,
+  })),
   entry("createSubtaskAction", subtasks.createSubtaskAction, () => ({
     ...subtaskBody(),
     taskId: ids.taskId,

@@ -14,7 +14,10 @@ import {
   IdempotencyLive,
 } from "@/src/server/core/idempotency";
 import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   PushNotifications,
   PushNotificationsLive,
@@ -23,7 +26,43 @@ import { PushTransportLive } from "@/src/server/notifications/push-transport";
 import {
   Notifications,
   NotificationsLive,
+  InboxSchema,
 } from "@/src/server/notifications/service";
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function listNotificationInboxAction(input: unknown) {
+  return await runServerAction(
+    input,
+    Schema.Struct({
+      limit: Schema.Number.check(
+        Schema.isInt(),
+        Schema.isGreaterThanOrEqualTo(1),
+        Schema.isLessThanOrEqualTo(100)
+      ),
+      unreadOnly: Schema.Boolean,
+    }),
+    (validated) =>
+      Effect.gen(function* listNotificationInbox() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const notifications = yield* Notifications;
+        return yield* notifications.listInbox(user.id, validated);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(NotificationsLive)
+      ),
+    undefined,
+    InboxSchema
+  );
+}
 
 const runNotificationAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
@@ -36,23 +75,28 @@ const runNotificationAction = <
     validated: InputSchema["Type"]
   ) => Effect.Effect<Result, AppError, Notifications | Idempotency>
 ): Promise<ActionResult<Result>> =>
-  runServerAction(input, schema, (validated) =>
-    Effect.gen(function* authorizeNotificationAction() {
-      const requestHeaders = yield* Effect.tryPromise({
-        catch: () =>
-          new AppError({
-            code: "UNAVAILABLE",
-            message: "The request could not be completed.",
-          }),
-        try: () => headers(),
-      });
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      return yield* execute(user.id, validated).pipe(
-        Effect.provide(NotificationsLive),
-        Effect.provide(IdempotencyLive)
-      );
-    }).pipe(Effect.provide(AuthSessionLive))
+  runServerAction(
+    input,
+    schema,
+    (validated) =>
+      Effect.gen(function* authorizeNotificationAction() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        return yield* execute(user.id, validated).pipe(
+          Effect.provide(NotificationsLive),
+          Effect.provide(IdempotencyLive)
+        );
+      }).pipe(Effect.provide(AuthSessionLive)),
+    undefined,
+    ServerActionOutputSchema
   );
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -203,7 +247,9 @@ export async function registerPushSubscriptionAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(Layer.provide(PushNotificationsLive, PushTransportLive)),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/settings/notifications");
@@ -248,7 +294,9 @@ export async function removePushSubscriptionAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(Layer.provide(PushNotificationsLive, PushTransportLive)),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/settings/notifications");

@@ -16,7 +16,10 @@ import {
   LabelColorSchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import {
   LabelManagement,
   LabelManagementLive,
@@ -89,7 +92,9 @@ export async function createLabelAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(LabelManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
@@ -126,7 +131,9 @@ export async function updateLabelAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(LabelManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
@@ -164,7 +171,9 @@ export async function removeLabelAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(LabelManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");

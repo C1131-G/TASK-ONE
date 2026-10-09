@@ -1,6 +1,7 @@
 import { Effect, Schema } from "effect";
 
 import { AppError, runEffectResult } from "./action-result";
+import type { ActionResult } from "./action-result";
 
 const ServerActionOutputTreeSchema = Schema.Tree(
   Schema.Union([
@@ -12,22 +13,32 @@ const ServerActionOutputTreeSchema = Schema.Tree(
     Schema.Date,
   ])
 );
-const ServerActionOutputSchema = Schema.UndefinedOr(
+export const ServerActionOutputSchema = Schema.UndefinedOr(
   ServerActionOutputTreeSchema
 );
+
+type ValidatedActionOutput<
+  Result,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never>,
+> = OutputSchema extends typeof ServerActionOutputSchema
+  ? Result
+  : OutputSchema["Type"];
 
 export const runServerAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
   Result,
   ErrorType,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never>,
 >(
   input: unknown,
   schema: InputSchema,
   execute: (validated: InputSchema["Type"]) => Effect.Effect<Result, ErrorType>,
-  requestId?: string,
-  outputSchema?: Schema.Codec<unknown, unknown, never, never>
-) => {
-  const program = Schema.decodeUnknownEffect(schema)(input).pipe(
+  requestId: string | undefined,
+  outputSchema: OutputSchema
+): Promise<ActionResult<ValidatedActionOutput<Result, OutputSchema>>> => {
+  const program: Effect.Effect<unknown, unknown> = Schema.decodeUnknownEffect(
+    schema
+  )(input).pipe(
     Effect.mapError(
       () =>
         new AppError({
@@ -36,21 +47,22 @@ export const runServerAction = <
         })
     ),
     Effect.flatMap(execute),
-    Effect.flatMap((result) =>
-      Schema.decodeUnknownEffect(outputSchema ?? ServerActionOutputSchema)(
-        result
-      ).pipe(
+    Effect.flatMap((result): Effect.Effect<unknown, AppError> => {
+      const validateOutput: Effect.Effect<unknown, unknown> =
+        Schema.decodeUnknownEffect(Schema.toType(outputSchema))(result);
+      return validateOutput.pipe(
         Effect.mapError(
           () =>
             new AppError({
               code: "UNAVAILABLE",
               message: "The request could not be completed.",
             })
-        ),
-        Effect.as(result)
-      )
-    )
+        )
+      );
+    })
   );
 
-  return runEffectResult(program, requestId);
+  return runEffectResult(program, requestId) as Promise<
+    ActionResult<ValidatedActionOutput<Result, OutputSchema>>
+  >;
 };

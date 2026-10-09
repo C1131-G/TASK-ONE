@@ -14,7 +14,10 @@ import {
 import { AppError } from "@/src/server/core/action-result";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
 import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 
 const requestHeaders = () =>
   Effect.tryPromise({
@@ -73,7 +76,9 @@ export async function updateCompanySettingsAction(input: unknown) {
         Effect.provide(AuthSessionLive),
         Effect.provide(CompanySettingsManagementLive),
         Effect.provide(IdempotencyLive)
-      )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
   if (result.ok) {
     revalidatePath("/");
