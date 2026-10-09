@@ -1,0 +1,14 @@
+// use prisma-8
+
+model CalendarEventAttendee {
+  eventId   Uuid
+  userId    String
+  createdAt TimestamptzJsDate @default(now())
+
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([eventId, userId])
+  @@index([userId])
+  @@map("calendar_event_attendee")
+}

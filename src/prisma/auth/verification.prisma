@@ -1,0 +1,13 @@
+// use prisma-8
+
+model Verification {
+  id         String @id
+  identifier String
+  value      String
+  expiresAt  TimestamptzJsDate
+  createdAt  TimestamptzJsDate? @default(now())
+  updatedAt  TimestamptzJsDate? @default(now())
+
+  @@index([identifier])
+  @@map("verification")
+}

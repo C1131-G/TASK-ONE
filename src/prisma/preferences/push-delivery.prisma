@@ -1,0 +1,16 @@
+// use prisma-8
+
+model PushDelivery {
+  id             Uuid @id @default(uuid())
+  notificationId Uuid
+  userId         String
+  endpointHash   String
+  deliveredAt    TimestamptzJsDate @default(now())
+  createdAt      TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([notificationId, userId, endpointHash])
+  @@index([userId, deliveredAt])
+  @@map("push_delivery")
+}

@@ -1,0 +1,16 @@
+// use prisma-8
+
+model PushSubscription {
+  id Uuid @id @default(uuid())
+  userId String
+  endpoint String @unique
+  keys Json
+  userAgent String?
+  createdAt TimestamptzJsDate @default(now())
+  updatedAt TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscription")
+}

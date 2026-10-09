@@ -1,0 +1,29 @@
+// use prisma-8
+
+model FileAsset {
+  id           Uuid @id @default(uuid())
+  projectId    Uuid
+  taskId       Uuid?
+  uploadedById String
+  originalName String
+  storageKey   String @unique
+  contentType  String?
+  sizeBytes    BigInt
+  copyState    String @default("ready")
+  copyError    String?
+  createdAt    TimestamptzJsDate @default(now())
+  deletedAt    TimestamptzJsDate?
+  deletedById  String?
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  task       Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  uploadedBy User    @relation("FileUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+  deletedBy  User?   @relation("FileDeletedBy", fields: [deletedById], references: [id], onDelete: Restrict)
+
+  @@index([projectId, createdAt])
+  @@index([taskId])
+  @@index([uploadedById])
+  @@check(expression: "\"sizeBytes\" >= 0", name: "file_asset_size_nonnegative")
+  @@check(expression: "\"copyState\" IN ('pending', 'ready', 'failed')", name: "file_asset_copy_state_valid")
+  @@map("file_asset")
+}

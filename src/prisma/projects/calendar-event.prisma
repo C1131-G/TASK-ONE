@@ -1,0 +1,22 @@
+// use prisma-8
+
+model CalendarEvent {
+  id          Uuid @id @default(uuid())
+  projectId   Uuid?
+  createdById String
+  title       String
+  description String?
+  startsAt    TimestamptzJsDate
+  endsAt      TimestamptzJsDate?
+  location    String?
+  createdAt   TimestamptzJsDate @default(now())
+  updatedAt   TimestamptzJsDate @default(now())
+
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([startsAt])
+  @@index([projectId, startsAt])
+  @@check(expression: "\"endsAt\" IS NULL OR \"endsAt\" >= \"startsAt\"", name: "calendar_event_end_after_start")
+  @@map("calendar_event")
+}

@@ -1,0 +1,13 @@
+// use prisma-8
+
+model RecentSearch {
+  id        Uuid @id @default(uuid())
+  userId    String
+  query     String
+  searchedAt TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, searchedAt])
+  @@map("recent_search")
+}

@@ -1,0 +1,195 @@
+[
+  {
+    "id": "table.push_delivery",
+    "label": "Create table \"push_delivery\"",
+    "summary": "Creates table \"push_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"push_delivery\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"push_delivery\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"push_delivery\"",
+        "sql": "CREATE TABLE \"public\".\"push_delivery\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deliveredAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"endpointHash\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"notificationId\" uuid NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"push_delivery\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"push_delivery\""]
+      }
+    ]
+  },
+  {
+    "id": "unique.push_delivery.push_delivery_notificationId_userId_endpointHash_key",
+    "label": "Add unique constraint on \"push_delivery\" (notificationId, userId, endpointHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "push_delivery_notificationId_userId_endpointHash_key",
+        "table": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"push_delivery_notificationId_userId_endpointHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_delivery_notificationId_userId_endpointHash_key",
+          "public",
+          "\"public\".\"push_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"push_delivery_notificationId_userId_endpointHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"push_delivery\" ADD CONSTRAINT \"push_delivery_notificationId_userId_endpointHash_key\" UNIQUE (\"notificationId\", \"userId\", \"endpointHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"push_delivery_notificationId_userId_endpointHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_delivery_notificationId_userId_endpointHash_key",
+          "public",
+          "\"public\".\"push_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.push_delivery.push_delivery_userId_deliveredAt_idx_c60c106a",
+    "label": "Create index \"push_delivery_userId_deliveredAt_idx_c60c106a\" on \"push_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "push_delivery_userId_deliveredAt_idx_c60c106a",
+        "table": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"push_delivery_userId_deliveredAt_idx_c60c106a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"push_delivery_userId_deliveredAt_idx_c60c106a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"push_delivery_userId_deliveredAt_idx_c60c106a\"",
+        "sql": "CREATE INDEX \"push_delivery_userId_deliveredAt_idx_c60c106a\" ON \"public\".\"push_delivery\" (\"userId\", \"deliveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"push_delivery_userId_deliveredAt_idx_c60c106a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"push_delivery_userId_deliveredAt_idx_c60c106a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.push_delivery.push_delivery_userId_idx_a489d58a",
+    "label": "Create index \"push_delivery_userId_idx_a489d58a\" on \"push_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "push_delivery_userId_idx_a489d58a",
+        "table": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"push_delivery_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"push_delivery_userId_idx_a489d58a\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"push_delivery_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"push_delivery_userId_idx_a489d58a\" ON \"public\".\"push_delivery\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"push_delivery_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"push_delivery_userId_idx_a489d58a\""]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.push_delivery.push_delivery_userId_fkey",
+    "label": "Add foreign key \"push_delivery_userId_fkey\" on \"push_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "push_delivery_userId_fkey",
+        "table": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"push_delivery_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_delivery_userId_fkey",
+          "public",
+          "\"public\".\"push_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"push_delivery_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"push_delivery\"\nADD CONSTRAINT \"push_delivery_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"push_delivery_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_delivery_userId_fkey",
+          "public",
+          "\"public\".\"push_delivery\""
+        ]
+      }
+    ]
+  }
+]

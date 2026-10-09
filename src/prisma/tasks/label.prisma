@@ -1,0 +1,10 @@
+// use prisma-8
+
+model Label {
+  id        Uuid @id @default(uuid())
+  name      String @unique
+  color     String
+  createdAt TimestamptzJsDate @default(now())
+
+  @@map("label")
+}

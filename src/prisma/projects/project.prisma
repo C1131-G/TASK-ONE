@@ -1,0 +1,34 @@
+// use prisma-8
+
+model Project {
+  id          Uuid @id @default(uuid())
+  key         String @unique
+  name        String
+  description String?
+  icon        String @default("folder")
+  color       String @default("slate")
+  status      ProjectStatus @default(Planning)
+  startDate   DateString?
+  dueDate     DateString?
+  teamId      Uuid?
+  leadId      String?
+  position    Int @default(0)
+  archivedAt  TimestamptzJsDate?
+  archivedById String?
+  createdAt   TimestamptzJsDate @default(now())
+  updatedAt   TimestamptzJsDate @default(now())
+  version     Int @default(1)
+
+  taskCounter ProjectTaskCounter?
+  uploadIntents UploadIntent[]
+
+  team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  lead       User? @relation("ProjectLead", fields: [leadId], references: [id], onDelete: Restrict)
+  archivedBy User? @relation("ProjectArchivedBy", fields: [archivedById], references: [id], onDelete: Restrict)
+
+  @@index([status, position])
+  @@index([teamId])
+  @@index([leadId])
+  @@index([archivedAt])
+  @@map("project")
+}

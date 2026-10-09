@@ -1,0 +1,868 @@
+[
+  {
+    "id": "column.public.company_settings.brandColor",
+    "label": "Add column \"brandColor\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "brandColor",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"brandColor\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "brandColor"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"brandColor\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"brandColor\" text DEFAULT '#1D1C1A' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"brandColor\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "brandColor"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.brandEnabled",
+    "label": "Add column \"brandEnabled\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "brandEnabled",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"brandEnabled\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "brandEnabled"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"brandEnabled\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"brandEnabled\" bool DEFAULT true NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"brandEnabled\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "brandEnabled"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.slug",
+    "label": "Add column \"slug\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "slug",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"slug\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "slug"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"slug\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"slug\" text DEFAULT 'gr8rstudio' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"slug\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "slug"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task_subtask.assigneeId",
+    "label": "Add column \"assigneeId\" to \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "assigneeId",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"assigneeId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "assigneeId"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"assigneeId\"",
+        "sql": "ALTER TABLE \"public\".\"task_subtask\" ADD COLUMN \"assigneeId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"assigneeId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "assigneeId"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task_subtask.description",
+    "label": "Add column \"description\" to \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "description",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"description\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "description"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"description\"",
+        "sql": "ALTER TABLE \"public\".\"task_subtask\" ADD COLUMN \"description\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"description\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "description"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task_subtask.dueDate",
+    "label": "Add column \"dueDate\" to \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "dueDate",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"dueDate\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "dueDate"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"dueDate\"",
+        "sql": "ALTER TABLE \"public\".\"task_subtask\" ADD COLUMN \"dueDate\" date"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"dueDate\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task_subtask", "dueDate"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.deactivatedAt",
+    "label": "Add column \"deactivatedAt\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deactivatedAt",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deactivatedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "deactivatedAt"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deactivatedAt\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"deactivatedAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deactivatedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "deactivatedAt"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.deactivatedById",
+    "label": "Add column \"deactivatedById\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deactivatedById",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deactivatedById\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "deactivatedById"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deactivatedById\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"deactivatedById\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deactivatedById\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "deactivatedById"]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.calendar_event.calendar_event_end_after_start_1669454c",
+    "label": "Add check constraint \"calendar_event_end_after_start_1669454c\" on \"calendar_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "calendar_event_end_after_start_1669454c",
+        "table": "calendar_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"calendar_event_end_after_start_1669454c\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_event_end_after_start_1669454c",
+          "public",
+          "\"public\".\"calendar_event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"calendar_event_end_after_start_1669454c\"",
+        "sql": "ALTER TABLE \"public\".\"calendar_event\" ADD CONSTRAINT \"calendar_event_end_after_start_1669454c\" CHECK (\"endsAt\" IS NULL OR \"endsAt\" >= \"startsAt\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"calendar_event_end_after_start_1669454c\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_event_end_after_start_1669454c",
+          "public",
+          "\"public\".\"calendar_event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.company_settings.company_settings_singleton_id_52a8a17b",
+    "label": "Add check constraint \"company_settings_singleton_id_52a8a17b\" on \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "company_settings_singleton_id_52a8a17b",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"company_settings_singleton_id_52a8a17b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_singleton_id_52a8a17b",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"company_settings_singleton_id_52a8a17b\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD CONSTRAINT \"company_settings_singleton_id_52a8a17b\" CHECK (id = 'company')"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"company_settings_singleton_id_52a8a17b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_singleton_id_52a8a17b",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.company_settings.company_settings_slug_key",
+    "label": "Add unique constraint on \"company_settings\" (slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "company_settings_slug_key",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"company_settings_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_slug_key",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"company_settings_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD CONSTRAINT \"company_settings_slug_key\" UNIQUE (\"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"company_settings_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_slug_key",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.file_asset.file_asset_size_nonnegative_cff0c8d9",
+    "label": "Add check constraint \"file_asset_size_nonnegative_cff0c8d9\" on \"file_asset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "file_asset_size_nonnegative_cff0c8d9",
+        "table": "file_asset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"file_asset_size_nonnegative_cff0c8d9\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "file_asset_size_nonnegative_cff0c8d9",
+          "public",
+          "\"public\".\"file_asset\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"file_asset_size_nonnegative_cff0c8d9\"",
+        "sql": "ALTER TABLE \"public\".\"file_asset\" ADD CONSTRAINT \"file_asset_size_nonnegative_cff0c8d9\" CHECK (\"sizeBytes\" >= 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"file_asset_size_nonnegative_cff0c8d9\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "file_asset_size_nonnegative_cff0c8d9",
+          "public",
+          "\"public\".\"file_asset\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task.task_project_number_positive_68c00e77",
+    "label": "Add check constraint \"task_project_number_positive_68c00e77\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_project_number_positive_68c00e77",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_project_number_positive_68c00e77\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_project_number_positive_68c00e77",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_project_number_positive_68c00e77\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD CONSTRAINT \"task_project_number_positive_68c00e77\" CHECK (\"projectTaskNumber\" > 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_project_number_positive_68c00e77\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_project_number_positive_68c00e77",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task_dependency.task_dependency_not_self_bb157a38",
+    "label": "Add check constraint \"task_dependency_not_self_bb157a38\" on \"task_dependency\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_dependency_not_self_bb157a38",
+        "table": "task_dependency"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_dependency_not_self_bb157a38\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_dependency_not_self_bb157a38",
+          "public",
+          "\"public\".\"task_dependency\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_dependency_not_self_bb157a38\"",
+        "sql": "ALTER TABLE \"public\".\"task_dependency\" ADD CONSTRAINT \"task_dependency_not_self_bb157a38\" CHECK (\"taskId\" <> \"dependsOnTaskId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_dependency_not_self_bb157a38\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_dependency_not_self_bb157a38",
+          "public",
+          "\"public\".\"task_dependency\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task_recurrence.task_recurrence_interval_positive_4915f922",
+    "label": "Add check constraint \"task_recurrence_interval_positive_4915f922\" on \"task_recurrence\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_recurrence_interval_positive_4915f922",
+        "table": "task_recurrence"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_recurrence_interval_positive_4915f922\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_recurrence_interval_positive_4915f922",
+          "public",
+          "\"public\".\"task_recurrence\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_recurrence_interval_positive_4915f922\"",
+        "sql": "ALTER TABLE \"public\".\"task_recurrence\" ADD CONSTRAINT \"task_recurrence_interval_positive_4915f922\" CHECK (\"interval\" > 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_recurrence_interval_positive_4915f922\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_recurrence_interval_positive_4915f922",
+          "public",
+          "\"public\".\"task_recurrence\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_deactivation_fields_paired_68ebd7ec",
+    "label": "Add check constraint \"user_deactivation_fields_paired_68ebd7ec\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_deactivation_fields_paired_68ebd7ec",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_deactivation_fields_paired_68ebd7ec\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_deactivation_fields_paired_68ebd7ec",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_deactivation_fields_paired_68ebd7ec\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_deactivation_fields_paired_68ebd7ec\" CHECK ((\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_deactivation_fields_paired_68ebd7ec\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_deactivation_fields_paired_68ebd7ec",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_employee_number_positive_e02d95cf",
+    "label": "Add check constraint \"user_employee_number_positive_e02d95cf\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_employee_number_positive_e02d95cf",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_employee_number_positive_e02d95cf\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_employee_number_positive_e02d95cf",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_employee_number_positive_e02d95cf\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_employee_number_positive_e02d95cf\" CHECK (\"employeeNumber\" > 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_employee_number_positive_e02d95cf\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_employee_number_positive_e02d95cf",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.task_subtask.task_subtask_assigneeId_idx_fd12ae38",
+    "label": "Create index \"task_subtask_assigneeId_idx_fd12ae38\" on \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_subtask_assigneeId_idx_fd12ae38",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_subtask_assigneeId_idx_fd12ae38\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"task_subtask_assigneeId_idx_fd12ae38\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_subtask_assigneeId_idx_fd12ae38\"",
+        "sql": "CREATE INDEX \"task_subtask_assigneeId_idx_fd12ae38\" ON \"public\".\"task_subtask\" (\"assigneeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_subtask_assigneeId_idx_fd12ae38\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"task_subtask_assigneeId_idx_fd12ae38\""]
+      }
+    ]
+  },
+  {
+    "id": "index.task_subtask.task_subtask_dueDate_idx_fb527616",
+    "label": "Create index \"task_subtask_dueDate_idx_fb527616\" on \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_subtask_dueDate_idx_fb527616",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_subtask_dueDate_idx_fb527616\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"task_subtask_dueDate_idx_fb527616\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_subtask_dueDate_idx_fb527616\"",
+        "sql": "CREATE INDEX \"task_subtask_dueDate_idx_fb527616\" ON \"public\".\"task_subtask\" (\"dueDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_subtask_dueDate_idx_fb527616\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"task_subtask_dueDate_idx_fb527616\""]
+      }
+    ]
+  },
+  {
+    "id": "index.user.user_deactivatedAt_idx_61cfa815",
+    "label": "Create index \"user_deactivatedAt_idx_61cfa815\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_deactivatedAt_idx_61cfa815",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_deactivatedAt_idx_61cfa815\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"user_deactivatedAt_idx_61cfa815\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_deactivatedAt_idx_61cfa815\"",
+        "sql": "CREATE INDEX \"user_deactivatedAt_idx_61cfa815\" ON \"public\".\"user\" (\"deactivatedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_deactivatedAt_idx_61cfa815\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"user_deactivatedAt_idx_61cfa815\""]
+      }
+    ]
+  },
+  {
+    "id": "index.user.user_deactivatedById_idx_12fe95fd",
+    "label": "Create index \"user_deactivatedById_idx_12fe95fd\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_deactivatedById_idx_12fe95fd",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_deactivatedById_idx_12fe95fd\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"user_deactivatedById_idx_12fe95fd\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_deactivatedById_idx_12fe95fd\"",
+        "sql": "CREATE INDEX \"user_deactivatedById_idx_12fe95fd\" ON \"public\".\"user\" (\"deactivatedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_deactivatedById_idx_12fe95fd\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"user_deactivatedById_idx_12fe95fd\""]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.task_subtask.task_subtask_assigneeId_fkey",
+    "label": "Add foreign key \"task_subtask_assigneeId_fkey\" on \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "task_subtask_assigneeId_fkey",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"task_subtask_assigneeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_subtask_assigneeId_fkey",
+          "public",
+          "\"public\".\"task_subtask\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"task_subtask_assigneeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"task_subtask\"\nADD CONSTRAINT \"task_subtask_assigneeId_fkey\"\nFOREIGN KEY (\"assigneeId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"task_subtask_assigneeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_subtask_assigneeId_fkey",
+          "public",
+          "\"public\".\"task_subtask\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.user.user_deactivatedById_fkey",
+    "label": "Add foreign key \"user_deactivatedById_fkey\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "user_deactivatedById_fkey",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"user_deactivatedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["user_deactivatedById_fkey", "public", "\"public\".\"user\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"user_deactivatedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"user\"\nADD CONSTRAINT \"user_deactivatedById_fkey\"\nFOREIGN KEY (\"deactivatedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"user_deactivatedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["user_deactivatedById_fkey", "public", "\"public\".\"user\""]
+      }
+    ]
+  }
+]

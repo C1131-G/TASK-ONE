@@ -1,0 +1,140 @@
+[
+  {
+    "id": "table.rateLimit",
+    "label": "Create table \"rateLimit\"",
+    "summary": "Creates table \"rateLimit\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "rateLimit"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"rateLimit\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"rateLimit\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"rateLimit\"",
+        "sql": "CREATE TABLE \"public\".\"rateLimit\" (\n  \"count\" int4 NOT NULL,\n  \"key\" text NOT NULL,\n  \"lastRequest\" int8 NOT NULL,\n  PRIMARY KEY (\"key\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"rateLimit\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"rateLimit\""]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.emailNormalized",
+    "label": "Add column \"emailNormalized\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "emailNormalized",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"emailNormalized\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "emailNormalized"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"emailNormalized\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"emailNormalized\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"emailNormalized\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "user", "emailNormalized"]
+      }
+    ]
+  },
+  {
+    "id": "unique.user.user_emailNormalized_key",
+    "label": "Add unique constraint on \"user\" (emailNormalized)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_emailNormalized_key",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_emailNormalized_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["user_emailNormalized_key", "public", "\"public\".\"user\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_emailNormalized_key\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_emailNormalized_key\" UNIQUE (\"emailNormalized\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_emailNormalized_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["user_emailNormalized_key", "public", "\"public\".\"user\""]
+      }
+    ]
+  },
+  {
+    "id": "index.rateLimit.rateLimit_lastRequest_idx_e5c9beaa",
+    "label": "Create index \"rateLimit_lastRequest_idx_e5c9beaa\" on \"rateLimit\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "rateLimit_lastRequest_idx_e5c9beaa",
+        "table": "rateLimit"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"rateLimit_lastRequest_idx_e5c9beaa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"rateLimit_lastRequest_idx_e5c9beaa\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"rateLimit_lastRequest_idx_e5c9beaa\"",
+        "sql": "CREATE INDEX \"rateLimit_lastRequest_idx_e5c9beaa\" ON \"public\".\"rateLimit\" (\"lastRequest\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"rateLimit_lastRequest_idx_e5c9beaa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"rateLimit_lastRequest_idx_e5c9beaa\""]
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+// use prisma-8
+
+model TaskDependency {
+  taskId            Uuid
+  dependsOnTaskId   Uuid
+  createdAt         TimestamptzJsDate @default(now())
+
+  task          Task @relation("DependencyTask", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOnTask Task @relation("DependencyPrerequisite", fields: [dependsOnTaskId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, dependsOnTaskId])
+  @@check(expression: "\"taskId\" <> \"dependsOnTaskId\"", name: "task_dependency_not_self")
+  @@index([dependsOnTaskId])
+  @@map("task_dependency")
+}

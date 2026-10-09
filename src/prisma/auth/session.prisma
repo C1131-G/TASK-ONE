@@ -1,0 +1,18 @@
+// use prisma-8
+
+model Session {
+  id             String @id
+  expiresAt      TimestamptzJsDate
+  token          String @unique
+  createdAt      TimestamptzJsDate @default(now())
+  updatedAt      TimestamptzJsDate @default(now())
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}

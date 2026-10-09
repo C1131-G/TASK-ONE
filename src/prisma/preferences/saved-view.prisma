@@ -1,0 +1,22 @@
+// use prisma-8
+
+model SavedView {
+  id            Uuid @id @default(uuid())
+  userId        String
+  projectId     Uuid?
+  name          String
+  type          SavedViewType
+  filters       Jsonb @default(json`[]`)
+  sort          Jsonb @default(json`{}`)
+  groupBy       String?
+  hiddenColumns Jsonb @default(json`[]`)
+  isShared      Boolean @default(false)
+  createdAt     TimestamptzJsDate @default(now())
+  updatedAt     TimestamptzJsDate @default(now())
+
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, projectId])
+  @@map("saved_view")
+}

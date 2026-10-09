@@ -1,0 +1,15 @@
+// use prisma-8
+
+model CompanySettings {
+  id          String  @id @default("company")
+  name        String  @default("Gr8r Studio")
+  slug        String  @unique @default("gr8rstudio")
+  brandColor  String  @default("#1D1C1A")
+  brandEnabled Boolean @default(true)
+  timeZone    String  @default("Asia/Kolkata")
+  settings    Jsonb   @default(json`{}`)
+  updatedAt   TimestamptzJsDate @default(now())
+
+  @@check(expression: "id = 'company'", name: "company_settings_singleton_id")
+  @@map("company_settings")
+}

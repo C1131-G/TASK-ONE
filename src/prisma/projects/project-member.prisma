@@ -1,0 +1,14 @@
+// use prisma-8
+
+model ProjectMember {
+  projectId Uuid
+  userId    String
+  joinedAt  TimestamptzJsDate @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([projectId, userId])
+  @@index([userId])
+  @@map("project_member")
+}

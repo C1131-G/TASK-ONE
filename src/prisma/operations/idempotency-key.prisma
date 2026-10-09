@@ -1,0 +1,17 @@
+// use prisma-8
+
+model IdempotencyKey {
+  id Uuid @id @default(uuid())
+  actorId String
+  key String
+  requestHash String
+  response Json?
+  expiresAt TimestamptzJsDate
+  createdAt TimestamptzJsDate @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@unique([actorId, key])
+  @@index([expiresAt])
+  @@map("idempotency_key")
+}

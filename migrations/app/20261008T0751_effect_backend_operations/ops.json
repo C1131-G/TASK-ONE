@@ -1,0 +1,1237 @@
+[
+  {
+    "id": "table.idempotency_key",
+    "label": "Create table \"idempotency_key\"",
+    "summary": "Creates table \"idempotency_key\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "idempotency_key"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"idempotency_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"idempotency_key\"",
+        "sql": "CREATE TABLE \"public\".\"idempotency_key\" (\n  \"actorId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"key\" text NOT NULL,\n  \"requestHash\" text NOT NULL,\n  \"response\" json,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"idempotency_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key\""]
+      }
+    ]
+  },
+  {
+    "id": "table.job",
+    "label": "Create table \"job\"",
+    "summary": "Creates table \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"job\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"job\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"job\"",
+        "sql": "CREATE TABLE \"public\".\"job\" (\n  \"attempts\" int4 DEFAULT 0 NOT NULL,\n  \"availableAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"completedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deadAt\" timestamptz,\n  \"dedupeKey\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"kind\" text NOT NULL,\n  \"lastError\" text,\n  \"leaseOwner\" text,\n  \"leasedUntil\" timestamptz,\n  \"maxAttempts\" int4 DEFAULT 8 NOT NULL,\n  \"payload\" json NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"job\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"job\""]
+      }
+    ]
+  },
+  {
+    "id": "table.project_task_counter",
+    "label": "Create table \"project_task_counter\"",
+    "summary": "Creates table \"project_task_counter\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "project_task_counter"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"project_task_counter\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"project_task_counter\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"project_task_counter\"",
+        "sql": "CREATE TABLE \"public\".\"project_task_counter\" (\n  \"nextNumber\" int4 DEFAULT 1 NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"projectId\"),\n  CONSTRAINT \"project_task_counter_positive_cb660188\" CHECK (\"nextNumber\" > 0)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"project_task_counter\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"project_task_counter\""]
+      }
+    ]
+  },
+  {
+    "id": "table.push_subscription",
+    "label": "Create table \"push_subscription\"",
+    "summary": "Creates table \"push_subscription\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "push_subscription"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"push_subscription\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"push_subscription\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"push_subscription\"",
+        "sql": "CREATE TABLE \"public\".\"push_subscription\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"endpoint\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"keys\" json NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userAgent\" text,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"push_subscription\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"push_subscription\""]
+      }
+    ]
+  },
+  {
+    "id": "table.recurrence_generation",
+    "label": "Create table \"recurrence_generation\"",
+    "summary": "Creates table \"recurrence_generation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"recurrence_generation\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"recurrence_generation\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"recurrence_generation\"",
+        "sql": "CREATE TABLE \"public\".\"recurrence_generation\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"generationKey\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"sourceTaskId\" uuid NOT NULL,\n  \"successorTaskId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"recurrence_generation\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"recurrence_generation\""]
+      }
+    ]
+  },
+  {
+    "id": "table.undo_record",
+    "label": "Create table \"undo_record\"",
+    "summary": "Creates table \"undo_record\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "undo_record"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"undo_record\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"undo_record\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"undo_record\"",
+        "sql": "CREATE TABLE \"public\".\"undo_record\" (\n  \"action\" text NOT NULL,\n  \"actorId\" text NOT NULL,\n  \"consumedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"entityId\" text NOT NULL,\n  \"entityType\" text NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"snapshot\" json NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"undo_record\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"undo_record\""]
+      }
+    ]
+  },
+  {
+    "id": "table.upload_intent",
+    "label": "Create table \"upload_intent\"",
+    "summary": "Creates table \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"upload_intent\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"upload_intent\"",
+        "sql": "CREATE TABLE \"public\".\"upload_intent\" (\n  \"contentType\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"fileName\" text NOT NULL,\n  \"finalizedAt\" timestamptz,\n  \"id\" uuid NOT NULL,\n  \"objectKey\" text NOT NULL,\n  \"ownerId\" text NOT NULL,\n  \"projectId\" uuid,\n  \"removedAt\" timestamptz,\n  \"sizeBytes\" int8 NOT NULL,\n  \"state\" text DEFAULT 'pending' NOT NULL,\n  \"taskId\" uuid,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"upload_size_valid_ac56015b\" CHECK (\"sizeBytes\" > 0 AND \"sizeBytes\" <= 52428800),\n  CONSTRAINT \"upload_state_valid_f79005c7\" CHECK (state IN ('pending', 'finalized', 'failed', 'removed'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"upload_intent\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent\""]
+      }
+    ]
+  },
+  {
+    "id": "column.public.project.version",
+    "label": "Add column \"version\" to \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "version",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"version\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "project", "version"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"version\"",
+        "sql": "ALTER TABLE \"public\".\"project\" ADD COLUMN \"version\" int4 DEFAULT 1 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"version\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "project", "version"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task.version",
+    "label": "Add column \"version\" to \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "version",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"version\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task", "version"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"version\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD COLUMN \"version\" int4 DEFAULT 1 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"version\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "task", "version"]
+      }
+    ]
+  },
+  {
+    "id": "unique.idempotency_key.idempotency_key_actorId_key_key",
+    "label": "Add unique constraint on \"idempotency_key\" (actorId, key)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "idempotency_key_actorId_key_key",
+        "table": "idempotency_key"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"idempotency_key_actorId_key_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "idempotency_key_actorId_key_key",
+          "public",
+          "\"public\".\"idempotency_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"idempotency_key_actorId_key_key\"",
+        "sql": "ALTER TABLE \"public\".\"idempotency_key\" ADD CONSTRAINT \"idempotency_key_actorId_key_key\" UNIQUE (\"actorId\", \"key\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"idempotency_key_actorId_key_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "idempotency_key_actorId_key_key",
+          "public",
+          "\"public\".\"idempotency_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.job.job_dedupeKey_key",
+    "label": "Add unique constraint on \"job\" (dedupeKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "job_dedupeKey_key",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"job_dedupeKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["job_dedupeKey_key", "public", "\"public\".\"job\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"job_dedupeKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"job\" ADD CONSTRAINT \"job_dedupeKey_key\" UNIQUE (\"dedupeKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"job_dedupeKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["job_dedupeKey_key", "public", "\"public\".\"job\""]
+      }
+    ]
+  },
+  {
+    "id": "unique.push_subscription.push_subscription_endpoint_key",
+    "label": "Add unique constraint on \"push_subscription\" (endpoint)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "push_subscription_endpoint_key",
+        "table": "push_subscription"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"push_subscription_endpoint_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_subscription_endpoint_key",
+          "public",
+          "\"public\".\"push_subscription\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"push_subscription_endpoint_key\"",
+        "sql": "ALTER TABLE \"public\".\"push_subscription\" ADD CONSTRAINT \"push_subscription_endpoint_key\" UNIQUE (\"endpoint\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"push_subscription_endpoint_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_subscription_endpoint_key",
+          "public",
+          "\"public\".\"push_subscription\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.recurrence_generation.recurrence_generation_successorTaskId_key",
+    "label": "Add unique constraint on \"recurrence_generation\" (successorTaskId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "recurrence_generation_successorTaskId_key",
+        "table": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"recurrence_generation_successorTaskId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_successorTaskId_key",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"recurrence_generation_successorTaskId_key\"",
+        "sql": "ALTER TABLE \"public\".\"recurrence_generation\" ADD CONSTRAINT \"recurrence_generation_successorTaskId_key\" UNIQUE (\"successorTaskId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"recurrence_generation_successorTaskId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_successorTaskId_key",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.recurrence_generation.recurrence_generation_generationKey_key",
+    "label": "Add unique constraint on \"recurrence_generation\" (generationKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "recurrence_generation_generationKey_key",
+        "table": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"recurrence_generation_generationKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_generationKey_key",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"recurrence_generation_generationKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"recurrence_generation\" ADD CONSTRAINT \"recurrence_generation_generationKey_key\" UNIQUE (\"generationKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"recurrence_generation_generationKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_generationKey_key",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.upload_intent.upload_intent_objectKey_key",
+    "label": "Add unique constraint on \"upload_intent\" (objectKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "upload_intent_objectKey_key",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"upload_intent_objectKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_objectKey_key",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"upload_intent_objectKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"upload_intent\" ADD CONSTRAINT \"upload_intent_objectKey_key\" UNIQUE (\"objectKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"upload_intent_objectKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_objectKey_key",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.idempotency_key.idempotency_key_actorId_idx_a58f6b4b",
+    "label": "Create index \"idempotency_key_actorId_idx_a58f6b4b\" on \"idempotency_key\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "idempotency_key_actorId_idx_a58f6b4b",
+        "table": "idempotency_key"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"idempotency_key_actorId_idx_a58f6b4b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key_actorId_idx_a58f6b4b\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"idempotency_key_actorId_idx_a58f6b4b\"",
+        "sql": "CREATE INDEX \"idempotency_key_actorId_idx_a58f6b4b\" ON \"public\".\"idempotency_key\" (\"actorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"idempotency_key_actorId_idx_a58f6b4b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key_actorId_idx_a58f6b4b\""]
+      }
+    ]
+  },
+  {
+    "id": "index.idempotency_key.idempotency_key_expiresAt_idx_6b6b8c10",
+    "label": "Create index \"idempotency_key_expiresAt_idx_6b6b8c10\" on \"idempotency_key\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "idempotency_key_expiresAt_idx_6b6b8c10",
+        "table": "idempotency_key"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"idempotency_key_expiresAt_idx_6b6b8c10\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key_expiresAt_idx_6b6b8c10\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"idempotency_key_expiresAt_idx_6b6b8c10\"",
+        "sql": "CREATE INDEX \"idempotency_key_expiresAt_idx_6b6b8c10\" ON \"public\".\"idempotency_key\" (\"expiresAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"idempotency_key_expiresAt_idx_6b6b8c10\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"idempotency_key_expiresAt_idx_6b6b8c10\""]
+      }
+    ]
+  },
+  {
+    "id": "index.job.job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0",
+    "label": "Create index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" on \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\"",
+        "sql": "CREATE INDEX \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" ON \"public\".\"job\" (\"availableAt\", \"leasedUntil\", \"completedAt\", \"deadAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.job.job_leaseOwner_leasedUntil_idx_a51039dd",
+    "label": "Create index \"job_leaseOwner_leasedUntil_idx_a51039dd\" on \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_leaseOwner_leasedUntil_idx_a51039dd",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_leaseOwner_leasedUntil_idx_a51039dd\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"job_leaseOwner_leasedUntil_idx_a51039dd\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"job_leaseOwner_leasedUntil_idx_a51039dd\"",
+        "sql": "CREATE INDEX \"job_leaseOwner_leasedUntil_idx_a51039dd\" ON \"public\".\"job\" (\"leaseOwner\", \"leasedUntil\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_leaseOwner_leasedUntil_idx_a51039dd\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"job_leaseOwner_leasedUntil_idx_a51039dd\""]
+      }
+    ]
+  },
+  {
+    "id": "index.push_subscription.push_subscription_userId_idx_a489d58a",
+    "label": "Create index \"push_subscription_userId_idx_a489d58a\" on \"push_subscription\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "push_subscription_userId_idx_a489d58a",
+        "table": "push_subscription"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"push_subscription_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"push_subscription_userId_idx_a489d58a\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"push_subscription_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"push_subscription_userId_idx_a489d58a\" ON \"public\".\"push_subscription\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"push_subscription_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"push_subscription_userId_idx_a489d58a\""]
+      }
+    ]
+  },
+  {
+    "id": "index.recurrence_generation.recurrence_generation_sourceTaskId_idx_e6290971",
+    "label": "Create index \"recurrence_generation_sourceTaskId_idx_e6290971\" on \"recurrence_generation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "recurrence_generation_sourceTaskId_idx_e6290971",
+        "table": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"recurrence_generation_sourceTaskId_idx_e6290971\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"recurrence_generation_sourceTaskId_idx_e6290971\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"recurrence_generation_sourceTaskId_idx_e6290971\"",
+        "sql": "CREATE INDEX \"recurrence_generation_sourceTaskId_idx_e6290971\" ON \"public\".\"recurrence_generation\" (\"sourceTaskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"recurrence_generation_sourceTaskId_idx_e6290971\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"recurrence_generation_sourceTaskId_idx_e6290971\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.undo_record.undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4",
+    "label": "Create index \"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\" on \"undo_record\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4",
+        "table": "undo_record"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\"",
+        "sql": "CREATE INDEX \"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\" ON \"public\".\"undo_record\" (\"actorId\", \"expiresAt\", \"consumedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.undo_record.undo_record_actorId_idx_a58f6b4b",
+    "label": "Create index \"undo_record_actorId_idx_a58f6b4b\" on \"undo_record\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "undo_record_actorId_idx_a58f6b4b",
+        "table": "undo_record"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"undo_record_actorId_idx_a58f6b4b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"undo_record_actorId_idx_a58f6b4b\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"undo_record_actorId_idx_a58f6b4b\"",
+        "sql": "CREATE INDEX \"undo_record_actorId_idx_a58f6b4b\" ON \"public\".\"undo_record\" (\"actorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"undo_record_actorId_idx_a58f6b4b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"undo_record_actorId_idx_a58f6b4b\""]
+      }
+    ]
+  },
+  {
+    "id": "index.undo_record.undo_record_entityType_entityId_idx_ea0fa809",
+    "label": "Create index \"undo_record_entityType_entityId_idx_ea0fa809\" on \"undo_record\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "undo_record_entityType_entityId_idx_ea0fa809",
+        "table": "undo_record"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"undo_record_entityType_entityId_idx_ea0fa809\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"undo_record_entityType_entityId_idx_ea0fa809\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"undo_record_entityType_entityId_idx_ea0fa809\"",
+        "sql": "CREATE INDEX \"undo_record_entityType_entityId_idx_ea0fa809\" ON \"public\".\"undo_record\" (\"entityType\", \"entityId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"undo_record_entityType_entityId_idx_ea0fa809\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"undo_record_entityType_entityId_idx_ea0fa809\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_expiresAt_state_idx_47121f95",
+    "label": "Create index \"upload_intent_expiresAt_state_idx_47121f95\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_expiresAt_state_idx_47121f95",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_expiresAt_state_idx_47121f95\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_expiresAt_state_idx_47121f95\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_expiresAt_state_idx_47121f95\"",
+        "sql": "CREATE INDEX \"upload_intent_expiresAt_state_idx_47121f95\" ON \"public\".\"upload_intent\" (\"expiresAt\", \"state\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_expiresAt_state_idx_47121f95\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_expiresAt_state_idx_47121f95\""]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_ownerId_idx_e2d0c1ef",
+    "label": "Create index \"upload_intent_ownerId_idx_e2d0c1ef\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_ownerId_idx_e2d0c1ef",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_ownerId_idx_e2d0c1ef\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_ownerId_idx_e2d0c1ef\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_ownerId_idx_e2d0c1ef\"",
+        "sql": "CREATE INDEX \"upload_intent_ownerId_idx_e2d0c1ef\" ON \"public\".\"upload_intent\" (\"ownerId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_ownerId_idx_e2d0c1ef\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_ownerId_idx_e2d0c1ef\""]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_ownerId_state_createdAt_idx_9ce082d2",
+    "label": "Create index \"upload_intent_ownerId_state_createdAt_idx_9ce082d2\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_ownerId_state_createdAt_idx_9ce082d2",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_ownerId_state_createdAt_idx_9ce082d2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"upload_intent_ownerId_state_createdAt_idx_9ce082d2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_ownerId_state_createdAt_idx_9ce082d2\"",
+        "sql": "CREATE INDEX \"upload_intent_ownerId_state_createdAt_idx_9ce082d2\" ON \"public\".\"upload_intent\" (\"ownerId\", \"state\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_ownerId_state_createdAt_idx_9ce082d2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"upload_intent_ownerId_state_createdAt_idx_9ce082d2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_projectId_state_idx_cea2771c",
+    "label": "Create index \"upload_intent_projectId_state_idx_cea2771c\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_projectId_state_idx_cea2771c",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_projectId_state_idx_cea2771c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_projectId_state_idx_cea2771c\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_projectId_state_idx_cea2771c\"",
+        "sql": "CREATE INDEX \"upload_intent_projectId_state_idx_cea2771c\" ON \"public\".\"upload_intent\" (\"projectId\", \"state\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_projectId_state_idx_cea2771c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_projectId_state_idx_cea2771c\""]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_taskId_state_idx_e8b19231",
+    "label": "Create index \"upload_intent_taskId_state_idx_e8b19231\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_taskId_state_idx_e8b19231",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_taskId_state_idx_e8b19231\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_taskId_state_idx_e8b19231\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_taskId_state_idx_e8b19231\"",
+        "sql": "CREATE INDEX \"upload_intent_taskId_state_idx_e8b19231\" ON \"public\".\"upload_intent\" (\"taskId\", \"state\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_taskId_state_idx_e8b19231\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_taskId_state_idx_e8b19231\""]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.idempotency_key.idempotency_key_actorId_fkey",
+    "label": "Add foreign key \"idempotency_key_actorId_fkey\" on \"idempotency_key\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "idempotency_key_actorId_fkey",
+        "table": "idempotency_key"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"idempotency_key_actorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "idempotency_key_actorId_fkey",
+          "public",
+          "\"public\".\"idempotency_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"idempotency_key_actorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"idempotency_key\"\nADD CONSTRAINT \"idempotency_key_actorId_fkey\"\nFOREIGN KEY (\"actorId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"idempotency_key_actorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "idempotency_key_actorId_fkey",
+          "public",
+          "\"public\".\"idempotency_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.push_subscription.push_subscription_userId_fkey",
+    "label": "Add foreign key \"push_subscription_userId_fkey\" on \"push_subscription\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "push_subscription_userId_fkey",
+        "table": "push_subscription"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"push_subscription_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_subscription_userId_fkey",
+          "public",
+          "\"public\".\"push_subscription\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"push_subscription_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"push_subscription\"\nADD CONSTRAINT \"push_subscription_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"push_subscription_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "push_subscription_userId_fkey",
+          "public",
+          "\"public\".\"push_subscription\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.undo_record.undo_record_actorId_fkey",
+    "label": "Add foreign key \"undo_record_actorId_fkey\" on \"undo_record\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "undo_record_actorId_fkey",
+        "table": "undo_record"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"undo_record_actorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "undo_record_actorId_fkey",
+          "public",
+          "\"public\".\"undo_record\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"undo_record_actorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"undo_record\"\nADD CONSTRAINT \"undo_record_actorId_fkey\"\nFOREIGN KEY (\"actorId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"undo_record_actorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "undo_record_actorId_fkey",
+          "public",
+          "\"public\".\"undo_record\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.upload_intent.upload_intent_ownerId_fkey",
+    "label": "Add foreign key \"upload_intent_ownerId_fkey\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "upload_intent_ownerId_fkey",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"upload_intent_ownerId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_ownerId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"upload_intent_ownerId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"upload_intent\"\nADD CONSTRAINT \"upload_intent_ownerId_fkey\"\nFOREIGN KEY (\"ownerId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"upload_intent_ownerId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_ownerId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ]
+  }
+]

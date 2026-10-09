@@ -1,0 +1,46 @@
+// use prisma-8
+
+model User {
+  id                 String  @id
+  name               String
+  email              String  @unique
+  emailNormalized    String? @unique
+  emailVerified      Boolean @default(false)
+  image              String?
+  createdAt          TimestamptzJsDate @default(now())
+  updatedAt          TimestamptzJsDate @default(now())
+
+  // Better Auth Admin plugin fields. The application config will set
+  // defaultRole to "employee" and expose only admin/employee roles.
+  role               String  @default("employee")
+  banned             Boolean @default(false)
+  banReason          String?
+  banExpires         TimestamptzJsDate?
+
+  // Employee-facing profile and onboarding data.
+  employeeNumber     Int     @unique @default(autoincrement())
+  jobTitle           String?
+  mustChangePassword Boolean @default(true)
+  timeZone           String?
+  teamId             Uuid?
+  deactivatedAt      TimestamptzJsDate?
+  deactivatedById    String?
+
+  team             Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  deactivatedBy    User?  @relation("UserDeactivatedBy", fields: [deactivatedById], references: [id], onDelete: Restrict)
+  deactivatedUsers User[] @relation("UserDeactivatedBy")
+  assignedSubtasks TaskSubtask[] @relation("SubtaskAssignee")
+  undoRecords UndoRecord[]
+  idempotencyKeys IdempotencyKey[]
+  uploadIntents UploadIntent[]
+  pushSubscriptions PushSubscription[]
+  pushDeliveries PushDelivery[]
+
+  @@check(expression: "role IN ('admin', 'employee')", name: "user_role_valid")
+  @@check(expression: "\"employeeNumber\" > 0", name: "user_employee_number_positive")
+  @@check(expression: "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)", name: "user_deactivation_fields_paired")
+  @@index([teamId])
+  @@index([deactivatedAt])
+  @@index([deactivatedById])
+  @@map("user")
+}

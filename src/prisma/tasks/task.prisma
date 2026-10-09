@@ -1,0 +1,38 @@
+// use prisma-8
+
+model Task {
+  id                Uuid @id @default(uuid())
+  projectId         Uuid
+  projectTaskNumber Int
+  title             String
+  description       String?
+  status            TaskStatus @default(Todo)
+  priority          TaskPriority @default(None)
+  createdById       String
+  startDate         DateString?
+  dueDate           DateString?
+  estimate          String?
+  position          Float @default(0)
+  completedAt       TimestamptzJsDate?
+  archivedAt        TimestamptzJsDate?
+  archivedById      String?
+  createdAt         TimestamptzJsDate @default(now())
+  updatedAt         TimestamptzJsDate @default(now())
+  version           Int @default(1)
+
+  recurrenceSources RecurrenceGeneration[] @relation("RecurrenceSource")
+  recurrenceSuccessor RecurrenceGeneration? @relation("RecurrenceSuccessor")
+  uploadIntents UploadIntent[]
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  createdBy User    @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  archivedBy User?  @relation("TaskArchivedBy", fields: [archivedById], references: [id], onDelete: Restrict)
+
+  @@unique([projectId, projectTaskNumber])
+  @@check(expression: "\"projectTaskNumber\" > 0", name: "task_project_number_positive")
+  @@index([projectId, status, position])
+  @@index([createdById])
+  @@index([dueDate])
+  @@index([archivedAt])
+  @@map("task")
+}

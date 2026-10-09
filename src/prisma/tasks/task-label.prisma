@@ -1,0 +1,13 @@
+// use prisma-8
+
+model TaskLabel {
+  taskId  Uuid
+  labelId Uuid
+
+  task  Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Restrict)
+
+  @@id([taskId, labelId])
+  @@index([labelId])
+  @@map("task_label")
+}

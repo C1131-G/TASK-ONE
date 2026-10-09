@@ -1,0 +1,282 @@
+[
+  {
+    "id": "index.upload_intent.upload_intent_projectId_idx_a96e4d92",
+    "label": "Create index \"upload_intent_projectId_idx_a96e4d92\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_projectId_idx_a96e4d92",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_projectId_idx_a96e4d92\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"upload_intent_projectId_idx_a96e4d92\" ON \"public\".\"upload_intent\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_projectId_idx_a96e4d92\""]
+      }
+    ]
+  },
+  {
+    "id": "index.upload_intent.upload_intent_taskId_idx_4965c936",
+    "label": "Create index \"upload_intent_taskId_idx_4965c936\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "upload_intent_taskId_idx_4965c936",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"upload_intent_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_taskId_idx_4965c936\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"upload_intent_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"upload_intent_taskId_idx_4965c936\" ON \"public\".\"upload_intent\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"upload_intent_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": ["\"public\".\"upload_intent_taskId_idx_4965c936\""]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project_task_counter.project_task_counter_projectId_fkey",
+    "label": "Add foreign key \"project_task_counter_projectId_fkey\" on \"project_task_counter\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_task_counter_projectId_fkey",
+        "table": "project_task_counter"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_task_counter_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_task_counter_projectId_fkey",
+          "public",
+          "\"public\".\"project_task_counter\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_task_counter_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project_task_counter\"\nADD CONSTRAINT \"project_task_counter_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_task_counter_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_task_counter_projectId_fkey",
+          "public",
+          "\"public\".\"project_task_counter\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.recurrence_generation.recurrence_generation_sourceTaskId_fkey",
+    "label": "Add foreign key \"recurrence_generation_sourceTaskId_fkey\" on \"recurrence_generation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "recurrence_generation_sourceTaskId_fkey",
+        "table": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"recurrence_generation_sourceTaskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_sourceTaskId_fkey",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"recurrence_generation_sourceTaskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"recurrence_generation\"\nADD CONSTRAINT \"recurrence_generation_sourceTaskId_fkey\"\nFOREIGN KEY (\"sourceTaskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"recurrence_generation_sourceTaskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_sourceTaskId_fkey",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.recurrence_generation.recurrence_generation_successorTaskId_fkey",
+    "label": "Add foreign key \"recurrence_generation_successorTaskId_fkey\" on \"recurrence_generation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "recurrence_generation_successorTaskId_fkey",
+        "table": "recurrence_generation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"recurrence_generation_successorTaskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_successorTaskId_fkey",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"recurrence_generation_successorTaskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"recurrence_generation\"\nADD CONSTRAINT \"recurrence_generation_successorTaskId_fkey\"\nFOREIGN KEY (\"successorTaskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"recurrence_generation_successorTaskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "recurrence_generation_successorTaskId_fkey",
+          "public",
+          "\"public\".\"recurrence_generation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.upload_intent.upload_intent_projectId_fkey",
+    "label": "Add foreign key \"upload_intent_projectId_fkey\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "upload_intent_projectId_fkey",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"upload_intent_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_projectId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"upload_intent_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"upload_intent\"\nADD CONSTRAINT \"upload_intent_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"upload_intent_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_projectId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.upload_intent.upload_intent_taskId_fkey",
+    "label": "Add foreign key \"upload_intent_taskId_fkey\" on \"upload_intent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "upload_intent_taskId_fkey",
+        "table": "upload_intent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"upload_intent_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_taskId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"upload_intent_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"upload_intent\"\nADD CONSTRAINT \"upload_intent_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"upload_intent_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "upload_intent_taskId_fkey",
+          "public",
+          "\"public\".\"upload_intent\""
+        ]
+      }
+    ]
+  }
+]

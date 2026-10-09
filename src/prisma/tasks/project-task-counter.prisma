@@ -1,0 +1,12 @@
+// use prisma-8
+
+model ProjectTaskCounter {
+  projectId Uuid @id
+  nextNumber Int @default(1)
+  updatedAt TimestamptzJsDate @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@check(expression: "\"nextNumber\" > 0", name: "project_task_counter_positive")
+  @@map("project_task_counter")
+}

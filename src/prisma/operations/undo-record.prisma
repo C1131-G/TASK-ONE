@@ -1,0 +1,19 @@
+// use prisma-8
+
+model UndoRecord {
+  id Uuid @id @default(uuid())
+  actorId String
+  action String
+  entityType String
+  entityId String
+  snapshot Json
+  expiresAt TimestamptzJsDate
+  consumedAt TimestamptzJsDate?
+  createdAt TimestamptzJsDate @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId, expiresAt, consumedAt])
+  @@index([entityType, entityId])
+  @@map("undo_record")
+}

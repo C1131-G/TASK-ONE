@@ -1,0 +1,15 @@
+// use prisma-8
+
+model CommentReaction {
+  commentId Uuid
+  userId    String
+  emoji     String
+  createdAt TimestamptzJsDate @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([commentId, userId, emoji])
+  @@index([userId])
+  @@map("comment_reaction")
+}

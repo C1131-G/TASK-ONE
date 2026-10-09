@@ -1,0 +1,21 @@
+// use prisma-8
+
+model Activity {
+  id        Uuid @id @default(uuid())
+  actorId   String
+  taskId    Uuid?
+  projectId Uuid?
+  action    String
+  details   Jsonb?
+  createdAt TimestamptzJsDate @default(now())
+
+  actor   User    @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  task    Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([taskId, createdAt])
+  @@map("activity")
+}

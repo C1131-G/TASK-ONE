@@ -1,0 +1,70 @@
+[
+  {
+    "id": "column.public.rateLimit.id",
+    "label": "Add column \"id\" to \"rateLimit\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "id",
+        "table": "rateLimit"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"id\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "rateLimit", "id"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"id\"",
+        "sql": "ALTER TABLE \"public\".\"rateLimit\" ADD COLUMN \"id\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"id\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "rateLimit", "id"]
+      }
+    ]
+  },
+  {
+    "id": "unique.rateLimit.rateLimit_id_key",
+    "label": "Add unique constraint on \"rateLimit\" (id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "rateLimit_id_key",
+        "table": "rateLimit"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"rateLimit_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["rateLimit_id_key", "public", "\"public\".\"rateLimit\""]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"rateLimit_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"rateLimit\" ADD CONSTRAINT \"rateLimit_id_key\" UNIQUE (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"rateLimit_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": ["rateLimit_id_key", "public", "\"public\".\"rateLimit\""]
+      }
+    ]
+  }
+]

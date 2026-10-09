@@ -1,0 +1,16 @@
+// use prisma-8
+
+model ProjectMilestone {
+  id          Uuid @id @default(uuid())
+  projectId   Uuid
+  name        String
+  dueDate     DateString?
+  completedAt TimestamptzJsDate?
+  position    Int @default(0)
+  createdAt   TimestamptzJsDate @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, position])
+  @@map("project_milestone")
+}

@@ -1,0 +1,13 @@
+// use prisma-8
+
+model Team {
+  id          Uuid   @id @default(uuid())
+  name        String @unique
+  description String?
+  icon        String @default("users")
+  color       String @default("#8A867E")
+  createdAt   TimestamptzJsDate @default(now())
+  updatedAt   TimestamptzJsDate @default(now())
+
+  @@map("team")
+}

@@ -1,0 +1,22 @@
+// use prisma-8
+
+model Job {
+  id Uuid @id @default(uuid())
+  kind String
+  payload Json
+  dedupeKey String @unique
+  availableAt TimestamptzJsDate @default(now())
+  attempts Int @default(0)
+  maxAttempts Int @default(8)
+  leasedUntil TimestamptzJsDate?
+  leaseOwner String?
+  lastError String?
+  completedAt TimestamptzJsDate?
+  deadAt TimestamptzJsDate?
+  createdAt TimestamptzJsDate @default(now())
+  updatedAt TimestamptzJsDate @default(now())
+
+  @@index([availableAt, leasedUntil, completedAt, deadAt])
+  @@index([leaseOwner, leasedUntil])
+  @@map("job")
+}

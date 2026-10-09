@@ -1,0 +1,15 @@
+// use prisma-8
+
+model RecurrenceGeneration {
+  id Uuid @id @default(uuid())
+  sourceTaskId Uuid
+  successorTaskId Uuid @unique
+  generationKey String @unique
+  createdAt TimestamptzJsDate @default(now())
+
+  source Task @relation("RecurrenceSource", fields: [sourceTaskId], references: [id], onDelete: Restrict)
+  successor Task @relation("RecurrenceSuccessor", fields: [successorTaskId], references: [id], onDelete: Restrict)
+
+  @@index([sourceTaskId])
+  @@map("recurrence_generation")
+}

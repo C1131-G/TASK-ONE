@@ -1,0 +1,22 @@
+// use prisma-8
+
+model TaskSubtask {
+  id          Uuid @id @default(uuid())
+  taskId      Uuid
+  title       String
+  description String?
+  assigneeId  String?
+  dueDate     DateString?
+  isCompleted Boolean @default(false)
+  position    Int @default(0)
+  completedAt TimestamptzJsDate?
+  createdAt   TimestamptzJsDate @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignee User? @relation("SubtaskAssignee", fields: [assigneeId], references: [id], onDelete: Restrict)
+
+  @@index([taskId, position])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@map("task_subtask")
+}

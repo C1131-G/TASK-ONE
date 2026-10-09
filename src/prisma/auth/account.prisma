@@ -1,0 +1,23 @@
+// use prisma-8
+
+model Account {
+  id                    String @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  TimestamptzJsDate?
+  refreshTokenExpiresAt TimestamptzJsDate?
+  scope                 String?
+  password              String?
+  createdAt             TimestamptzJsDate @default(now())
+  updatedAt             TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@unique([providerId, accountId])
+  @@map("account")
+}

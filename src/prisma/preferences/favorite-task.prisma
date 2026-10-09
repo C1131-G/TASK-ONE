@@ -1,0 +1,13 @@
+// use prisma-8
+
+model FavoriteTask {
+  userId    String
+  taskId    Uuid
+  createdAt TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([userId, taskId])
+  @@map("favorite_task")
+}

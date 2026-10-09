@@ -1,0 +1,20 @@
+// use prisma-8
+
+model Comment {
+  id          Uuid @id @default(uuid())
+  taskId      Uuid
+  authorId    String
+  body        String
+  createdAt   TimestamptzJsDate @default(now())
+  updatedAt   TimestamptzJsDate @default(now())
+  deletedAt   TimestamptzJsDate?
+  deletedById String?
+
+  task      Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author    User @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  deletedBy User? @relation("CommentDeletedBy", fields: [deletedById], references: [id], onDelete: Restrict)
+
+  @@index([taskId, createdAt])
+  @@index([authorId])
+  @@map("comment")
+}

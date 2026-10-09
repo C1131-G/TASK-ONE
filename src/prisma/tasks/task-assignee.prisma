@@ -1,0 +1,17 @@
+// use prisma-8
+
+model TaskAssignee {
+  taskId       Uuid
+  userId       String
+  assignedById String
+  assignedAt   TimestamptzJsDate @default(now())
+
+  task       Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User @relation("TaskAssignee", fields: [userId], references: [id], onDelete: Restrict)
+  assignedBy User @relation("TaskAssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@id([taskId, userId])
+  @@index([userId, taskId])
+  @@index([assignedById])
+  @@map("task_assignee")
+}

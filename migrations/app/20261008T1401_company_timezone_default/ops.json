@@ -1,0 +1,30 @@
+[
+  {
+    "id": "setDefault.company_settings.timeZone",
+    "label": "Set default on \"company_settings\".\"timeZone\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "timeZone",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"timeZone\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "company_settings", "timeZone"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"timeZone\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ALTER COLUMN \"timeZone\" SET DEFAULT 'Asia/Kolkata'"
+      }
+    ],
+    "postcheck": []
+  }
+]

@@ -1,0 +1,4 @@
+// use prisma-8
+
+// This root file intentionally contains no models. The config includes every
+// opted-in PSL file below src/prisma/ as one Prisma ORM 8 contract.

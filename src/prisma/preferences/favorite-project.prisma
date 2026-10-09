@@ -1,0 +1,13 @@
+// use prisma-8
+
+model FavoriteProject {
+  userId    String
+  projectId Uuid
+  createdAt TimestamptzJsDate @default(now())
+
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([userId, projectId])
+  @@map("favorite_project")
+}

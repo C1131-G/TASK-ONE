@@ -1,0 +1,60 @@
+// use prisma-8
+
+enum TaskStatus {
+  @@type("pg/text@1")
+
+  Backlog    = "backlog"
+  Todo       = "todo"
+  InProgress = "progress"
+  Review     = "review"
+  Done       = "done"
+}
+
+enum TaskPriority {
+  @@type("pg/text@1")
+
+  Urgent = "urgent"
+  High   = "high"
+  Medium = "medium"
+  Low    = "low"
+  None   = "none"
+}
+
+enum ProjectStatus {
+  @@type("pg/text@1")
+
+  Planning = "planning"
+  Active   = "active"
+  Risk     = "risk"
+  Hold     = "hold"
+  Complete = "complete"
+}
+
+enum RecurrenceFrequency {
+  @@type("pg/text@1")
+
+  Daily   = "daily"
+  Weekly  = "weekly"
+  Biweekly = "biweekly"
+  Monthly = "monthly"
+}
+
+enum SavedViewType {
+  @@type("pg/text@1")
+
+  Board    = "board"
+  List     = "list"
+  Table    = "table"
+  Calendar = "calendar"
+  Timeline = "timeline"
+}
+
+enum NotificationType {
+  @@type("pg/text@1")
+
+  Mention    = "mention"
+  Assignment = "assignment"
+  Comment    = "comment"
+  Update     = "update"
+  Due        = "due"
+}

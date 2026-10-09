@@ -1,0 +1,18 @@
+// use prisma-8
+
+model TaskRecurrence {
+  id          Uuid @id @default(uuid())
+  taskId      Uuid @unique
+  frequency   RecurrenceFrequency
+  interval    Int @default(1)
+  weekDays    Jsonb?
+  endsOn      DateString?
+  nextRunAt   DateString?
+  createdAt   TimestamptzJsDate @default(now())
+  updatedAt   TimestamptzJsDate @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@check(expression: "\"interval\" > 0", name: "task_recurrence_interval_positive")
+  @@map("task_recurrence")
+}

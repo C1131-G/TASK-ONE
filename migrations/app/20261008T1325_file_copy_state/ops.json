@@ -1,0 +1,112 @@
+[
+  {
+    "id": "column.public.file_asset.copyError",
+    "label": "Add column \"copyError\" to \"file_asset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "copyError",
+        "table": "file_asset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"copyError\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "file_asset", "copyError"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"copyError\"",
+        "sql": "ALTER TABLE \"public\".\"file_asset\" ADD COLUMN \"copyError\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"copyError\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "file_asset", "copyError"]
+      }
+    ]
+  },
+  {
+    "id": "column.public.file_asset.copyState",
+    "label": "Add column \"copyState\" to \"file_asset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "copyState",
+        "table": "file_asset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"copyState\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "file_asset", "copyState"]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"copyState\"",
+        "sql": "ALTER TABLE \"public\".\"file_asset\" ADD COLUMN \"copyState\" text DEFAULT 'ready' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"copyState\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": ["public", "file_asset", "copyState"]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.file_asset.file_asset_copy_state_valid_08b2bfa7",
+    "label": "Add check constraint \"file_asset_copy_state_valid_08b2bfa7\" on \"file_asset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "file_asset_copy_state_valid_08b2bfa7",
+        "table": "file_asset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"file_asset_copy_state_valid_08b2bfa7\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "file_asset_copy_state_valid_08b2bfa7",
+          "public",
+          "\"public\".\"file_asset\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"file_asset_copy_state_valid_08b2bfa7\"",
+        "sql": "ALTER TABLE \"public\".\"file_asset\" ADD CONSTRAINT \"file_asset_copy_state_valid_08b2bfa7\" CHECK (\"copyState\" IN ('pending', 'ready', 'failed'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"file_asset_copy_state_valid_08b2bfa7\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "file_asset_copy_state_valid_08b2bfa7",
+          "public",
+          "\"public\".\"file_asset\""
+        ]
+      }
+    ]
+  }
+]

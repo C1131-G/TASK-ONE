@@ -1,0 +1,15 @@
+// use prisma-8
+
+model NotificationPreference {
+  id        Uuid @id @default(uuid())
+  userId    String
+  channel   String
+  eventType String
+  enabled   Boolean @default(true)
+  updatedAt TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel, eventType])
+  @@map("notification_preference")
+}

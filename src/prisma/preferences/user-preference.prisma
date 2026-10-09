@@ -1,0 +1,14 @@
+// use prisma-8
+
+model UserPreference {
+  id        Uuid @id @default(uuid())
+  userId    String
+  key       String
+  value     Jsonb
+  updatedAt TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@map("user_preference")
+}

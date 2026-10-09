@@ -1,0 +1,11 @@
+// use prisma-8
+
+model RateLimit {
+  id          String? @unique
+  key         String @id
+  count       Int
+  lastRequest BigInt
+
+  @@index([lastRequest])
+  @@map("rateLimit")
+}
