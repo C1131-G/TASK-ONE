@@ -5,10 +5,8 @@ import { Effect } from "effect";
 
 import { authPool } from "../../src/server/auth/database";
 import { runEffectResult } from "../../src/server/core/action-result";
-import {
-  ProjectManagement,
-  ProjectManagementLive,
-} from "../../src/server/projects/project-management";
+import { ProjectManagement } from "../../src/server/projects/project-contracts";
+import { ProjectManagementLive } from "../../src/server/projects/project-management";
 
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
