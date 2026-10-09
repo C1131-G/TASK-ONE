@@ -42,17 +42,22 @@ const getHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listLabelsAction(input: unknown) {
-  return await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* listLabels() {
-      const requestHeaders = yield* getHeaders();
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      const labels = yield* LabelManagement;
-      return yield* labels.list(user.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(LabelManagementLive)
-    )
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listLabels() {
+        const requestHeaders = yield* getHeaders();
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const labels = yield* LabelManagement;
+        return yield* labels.list(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(LabelManagementLive)
+      ),
+    undefined,
+    Schema.Array(LabelSummarySchema)
   );
 }
 

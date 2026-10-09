@@ -25,18 +25,23 @@ const requestHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function getCompanySettingsAction(input: unknown = {}) {
-  return await runServerAction(input, Schema.Struct({}), (validated) =>
-    Effect.gen(function* getSettings() {
-      void validated;
-      const currentHeaders = yield* requestHeaders();
-      const sessions = yield* AuthSession;
-      const actor = yield* sessions.requireWorkspaceAccess(currentHeaders);
-      const settings = yield* CompanySettingsManagement;
-      return yield* settings.get(actor.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(CompanySettingsManagementLive)
-    )
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    (validated) =>
+      Effect.gen(function* getSettings() {
+        void validated;
+        const currentHeaders = yield* requestHeaders();
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(currentHeaders);
+        const settings = yield* CompanySettingsManagement;
+        return yield* settings.get(actor.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(CompanySettingsManagementLive)
+      ),
+    undefined,
+    CompanySettingsValuesSchema
   );
 }
 

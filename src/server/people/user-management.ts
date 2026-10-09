@@ -51,6 +51,36 @@ export interface TemporaryPasswordResult {
   readonly temporaryPassword: string;
 }
 
+export const CreatedEmployeeSchema = Schema.Struct({
+  email: Schema.String,
+  employeeId: Schema.String,
+  id: Schema.String,
+  name: Schema.String,
+  role: Schema.Literals(["employee", "admin"]),
+  temporaryPassword: Schema.String,
+});
+
+export const EmployeeDirectoryEntrySchema = Schema.Struct({
+  avatar: Schema.NullOr(Schema.String),
+  email: Schema.String,
+  employeeId: Schema.String,
+  id: Schema.String,
+  jobTitle: Schema.NullOr(Schema.String),
+  name: Schema.String,
+  role: Schema.Literals(["admin", "employee"]),
+  teamId: Schema.NullOr(Schema.String),
+  teamName: Schema.NullOr(Schema.String),
+});
+
+export const EmployeeDirectorySchema = Schema.Array(
+  EmployeeDirectoryEntrySchema
+);
+
+export const TemporaryPasswordResultSchema = Schema.Struct({
+  employeeId: Schema.String,
+  temporaryPassword: Schema.String,
+});
+
 export class UserManagement extends Context.Service<
   UserManagement,
   {

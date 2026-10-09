@@ -11,6 +11,7 @@ import { runServerAction } from "@/src/server/core/server-action";
 import {
   SessionManagement,
   SessionManagementLive,
+  SessionSummarySchema,
 } from "@/src/server/people/session-management";
 
 const noInput = Schema.Struct({});
@@ -28,17 +29,22 @@ const getRequestHeaders = () =>
 // oxlint-disable-next-line eslint(func-style) -- Next requires exported Server Actions in this form.
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listMySessionsAction(input: unknown) {
-  const result = await runServerAction(input, noInput, () =>
-    Effect.gen(function* listMySessions() {
-      const requestHeaders = yield* getRequestHeaders();
-      const session = yield* AuthSession;
-      const user = yield* session.requireAuthenticated(requestHeaders);
-      const management = yield* SessionManagement;
-      return yield* management.listSessions(user.id, user.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(SessionManagementLive)
-    )
+  const result = await runServerAction(
+    input,
+    noInput,
+    () =>
+      Effect.gen(function* listMySessions() {
+        const requestHeaders = yield* getRequestHeaders();
+        const session = yield* AuthSession;
+        const user = yield* session.requireAuthenticated(requestHeaders);
+        const management = yield* SessionManagement;
+        return yield* management.listSessions(user.id, user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(SessionManagementLive)
+      ),
+    undefined,
+    Schema.Array(SessionSummarySchema)
   );
   return result;
 }
@@ -61,7 +67,9 @@ export async function listEmployeeSessionsAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(SessionManagementLive)
-      )
+      ),
+    undefined,
+    Schema.Array(SessionSummarySchema)
   );
   return result;
 }
@@ -82,7 +90,9 @@ export async function revokeSessionAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(SessionManagementLive)
-      )
+      ),
+    undefined,
+    Schema.Undefined
   );
   return result;
 }

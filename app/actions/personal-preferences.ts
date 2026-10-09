@@ -28,17 +28,22 @@ const getRequestHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function getPersonalPreferencesAction(input: unknown) {
-  return await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* getPreferences() {
-      const requestHeaders = yield* getRequestHeaders();
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      const preferences = yield* PersonalPreferences;
-      return yield* preferences.get(user.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(PersonalPreferencesLive)
-    )
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getPreferences() {
+        const requestHeaders = yield* getRequestHeaders();
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const preferences = yield* PersonalPreferences;
+        return yield* preferences.get(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(PersonalPreferencesLive)
+      ),
+    undefined,
+    PersonalPreferenceSchema
   );
 }
 

@@ -45,17 +45,22 @@ const getRequestHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listSavedViewsAction(input: unknown) {
-  const result = await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* listViews() {
-      const requestHeaders = yield* getRequestHeaders();
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      const views = yield* SavedViewManagement;
-      return yield* views.listViews(user.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(SavedViewManagementLive)
-    )
+  const result = await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listViews() {
+        const requestHeaders = yield* getRequestHeaders();
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const views = yield* SavedViewManagement;
+        return yield* views.listViews(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(SavedViewManagementLive)
+      ),
+    undefined,
+    Schema.Array(SavedViewSummarySchema)
   );
   return result;
 }

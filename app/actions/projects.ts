@@ -18,6 +18,7 @@ import {
   DuplicateProjectInputSchema,
   ProjectManagement,
   ProjectManagementLive,
+  ProjectListItemSchema,
   ProjectMilestonesResultSchema,
   ProjectSummarySchema,
   ProjectWithPeopleSchema,
@@ -74,17 +75,22 @@ const requestHeadersOrFail = Effect.tryPromise({
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listProjectsAction(input: unknown) {
-  return await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* listProjects() {
-      const requestHeaders = yield* requestHeadersOrFail;
-      const sessions = yield* AuthSession;
-      const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      const projects = yield* ProjectManagement;
-      return yield* projects.listProjects(actor.id);
-    }).pipe(
-      Effect.provide(AuthSessionLive),
-      Effect.provide(ProjectManagementLive)
-    )
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listProjects() {
+        const requestHeaders = yield* requestHeadersOrFail;
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const projects = yield* ProjectManagement;
+        return yield* projects.listProjects(actor.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(ProjectManagementLive)
+      ),
+    undefined,
+    Schema.Array(ProjectListItemSchema)
   );
 }
 

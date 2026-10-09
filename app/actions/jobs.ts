@@ -8,7 +8,11 @@ import { AppError } from "@/src/server/core/action-result";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import { runServerAction } from "@/src/server/core/server-action";
 import { JobHandlersLive } from "@/src/server/jobs/handlers";
-import { JobProcessor, JobProcessorLive } from "@/src/server/jobs/processor";
+import {
+  DeadJobListSchema,
+  JobProcessor,
+  JobProcessorLive,
+} from "@/src/server/jobs/processor";
 import { PushTransportLive } from "@/src/server/notifications/push-transport";
 import { StorageLive } from "@/src/server/storage/storage";
 
@@ -41,7 +45,9 @@ export async function listDeadJobsAction(input: unknown) {
             )
           )
         )
-      )
+      ),
+    undefined,
+    DeadJobListSchema
   );
   return result;
 }

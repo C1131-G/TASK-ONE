@@ -24,6 +24,8 @@ import {
   FileCopyResultSchema,
   FileUndoReceiptSchema,
   FinalizedFileSchema,
+  FinalizedFileListSchema,
+  UploadTicketSchema,
   Uploads,
   UploadsLive,
 } from "@/src/server/storage/uploads";
@@ -37,25 +39,31 @@ const runUploadAction = <
   execute: (
     userId: string,
     validated: InputSchema["Type"]
-  ) => Effect.Effect<Result, AppError, Uploads | Idempotency>
+  ) => Effect.Effect<Result, AppError, Uploads | Idempotency>,
+  outputSchema?: Schema.Codec<unknown, unknown, never, never>
 ): Promise<ActionResult<Result>> =>
-  runServerAction(input, schema, (validated) =>
-    Effect.gen(function* authorizeUploadAction() {
-      const requestHeaders = yield* Effect.tryPromise({
-        catch: () =>
-          new AppError({
-            code: "UNAVAILABLE",
-            message: "The request could not be completed.",
-          }),
-        try: () => headers(),
-      });
-      const sessions = yield* AuthSession;
-      const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
-      return yield* execute(user.id, validated).pipe(
-        Effect.provide(Layer.provide(UploadsLive, StorageLive)),
-        Effect.provide(IdempotencyLive)
-      );
-    }).pipe(Effect.provide(AuthSessionLive))
+  runServerAction(
+    input,
+    schema,
+    (validated) =>
+      Effect.gen(function* authorizeUploadAction() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        return yield* execute(user.id, validated).pipe(
+          Effect.provide(Layer.provide(UploadsLive, StorageLive)),
+          Effect.provide(IdempotencyLive)
+        );
+      }).pipe(Effect.provide(AuthSessionLive)),
+    undefined,
+    outputSchema
   );
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -72,7 +80,8 @@ export async function requestTaskUploadAction(input: unknown) {
       Effect.gen(function* requestTaskUpload() {
         const uploads = yield* Uploads;
         return yield* uploads.requestTaskUpload(userId, validated);
-      })
+      }),
+    UploadTicketSchema
   );
   return result;
 }
@@ -91,7 +100,8 @@ export async function requestProjectUploadAction(input: unknown) {
       Effect.gen(function* requestStandaloneProjectUpload() {
         const uploads = yield* Uploads;
         return yield* uploads.requestProjectUpload(userId, validated);
-      })
+      }),
+    UploadTicketSchema
   );
 }
 
@@ -104,7 +114,8 @@ export async function listProjectFilesAction(input: unknown) {
       Effect.gen(function* listProjectFiles() {
         const uploads = yield* Uploads;
         return yield* uploads.listProjectFiles(userId, validated.projectId);
-      })
+      }),
+    FinalizedFileListSchema
   );
 }
 
@@ -117,7 +128,8 @@ export async function listTaskFilesAction(input: unknown) {
       Effect.gen(function* listTaskFiles() {
         const uploads = yield* Uploads;
         return yield* uploads.listTaskFiles(userId, validated.taskId);
-      })
+      }),
+    FinalizedFileListSchema
   );
 }
 
@@ -133,7 +145,8 @@ export async function requestAvatarUploadAction(input: unknown) {
       Effect.gen(function* requestAvatarUpload() {
         const uploads = yield* Uploads;
         return yield* uploads.requestAvatarUpload(userId, validated);
-      })
+      }),
+    UploadTicketSchema
   );
 }
 
@@ -176,7 +189,8 @@ export async function getAvatarDownloadUrlAction(input: unknown) {
       Effect.gen(function* getAvatarDownloadUrl() {
         const uploads = yield* Uploads;
         return yield* uploads.signedAvatar(requesterId, validated.userId);
-      })
+      }),
+    Schema.NullOr(Schema.String)
   );
 }
 
@@ -221,7 +235,8 @@ export async function getFileDownloadUrlAction(input: unknown) {
       Effect.gen(function* getFileDownloadUrl() {
         const uploads = yield* Uploads;
         return yield* uploads.signedDownload(userId, validated.fileId);
-      })
+      }),
+    Schema.String
   );
   return result;
 }
@@ -235,7 +250,8 @@ export async function getFilePreviewUrlAction(input: unknown) {
       Effect.gen(function* getFilePreviewUrl() {
         const uploads = yield* Uploads;
         return yield* uploads.signedPreview(userId, validated.fileId);
-      })
+      }),
+    Schema.String
   );
 }
 

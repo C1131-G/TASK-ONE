@@ -34,6 +34,18 @@ export interface DeadJobSummary {
   readonly deadAt: string | null;
 }
 
+export const DeadJobSummarySchema = Schema.Struct({
+  attempts: Schema.Number,
+  createdAt: Schema.String,
+  deadAt: Schema.NullOr(Schema.String),
+  id: Schema.String,
+  kind: Schema.String,
+  lastError: Schema.NullOr(Schema.String),
+  maxAttempts: Schema.Number,
+});
+
+export const DeadJobListSchema = Schema.Array(DeadJobSummarySchema);
+
 export class JobProcessor extends Context.Service<
   JobProcessor,
   {

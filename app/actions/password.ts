@@ -43,7 +43,9 @@ export async function changeOwnPasswordAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(PasswordManagementLive)
-      )
+      ),
+    undefined,
+    Schema.Undefined
   );
   return result;
 }

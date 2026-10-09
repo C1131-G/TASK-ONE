@@ -51,6 +51,16 @@ export interface UploadTicket {
     readonly "if-none-match": "*";
   };
 }
+
+export const UploadTicketSchema = Schema.Struct({
+  requiredHeaders: Schema.Struct({
+    "content-type": Schema.String,
+    "if-none-match": Schema.Literal("*"),
+  }),
+  uploadIntentId: Schema.String,
+  uploadUrl: Schema.String,
+});
+
 export const FinalizedFileSchema = Schema.Struct({
   contentType: Schema.String,
   copyState: Schema.Literals(["pending", "ready", "failed"]),
@@ -62,6 +72,8 @@ export const FinalizedFileSchema = Schema.Struct({
   taskId: Schema.NullOr(Schema.String),
   uploadedById: Schema.String,
 });
+
+export const FinalizedFileListSchema = Schema.Array(FinalizedFileSchema);
 
 export const FileUndoReceiptSchema = Schema.Struct({
   expiresAt: Schema.String,

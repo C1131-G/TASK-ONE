@@ -19,7 +19,10 @@ import {
 } from "@/src/server/core/input-schemas";
 import { runServerAction } from "@/src/server/core/server-action";
 import {
+  CreatedEmployeeSchema,
   CreateEmployeeInputSchema,
+  EmployeeDirectorySchema,
+  TemporaryPasswordResultSchema,
   UpdateOwnProfileInputSchema,
   UserManagement,
   UserManagementLive,
@@ -54,7 +57,9 @@ export async function listEmployeesAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive)
-      )
+      ),
+    undefined,
+    EmployeeDirectorySchema
   );
 }
 
@@ -80,7 +85,9 @@ export async function createEmployeeAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive)
-      )
+      ),
+    undefined,
+    CreatedEmployeeSchema
   );
 
   if (action.ok) {
@@ -259,7 +266,9 @@ export async function resetEmployeePasswordAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive)
-      )
+      ),
+    undefined,
+    TemporaryPasswordResultSchema
   );
 
   if (action.ok) {

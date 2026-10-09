@@ -56,14 +56,22 @@ const requestHeaders = () =>
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listTeamsAction(input: unknown) {
-  return await runServerAction(input, Schema.Struct({}), () =>
-    Effect.gen(function* listTeams() {
-      const currentHeaders = yield* requestHeaders();
-      const sessions = yield* AuthSession;
-      const actor = yield* sessions.requireWorkspaceAccess(currentHeaders);
-      const teams = yield* TeamManagement;
-      return yield* teams.listTeams(actor.id);
-    }).pipe(Effect.provide(AuthSessionLive), Effect.provide(TeamManagementLive))
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listTeams() {
+        const currentHeaders = yield* requestHeaders();
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(currentHeaders);
+        const teams = yield* TeamManagement;
+        return yield* teams.listTeams(actor.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(TeamManagementLive)
+      ),
+    undefined,
+    Schema.Array(TeamSummarySchema)
   );
 }
 

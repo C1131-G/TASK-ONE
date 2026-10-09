@@ -63,6 +63,13 @@ export const ProjectWithPeopleSchema = Schema.Struct({
   memberIds: Schema.Array(Schema.String),
 });
 
+export const ProjectListItemSchema = Schema.Struct({
+  ...ProjectWithPeopleSchema.fields,
+  completedTaskCount: Schema.Number,
+  progress: Schema.Number,
+  taskCount: Schema.Number,
+});
+
 export const ProjectMilestonesResultSchema = Schema.Struct({
   milestones: Schema.Array(
     Schema.Struct({

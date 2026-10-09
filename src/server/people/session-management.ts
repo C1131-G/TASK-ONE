@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
@@ -11,6 +11,14 @@ export interface SessionSummary {
   readonly ipAddress: string | null;
   readonly userAgent: string | null;
 }
+
+export const SessionSummarySchema = Schema.Struct({
+  createdAt: Schema.String,
+  expiresAt: Schema.String,
+  id: Schema.String,
+  ipAddress: Schema.NullOr(Schema.String),
+  userAgent: Schema.NullOr(Schema.String),
+});
 
 export class SessionManagement extends Context.Service<
   SessionManagement,

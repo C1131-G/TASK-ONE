@@ -155,6 +155,22 @@ export interface ProjectTaskListItem extends CreatedTask {
   readonly completedSubtaskCount: number;
 }
 
+export const ProjectTaskListItemSchema = Schema.Struct({
+  ...CreatedTaskSchema.fields,
+  archivedAt: Schema.NullOr(Schema.String),
+  assignees: Schema.Array(
+    Schema.Struct({ id: Schema.String, name: Schema.String })
+  ),
+  completedAt: Schema.NullOr(Schema.String),
+  completedSubtaskCount: Schema.Number,
+  dependencyIds: Schema.Array(Schema.String),
+  estimate: Schema.NullOr(Schema.String),
+  labelIds: Schema.Array(Schema.String),
+  position: Schema.Number,
+  startDate: Schema.NullOr(Schema.String),
+  subtaskCount: Schema.Number,
+});
+
 export class WorkManagement extends Context.Service<
   WorkManagement,
   {

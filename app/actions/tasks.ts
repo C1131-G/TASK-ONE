@@ -30,6 +30,7 @@ import {
 } from "@/src/server/tasks/task-relations";
 import {
   CreatedTaskSchema,
+  ProjectTaskListItemSchema,
   TaskArchiveUndoReceiptSchema,
   TaskRecurrenceInputSchema,
   TaskVersionResultSchema,
@@ -101,7 +102,9 @@ export async function listProjectTasksAction(input: unknown) {
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(WorkManagementLive)
-      )
+      ),
+    undefined,
+    Schema.Array(ProjectTaskListItemSchema)
   );
 }
 
