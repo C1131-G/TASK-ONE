@@ -21,25 +21,24 @@ import {
   IdempotencyKeySchema,
   UUIDSchema,
 } from "@/src/server/core/input-schemas";
-import {
-  ServerActionOutputSchema,
-  runServerAction,
-} from "@/src/server/core/server-action";
+import { runServerAction } from "@/src/server/core/server-action";
 
 const runCollaborationAction = <
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
-  Result,
-  OutputSchema extends Schema.Codec<unknown, unknown, never, never> =
-    typeof ServerActionOutputSchema,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never>,
 >(
   input: unknown,
   schema: InputSchema,
   execute: (
     actorId: string,
     validated: InputSchema["Type"]
-  ) => Effect.Effect<Result, AppError, Collaboration | Idempotency>,
-  outputSchema: OutputSchema = ServerActionOutputSchema as unknown as OutputSchema
-): Promise<ActionResult<Result>> =>
+  ) => Effect.Effect<
+    OutputSchema["Type"],
+    AppError,
+    Collaboration | Idempotency
+  >,
+  outputSchema: OutputSchema
+): Promise<ActionResult<OutputSchema["Type"]>> =>
   runServerAction(
     input,
     schema,
@@ -62,7 +61,7 @@ const runCollaborationAction = <
       }).pipe(Effect.provide(AuthSessionLive)),
     undefined,
     outputSchema
-  ) as Promise<ActionResult<Result>>;
+  );
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listTaskCommentsAction(input: unknown) {
@@ -105,7 +104,8 @@ export async function createCommentAction(input: unknown) {
           operation: "comment.create",
           resultSchema: CreatedCommentSchema,
         });
-      })
+      }),
+    CreatedCommentSchema
   );
 
   if (result.ok) {
@@ -135,7 +135,8 @@ export async function removeCommentAction(input: unknown) {
           operation: "comment.remove",
           resultSchema: UndoReceiptSchema,
         });
-      })
+      }),
+    UndoReceiptSchema
   );
 
   if (result.ok) {
@@ -167,7 +168,8 @@ export async function undoCommentRemovalAction(input: unknown) {
           operation: "comment.undoRemoval",
           resultSchema: CommentUndoneResultSchema,
         });
-      })
+      }),
+    CommentUndoneResultSchema
   );
 
   if (result.ok) {
@@ -202,7 +204,8 @@ export async function toggleCommentReactionAction(input: unknown) {
           operation: "comment.toggleReaction",
           resultSchema: CommentReactionResultSchema,
         });
-      })
+      }),
+    CommentReactionResultSchema
   );
 
   if (result.ok) {
