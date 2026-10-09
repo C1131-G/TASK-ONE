@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.job.leaseToken",
+    "label": "Add column \"leaseToken\" to \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "leaseToken",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"leaseToken\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "job",
+          "leaseToken"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"leaseToken\"",
+        "sql": "ALTER TABLE \"public\".\"job\" ADD COLUMN \"leaseToken\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"leaseToken\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "job",
+          "leaseToken"
+        ]
+      }
+    ]
+  }
+]

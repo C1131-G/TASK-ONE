@@ -10,6 +10,7 @@ model Job {
   maxAttempts Int @default(8)
   leasedUntil TimestamptzJsDate?
   leaseOwner String?
+  leaseToken Uuid?
   lastError String?
   completedAt TimestamptzJsDate?
   deadAt TimestamptzJsDate?

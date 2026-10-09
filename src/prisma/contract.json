@@ -408,8 +408,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -520,8 +524,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["actorId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -532,8 +540,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -544,8 +556,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -659,8 +675,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["createdById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -671,8 +691,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -746,8 +770,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["eventId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "eventId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "CalendarEvent",
@@ -758,8 +786,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -847,8 +879,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["authorId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "authorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -859,8 +895,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["deletedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "deletedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -871,8 +911,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -947,8 +991,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["commentId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "commentId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Comment",
@@ -959,8 +1007,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1107,8 +1159,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -1119,8 +1175,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1173,8 +1233,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -1185,8 +1249,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1309,8 +1377,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["deletedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "deletedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1321,8 +1393,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -1333,8 +1409,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -1345,8 +1425,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["uploadedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "uploadedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1457,8 +1541,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["actorId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1566,6 +1654,13 @@
                   "kind": "scalar"
                 }
               },
+              "leaseToken": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
               "leasedUntil": {
                 "nullable": true,
                 "type": {
@@ -1627,6 +1722,9 @@
                 },
                 "leaseOwner": {
                   "column": "leaseOwner"
+                },
+                "leaseToken": {
+                  "column": "leaseToken"
                 },
                 "leasedUntil": {
                   "column": "leasedUntil"
@@ -1780,8 +1878,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["actorId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1792,8 +1894,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -1804,8 +1910,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -1816,8 +1926,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -1912,8 +2026,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2079,8 +2197,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["archivedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "archivedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2091,8 +2213,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["leadId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "leadId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2103,8 +2229,12 @@
                 "cardinality": "1:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["projectId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
                 },
                 "to": {
                   "model": "ProjectTaskCounter",
@@ -2115,8 +2245,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["teamId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "teamId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Team",
@@ -2126,8 +2260,12 @@
               "uploadIntents": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["projectId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
                 },
                 "to": {
                   "model": "UploadIntent",
@@ -2222,8 +2360,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -2234,8 +2376,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2316,8 +2462,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -2382,8 +2532,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -2457,8 +2611,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2548,8 +2706,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2672,8 +2834,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -2743,8 +2909,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["sourceTaskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "sourceTaskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -2755,8 +2925,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["successorTaskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "successorTaskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -2884,8 +3058,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -2896,8 +3074,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3019,8 +3201,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3208,8 +3394,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["archivedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "archivedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3220,8 +3410,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["createdById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3232,8 +3426,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -3243,8 +3441,12 @@
               "recurrenceSources": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["sourceTaskId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "sourceTaskId"
+                  ]
                 },
                 "to": {
                   "model": "RecurrenceGeneration",
@@ -3255,8 +3457,12 @@
                 "cardinality": "1:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["successorTaskId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "successorTaskId"
+                  ]
                 },
                 "to": {
                   "model": "RecurrenceGeneration",
@@ -3266,8 +3472,12 @@
               "uploadIntents": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["taskId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
                 },
                 "to": {
                   "model": "UploadIntent",
@@ -3372,8 +3582,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["assignedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "assignedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3384,8 +3598,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3396,8 +3614,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3453,8 +3675,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["dependsOnTaskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "dependsOnTaskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3465,8 +3691,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3512,8 +3742,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["labelId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "labelId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Label",
@@ -3524,8 +3758,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3623,8 +3861,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3744,8 +3986,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["assigneeId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "assigneeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -3756,8 +4002,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -3954,8 +4204,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["actorId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -4103,8 +4357,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["ownerId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "ownerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -4115,8 +4373,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["projectId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Project",
@@ -4127,8 +4389,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -4325,8 +4591,12 @@
               "assignedSubtasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["assigneeId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "assigneeId"
+                  ]
                 },
                 "to": {
                   "model": "TaskSubtask",
@@ -4337,8 +4607,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["deactivatedById"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "deactivatedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -4348,8 +4622,12 @@
               "deactivatedUsers": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["deactivatedById"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "deactivatedById"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -4359,8 +4637,12 @@
               "idempotencyKeys": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["actorId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
                 },
                 "to": {
                   "model": "IdempotencyKey",
@@ -4370,8 +4652,12 @@
               "pushDeliveries": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["userId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
                 },
                 "to": {
                   "model": "PushDelivery",
@@ -4381,8 +4667,12 @@
               "pushSubscriptions": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["userId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
                 },
                 "to": {
                   "model": "PushSubscription",
@@ -4393,8 +4683,12 @@
                 "cardinality": "N:1",
                 "nullable": true,
                 "on": {
-                  "localFields": ["teamId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "teamId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Team",
@@ -4404,8 +4698,12 @@
               "undoRecords": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["actorId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
                 },
                 "to": {
                   "model": "UndoRecord",
@@ -4415,8 +4713,12 @@
               "uploadIntents": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["ownerId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "ownerId"
+                  ]
                 },
                 "to": {
                   "model": "UploadIntent",
@@ -4531,8 +4833,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -4722,12 +5028,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "account"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -4735,18 +5045,25 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "account_userId_idx_a489d58a",
                   "prefix": "account_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["providerId", "accountId"]
+                  "columns": [
+                    "providerId",
+                    "accountId"
+                  ]
                 }
               ]
             },
@@ -4796,12 +5113,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["actorId"],
+                    "columns": [
+                      "actorId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "activity"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -4809,12 +5130,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "activity"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -4822,12 +5147,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "activity"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -4835,50 +5164,69 @@
               ],
               "indexes": [
                 {
-                  "columns": ["actorId", "createdAt"],
+                  "columns": [
+                    "actorId",
+                    "createdAt"
+                  ],
                   "name": "activity_actorId_createdAt_idx_0e9f1adf",
                   "prefix": "activity_actorId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["actorId"],
+                  "columns": [
+                    "actorId"
+                  ],
                   "name": "activity_actorId_idx_a58f6b4b",
                   "prefix": "activity_actorId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["createdAt"],
+                  "columns": [
+                    "createdAt"
+                  ],
                   "name": "activity_createdAt_idx_9575dbd7",
                   "prefix": "activity_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "createdAt"],
+                  "columns": [
+                    "projectId",
+                    "createdAt"
+                  ],
                   "name": "activity_projectId_createdAt_idx_d2d6484f",
                   "prefix": "activity_projectId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "activity_projectId_idx_a96e4d92",
                   "prefix": "activity_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId", "createdAt"],
+                  "columns": [
+                    "taskId",
+                    "createdAt"
+                  ],
                   "name": "activity_taskId_createdAt_idx_f41547ff",
                   "prefix": "activity_taskId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "activity_taskId_idx_4965c936",
                   "prefix": "activity_taskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -4954,12 +5302,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "calendar_event"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -4967,12 +5319,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["createdById"],
+                    "columns": [
+                      "createdById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "calendar_event"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -4980,32 +5336,43 @@
               ],
               "indexes": [
                 {
-                  "columns": ["createdById"],
+                  "columns": [
+                    "createdById"
+                  ],
                   "name": "calendar_event_createdById_idx_8bf640ed",
                   "prefix": "calendar_event_createdById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "calendar_event_projectId_idx_a96e4d92",
                   "prefix": "calendar_event_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "startsAt"],
+                  "columns": [
+                    "projectId",
+                    "startsAt"
+                  ],
                   "name": "calendar_event_projectId_startsAt_idx_f24326de",
                   "prefix": "calendar_event_projectId_startsAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["startsAt"],
+                  "columns": [
+                    "startsAt"
+                  ],
                   "name": "calendar_event_startsAt_idx_5ff0df68",
                   "prefix": "calendar_event_startsAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -5035,12 +5402,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["eventId"],
+                    "columns": [
+                      "eventId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "calendar_event_attendee"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "calendar_event"
                   }
@@ -5048,12 +5419,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "calendar_event_attendee"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5061,20 +5436,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["eventId"],
+                  "columns": [
+                    "eventId"
+                  ],
                   "name": "calendar_event_attendee_eventId_idx_6a266d47",
                   "prefix": "calendar_event_attendee_eventId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "calendar_event_attendee_userId_idx_a489d58a",
                   "prefix": "calendar_event_attendee_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["eventId", "userId"]
+                "columns": [
+                  "eventId",
+                  "userId"
+                ]
               },
               "uniques": []
             },
@@ -5133,12 +5515,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -5146,12 +5532,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["authorId"],
+                    "columns": [
+                      "authorId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5159,12 +5549,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["deletedById"],
+                    "columns": [
+                      "deletedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5172,32 +5566,43 @@
               ],
               "indexes": [
                 {
-                  "columns": ["authorId"],
+                  "columns": [
+                    "authorId"
+                  ],
                   "name": "comment_authorId_idx_e47547ed",
                   "prefix": "comment_authorId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["deletedById"],
+                  "columns": [
+                    "deletedById"
+                  ],
                   "name": "comment_deletedById_idx_6409fd1e",
                   "prefix": "comment_deletedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId", "createdAt"],
+                  "columns": [
+                    "taskId",
+                    "createdAt"
+                  ],
                   "name": "comment_taskId_createdAt_idx_f41547ff",
                   "prefix": "comment_taskId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "comment_taskId_idx_4965c936",
                   "prefix": "comment_taskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -5232,12 +5637,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["commentId"],
+                    "columns": [
+                      "commentId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment_reaction"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment"
                   }
@@ -5245,12 +5654,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "comment_reaction"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5258,20 +5671,28 @@
               ],
               "indexes": [
                 {
-                  "columns": ["commentId"],
+                  "columns": [
+                    "commentId"
+                  ],
                   "name": "comment_reaction_commentId_idx_b5a4f615",
                   "prefix": "comment_reaction_commentId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "comment_reaction_userId_idx_a489d58a",
                   "prefix": "comment_reaction_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["commentId", "userId", "emoji"]
+                "columns": [
+                  "commentId",
+                  "userId",
+                  "emoji"
+                ]
               },
               "uniques": []
             },
@@ -5360,11 +5781,15 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["slug"]
+                  "columns": [
+                    "slug"
+                  ]
                 }
               ]
             },
@@ -5394,12 +5819,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "favorite_project"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5407,12 +5836,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "favorite_project"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -5420,20 +5853,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "favorite_project_projectId_idx_a96e4d92",
                   "prefix": "favorite_project_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "favorite_project_userId_idx_a489d58a",
                   "prefix": "favorite_project_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["userId", "projectId"]
+                "columns": [
+                  "userId",
+                  "projectId"
+                ]
               },
               "uniques": []
             },
@@ -5463,12 +5903,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "favorite_task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5476,12 +5920,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "favorite_task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -5489,20 +5937,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "favorite_task_taskId_idx_4965c936",
                   "prefix": "favorite_task_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "favorite_task_userId_idx_a489d58a",
                   "prefix": "favorite_task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["userId", "taskId"]
+                "columns": [
+                  "userId",
+                  "taskId"
+                ]
               },
               "uniques": []
             },
@@ -5598,12 +6053,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "file_asset"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -5611,12 +6070,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "file_asset"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -5624,12 +6087,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["uploadedById"],
+                    "columns": [
+                      "uploadedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "file_asset"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5637,12 +6104,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["deletedById"],
+                    "columns": [
+                      "deletedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "file_asset"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5650,42 +6121,57 @@
               ],
               "indexes": [
                 {
-                  "columns": ["deletedById"],
+                  "columns": [
+                    "deletedById"
+                  ],
                   "name": "file_asset_deletedById_idx_6409fd1e",
                   "prefix": "file_asset_deletedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "createdAt"],
+                  "columns": [
+                    "projectId",
+                    "createdAt"
+                  ],
                   "name": "file_asset_projectId_createdAt_idx_d2d6484f",
                   "prefix": "file_asset_projectId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "file_asset_projectId_idx_a96e4d92",
                   "prefix": "file_asset_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "file_asset_taskId_idx_4965c936",
                   "prefix": "file_asset_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["uploadedById"],
+                  "columns": [
+                    "uploadedById"
+                  ],
                   "name": "file_asset_uploadedById_idx_b92fad21",
                   "prefix": "file_asset_uploadedById_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["storageKey"]
+                  "columns": [
+                    "storageKey"
+                  ]
                 }
               ]
             },
@@ -5735,12 +6221,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["actorId"],
+                    "columns": [
+                      "actorId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "idempotency_key"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -5748,24 +6238,33 @@
               ],
               "indexes": [
                 {
-                  "columns": ["actorId"],
+                  "columns": [
+                    "actorId"
+                  ],
                   "name": "idempotency_key_actorId_idx_a58f6b4b",
                   "prefix": "idempotency_key_actorId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["expiresAt"],
+                  "columns": [
+                    "expiresAt"
+                  ],
                   "name": "idempotency_key_expiresAt_idx_6b6b8c10",
                   "prefix": "idempotency_key_expiresAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["actorId", "key"]
+                  "columns": [
+                    "actorId",
+                    "key"
+                  ]
                 }
               ]
             },
@@ -5833,6 +6332,11 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
+                "leaseToken": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
                 "leasedUntil": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
@@ -5876,18 +6380,25 @@
                   "unique": false
                 },
                 {
-                  "columns": ["leaseOwner", "leasedUntil"],
+                  "columns": [
+                    "leaseOwner",
+                    "leasedUntil"
+                  ],
                   "name": "job_leaseOwner_leasedUntil_idx_a51039dd",
                   "prefix": "job_leaseOwner_leasedUntil_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["dedupeKey"]
+                  "columns": [
+                    "dedupeKey"
+                  ]
                 }
               ]
             },
@@ -5921,11 +6432,15 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["name"]
+                  "columns": [
+                    "name"
+                  ]
                 }
               ]
             },
@@ -6003,12 +6518,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "notification"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6016,12 +6535,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["actorId"],
+                    "columns": [
+                      "actorId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "notification"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6029,12 +6552,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "notification"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -6042,12 +6569,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "notification"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -6055,38 +6586,52 @@
               ],
               "indexes": [
                 {
-                  "columns": ["actorId"],
+                  "columns": [
+                    "actorId"
+                  ],
                   "name": "notification_actorId_idx_a58f6b4b",
                   "prefix": "notification_actorId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "notification_projectId_idx_a96e4d92",
                   "prefix": "notification_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "notification_taskId_idx_4965c936",
                   "prefix": "notification_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "notification_userId_idx_a489d58a",
                   "prefix": "notification_userId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId", "readAt", "createdAt"],
+                  "columns": [
+                    "userId",
+                    "readAt",
+                    "createdAt"
+                  ],
                   "name": "notification_userId_readAt_createdAt_idx_9b6c3810",
                   "prefix": "notification_userId_readAt_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -6135,12 +6680,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "notification_preference"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6148,18 +6697,26 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "notification_preference_userId_idx_a489d58a",
                   "prefix": "notification_preference_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["userId", "channel", "eventType"]
+                  "columns": [
+                    "userId",
+                    "channel",
+                    "eventType"
+                  ]
                 }
               ]
             },
@@ -6296,12 +6853,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["teamId"],
+                    "columns": [
+                      "teamId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "team"
                   }
@@ -6309,12 +6870,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["leadId"],
+                    "columns": [
+                      "leadId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6322,12 +6887,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["archivedById"],
+                    "columns": [
+                      "archivedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6335,42 +6904,57 @@
               ],
               "indexes": [
                 {
-                  "columns": ["archivedAt"],
+                  "columns": [
+                    "archivedAt"
+                  ],
                   "name": "project_archivedAt_idx_5fc66e5b",
                   "prefix": "project_archivedAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["archivedById"],
+                  "columns": [
+                    "archivedById"
+                  ],
                   "name": "project_archivedById_idx_d546efc6",
                   "prefix": "project_archivedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["leadId"],
+                  "columns": [
+                    "leadId"
+                  ],
                   "name": "project_leadId_idx_9113844c",
                   "prefix": "project_leadId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["status", "position"],
+                  "columns": [
+                    "status",
+                    "position"
+                  ],
                   "name": "project_status_position_idx_201c8b80",
                   "prefix": "project_status_position_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["teamId"],
+                  "columns": [
+                    "teamId"
+                  ],
                   "name": "project_teamId_idx_f2b72ab3",
                   "prefix": "project_teamId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["key"]
+                  "columns": [
+                    "key"
+                  ]
                 }
               ]
             },
@@ -6400,12 +6984,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project_member"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -6413,12 +7001,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project_member"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6426,20 +7018,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "project_member_projectId_idx_a96e4d92",
                   "prefix": "project_member_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "project_member_userId_idx_a489d58a",
                   "prefix": "project_member_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["projectId", "userId"]
+                "columns": [
+                  "projectId",
+                  "userId"
+                ]
               },
               "uniques": []
             },
@@ -6493,12 +7092,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project_milestone"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -6506,20 +7109,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "project_milestone_projectId_idx_a96e4d92",
                   "prefix": "project_milestone_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "position"],
+                  "columns": [
+                    "projectId",
+                    "position"
+                  ],
                   "name": "project_milestone_projectId_position_idx_8e0c4225",
                   "prefix": "project_milestone_projectId_position_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -6560,12 +7170,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project_task_counter"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -6573,7 +7187,9 @@
               ],
               "indexes": [],
               "primaryKey": {
-                "columns": ["projectId"]
+                "columns": [
+                  "projectId"
+                ]
               },
               "uniques": []
             },
@@ -6622,12 +7238,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "push_delivery"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6635,24 +7255,35 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId", "deliveredAt"],
+                  "columns": [
+                    "userId",
+                    "deliveredAt"
+                  ],
                   "name": "push_delivery_userId_deliveredAt_idx_c60c106a",
                   "prefix": "push_delivery_userId_deliveredAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "push_delivery_userId_idx_a489d58a",
                   "prefix": "push_delivery_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["notificationId", "userId", "endpointHash"]
+                  "columns": [
+                    "notificationId",
+                    "userId",
+                    "endpointHash"
+                  ]
                 }
               ]
             },
@@ -6706,12 +7337,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "push_subscription"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6719,18 +7354,24 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "push_subscription_userId_idx_a489d58a",
                   "prefix": "push_subscription_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["endpoint"]
+                  "columns": [
+                    "endpoint"
+                  ]
                 }
               ]
             },
@@ -6760,18 +7401,24 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": ["lastRequest"],
+                  "columns": [
+                    "lastRequest"
+                  ],
                   "name": "rateLimit_lastRequest_idx_e5c9beaa",
                   "prefix": "rateLimit_lastRequest_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["key"]
+                "columns": [
+                  "key"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["id"]
+                  "columns": [
+                    "id"
+                  ]
                 }
               ]
             },
@@ -6806,12 +7453,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "recent_search"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -6819,20 +7470,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "recent_search_userId_idx_a489d58a",
                   "prefix": "recent_search_userId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId", "searchedAt"],
+                  "columns": [
+                    "userId",
+                    "searchedAt"
+                  ],
                   "name": "recent_search_userId_searchedAt_idx_016097ac",
                   "prefix": "recent_search_userId_searchedAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -6872,12 +7530,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["sourceTaskId"],
+                    "columns": [
+                      "sourceTaskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "recurrence_generation"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -6885,12 +7547,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["successorTaskId"],
+                    "columns": [
+                      "successorTaskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "recurrence_generation"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -6898,21 +7564,29 @@
               ],
               "indexes": [
                 {
-                  "columns": ["sourceTaskId"],
+                  "columns": [
+                    "sourceTaskId"
+                  ],
                   "name": "recurrence_generation_sourceTaskId_idx_e6290971",
                   "prefix": "recurrence_generation_sourceTaskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["successorTaskId"]
+                  "columns": [
+                    "successorTaskId"
+                  ]
                 },
                 {
-                  "columns": ["generationKey"]
+                  "columns": [
+                    "generationKey"
+                  ]
                 }
               ]
             },
@@ -7020,12 +7694,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "saved_view"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7033,12 +7711,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "saved_view"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -7046,26 +7728,35 @@
               ],
               "indexes": [
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "saved_view_projectId_idx_a96e4d92",
                   "prefix": "saved_view_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "saved_view_userId_idx_a489d58a",
                   "prefix": "saved_view_userId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId", "projectId"],
+                  "columns": [
+                    "userId",
+                    "projectId"
+                  ],
                   "name": "saved_view_userId_projectId_idx_a2a73bc7",
                   "prefix": "saved_view_userId_projectId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -7129,12 +7820,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "session"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7142,18 +7837,24 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "session_userId_idx_a489d58a",
                   "prefix": "session_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["token"]
+                  "columns": [
+                    "token"
+                  ]
                 }
               ]
             },
@@ -7307,12 +8008,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -7320,12 +8025,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["createdById"],
+                    "columns": [
+                      "createdById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7333,12 +8042,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["archivedById"],
+                    "columns": [
+                      "archivedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7346,48 +8059,67 @@
               ],
               "indexes": [
                 {
-                  "columns": ["archivedAt"],
+                  "columns": [
+                    "archivedAt"
+                  ],
                   "name": "task_archivedAt_idx_5fc66e5b",
                   "prefix": "task_archivedAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["archivedById"],
+                  "columns": [
+                    "archivedById"
+                  ],
                   "name": "task_archivedById_idx_d546efc6",
                   "prefix": "task_archivedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["createdById"],
+                  "columns": [
+                    "createdById"
+                  ],
                   "name": "task_createdById_idx_8bf640ed",
                   "prefix": "task_createdById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["dueDate"],
+                  "columns": [
+                    "dueDate"
+                  ],
                   "name": "task_dueDate_idx_fb527616",
                   "prefix": "task_dueDate_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "task_projectId_idx_a96e4d92",
                   "prefix": "task_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "status", "position"],
+                  "columns": [
+                    "projectId",
+                    "status",
+                    "position"
+                  ],
                   "name": "task_projectId_status_position_idx_e47eb21e",
                   "prefix": "task_projectId_status_position_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["projectId", "projectTaskNumber"]
+                  "columns": [
+                    "projectId",
+                    "projectTaskNumber"
+                  ]
                 }
               ]
             },
@@ -7422,12 +8154,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_assignee"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7435,12 +8171,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_assignee"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7448,12 +8188,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["assignedById"],
+                    "columns": [
+                      "assignedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_assignee"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7461,32 +8205,44 @@
               ],
               "indexes": [
                 {
-                  "columns": ["assignedById"],
+                  "columns": [
+                    "assignedById"
+                  ],
                   "name": "task_assignee_assignedById_idx_f5db02c3",
                   "prefix": "task_assignee_assignedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "task_assignee_taskId_idx_4965c936",
                   "prefix": "task_assignee_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "task_assignee_userId_idx_a489d58a",
                   "prefix": "task_assignee_userId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId", "taskId"],
+                  "columns": [
+                    "userId",
+                    "taskId"
+                  ],
                   "name": "task_assignee_userId_taskId_idx_1ad162b7",
                   "prefix": "task_assignee_userId_taskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["taskId", "userId"]
+                "columns": [
+                  "taskId",
+                  "userId"
+                ]
               },
               "uniques": []
             },
@@ -7523,12 +8279,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_dependency"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7536,12 +8296,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["dependsOnTaskId"],
+                    "columns": [
+                      "dependsOnTaskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_dependency"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7549,20 +8313,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["dependsOnTaskId"],
+                  "columns": [
+                    "dependsOnTaskId"
+                  ],
                   "name": "task_dependency_dependsOnTaskId_idx_213f256d",
                   "prefix": "task_dependency_dependsOnTaskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "task_dependency_taskId_idx_4965c936",
                   "prefix": "task_dependency_taskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["taskId", "dependsOnTaskId"]
+                "columns": [
+                  "taskId",
+                  "dependsOnTaskId"
+                ]
               },
               "uniques": []
             },
@@ -7583,12 +8354,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_label"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7596,12 +8371,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["labelId"],
+                    "columns": [
+                      "labelId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_label"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "label"
                   }
@@ -7609,20 +8388,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["labelId"],
+                  "columns": [
+                    "labelId"
+                  ],
                   "name": "task_label_labelId_idx_e2585939",
                   "prefix": "task_label_labelId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "task_label_taskId_idx_4965c936",
                   "prefix": "task_label_taskId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["taskId", "labelId"]
+                "columns": [
+                  "taskId",
+                  "labelId"
+                ]
               },
               "uniques": []
             },
@@ -7708,12 +8494,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_recurrence"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7721,11 +8511,15 @@
               ],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["taskId"]
+                  "columns": [
+                    "taskId"
+                  ]
                 }
               ]
             },
@@ -7798,12 +8592,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_subtask"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -7811,12 +8609,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["assigneeId"],
+                    "columns": [
+                      "assigneeId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task_subtask"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7824,32 +8626,43 @@
               ],
               "indexes": [
                 {
-                  "columns": ["assigneeId"],
+                  "columns": [
+                    "assigneeId"
+                  ],
                   "name": "task_subtask_assigneeId_idx_fd12ae38",
                   "prefix": "task_subtask_assigneeId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["dueDate"],
+                  "columns": [
+                    "dueDate"
+                  ],
                   "name": "task_subtask_dueDate_idx_fb527616",
                   "prefix": "task_subtask_dueDate_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "task_subtask_taskId_idx_4965c936",
                   "prefix": "task_subtask_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId", "position"],
+                  "columns": [
+                    "taskId",
+                    "position"
+                  ],
                   "name": "task_subtask_taskId_position_idx_7b8f9842",
                   "prefix": "task_subtask_taskId_position_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -7910,11 +8723,15 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["name"]
+                  "columns": [
+                    "name"
+                  ]
                 }
               ]
             },
@@ -7974,12 +8791,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["actorId"],
+                    "columns": [
+                      "actorId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "undo_record"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -7987,26 +8808,37 @@
               ],
               "indexes": [
                 {
-                  "columns": ["actorId", "expiresAt", "consumedAt"],
+                  "columns": [
+                    "actorId",
+                    "expiresAt",
+                    "consumedAt"
+                  ],
                   "name": "undo_record_actorId_expiresAt_consumedAt_idx_0a8a75a4",
                   "prefix": "undo_record_actorId_expiresAt_consumedAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["actorId"],
+                  "columns": [
+                    "actorId"
+                  ],
                   "name": "undo_record_actorId_idx_a58f6b4b",
                   "prefix": "undo_record_actorId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["entityType", "entityId"],
+                  "columns": [
+                    "entityType",
+                    "entityId"
+                  ],
                   "name": "undo_record_entityType_entityId_idx_ea0fa809",
                   "prefix": "undo_record_entityType_entityId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -8111,12 +8943,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["ownerId"],
+                    "columns": [
+                      "ownerId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "upload_intent"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -8124,12 +8960,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "upload_intent"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "task"
                   }
@@ -8137,12 +8977,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["projectId"],
+                    "columns": [
+                      "projectId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "upload_intent"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "project"
                   }
@@ -8150,54 +8994,77 @@
               ],
               "indexes": [
                 {
-                  "columns": ["expiresAt", "state"],
+                  "columns": [
+                    "expiresAt",
+                    "state"
+                  ],
                   "name": "upload_intent_expiresAt_state_idx_47121f95",
                   "prefix": "upload_intent_expiresAt_state_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["ownerId"],
+                  "columns": [
+                    "ownerId"
+                  ],
                   "name": "upload_intent_ownerId_idx_e2d0c1ef",
                   "prefix": "upload_intent_ownerId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["ownerId", "state", "createdAt"],
+                  "columns": [
+                    "ownerId",
+                    "state",
+                    "createdAt"
+                  ],
                   "name": "upload_intent_ownerId_state_createdAt_idx_9ce082d2",
                   "prefix": "upload_intent_ownerId_state_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId"],
+                  "columns": [
+                    "projectId"
+                  ],
                   "name": "upload_intent_projectId_idx_a96e4d92",
                   "prefix": "upload_intent_projectId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["projectId", "state"],
+                  "columns": [
+                    "projectId",
+                    "state"
+                  ],
                   "name": "upload_intent_projectId_state_idx_cea2771c",
                   "prefix": "upload_intent_projectId_state_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "upload_intent_taskId_idx_4965c936",
                   "prefix": "upload_intent_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["taskId", "state"],
+                  "columns": [
+                    "taskId",
+                    "state"
+                  ],
                   "name": "upload_intent_taskId_state_idx_e8b19231",
                   "prefix": "upload_intent_taskId_state_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["objectKey"]
+                  "columns": [
+                    "objectKey"
+                  ]
                 }
               ]
             },
@@ -8348,12 +9215,16 @@
                 {
                   "onDelete": "setNull",
                   "source": {
-                    "columns": ["teamId"],
+                    "columns": [
+                      "teamId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "team"
                   }
@@ -8361,12 +9232,16 @@
                 {
                   "onDelete": "restrict",
                   "source": {
-                    "columns": ["deactivatedById"],
+                    "columns": [
+                      "deactivatedById"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -8374,36 +9249,50 @@
               ],
               "indexes": [
                 {
-                  "columns": ["deactivatedAt"],
+                  "columns": [
+                    "deactivatedAt"
+                  ],
                   "name": "user_deactivatedAt_idx_61cfa815",
                   "prefix": "user_deactivatedAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["deactivatedById"],
+                  "columns": [
+                    "deactivatedById"
+                  ],
                   "name": "user_deactivatedById_idx_12fe95fd",
                   "prefix": "user_deactivatedById_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["teamId"],
+                  "columns": [
+                    "teamId"
+                  ],
                   "name": "user_teamId_idx_f2b72ab3",
                   "prefix": "user_teamId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["email"]
+                  "columns": [
+                    "email"
+                  ]
                 },
                 {
-                  "columns": ["emailNormalized"]
+                  "columns": [
+                    "emailNormalized"
+                  ]
                 },
                 {
-                  "columns": ["employeeNumber"]
+                  "columns": [
+                    "employeeNumber"
+                  ]
                 }
               ]
             },
@@ -8443,12 +9332,16 @@
                 {
                   "onDelete": "cascade",
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user_preference"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "user"
                   }
@@ -8456,18 +9349,25 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "user_preference_userId_idx_a489d58a",
                   "prefix": "user_preference_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["userId", "key"]
+                  "columns": [
+                    "userId",
+                    "key"
+                  ]
                 }
               ]
             },
@@ -8515,14 +9415,18 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": ["identifier"],
+                  "columns": [
+                    "identifier"
+                  ],
                   "name": "verification_identifier_idx_79a0dbb3",
                   "prefix": "verification_identifier_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             }
@@ -8530,27 +9434,62 @@
           "valueSet": {
             "NotificationType": {
               "kind": "valueSet",
-              "values": ["mention", "assignment", "comment", "update", "due"]
+              "values": [
+                "mention",
+                "assignment",
+                "comment",
+                "update",
+                "due"
+              ]
             },
             "ProjectStatus": {
               "kind": "valueSet",
-              "values": ["planning", "active", "risk", "hold", "complete"]
+              "values": [
+                "planning",
+                "active",
+                "risk",
+                "hold",
+                "complete"
+              ]
             },
             "RecurrenceFrequency": {
               "kind": "valueSet",
-              "values": ["daily", "weekly", "biweekly", "monthly"]
+              "values": [
+                "daily",
+                "weekly",
+                "biweekly",
+                "monthly"
+              ]
             },
             "SavedViewType": {
               "kind": "valueSet",
-              "values": ["board", "list", "table", "calendar", "timeline"]
+              "values": [
+                "board",
+                "list",
+                "table",
+                "calendar",
+                "timeline"
+              ]
             },
             "TaskPriority": {
               "kind": "valueSet",
-              "values": ["urgent", "high", "medium", "low", "none"]
+              "values": [
+                "urgent",
+                "high",
+                "medium",
+                "low",
+                "none"
+              ]
             },
             "TaskStatus": {
               "kind": "valueSet",
-              "values": ["backlog", "todo", "progress", "review", "done"]
+              "values": [
+                "backlog",
+                "todo",
+                "progress",
+                "review",
+                "done"
+              ]
             }
           }
         },
@@ -8558,7 +9497,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e4527d00558f872a369d4ec2fabac4edd010594a767dfc4b2ccd5e92600f8021"
+    "storageHash": "7e3ecb92acdb436c18b9f4a11e952c59156c5c16fa8f6dba04cab511c5ffc61a"
   },
   "execution": {
     "executionHash": "6626bacd52f04de1b6c569d8495e1eac45312ec18056cdb283b536b26ad02845",
