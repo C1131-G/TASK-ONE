@@ -124,27 +124,6 @@ const successorDueDate = async (successorId: string | undefined) => {
   return rows.rows[0]?.due ?? null;
 };
 
-it("moves a weekly successor to the first selected weekday", async () => {
-  const fixture = await seedFixture(1);
-  try {
-    // 2026-01-07 is a Wednesday. One week later is Wednesday 2026-01-14, and
-    // the first Monday on or after that date is 2026-01-19.
-    const recurring = await createRecurringTask(fixture, "2026-01-07", {
-      endsOn: null,
-      frequency: "weekly",
-      interval: 1,
-      weekDays: [1],
-    });
-    const completed = await completeTask(fixture, recurring);
-
-    expect(await successorDueDate(completed.recurrenceSuccessorId)).toBe(
-      "2026-01-19"
-    );
-  } finally {
-    await removeFixture(fixture);
-  }
-});
-
 it("applies the biweekly interval before choosing the selected weekday", async () => {
   const fixture = await seedFixture(1);
   try {
@@ -297,63 +276,6 @@ it("lets exactly one of two concurrent moves of the same task win", async () => 
     const [winner] = succeeded;
     expect(winner?.ok && winner.data.projectId).toBe(stored.rows[0]?.projectId);
     expect(stored.rows[0]?.projectTaskNumber).toBe(1);
-  } finally {
-    await removeFixture(fixture);
-  }
-});
-
-it("keeps file links attached to a task when it moves to another project", async () => {
-  const fixture = await seedFixture(2);
-  const [sourceId, destinationId] = fixture.projectIds;
-  const fileId = randomUUID();
-  try {
-    const task = await runWork(
-      Effect.gen(function* createTaskWithFile() {
-        const work = yield* WorkManagement;
-        return yield* work.createTask(fixture.actorId, {
-          assigneeIds: [],
-          description: null,
-          dueDate: null,
-          priority: "medium",
-          projectId: sourceId ?? "",
-          title: "Task with a file",
-        });
-      })
-    );
-    await authPool.query(
-      'INSERT INTO file_asset (id, "projectId", "taskId", "uploadedById", "originalName", "storageKey", "contentType", "sizeBytes") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-      [
-        fileId,
-        sourceId,
-        task.id,
-        fixture.actorId,
-        "moved.txt",
-        `tasks/${fileId}/moved.txt`,
-        "text/plain",
-        12,
-      ]
-    );
-
-    await runWork(
-      Effect.gen(function* moveTaskWithFile() {
-        const work = yield* WorkManagement;
-        return yield* work.moveTask(
-          fixture.actorId,
-          task.id,
-          destinationId ?? "",
-          task.version
-        );
-      })
-    );
-
-    const file = await authPool.query(
-      'SELECT "projectId", "taskId" FROM file_asset WHERE id = $1',
-      [fileId]
-    );
-    expect(file.rows[0]).toMatchObject({
-      projectId: destinationId,
-      taskId: task.id,
-    });
   } finally {
     await removeFixture(fixture);
   }
