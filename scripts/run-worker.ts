@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Effect, Layer } from "effect";
 
+import { authPool } from "../src/server/auth/database";
 import { JobHandlersLive } from "../src/server/jobs/handlers";
 import { JobProcessor, JobProcessorLive } from "../src/server/jobs/processor";
 import { PushTransportLive } from "../src/server/notifications/push-transport";
@@ -20,23 +21,32 @@ process.once("SIGTERM", () => {
   stopping = true;
 });
 
-while (true) {
-  if (stopping) {
-    break;
-  }
-  // This dedicated process intentionally awaits one bounded batch at a time.
-  // eslint-disable-next-line no-await-in-loop
-  const result = await Effect.runPromise(
-    Effect.gen(function* result() {
-      const processor = yield* JobProcessor;
-      yield* processor.enqueueMaintenance(new Date());
-      return yield* processor.processBatch(workerId, 25);
-    }).pipe(Effect.provide(processorLayer))
-  );
-
-  process.stdout.write(`${JSON.stringify(result)}\n`);
-  if (result.claimed === 0) {
+try {
+  for (;;) {
+    if (stopping) {
+      break;
+    }
+    // This dedicated process intentionally awaits one bounded batch at a time.
     // eslint-disable-next-line no-await-in-loop
-    await Effect.runPromise(Effect.sleep("1 second"));
+    const result = await Effect.runPromise(
+      Effect.gen(function* result() {
+        const processor = yield* JobProcessor;
+        yield* processor.enqueueMaintenance(new Date());
+        return yield* processor.processBatch(workerId, 25);
+      }).pipe(Effect.provide(processorLayer))
+    );
+
+    process.stdout.write(`${JSON.stringify(result)}\n`);
+    if (result.claimed === 0 && !stopping) {
+      // eslint-disable-next-line no-await-in-loop
+      await Effect.runPromise(Effect.sleep("1 second"));
+    }
   }
+} catch {
+  process.stderr.write(
+    "The durable worker stopped after an unexpected failure.\n"
+  );
+  process.exitCode = 1;
+} finally {
+  await authPool.end();
 }

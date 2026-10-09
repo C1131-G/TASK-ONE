@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import { and } from "@prisma/orm-postgres/orm-client";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
@@ -29,6 +29,24 @@ export interface InboxOptions {
   readonly unreadOnly: boolean;
   readonly limit: number;
 }
+
+export const InboxSchema = Schema.Struct({
+  items: Schema.Array(
+    Schema.Struct({
+      actorId: Schema.NullOr(Schema.String),
+      actorName: Schema.NullOr(Schema.String),
+      createdAt: Schema.String,
+      id: Schema.String,
+      projectId: Schema.NullOr(Schema.String),
+      readAt: Schema.NullOr(Schema.String),
+      snippet: Schema.NullOr(Schema.String),
+      taskId: Schema.NullOr(Schema.String),
+      text: Schema.String,
+      type: Schema.String,
+    })
+  ),
+  unreadCount: Schema.Number,
+});
 
 export class Notifications extends Context.Service<
   Notifications,

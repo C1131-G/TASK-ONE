@@ -7,7 +7,15 @@ import { AppError } from "../core/action-result";
 import { JobHandlers } from "./job-handlers";
 import type { JobHandlersApi, JsonValue } from "./job-handlers";
 
-const JOB_CLOCK_SKEW_TOLERANCE_MS = 5000;
+export interface JobLeasePolicy {
+  readonly leaseDurationMs: number;
+  readonly renewalIntervalMs: number;
+}
+
+const DEFAULT_JOB_LEASE_POLICY: JobLeasePolicy = {
+  leaseDurationMs: 60_000,
+  renewalIntervalMs: 20_000,
+};
 
 export interface ClaimedJob {
   readonly id: string;
@@ -15,6 +23,7 @@ export interface ClaimedJob {
   readonly payload: JsonValue;
   readonly attempts: number;
   readonly maxAttempts: number;
+  readonly leaseToken: string;
 }
 
 export interface JobBatchResult {
@@ -82,9 +91,10 @@ const isPermanentFailure = (cause: Cause.Cause<AppError>): boolean => {
 
 const claimJobs = async (
   workerId: string,
-  limit: number
+  limit: number,
+  leaseDurationMs: number
 ): Promise<readonly ClaimedJob[]> => {
-  const now = new Date(Date.now() + JOB_CLOCK_SKEW_TOLERANCE_MS);
+  const now = new Date();
   const candidates = await db.orm.public.Job.where((job) =>
     and(
       job.completedAt.isNull(),
@@ -98,7 +108,8 @@ const claimJobs = async (
     .all();
   const claimed = await Promise.all(
     candidates.map(async (job) => {
-      const claimedAt = new Date(Date.now() + JOB_CLOCK_SKEW_TOLERANCE_MS);
+      const claimedAt = new Date();
+      const leaseToken = crypto.randomUUID();
       const updated = await db.orm.public.Job.where((current) =>
         and(
           current.id.eq(job.id),
@@ -108,19 +119,28 @@ const claimJobs = async (
           current.availableAt.lte(claimedAt),
           or(current.leasedUntil.isNull(), current.leasedUntil.lt(claimedAt))
         )
-      ).update({
+      ).updateAndCount({
         attempts: job.attempts + 1,
         leaseOwner: workerId,
-        leasedUntil: new Date(claimedAt.getTime() + 60_000),
+        leaseToken,
+        leasedUntil: new Date(claimedAt.getTime() + leaseDurationMs),
         updatedAt: claimedAt,
       });
-      return updated
+      if (updated === 0) {
+        return null;
+      }
+      const claimedJob = await db.orm.public.Job.where({
+        id: job.id,
+        leaseToken,
+      }).first();
+      return claimedJob
         ? {
-            attempts: updated.attempts,
-            id: updated.id,
-            kind: updated.kind,
-            maxAttempts: updated.maxAttempts,
-            payload: updated.payload,
+            attempts: claimedJob.attempts,
+            id: claimedJob.id,
+            kind: claimedJob.kind,
+            leaseToken,
+            maxAttempts: claimedJob.maxAttempts,
+            payload: claimedJob.payload,
           }
         : null;
     })
@@ -128,16 +148,83 @@ const claimJobs = async (
   return claimed.filter((job): job is ClaimedJob => job !== null);
 };
 
+const renewJobLease = async (
+  job: ClaimedJob,
+  workerId: string,
+  leaseDurationMs: number
+): Promise<boolean> => {
+  const now = new Date();
+  const renewed = await db.orm.public.Job.where((current) =>
+    and(
+      current.completedAt.isNull(),
+      current.id.eq(job.id),
+      current.leaseOwner.eq(workerId),
+      current.leaseToken.eq(job.leaseToken),
+      current.leasedUntil.gt(now)
+    )
+  ).updateAndCount({
+    leasedUntil: new Date(now.getTime() + leaseDurationMs),
+    updatedAt: now,
+  });
+  return renewed > 0;
+};
+
+const runHandlerWithLease = async (
+  job: ClaimedJob,
+  workerId: string,
+  handler: Effect.Effect<void, AppError>,
+  leasePolicy: JobLeasePolicy
+): Promise<{
+  readonly exit: Exit.Exit<void, AppError>;
+  readonly leaseLost: boolean;
+}> => {
+  let renewalInFlight = false;
+  let leaseLost = false;
+  let renewalPromise: Promise<void> | undefined;
+  const timer = setInterval(() => {
+    if (renewalInFlight || leaseLost) {
+      return;
+    }
+    renewalInFlight = true;
+    renewalPromise = (async () => {
+      try {
+        const renewed = await renewJobLease(
+          job,
+          workerId,
+          leasePolicy.leaseDurationMs
+        );
+        leaseLost = !renewed;
+      } catch {
+        leaseLost = true;
+      } finally {
+        renewalInFlight = false;
+      }
+    })();
+  }, leasePolicy.renewalIntervalMs);
+  try {
+    const exit = await Effect.runPromiseExit(handler);
+    clearInterval(timer);
+    await renewalPromise;
+    return { exit, leaseLost };
+  } finally {
+    clearInterval(timer);
+  }
+};
+
 const finishJob = async (
   job: ClaimedJob,
   workerId: string
 ): Promise<boolean> => {
   const now = new Date();
-  const finished = await db.orm.public.Job.where({
-    completedAt: null,
-    id: job.id,
-    leaseOwner: workerId,
-  }).updateAndCount({
+  const finished = await db.orm.public.Job.where((current) =>
+    and(
+      current.completedAt.isNull(),
+      current.id.eq(job.id),
+      current.leaseOwner.eq(workerId),
+      current.leaseToken.eq(job.leaseToken),
+      current.leasedUntil.gte(now)
+    )
+  ).updateAndCount({
     completedAt: now,
     lastError: null,
     leaseOwner: null,
@@ -152,15 +239,19 @@ const retryJob = async (
   workerId: string,
   reason: string,
   permanent: boolean
-): Promise<void> => {
+): Promise<boolean> => {
   const isDead = permanent || job.attempts >= job.maxAttempts;
   const delaySeconds = Math.min(3600, 2 ** Math.min(job.attempts, 11));
   const now = new Date();
-  await db.orm.public.Job.where({
-    completedAt: null,
-    id: job.id,
-    leaseOwner: workerId,
-  }).updateAndCount({
+  const retried = await db.orm.public.Job.where((current) =>
+    and(
+      current.completedAt.isNull(),
+      current.id.eq(job.id),
+      current.leaseOwner.eq(workerId),
+      current.leaseToken.eq(job.leaseToken),
+      current.leasedUntil.gte(now)
+    )
+  ).updateAndCount({
     ...(isDead
       ? {}
       : { availableAt: new Date(now.getTime() + delaySeconds * 1000) }),
@@ -170,6 +261,7 @@ const retryJob = async (
     leasedUntil: null,
     updatedAt: now,
   });
+  return retried > 0;
 };
 
 const workerIdSchema = Schema.String.check(
@@ -181,7 +273,7 @@ const workerIdSchema = Schema.String.check(
 );
 
 const makeProcessBatch =
-  (handlers: JobHandlersApi) =>
+  (handlers: JobHandlersApi, leasePolicy: JobLeasePolicy) =>
   (
     workerId: string,
     requestedLimit: number
@@ -202,12 +294,22 @@ const makeProcessBatch =
           });
         }
         const limit = Math.max(1, Math.min(25, Math.trunc(requestedLimit)));
-        const jobs = await claimJobs(workerId.trim(), limit);
+        const jobs = await claimJobs(
+          workerId.trim(),
+          limit,
+          leasePolicy.leaseDurationMs
+        );
         const results = await Promise.all(
           jobs.map(async (job) => {
-            const exit = await Effect.runPromiseExit(
-              handlers.handle(job.kind, job.payload)
+            const { exit, leaseLost } = await runHandlerWithLease(
+              job,
+              workerId.trim(),
+              handlers.handle(job.kind, job.payload),
+              leasePolicy
             );
+            if (leaseLost) {
+              return "lease-lost";
+            }
             if (Exit.isSuccess(exit)) {
               return (await finishJob(job, workerId.trim()))
                 ? "completed"
@@ -215,12 +317,15 @@ const makeProcessBatch =
             }
 
             const permanent = isPermanentFailure(exit.cause);
-            await retryJob(
+            const retryScheduled = await retryJob(
               job,
               workerId.trim(),
               errorMessage(exit.cause),
               permanent
             );
+            if (!retryScheduled) {
+              return "lease-lost";
+            }
             return permanent || job.attempts >= job.maxAttempts
               ? "dead-lettered"
               : "retried";
@@ -342,13 +447,18 @@ const listDeadJobs = (
     },
   });
 
-export const JobProcessorLive = Layer.effect(
-  JobProcessor,
-  Effect.map(Effect.service(JobHandlers), (handlers) =>
-    JobProcessor.of({
-      enqueueMaintenance,
-      listDeadJobs,
-      processBatch: makeProcessBatch(handlers),
-    })
-  )
-);
+export const makeJobProcessorLayer = (
+  leasePolicy: JobLeasePolicy = DEFAULT_JOB_LEASE_POLICY
+) =>
+  Layer.effect(
+    JobProcessor,
+    Effect.map(Effect.service(JobHandlers), (handlers) =>
+      JobProcessor.of({
+        enqueueMaintenance,
+        listDeadJobs,
+        processBatch: makeProcessBatch(handlers, leasePolicy),
+      })
+    )
+  );
+
+export const JobProcessorLive = makeJobProcessorLayer();

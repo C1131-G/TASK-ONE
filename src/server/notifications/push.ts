@@ -6,6 +6,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 import type { PushMessage, PushTransportApi } from "./push-transport";
 import { PushTransport } from "./push-transport";
 
@@ -54,11 +55,7 @@ const mapError = (error: unknown): AppError =>
 
 const RECEIPT_WRITE_ATTEMPTS = 3;
 
-const isUniqueViolation = (error: unknown): boolean =>
-  typeof error === "object" &&
-  error !== null &&
-  "code" in error &&
-  error.code === "P2002";
+const isUniqueViolation = isUniqueConstraintViolation;
 
 interface ReceiptInput {
   readonly endpointHash: string;

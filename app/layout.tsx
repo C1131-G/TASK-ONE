@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { EB_Garamond, Geist_Mono, Noto_Sans } from "next/font/google";
 
 import "./globals.css";
+import { PushNotificationsControl } from "@/components/push-notifications-control";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +40,12 @@ const RootLayout = ({
     )}
   >
     <body>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        {children}
+        <PushNotificationsControl
+          publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
+        />
+      </ThemeProvider>
     </body>
   </html>
 );

@@ -2,7 +2,10 @@ import { randomUUID, timingSafeEqual } from "node:crypto";
 
 import { Effect, Layer, Schema } from "effect";
 
-import { runServerAction } from "@/src/server/core/server-action";
+import {
+  ServerActionOutputSchema,
+  runServerAction,
+} from "@/src/server/core/server-action";
 import { JobHandlersLive } from "@/src/server/jobs/handlers";
 import { JobProcessor, JobProcessorLive } from "@/src/server/jobs/processor";
 import { PushTransportLive } from "@/src/server/notifications/push-transport";
@@ -56,26 +59,31 @@ export async function POST(request: Request) {
     input = { limit: 10 };
   }
 
-  const result = await runServerAction(input, BatchSchema, ({ limit }) =>
-    Effect.gen(function* processScheduledBatch() {
-      const processor = yield* JobProcessor;
-      yield* processor.enqueueMaintenance(new Date());
-      const batch = yield* processor.processBatch(
-        `scheduler-${crypto.randomUUID()}`,
-        limit
-      );
-      return batch;
-    }).pipe(
-      Effect.provide(
-        Layer.provide(
-          JobProcessorLive,
+  const result = await runServerAction(
+    input,
+    BatchSchema,
+    ({ limit }) =>
+      Effect.gen(function* processScheduledBatch() {
+        const processor = yield* JobProcessor;
+        yield* processor.enqueueMaintenance(new Date());
+        const batch = yield* processor.processBatch(
+          `scheduler-${crypto.randomUUID()}`,
+          limit
+        );
+        return batch;
+      }).pipe(
+        Effect.provide(
           Layer.provide(
-            JobHandlersLive,
-            Layer.merge(StorageLive, PushTransportLive)
+            JobProcessorLive,
+            Layer.provide(
+              JobHandlersLive,
+              Layer.merge(StorageLive, PushTransportLive)
+            )
           )
         )
-      )
-    )
+      ),
+    undefined,
+    ServerActionOutputSchema
   );
 
   let status = 503;
