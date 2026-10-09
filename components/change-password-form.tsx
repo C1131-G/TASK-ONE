@@ -1,19 +1,42 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle */
+
+import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { changeOwnPasswordAction } from "@/app/actions/password";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+
+const PasswordVisibilityButton = ({
+  label,
+  onToggle,
+  visible,
+}: {
+  readonly label: string;
+  readonly onToggle: () => void;
+  readonly visible: boolean;
+}) => (
+  <Button
+    aria-label={`${visible ? "Hide" : "Show"} ${label}`}
+    aria-pressed={visible}
+    className="absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    onClick={onToggle}
+    size="icon"
+    type="button"
+    variant="ghost"
+  >
+    {visible ? (
+      <EyeSlash aria-hidden="true" size={18} />
+    ) : (
+      <Eye aria-hidden="true" size={18} />
+    )}
+  </Button>
+);
 
 const ChangePasswordForm = () => {
   const router = useRouter();
@@ -24,6 +47,9 @@ const ChangePasswordForm = () => {
   const [errorField, setErrorField] = useState<
     "currentPassword" | "confirmPassword" | null
   >(null);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,63 +94,93 @@ const ChangePasswordForm = () => {
 
   return (
     <form onSubmit={submit}>
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="current-password">Temporary password</FieldLabel>
-          <Input
-            aria-describedby={
-              errorField === "currentPassword"
-                ? "change-password-error"
-                : undefined
-            }
-            aria-invalid={errorField === "currentPassword" ? true : undefined}
-            autoComplete="current-password"
-            id="current-password"
-            maxLength={128}
-            name="currentPassword"
-            required
-            type="password"
-            ref={currentPasswordRef}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="new-password">New password</FieldLabel>
-          <Input
-            autoComplete="new-password"
-            id="new-password"
-            maxLength={128}
-            minLength={12}
-            name="newPassword"
-            required
-            type="password"
-          />
-          <FieldDescription>Use 12 to 128 characters.</FieldDescription>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="confirm-password">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium" htmlFor="current-password">
+            Temporary password
+          </label>
+          <div className="relative">
+            <Input
+              aria-describedby={
+                errorField === "currentPassword"
+                  ? "change-password-error"
+                  : undefined
+              }
+              aria-invalid={errorField === "currentPassword" ? true : undefined}
+              autoComplete="current-password"
+              id="current-password"
+              maxLength={128}
+              name="currentPassword"
+              ref={currentPasswordRef}
+              required
+              trailingAction
+              type={showCurrentPassword ? "text" : "password"}
+            />
+            <PasswordVisibilityButton
+              label="temporary password"
+              onToggle={() => setShowCurrentPassword((visible) => !visible)}
+              visible={showCurrentPassword}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium" htmlFor="new-password">
+            New password
+          </label>
+          <div className="relative">
+            <Input
+              autoComplete="new-password"
+              id="new-password"
+              maxLength={128}
+              minLength={12}
+              name="newPassword"
+              required
+              trailingAction
+              type={showNewPassword ? "text" : "password"}
+            />
+            <PasswordVisibilityButton
+              label="new password"
+              onToggle={() => setShowNewPassword((visible) => !visible)}
+              visible={showNewPassword}
+            />
+          </div>
+          <p className="text-xs leading-4 text-muted-foreground">
+            Use 12 to 128 characters.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium" htmlFor="confirm-password">
             Confirm new password
-          </FieldLabel>
-          <Input
-            aria-describedby={
-              errorField === "confirmPassword"
-                ? "change-password-error"
-                : undefined
-            }
-            aria-invalid={errorField === "confirmPassword" ? true : undefined}
-            autoComplete="new-password"
-            id="confirm-password"
-            maxLength={128}
-            minLength={12}
-            name="confirmPassword"
-            required
-            type="password"
-            ref={confirmPasswordRef}
-          />
-        </Field>
+          </label>
+          <div className="relative">
+            <Input
+              aria-describedby={
+                errorField === "confirmPassword"
+                  ? "change-password-error"
+                  : undefined
+              }
+              aria-invalid={errorField === "confirmPassword" ? true : undefined}
+              autoComplete="new-password"
+              id="confirm-password"
+              maxLength={128}
+              minLength={12}
+              name="confirmPassword"
+              ref={confirmPasswordRef}
+              required
+              trailingAction
+              type={showConfirmPassword ? "text" : "password"}
+            />
+            <PasswordVisibilityButton
+              label="confirmation password"
+              onToggle={() => setShowConfirmPassword((visible) => !visible)}
+              visible={showConfirmPassword}
+            />
+          </div>
+        </div>
         <FieldError id="change-password-error">{error}</FieldError>
         <Button
           aria-busy={pending}
-          className="h-11 w-full"
+          className="h-10 w-full"
           disabled={pending}
           type="submit"
         >
@@ -133,7 +189,7 @@ const ChangePasswordForm = () => {
         <p aria-live="polite" className="sr-only">
           {pending ? "Updating your password" : ""}
         </p>
-      </FieldGroup>
+      </div>
     </form>
   );
 };

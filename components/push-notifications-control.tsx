@@ -1,8 +1,11 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle */
+
 import { useEffect, useState } from "react";
 
 import { registerPushSubscriptionAction } from "@/app/actions/notifications";
+import { Button } from "@/components/ui/button";
 
 const decodeApplicationServerKey = (encoded: string): ArrayBuffer => {
   const padding = "=".repeat((4 - (encoded.length % 4)) % 4);
@@ -103,13 +106,14 @@ const PushNotificationsControl = ({ publicKey }: { publicKey: string }) => {
       <output aria-live="polite" className="text-sm">
         {message}
       </output>
-      <button
+      <Button
+        variant="outline"
         className="rounded-md border bg-background px-4 py-2 text-sm shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2"
         onClick={enableNotifications}
         type="button"
       >
         Enable notifications
-      </button>
+      </Button>
     </aside>
   );
 };

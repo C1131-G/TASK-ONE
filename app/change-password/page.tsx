@@ -34,25 +34,25 @@ const ChangePasswordContent = async () => {
         Skip to main content
       </a>
       <main
-        className="auth-backdrop flex min-h-svh flex-col items-center justify-center gap-6 p-4"
+        className="auth-backdrop flex min-h-svh items-center justify-center px-4 py-2 sm:py-4"
         id="password-main"
         tabIndex={-1}
       >
         <div className="w-full max-w-md">
-          <div className="mb-5 flex justify-center">
+          <div className="mb-2 flex justify-center">
             <AuthBrand />
           </div>
-          <Card className="w-full">
+          <Card className="w-full" size="sm">
             <CardHeader>
-              <h1 className="font-heading text-2xl font-semibold">
+              <h1 className="font-heading text-xl font-semibold">
                 Set a new password
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm leading-5 text-muted-foreground">
                 Change your temporary password to continue to your workspace.
               </p>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 <ChangePasswordForm />
                 <Link
                   className="text-sm underline underline-offset-4"
