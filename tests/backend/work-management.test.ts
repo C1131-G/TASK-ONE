@@ -48,8 +48,10 @@ it("creates a numbered task with multiple active assignees in one transaction", 
         assigneeIds: [firstAssigneeId, secondAssigneeId],
         description: null,
         dueDate: null,
+        estimate: "4 hours",
         priority: "high",
         projectId,
+        startDate: "2026-10-10",
         title: "Review mobile layout",
       });
       const tasks = yield* work.listProjectTasks(actorId, projectId, {
@@ -71,8 +73,10 @@ it("creates a numbered task with multiple active assignees in one transaction", 
     expect(result.tasks).toMatchObject([
       {
         assignees: [{ id: firstAssigneeId }, { id: secondAssigneeId }],
+        estimate: "4 hours",
         id: result.task.id,
         projectTaskNumber: 1,
+        startDate: "2026-10-10",
         title: "Review mobile layout",
       },
     ]);
@@ -589,6 +593,27 @@ it("archives a task and allows only its actor to undo within the window", async 
     const receipt = await Effect.runPromise(
       Effect.provide(archive, WorkManagementLive)
     );
+    const activeTasks = Effect.gen(function* listActiveTasks() {
+      const work = yield* WorkManagement;
+      return yield* work.listProjectTasks(adminId, projectId, {
+        limit: 20,
+        offset: 0,
+      });
+    });
+    const archivedTasks = Effect.gen(function* listArchivedTasks() {
+      const work = yield* WorkManagement;
+      return yield* work.listProjectTasks(adminId, projectId, {
+        includeArchived: true,
+        limit: 20,
+        offset: 0,
+      });
+    });
+    expect(
+      await Effect.runPromise(Effect.provide(activeTasks, WorkManagementLive))
+    ).toHaveLength(0);
+    expect(
+      await Effect.runPromise(Effect.provide(archivedTasks, WorkManagementLive))
+    ).toMatchObject([{ archivedAt: expect.any(String), id: task.id }]);
     const archivedEdit = Effect.gen(function* editArchived() {
       const work = yield* WorkManagement;
       return yield* work.updateTask(adminId, task.id, 2, {
@@ -972,7 +997,7 @@ it("applies bulk task changes atomically and enforces edit permission on every t
       const employeeTask = yield* work.createTask(employeeId, {
         assigneeIds: [],
         description: null,
-        dueDate: null,
+        dueDate: "2026-10-10",
         priority: "none",
         projectId,
         title: "Employee task",
@@ -990,17 +1015,37 @@ it("applies bulk task changes atomically and enforces edit permission on every t
     const { adminTask, employeeTask } = await Effect.runPromise(
       Effect.provide(createTasks, WorkManagementLive)
     );
+    const recurringVersion = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* setRecurrence() {
+          const work = yield* WorkManagement;
+          const result = yield* work.setTaskRecurrence(
+            employeeId,
+            employeeTask.id,
+            employeeTask.version,
+            {
+              endsOn: null,
+              frequency: "daily",
+              interval: 1,
+              weekDays: [],
+            }
+          );
+          return result.version;
+        }),
+        WorkManagementLive
+      )
+    );
     const employeeBulk = Effect.gen(function* unauthorizedBulk() {
       const work = yield* WorkManagement;
       return yield* work.bulkUpdateTasks(
         employeeId,
         [
-          { expectedVersion: 1, taskId: employeeTask.id },
+          { expectedVersion: recurringVersion, taskId: employeeTask.id },
           { expectedVersion: 1, taskId: adminTask.id },
         ],
         {
           assigneeIds: [],
-          dueDate: null,
+          dueDate: "2026-10-10",
           priority: "high",
           status: "done",
         }
@@ -1016,16 +1061,21 @@ it("applies bulk task changes atomically and enforces edit permission on every t
 
     const employeeEdit = Effect.gen(function* employeeEdit() {
       const work = yield* WorkManagement;
-      return yield* work.updateTask(employeeId, employeeTask.id, 1, {
-        assigneeIds: [],
-        description: null,
-        dueDate: null,
-        priority: "medium",
-        status: "todo",
-        title: "Still unchanged by failed bulk",
-      });
+      return yield* work.updateTask(
+        employeeId,
+        employeeTask.id,
+        recurringVersion,
+        {
+          assigneeIds: [],
+          description: null,
+          dueDate: "2026-10-10",
+          priority: "medium",
+          status: "todo",
+          title: "Still unchanged by failed bulk",
+        }
+      );
     });
-    const stillVersionOne = await Effect.runPromise(
+    const unchangedTask = await Effect.runPromise(
       Effect.provide(employeeEdit, WorkManagementLive)
     );
     const adminBulk = Effect.gen(function* authorizedBulk() {
@@ -1033,12 +1083,12 @@ it("applies bulk task changes atomically and enforces edit permission on every t
       return yield* work.bulkUpdateTasks(
         adminId,
         [
-          { expectedVersion: stillVersionOne.version, taskId: employeeTask.id },
+          { expectedVersion: unchangedTask.version, taskId: employeeTask.id },
           { expectedVersion: adminTask.version, taskId: adminTask.id },
         ],
         {
           assigneeIds: [],
-          dueDate: null,
+          dueDate: "2026-10-10",
           priority: "high",
           status: "done",
         }
@@ -1047,10 +1097,27 @@ it("applies bulk task changes atomically and enforces edit permission on every t
     const updated = await Effect.runPromise(
       Effect.provide(adminBulk, WorkManagementLive)
     );
-    expect(stillVersionOne.version).toBe(2);
+    expect(unchangedTask.version).toBe(3);
     expect(updated).toHaveLength(2);
     expect(updated.every((task) => task.status === "done")).toBe(true);
+    expect(
+      updated.find(({ id }) => id === employeeTask.id)?.completionUndo
+    ).toBeDefined();
+    expect(
+      updated.find(({ id }) => id === employeeTask.id)?.recurrenceSuccessorId
+    ).toBeDefined();
+    expect(
+      updated.find(({ id }) => id === adminTask.id)?.completionUndo
+    ).toBeDefined();
   } finally {
+    await authPool.query(
+      "DELETE FROM job WHERE payload->>'userId' = ANY($1::text[])",
+      [[adminId, employeeId]]
+    );
+    await authPool.query(
+      'DELETE FROM notification WHERE "userId" = ANY($1::text[])',
+      [[adminId, employeeId]]
+    );
     await authPool.query(
       'DELETE FROM activity WHERE "actorId" = ANY($1::text[])',
       [[adminId, employeeId]]
@@ -1058,6 +1125,10 @@ it("applies bulk task changes atomically and enforces edit permission on every t
     await authPool.query('DELETE FROM undo_record WHERE "actorId" = $1', [
       adminId,
     ]);
+    await authPool.query(
+      'DELETE FROM recurrence_generation WHERE "sourceTaskId" IN (SELECT id FROM task WHERE "projectId" = $1) OR "successorTaskId" IN (SELECT id FROM task WHERE "projectId" = $1)',
+      [projectId]
+    );
     await authPool.query('DELETE FROM task WHERE "projectId" = $1', [
       projectId,
     ]);

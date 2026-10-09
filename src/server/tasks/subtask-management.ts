@@ -8,6 +8,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 import { allocateTaskNumber } from "../work/work-management";
 import type { CreatedTask } from "../work/work-management";
 
@@ -49,6 +50,11 @@ export const RemovedSubtaskSchema = Schema.Struct({
   parentVersion: Schema.Number,
 });
 
+export const ReorderedSubtasksSchema = Schema.Struct({
+  parentVersion: Schema.Number,
+  subtasks: Schema.Array(SubtaskEntrySchema),
+});
+
 export interface UpdatedSubtask {
   readonly subtask: SubtaskEntry;
   readonly parentVersion: number;
@@ -74,6 +80,12 @@ export class SubtaskManagement extends Context.Service<
       actorId: string,
       taskId: string
     ) => Effect.Effect<readonly SubtaskEntry[], AppError>;
+    readonly reorderSubtasks: (
+      actorId: string,
+      taskId: string,
+      expectedTaskVersion: number,
+      subtaskIds: readonly string[]
+    ) => Effect.Effect<typeof ReorderedSubtasksSchema.Type, AppError>;
     readonly updateSubtask: (
       actorId: string,
       subtaskId: string,
@@ -100,12 +112,7 @@ const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "The subtask was changed by another request.",
@@ -400,6 +407,77 @@ const listSubtasks = (
     },
   });
 
+const reorderSubtasks = (
+  actorId: string,
+  taskId: string,
+  expectedTaskVersion: number,
+  subtaskIds: readonly string[]
+): Effect.Effect<typeof ReorderedSubtasksSchema.Type, AppError> =>
+  Effect.tryPromise({
+    catch: mapError,
+    try: () =>
+      db.transaction(async (transaction) => {
+        const task = await requireEditableTask(
+          transaction,
+          actorId,
+          taskId,
+          expectedTaskVersion
+        );
+        const uniqueIds = new Set(subtaskIds);
+        if (
+          subtaskIds.length > 100 ||
+          uniqueIds.size !== subtaskIds.length ||
+          subtaskIds.some(
+            (id) => !Schema.is(Schema.String.check(Schema.isUUID()))(id)
+          )
+        ) {
+          throw new AppError({
+            code: "VALIDATION_FAILED",
+            message: "Choose a valid subtask ordering.",
+          });
+        }
+        const current = await transaction.orm.public.TaskSubtask.where({
+          taskId,
+        }).all();
+        if (
+          current.length !== subtaskIds.length ||
+          current.some((subtask) => !uniqueIds.has(subtask.id))
+        ) {
+          throw new AppError({
+            code: "CONFLICT",
+            message: "The subtask list changed. Refresh and try again.",
+          });
+        }
+        const parentVersion = await advanceParent(
+          transaction,
+          taskId,
+          expectedTaskVersion
+        );
+        await Promise.all(
+          subtaskIds.map((id, position) =>
+            transaction.orm.public.TaskSubtask.where({ id, taskId }).update({
+              position,
+            })
+          )
+        );
+        await writeActivity(
+          transaction,
+          actorId,
+          taskId,
+          task.projectId,
+          "subtask.reordered",
+          { count: subtaskIds.length }
+        );
+        const rows = await transaction.orm.public.TaskSubtask.where({ taskId })
+          .orderBy((subtask) => subtask.position.asc())
+          .all();
+        return {
+          parentVersion,
+          subtasks: rows.map(toEntry),
+        };
+      }),
+  });
+
 const updateSubtask = (
   actorId: string,
   subtaskId: string,
@@ -603,6 +681,7 @@ export const SubtaskManagementLive = Layer.succeed(
     listSubtasks,
     promoteSubtask,
     removeSubtask,
+    reorderSubtasks,
     updateSubtask,
   })
 );

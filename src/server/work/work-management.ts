@@ -9,6 +9,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 
 const TaskStatusSchema = Schema.Literals([
   "backlog",
@@ -34,7 +35,11 @@ export const UpdateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(CalendarDateSchema),
+  estimate: Schema.optional(
+    Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))
+  ),
   priority: TaskPrioritySchema,
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   status: TaskStatusSchema,
   title: Schema.String,
 });
@@ -45,8 +50,12 @@ export const CreateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(CalendarDateSchema),
+  estimate: Schema.optional(
+    Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))
+  ),
   priority: TaskPrioritySchema,
   projectId: Schema.String.check(Schema.isUUID()),
+  startDate: Schema.optional(Schema.NullOr(CalendarDateSchema)),
   title: Schema.String,
 });
 
@@ -177,7 +186,11 @@ export class WorkManagement extends Context.Service<
     readonly listProjectTasks: (
       actorId: string,
       projectId: string,
-      pagination: { readonly limit: number; readonly offset: number }
+      pagination: {
+        readonly includeArchived?: boolean;
+        readonly limit: number;
+        readonly offset: number;
+      }
     ) => Effect.Effect<readonly ProjectTaskListItem[], AppError>;
     readonly createTask: (
       actorId: string,
@@ -242,12 +255,7 @@ const databaseError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error.code === "23505" || error.code === "P2002")
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "The requested task conflicts with existing work.",
@@ -485,13 +493,13 @@ const createTaskInTransaction = async (
     createdById: actorId,
     description: input.description,
     dueDate: input.dueDate,
-    estimate: null,
+    estimate: input.estimate ?? null,
     id: taskId,
     position: 0,
     priority: input.priority,
     projectId: input.projectId,
     projectTaskNumber,
-    startDate: null,
+    startDate: input.startDate ?? null,
     status: "todo",
     title: input.title,
     updatedAt: now,
@@ -929,7 +937,7 @@ const createRecurrenceSuccessor = async (
     priority,
     projectId: task.projectId,
     projectTaskNumber,
-    startDate: null,
+    startDate: nextDueDate,
     status: "todo",
     title,
     updatedAt: now,
@@ -1057,7 +1065,9 @@ const updateTask = (
             rawInput.status === "done" ? (task.completedAt ?? now) : null,
           description,
           dueDate: rawInput.dueDate,
+          estimate: rawInput.estimate ?? task.estimate,
           priority: rawInput.priority,
+          startDate: rawInput.startDate ?? task.startDate,
           status: rawInput.status,
           title,
           updatedAt: now,
@@ -1942,19 +1952,23 @@ const bulkUpdateTasks = (
             message: "Change your password before continuing.",
           });
         }
-        const [tasks, assignments, activeUsers] = await Promise.all([
-          transaction.orm.public.Task.include("project")
-            .where((task) => task.id.in(taskIds))
-            .all(),
-          transaction.orm.public.TaskAssignee.where((assignment) =>
-            assignment.taskId.in(taskIds)
-          )
-            .select("taskId", "userId")
-            .all(),
-          transaction.orm.public.User.where((user) => user.id.in(assigneeIds))
-            .select("id", "deactivatedAt")
-            .all(),
-        ]);
+        const [tasks, assignments, activeUsers, recurrences] =
+          await Promise.all([
+            transaction.orm.public.Task.include("project")
+              .where((task) => task.id.in(taskIds))
+              .all(),
+            transaction.orm.public.TaskAssignee.where((assignment) =>
+              assignment.taskId.in(taskIds)
+            )
+              .select("taskId", "userId")
+              .all(),
+            transaction.orm.public.User.where((user) => user.id.in(assigneeIds))
+              .select("id", "deactivatedAt")
+              .all(),
+            transaction.orm.public.TaskRecurrence.where((recurrence) =>
+              recurrence.taskId.in(taskIds)
+            ).all(),
+          ]);
         if (tasks.length !== targets.length) {
           throw new AppError({
             code: "NOT_FOUND",
@@ -1991,6 +2005,15 @@ const bulkUpdateTasks = (
             });
           }
           if (
+            recurrences.some((recurrence) => recurrence.taskId === task.id) &&
+            changes.dueDate === null
+          ) {
+            throw new AppError({
+              code: "VALIDATION_FAILED",
+              message: "Remove recurrence before clearing the task due date.",
+            });
+          }
+          if (
             actor.role !== "admin" &&
             task.createdById !== actorId &&
             !assignmentsByTask.get(task.id)?.has(actorId)
@@ -2002,8 +2025,11 @@ const bulkUpdateTasks = (
           }
         }
         const now = new Date();
+        const orderedTasks = tasks.toSorted((left, right) =>
+          left.id.localeCompare(right.id)
+        );
         const updatedTasks = await Promise.all(
-          tasks.map(async (task) => {
+          orderedTasks.map(async (task) => {
             const expectedVersion = targetsById.get(task.id)?.expectedVersion;
             if (!expectedVersion) {
               throw new AppError({
@@ -2056,9 +2082,46 @@ const bulkUpdateTasks = (
             )
           )
         );
-        await Promise.all(
-          updatedTasks.map((task) =>
-            transaction.orm.public.Activity.create({
+        const updatedById = new Map(
+          updatedTasks.map((task) => [task.id, task] as const)
+        );
+        const recurrenceByTaskId = new Map(
+          recurrences.map(
+            (recurrence) => [recurrence.taskId, recurrence] as const
+          )
+        );
+        const results: CreatedTask[] = await Promise.all(
+          orderedTasks.map(async (task) => {
+            const updated = updatedById.get(task.id);
+            if (!updated) {
+              throw new AppError({
+                code: "NOT_FOUND",
+                message: "One or more tasks were not found.",
+              });
+            }
+            const previousAssignees =
+              assignmentsByTask.get(task.id) ?? new Set();
+            await notifyTaskAssignees(
+              transaction,
+              { id: actorId, name: actor.name },
+              { id: task.id, projectId: task.projectId, title: task.title },
+              assigneeIds.filter((userId) => !previousAssignees.has(userId)),
+              now
+            );
+            await notifyTaskAssignees(
+              transaction,
+              { id: actorId, name: actor.name },
+              { id: task.id, projectId: task.projectId, title: task.title },
+              [
+                task.createdById,
+                ...assigneeIds.filter((userId) =>
+                  previousAssignees.has(userId)
+                ),
+              ],
+              now,
+              "update"
+            );
+            await transaction.orm.public.Activity.create({
               action: "task.bulk_updated",
               actorId,
               createdAt: now,
@@ -2066,22 +2129,61 @@ const bulkUpdateTasks = (
               id: randomUUID(),
               projectId: task.projectId,
               taskId: task.id,
-            })
-          )
+            });
+            const completionTransition =
+              task.status !== "done" && changes.status === "done";
+            const successorId = completionTransition
+              ? await createRecurrenceSuccessor(
+                  transaction,
+                  recurrenceByTaskId.get(task.id) ?? null,
+                  task,
+                  actorId,
+                  updated.version,
+                  changes.dueDate,
+                  task.description,
+                  changes.priority,
+                  task.title,
+                  assigneeIds,
+                  now
+                )
+              : undefined;
+            let completionUndo: TaskArchiveUndoReceipt | undefined;
+            if (completionTransition) {
+              const undoId = randomUUID();
+              const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
+              await transaction.orm.public.UndoRecord.create({
+                action: "task.complete",
+                actorId,
+                createdAt: now,
+                entityId: task.id,
+                entityType: "task",
+                expiresAt,
+                id: undoId,
+                snapshot: {
+                  status: decodeTaskStatus(task.status),
+                  version: updated.version,
+                },
+              });
+              completionUndo = { expiresAt: expiresAt.toISOString(), undoId };
+            }
+            return {
+              assigneeIds,
+              createdById: task.createdById,
+              ...(completionUndo ? { completionUndo } : {}),
+              ...(successorId ? { recurrenceSuccessorId: successorId } : {}),
+              description: task.description,
+              dueDate: updated.dueDate,
+              id: task.id,
+              priority: decodeTaskPriority(updated.priority),
+              projectId: task.projectId,
+              projectTaskNumber: task.projectTaskNumber,
+              status: decodeTaskStatus(updated.status),
+              title: task.title,
+              version: updated.version,
+            };
+          })
         );
-        return updatedTasks.map((task) => ({
-          assigneeIds,
-          createdById: task.createdById,
-          description: task.description,
-          dueDate: task.dueDate,
-          id: task.id,
-          priority: decodeTaskPriority(task.priority),
-          projectId: task.projectId,
-          projectTaskNumber: task.projectTaskNumber,
-          status: decodeTaskStatus(task.status),
-          title: task.title,
-          version: task.version,
-        }));
+        return results;
       });
     },
   });
@@ -2117,10 +2219,36 @@ const changeTaskStatus = (
     },
   }).pipe(Effect.flatten);
 
+const validateProjectTaskPagination = (
+  projectId: string,
+  pagination: {
+    readonly limit: number;
+    readonly offset: number;
+  }
+): void => {
+  if (
+    !Schema.is(Schema.String.check(Schema.isUUID()))(projectId) ||
+    !Number.isInteger(pagination.limit) ||
+    pagination.limit < 1 ||
+    pagination.limit > 200 ||
+    !Number.isInteger(pagination.offset) ||
+    pagination.offset < 0
+  ) {
+    throw new AppError({
+      code: "VALIDATION_FAILED",
+      message: "The project task query is invalid.",
+    });
+  }
+};
+
 const listProjectTasks = (
   actorId: string,
   projectId: string,
-  pagination: { readonly limit: number; readonly offset: number }
+  pagination: {
+    readonly includeArchived?: boolean;
+    readonly limit: number;
+    readonly offset: number;
+  }
 ): Effect.Effect<readonly ProjectTaskListItem[], AppError> =>
   Effect.tryPromise({
     catch: databaseError,
@@ -2140,19 +2268,7 @@ const listProjectTasks = (
           message: "Change your password before continuing.",
         });
       }
-      if (
-        !Schema.is(Schema.String.check(Schema.isUUID()))(projectId) ||
-        !Number.isInteger(pagination.limit) ||
-        pagination.limit < 1 ||
-        pagination.limit > 200 ||
-        !Number.isInteger(pagination.offset) ||
-        pagination.offset < 0
-      ) {
-        throw new AppError({
-          code: "VALIDATION_FAILED",
-          message: "The project task query is invalid.",
-        });
-      }
+      validateProjectTaskPagination(projectId, pagination);
       const project = await db.orm.public.Project.where({ id: projectId })
         .select("id")
         .first();
@@ -2162,7 +2278,11 @@ const listProjectTasks = (
           message: "The project was not found.",
         });
       }
-      const tasks = await db.orm.public.Task.where({ projectId })
+      const tasks = await db.orm.public.Task.where(
+        pagination.includeArchived
+          ? { projectId }
+          : { archivedAt: null, projectId }
+      )
         .orderBy((task) => task.position.asc())
         .orderBy((task) => task.projectTaskNumber.asc())
         .limit(pagination.limit)

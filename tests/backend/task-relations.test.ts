@@ -51,7 +51,23 @@ it("saves labels and dependencies while rejecting dependency cycles", async () =
         projectId,
         title: "Second relation task",
       });
-      return { first, second };
+      const third = yield* work.createTask(adminId, {
+        assigneeIds: [],
+        description: null,
+        dueDate: null,
+        priority: "none",
+        projectId,
+        title: "Third relation task",
+      });
+      const fourth = yield* work.createTask(adminId, {
+        assigneeIds: [],
+        description: null,
+        dueDate: null,
+        priority: "none",
+        projectId,
+        title: "Fourth relation task",
+      });
+      return { first, fourth, second, third };
     });
     const tasks = await Effect.runPromise(
       Effect.provide(createTasks, WorkManagementLive)
@@ -80,6 +96,25 @@ it("saves labels and dependencies while rejecting dependency cycles", async () =
     const cycleResult = await runEffectResult(
       Effect.provide(cycle, TaskRelationsLive)
     );
+    const oppositeEdges = await Promise.all(
+      [
+        [tasks.third.id, tasks.fourth.id] as const,
+        [tasks.fourth.id, tasks.third.id] as const,
+      ].map(([taskId, dependencyTaskId]) =>
+        runEffectResult(
+          Effect.provide(
+            Effect.gen(function* addConcurrentEdge() {
+              const relations = yield* TaskRelations;
+              return yield* relations.setTaskRelations(adminId, taskId, 1, {
+                dependencyTaskIds: [dependencyTaskId],
+                labelIds: [],
+              });
+            }),
+            TaskRelationsLive
+          )
+        )
+      )
+    );
 
     expect(firstRelations.labelIds).toEqual([labelId]);
     expect(firstRelations.dependencyTaskIds).toEqual([tasks.second.id]);
@@ -88,6 +123,8 @@ it("saves labels and dependencies while rejecting dependency cycles", async () =
       error: { code: "CONFLICT" },
       ok: false,
     });
+    expect(oppositeEdges.filter(({ ok }) => ok)).toHaveLength(1);
+    expect(oppositeEdges.filter(({ ok }) => !ok)).toHaveLength(1);
   } finally {
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       adminId,

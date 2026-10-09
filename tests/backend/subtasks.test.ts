@@ -89,12 +89,54 @@ it("creates, completes, and promotes a subtask through task services", async () 
     const disposable = await Effect.runPromise(
       Effect.provide(createDisposable, SubtaskManagementLive)
     );
+    const createSecondSubtask = Effect.gen(function* makeSecondSubtask() {
+      const subtasks = yield* SubtaskManagement;
+      return yield* subtasks.createSubtask(
+        actorId,
+        task.id,
+        disposable.parentVersion,
+        {
+          assigneeId: null,
+          description: null,
+          dueDate: null,
+          title: "Second subtask",
+        }
+      );
+    });
+    const secondSubtask = await Effect.runPromise(
+      Effect.provide(createSecondSubtask, SubtaskManagementLive)
+    );
+    const reorder = Effect.gen(function* reorderSubtasks() {
+      const subtasks = yield* SubtaskManagement;
+      return yield* subtasks.reorderSubtasks(
+        actorId,
+        task.id,
+        secondSubtask.parentVersion,
+        [secondSubtask.subtask.id, created.subtask.id, disposable.subtask.id]
+      );
+    });
+    const reordered = await Effect.runPromise(
+      Effect.provide(reorder, SubtaskManagementLive)
+    );
+    const listSubtasks = Effect.gen(function* listSubtasks() {
+      const subtasks = yield* SubtaskManagement;
+      return yield* subtasks.listSubtasks(actorId, task.id);
+    });
+    const orderedSubtasks = await Effect.runPromise(
+      Effect.provide(listSubtasks, SubtaskManagementLive)
+    );
+    expect(reordered.parentVersion).toBe(6);
+    expect(orderedSubtasks.map(({ id }) => id)).toEqual([
+      secondSubtask.subtask.id,
+      created.subtask.id,
+      disposable.subtask.id,
+    ]);
     const removeDisposable = Effect.gen(function* removeDisposable() {
       const subtasks = yield* SubtaskManagement;
       return yield* subtasks.removeSubtask(
         actorId,
         disposable.subtask.id,
-        disposable.parentVersion
+        reordered.parentVersion
       );
     });
     const removal = await Effect.runPromise(
@@ -115,7 +157,7 @@ it("creates, completes, and promotes a subtask through task services", async () 
     expect(created.subtask.description).toBe("<p>Draft slides</p>");
     expect(created.parentVersion).toBe(2);
     expect(completed.subtask.completed).toBe(true);
-    expect(removal.parentVersion).toBe(5);
+    expect(removal.parentVersion).toBe(7);
     expect(promoted.id).not.toBe(task.id);
     expect(promoted.projectTaskNumber).toBe(2);
     expect(promoted.title).toBe("Draft slides");

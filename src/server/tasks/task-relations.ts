@@ -150,6 +150,20 @@ const setTaskRelations = (
             message: "The task changed. Refresh and try again.",
           });
         }
+        await transaction.orm.public.CompanySettings.upsert({
+          conflictOn: { id: "company" },
+          create: {
+            brandColor: "#1D1C1A",
+            brandEnabled: true,
+            id: "company",
+            name: "Gr8r Studio",
+            settings: {},
+            slug: "gr8rstudio",
+            timeZone: "Asia/Kolkata",
+            updatedAt: new Date(),
+          },
+          update: { updatedAt: new Date() },
+        });
         if (actor.role !== "admin" && task.createdById !== actorId) {
           const assignment = await transaction.orm.public.TaskAssignee.where({
             taskId,
