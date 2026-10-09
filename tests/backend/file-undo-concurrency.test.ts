@@ -6,7 +6,8 @@ import { Effect, Layer } from "effect";
 import { authPool } from "../../src/server/auth/database";
 import { runEffectResult } from "../../src/server/core/action-result";
 import { Storage } from "../../src/server/storage/storage";
-import { Uploads, UploadsLive } from "../../src/server/storage/uploads";
+import { UploadsLive } from "../../src/server/storage/uploads";
+import { Uploads } from "../../src/server/storage/uploads-contracts";
 
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
