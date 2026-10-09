@@ -21,6 +21,29 @@ it("rejects public account registration", async () => {
   expect(response.status).toBeGreaterThanOrEqual(400);
 });
 
+it("does not expose Better Auth profile, session-management, or admin endpoints", async () => {
+  const { POST } = await import("../../app/api/auth/[...all]/route");
+  const blockedPaths = [
+    "/api/auth/update-user",
+    "/api/auth/list-sessions",
+    "/api/auth/admin/set-role",
+  ];
+
+  const responses = await Promise.all(
+    blockedPaths.map((path) =>
+      POST(
+        new Request(`http://localhost:3000${path}`, {
+          body: JSON.stringify({ name: "Untrusted update" }),
+          headers: { "content-type": "application/json" },
+          method: "POST",
+        })
+      )
+    )
+  );
+
+  expect(responses.map(({ status }) => status)).toEqual([404, 404, 404]);
+});
+
 it("requires the scheduler token before running any durable jobs", async () => {
   const { POST } = await import("../../app/api/internal/jobs/route");
   const response = await POST(

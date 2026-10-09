@@ -8,6 +8,7 @@ import { db } from "@/src/prisma/db";
 import { auth } from "../auth/auth";
 import { AppError } from "../core/action-result";
 import { EmailAddressSchema, UUIDSchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 
 export const CreateEmployeeInputSchema = Schema.Struct({
   email: EmailAddressSchema,
@@ -137,12 +138,7 @@ const databaseError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error.code === "P2002" || error.code === "23505")
-  ) {
+  if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
       message: "An account with that email already exists.",

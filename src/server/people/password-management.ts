@@ -1,3 +1,4 @@
+import { and } from "@prisma/orm-postgres/orm-client";
 import { Context, Effect, Layer } from "effect";
 
 import { db } from "@/src/prisma/db";
@@ -46,16 +47,34 @@ const changeOwnPassword = (
         });
       }
 
-      await auth.api.changePassword({
-        body: {
-          currentPassword,
-          newPassword,
-          revokeOtherSessions: false,
-        },
-        headers,
-      });
+      const passwordContext = await auth.$context;
 
       await db.transaction(async (transaction) => {
+        const credential = await transaction.orm.public.Account.where({
+          providerId: "credential",
+          userId: session.user.id,
+        })
+          .select("id", "password")
+          .first();
+        if (
+          !credential?.password ||
+          !(await passwordContext.password.verify({
+            hash: credential.password,
+            password: currentPassword,
+          }))
+        ) {
+          throw new AppError({
+            code: "VALIDATION_FAILED",
+            message: "Check your current password and try again.",
+          });
+        }
+        const passwordHash = await passwordContext.password.hash(newPassword);
+        await transaction.orm.public.Account.where({
+          id: credential.id,
+        }).update({
+          password: passwordHash,
+          updatedAt: new Date(),
+        });
         const updated = await transaction.orm.public.User.where({
           deactivatedAt: null,
           id: session.user.id,
@@ -66,6 +85,12 @@ const changeOwnPassword = (
             message: "This account is unavailable.",
           });
         }
+        await transaction.orm.public.Session.where((activeSession) =>
+          and(
+            activeSession.userId.eq(session.user.id),
+            activeSession.token.neq(session.session.token)
+          )
+        ).deleteAll();
         await transaction.orm.public.Activity.create({
           action: "user.password_changed",
           actorId: session.user.id,
