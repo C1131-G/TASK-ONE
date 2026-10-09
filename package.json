@@ -12,6 +12,7 @@
     "test": "bun run scripts/test-backend.ts",
     "test:backend": "bun run scripts/test-backend.ts",
     "bootstrap:admin": "bun run scripts/bootstrap-admin.ts",
+    "seed:test-users": "bun run scripts/seed-test-users.ts",
     "worker": "bun run scripts/run-worker.ts",
     "check": "ultracite check",
     "fix": "ultracite fix",

@@ -22,6 +22,14 @@ On a fresh database, create the first administrator once with:
 BOOTSTRAP_ADMIN_NAME="Studio Admin" BOOTSTRAP_ADMIN_EMAIL="admin@example.com" bun run bootstrap:admin
 ```
 
+For local UI testing on an already initialized database, seed one test admin and one test employee with:
+
+```bash
+bun run seed:test-users
+```
+
+The command prints each account's employee ID, email, and generated temporary password once. Both accounts must change their password after their first sign-in. It only runs against a local, non-test Metsys database and refuses to overwrite either test email.
+
 The command prints a generated temporary password once and requires a password change at first sign-in. Keep that output private. It refuses to run after an admin account exists.
 
 The service, adapter, test coverage, and remaining work checklist is in [`docs/backend-progress.md`](docs/backend-progress.md). Prisma model groups and authorization policy are in [`docs/data-model.md`](docs/data-model.md).
