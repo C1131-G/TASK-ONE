@@ -12,6 +12,7 @@ import { useState, useTransition } from "react";
 import {
   createSavedViewAction,
   deleteSavedViewAction,
+  updateSavedViewAction,
 } from "@/app/actions/saved-views";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -23,10 +24,14 @@ import {
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
+
 import {
-  defaultSavedViewFilters,
-  defaultSavedViewSort,
-} from "@/src/server/preferences/saved-view-settings";
+  normalizeProjectViewSearch,
+  projectViewHref,
+  projectViewSearchToSettings,
+  projectViewSettingsToSearch,
+} from "./project-view-search";
+import { useProjectViewSearch } from "./use-project-view-search";
 
 const selectedViewType = (
   value: FormDataEntryValue | null
@@ -58,19 +63,30 @@ export const ProjectSavedViews = ({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { search } = useProjectViewSearch();
+  const currentSettings = projectViewSearchToSettings(search);
+  const selectedView = views.find((view) => view.id === selectedId) ?? null;
+  const canEditSelected =
+    selectedView !== null && (isAdmin || selectedView.userId === userId);
+  const hasUnsavedChanges =
+    selectedView !== null &&
+    JSON.stringify(normalizeProjectViewSearch(search)) !==
+      JSON.stringify(
+        normalizeProjectViewSearch(projectViewSettingsToSearch(selectedView))
+      );
 
   const create = (formData: FormData) =>
     startTransition(async () => {
       const result = await createSavedViewAction({
         idempotencyKey: crypto.randomUUID(),
         view: {
-          filters: defaultSavedViewFilters,
-          groupBy: null,
+          filters: currentSettings.filters,
+          groupBy: currentSettings.groupBy,
           hiddenColumns: [],
           isShared: isAdmin && formData.get("isShared") === "on",
           name: String(formData.get("name") ?? "").trim(),
           projectId,
-          sort: defaultSavedViewSort,
+          sort: currentSettings.sort,
           type: selectedViewType(formData.get("type")),
         },
       });
@@ -79,9 +95,31 @@ export const ProjectSavedViews = ({
         return;
       }
       setError(null);
-      router.push(
-        `/projects/${projectId}?view=saved-${result.data.id}` as Route
-      );
+      router.push(projectViewHref(projectId, result.data.id, search) as Route);
+      router.refresh();
+    });
+
+  const saveChanges = (view: SavedViewSummary) =>
+    startTransition(async () => {
+      const result = await updateSavedViewAction({
+        idempotencyKey: crypto.randomUUID(),
+        view: {
+          filters: currentSettings.filters,
+          groupBy: currentSettings.groupBy,
+          hiddenColumns: [...view.hiddenColumns],
+          isShared: view.isShared,
+          name: view.name,
+          projectId: view.projectId,
+          sort: currentSettings.sort,
+          type: view.type,
+        },
+        viewId: view.id,
+      });
+      if (!result.ok) {
+        setError(result.error.message);
+        return;
+      }
+      setError(null);
       router.refresh();
     });
 
@@ -110,12 +148,28 @@ export const ProjectSavedViews = ({
         </p>
       ) : null}
       <nav aria-label="Saved project views" className="tabs saved-view-tabs">
+        {canEditSelected && hasUnsavedChanges && selectedView ? (
+          <WorkspaceButton
+            className="tab"
+            disabled={pending}
+            onClick={() => saveChanges(selectedView)}
+            type="button"
+          >
+            {pending ? "Saving…" : "Update view"}
+          </WorkspaceButton>
+        ) : null}
         {views.map((view) => (
           <span className="tab-wrap" key={view.id}>
             <Link
               aria-current={selectedId === view.id ? "page" : undefined}
               className={`tab${selectedId === view.id ? " on" : ""}`}
-              href={`/projects/${projectId}?view=saved-${view.id}` as Route}
+              href={
+                projectViewHref(
+                  projectId,
+                  view.id,
+                  projectViewSettingsToSearch(view)
+                ) as Route
+              }
             >
               {view.name}
             </Link>

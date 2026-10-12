@@ -16,6 +16,8 @@ import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
+import { useProjectViewSearch } from "./use-project-view-search";
+
 const priorityOrder = {
   high: 1,
   low: 3,
@@ -54,11 +56,13 @@ export const ProjectTaskListViewContent = ({
   readonly tasks: readonly ProjectTaskViewItem[];
   readonly view: "list" | "table";
 }) => {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [priority, setPriority] = useState("all");
-  const [sort, setSort] = useState("manual");
-  const [groupBy, setGroupBy] = useState("status");
+  const { search, update: updateSearch } = useProjectViewSearch();
+  const { group: groupBy, priority, q: query, sort, status } = search;
+  const setQuery = (value: string) => updateSearch({ q: value });
+  const setStatus = (value: string) => updateSearch({ status: value });
+  const setPriority = (value: string) => updateSearch({ priority: value });
+  const setSort = (value: string) => updateSearch({ sort: value });
+  const setGroupBy = (value: string) => updateSearch({ group: value });
   const [selectedTaskIds, setSelectedTaskIds] = useState<ReadonlySet<string>>(
     new Set()
   );

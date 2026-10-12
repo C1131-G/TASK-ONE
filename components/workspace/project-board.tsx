@@ -24,6 +24,8 @@ import {
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 import type { TaskRecurrenceInput } from "@/src/server/work/work-contracts";
 
+import { useProjectViewSearch } from "./use-project-view-search";
+
 interface Task {
   readonly id: string;
   readonly projectId: string;
@@ -86,9 +88,12 @@ export const ProjectBoard = ({
   const [pending, startTransition] = useTransition();
   const draggedTaskId = useRef<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("all");
-  const [sort, setSort] = useState("manual");
+  const { search, update: updateSearch } = useProjectViewSearch();
+  const { priority: priorityFilter, q: query, sort } = search;
+  const setQuery = (value: string) => updateSearch({ q: value });
+  const setPriorityFilter = (value: string) =>
+    updateSearch({ priority: value });
+  const setSort = (value: string) => updateSearch({ sort: value });
   const labelsById = new Map(labels.map((label) => [label.id, label]));
 
   const visibleTasks = tasks
