@@ -3,17 +3,18 @@
 
 "use client";
 
+import { useSelector } from "@tanstack/react-store";
 import type { Route } from "next";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo } from "react";
 import type { ReactNode } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
-  TableCell,
   TableCaption,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -21,8 +22,26 @@ import {
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import { GlobalTaskBoard } from "@/components/workspace/global-task-board";
 import { GlobalTaskBulkDialog } from "@/components/workspace/global-task-bulk-dialog";
+import {
+  GLOBAL_TASK_VIEWS,
+  serializeGlobalTaskHidden,
+} from "@/components/workspace/global-task-view-state";
 import { TaskManageControls } from "@/components/workspace/task-manage-controls";
 import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import { TaskTableColumnMenu } from "@/components/workspace/task-table-column-menu";
+import type {
+  TaskTableColumnDef,
+  TaskTableColumnId,
+} from "@/components/workspace/task-table-columns";
+import {
+  GLOBAL_HIDEABLE_COLUMNS,
+  GLOBAL_TASK_COLUMNS,
+  defaultColumnWidth,
+} from "@/components/workspace/task-table-columns";
+import { TaskTableHeaderCell } from "@/components/workspace/task-table-header-cell";
+import { useGlobalTaskView } from "@/components/workspace/use-global-task-view";
+import { useGlobalTaskViewStore } from "@/components/workspace/view-store/global-task-view-store-provider";
+import { MAX_BULK_SELECTION } from "@/components/workspace/view-store/project-view-store";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -111,78 +130,130 @@ const TaskActions = ({
   </div>
 );
 
-const GlobalTaskTable = (props: GlobalTaskViewProps) => (
-  <Table>
-    <TableCaption className="sr-only">Workspace tasks</TableCaption>
-    <TableHeader>
-      <TableRow>
-        <TableHead className="w-10">
-          <span className="sr-only">Select</span>
-        </TableHead>
-        <TableHead>Task</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Assignee</TableHead>
-        <TableHead>Priority</TableHead>
-        <TableHead>Due date</TableHead>
-        <TableHead>Project</TableHead>
-        <TableHead>Actions</TableHead>
-      </TableRow>
-    </TableHeader>
-    {props.taskGroups.map((group) => (
-      <TableBody key={group.key}>
+const renderGlobalCell = (
+  columnId: TaskTableColumnId,
+  task: GlobalTask,
+  props: GlobalTaskViewProps
+): ReactNode => {
+  switch (columnId) {
+    case "task": {
+      return (
+        <Link
+          className="trunc"
+          href={`/projects/${task.projectId}?view=board` as Route}
+        >
+          <span className="mono faint">
+            {task.projectKey}-{task.projectTaskNumber}
+          </span>{" "}
+          {task.title}
+        </Link>
+      );
+    }
+    case "status": {
+      return (
+        <TaskStatus
+          canEdit={canEditTask(task, props.userId, props.isAdmin)}
+          task={task}
+        />
+      );
+    }
+    case "assignees": {
+      return task.assignees.length
+        ? task.assignees.map(({ name }) => name).join(", ")
+        : "Unassigned";
+    }
+    case "priority": {
+      return task.priority;
+    }
+    case "due": {
+      return task.dueDate ?? "—";
+    }
+    case "project": {
+      return (
+        <Link href={`/projects/${task.projectId}` as Route}>
+          {task.projectName}
+        </Link>
+      );
+    }
+    case "actions": {
+      return <TaskActions {...props} task={task} />;
+    }
+    default: {
+      return null;
+    }
+  }
+};
+
+const GlobalTaskTable = ({
+  activeSort,
+  columnWidths,
+  hidden,
+  onResize,
+  onSort,
+  props,
+}: {
+  readonly activeSort: string;
+  readonly columnWidths: Partial<Record<TaskTableColumnId, number>>;
+  readonly hidden: readonly TaskTableColumnId[];
+  readonly onResize: (columnId: TaskTableColumnId, width: number) => void;
+  readonly onSort: (field: string) => void;
+  readonly props: GlobalTaskViewProps;
+}) => {
+  const visibleColumns: readonly TaskTableColumnDef[] =
+    GLOBAL_TASK_COLUMNS.filter((column) => !hidden.includes(column.id));
+  const widthOf = (column: TaskTableColumnDef) =>
+    columnWidths[column.id] ?? defaultColumnWidth(column.id);
+
+  return (
+    <Table className="project-task-data-table">
+      <TableCaption className="sr-only">Workspace tasks</TableCaption>
+      <TableHeader>
         <TableRow>
-          <TableCell className="font-medium" colSpan={8}>
-            {group.label} <span className="muted">{group.tasks.length}</span>
-          </TableCell>
+          <TableHead className="w-10">
+            <span className="sr-only">Select</span>
+          </TableHead>
+          {visibleColumns.map((column) => (
+            <TaskTableHeaderCell
+              activeSort={activeSort}
+              column={column}
+              key={column.id}
+              onResize={onResize}
+              onSort={onSort}
+              width={widthOf(column)}
+            />
+          ))}
         </TableRow>
-        {group.tasks.map((task) => (
-          <TableRow key={task.id}>
-            <TableCell>
-              <Checkbox
-                aria-label={`Select ${task.title}`}
-                checked={props.selectedIds.has(task.id)}
-                onCheckedChange={(checked) =>
-                  props.onToggle(task.id, checked === true)
-                }
-              />
-            </TableCell>
-            <TableCell>
-              <Link
-                className="trunc"
-                href={`/projects/${task.projectId}?view=board` as Route}
-              >
-                <span className="mono faint">
-                  {task.projectKey}-{task.projectTaskNumber}
-                </span>{" "}
-                {task.title}
-              </Link>
-            </TableCell>
-            <TableCell>
-              <TaskStatus
-                canEdit={canEditTask(task, props.userId, props.isAdmin)}
-                task={task}
-              />
-            </TableCell>
-            <TableCell>
-              {task.assignees.map(({ name }) => name).join(", ") ||
-                "Unassigned"}
-            </TableCell>
-            <TableCell>{task.priority}</TableCell>
-            <TableCell>{task.dueDate ?? "—"}</TableCell>
-            <TableCell>
-              <Link href={`/projects/${task.projectId}` as Route}>
-                {task.projectName}
-              </Link>
-            </TableCell>
-            <TableCell>
-              <TaskActions {...props} task={task} />
+      </TableHeader>
+      {props.taskGroups.map((group) => (
+        <TableBody key={group.key}>
+          <TableRow className="project-task-group-row">
+            <TableCell colSpan={visibleColumns.length + 1}>
+              {group.label} <span className="muted">{group.tasks.length}</span>
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    ))}
-  </Table>
-);
+          {group.tasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell>
+                <Checkbox
+                  aria-label={`Select ${task.title}`}
+                  checked={props.selectedIds.has(task.id)}
+                  onCheckedChange={(checked) =>
+                    props.onToggle(task.id, checked === true)
+                  }
+                />
+              </TableCell>
+              {visibleColumns.map((column) => (
+                <TableCell data-label={column.label} key={column.id}>
+                  {renderGlobalCell(column.id, task, props)}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      ))}
+    </Table>
+  );
+};
 
 const GlobalTaskList = ({
   taskGroups,
@@ -264,33 +335,29 @@ const GlobalTaskList = ({
 );
 
 export const GlobalTaskRows = (props: GlobalTaskRowsProps) => {
-  const tasks = props.taskGroups.flatMap((group) => group.tasks);
-  const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(
-    new Set()
+  const store = useGlobalTaskViewStore();
+  const { search, update } = useGlobalTaskView(GLOBAL_TASK_VIEWS);
+  const selectedTaskIdList = useSelector(
+    store,
+    (state) => state.selectedTaskIds
   );
+  const columnWidths = useSelector(store, (state) => state.columnWidths);
+  const selectedIds: ReadonlySet<string> = useMemo(
+    () => new Set(selectedTaskIdList),
+    [selectedTaskIdList]
+  );
+  const tasks = props.taskGroups.flatMap((group) => group.tasks);
   const selectedTasks = tasks.filter((task) => selectedIds.has(task.id));
-  const selectionLimitReached = selectedIds.size >= 100;
+  const selectionLimitReached = selectedTasks.length >= MAX_BULK_SELECTION;
 
-  const onToggle = (taskId: string, checked: boolean) => {
-    setSelectedIds((current) => {
-      if (checked && current.size >= 100) {
-        return current;
-      }
-      const next = new Set(current);
-      if (checked) {
-        next.add(taskId);
-      } else {
-        next.delete(taskId);
-      }
-      return next;
-    });
-  };
-
-  const selectAll = (checked: boolean) => {
-    setSelectedIds(
-      checked ? new Set(tasks.slice(0, 100).map((task) => task.id)) : new Set()
+  const onToggle = (taskId: string, checked: boolean) =>
+    store.actions.toggleTaskSelected(taskId, checked);
+  const selectAll = (checked: boolean) =>
+    store.actions.setSelectedTaskIds(
+      checked ? tasks.map((task) => task.id) : []
     );
-  };
+  const sortByColumn = (field: string) =>
+    update({ sort: search.sort === field ? "due" : field });
 
   const viewProps: GlobalTaskViewProps = { ...props, onToggle, selectedIds };
   let content: ReactNode;
@@ -307,7 +374,18 @@ export const GlobalTaskRows = (props: GlobalTaskRowsProps) => {
       />
     );
   } else if (props.view === "table") {
-    content = <GlobalTaskTable {...viewProps} />;
+    content = (
+      <GlobalTaskTable
+        activeSort={search.sort}
+        columnWidths={columnWidths}
+        hidden={search.hidden}
+        onResize={(columnId, width) =>
+          store.actions.setColumnWidth(columnId, width)
+        }
+        onSort={sortByColumn}
+        props={viewProps}
+      />
+    );
   } else {
     content = <GlobalTaskList {...viewProps} />;
   }
@@ -324,16 +402,28 @@ export const GlobalTaskRows = (props: GlobalTaskRowsProps) => {
             id="global-task-select-all"
             onCheckedChange={(checked) => selectAll(checked === true)}
           />
-          {tasks.length > 100 ? "Select first 100 tasks" : "Select all tasks"}
+          {tasks.length > MAX_BULK_SELECTION
+            ? `Select first ${MAX_BULK_SELECTION} tasks`
+            : "Select all tasks"}
         </label>
         <span aria-live="polite" className="muted">
-          {selectedIds.size} selected{selectionLimitReached ? " (maximum)" : ""}
+          {selectedTasks.length} selected
+          {selectionLimitReached ? " (maximum)" : ""}
         </span>
         {selectedTasks.length > 0 ? (
           <GlobalTaskBulkDialog
             employees={props.employees}
-            onSuccess={() => setSelectedIds(new Set())}
+            onSuccess={() => store.actions.clearSelection()}
             tasks={selectedTasks}
+          />
+        ) : null}
+        {props.view === "table" ? (
+          <TaskTableColumnMenu
+            columns={GLOBAL_HIDEABLE_COLUMNS}
+            hidden={search.hidden}
+            onHiddenChange={(next) =>
+              update({ hidden: serializeGlobalTaskHidden(next) })
+            }
           />
         ) : null}
       </div>

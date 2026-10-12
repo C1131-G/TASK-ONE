@@ -150,6 +150,12 @@ it("replays personal, notification, and favorite mutations", async () => {
     { preferences: {} }
   );
   await replay(
+    "saveTaskTableColumnWidthsAction",
+    "owner",
+    personalPreferences.saveTaskTableColumnWidthsAction,
+    { columnWidths: { due: 140 } }
+  );
+  await replay(
     "setNotificationPreferenceAction",
     "owner",
     notifications.setNotificationPreferenceAction,

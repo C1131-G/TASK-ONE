@@ -9,7 +9,10 @@ import { useRef } from "react";
 
 import { TableHead } from "@/components/ui/table";
 
-import type { TaskTableColumn, TaskTableColumnId } from "./task-table-columns";
+import type {
+  TaskTableColumnDef,
+  TaskTableColumnId,
+} from "./task-table-columns";
 import { clampColumnWidth } from "./task-table-columns";
 
 const KEYBOARD_RESIZE_STEP = 8;
@@ -23,7 +26,7 @@ export const TaskTableHeaderCell = ({
   width,
 }: {
   readonly activeSort: string;
-  readonly column: TaskTableColumn;
+  readonly column: TaskTableColumnDef;
   readonly onResize: (columnId: TaskTableColumnId, width: number) => void;
   readonly onSort: (field: string) => void;
   readonly width: number;

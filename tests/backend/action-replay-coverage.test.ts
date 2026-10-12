@@ -31,6 +31,7 @@ const excludedByDesign = new Set([
   "revokeSessionAction",
 ]);
 const replayedMutations = new Set([
+  "saveTaskTableColumnWidthsAction",
   "archiveProjectAction",
   "archiveTaskAction",
   "bulkUpdateTasksAction",

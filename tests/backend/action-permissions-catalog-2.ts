@@ -72,6 +72,11 @@ export const actionCatalog2: readonly ActionEntry[] = [
     personalPreferences.savePersonalPreferencesAction,
     () => ({ idempotencyKey: nextKey(), preferences: {} })
   ),
+  entry(
+    "saveTaskTableColumnWidthsAction",
+    personalPreferences.saveTaskTableColumnWidthsAction,
+    () => ({ columnWidths: { due: 140 }, idempotencyKey: nextKey() })
+  ),
   entry("listProjectsAction", projects.listProjectsAction, () => ({})),
   entry(
     "listProjectMilestonesAction",

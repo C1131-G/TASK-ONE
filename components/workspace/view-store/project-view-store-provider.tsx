@@ -1,6 +1,10 @@
 "use client";
 
-import { createStoreContext, useCreateStore } from "@tanstack/react-store";
+import {
+  createStoreContext,
+  useCreateStore,
+  useSelector,
+} from "@tanstack/react-store";
 import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
@@ -10,6 +14,8 @@ import {
   readProjectViewSearchRaw,
   writeProjectViewSearch,
 } from "../project-view-search";
+import type { TaskTableColumnId } from "../task-table-columns";
+import { usePersistColumnWidths } from "./column-width-persistence";
 import {
   createInitialProjectViewState,
   projectViewActions,
@@ -24,15 +30,20 @@ export const useProjectViewStore = () => useStoreContext().projectViewStore;
 
 // The store is the source for the page; the URL mirrors it so refresh, back and
 // forward and shared links restore the same view.
+const NO_COLUMN_WIDTHS: Partial<Record<TaskTableColumnId, number>> = {};
+
 export const ProjectViewStoreProvider = ({
   children,
+  initialColumnWidths = NO_COLUMN_WIDTHS,
 }: {
   readonly children: ReactNode;
+  readonly initialColumnWidths?: Partial<Record<TaskTableColumnId, number>>;
 }) => {
   const searchParams = useSearchParams();
   const projectViewStore = useCreateStore(
     createInitialProjectViewState(
-      readProjectViewSearchRaw(new URLSearchParams(searchParams.toString()))
+      readProjectViewSearchRaw(new URLSearchParams(searchParams.toString())),
+      initialColumnWidths
     ),
     projectViewActions
   ) as ProjectViewStore;
@@ -62,6 +73,12 @@ export const ProjectViewStoreProvider = ({
     });
     return () => subscription.unsubscribe();
   }, [projectViewStore]);
+
+  const columnWidths = useSelector(
+    projectViewStore,
+    (state) => state.columnWidths
+  );
+  usePersistColumnWidths(columnWidths);
 
   return <StoreProvider value={{ projectViewStore }}>{children}</StoreProvider>;
 };

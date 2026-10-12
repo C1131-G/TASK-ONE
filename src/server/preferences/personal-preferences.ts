@@ -12,12 +12,27 @@ const supportedTimezones = new Set([
   "Asia/Calcutta",
 ]);
 
+const MAX_COLUMN_WIDTH_ENTRIES = 32;
+
+// Widths are per column ID (task table columns). The UI clamps to the same bounds.
+export const TaskTableColumnWidthsSchema = Schema.Record(
+  Schema.String.check(Schema.isMaxLength(40)),
+  Schema.Int.check(Schema.isBetween({ maximum: 800, minimum: 80 }))
+).check(
+  Schema.makeFilter((widths) =>
+    Object.keys(widths).length <= MAX_COLUMN_WIDTH_ENTRIES
+      ? undefined
+      : "Too many column widths."
+  )
+);
+
 export const PersonalPreferenceSchema = Schema.Struct({
   calendarView: Schema.optional(Schema.Literals(["day", "week", "month"])),
   defaultViewId: Schema.optional(
     Schema.NullOr(Schema.String.check(Schema.isUUID()))
   ),
   density: Schema.optional(Schema.Literals(["comfortable", "compact"])),
+  taskTableColumnWidths: Schema.optional(TaskTableColumnWidthsSchema),
   timezone: Schema.optional(
     Schema.String.check(
       Schema.makeFilter((timezone) =>
@@ -80,8 +95,80 @@ const toJsonValue = (
   ...(values.defaultViewId === undefined
     ? {}
     : { defaultViewId: values.defaultViewId }),
+  ...(values.taskTableColumnWidths === undefined
+    ? {}
+    : { taskTableColumnWidths: values.taskTableColumnWidths }),
   ...(values.timezone === undefined ? {} : { timezone: values.timezone }),
 });
+
+const readValues = (
+  userId: string
+): Effect.Effect<PersonalPreferenceValues, AppError> =>
+  Effect.tryPromise({
+    catch: mapError,
+    try: () => getPreferenceQuery(userId),
+  }).pipe(
+    Effect.flatMap((record: PreferenceQueryResult) =>
+      Schema.decodeUnknownEffect(PersonalPreferenceSchema)(
+        record?.value ?? {}
+      ).pipe(Effect.mapError(() => validationError()))
+    )
+  );
+
+const writeValues = (
+  userId: string,
+  values: PersonalPreferenceValues
+): Effect.Effect<PersonalPreferenceValues, AppError> =>
+  Effect.tryPromise({
+    catch: mapError,
+    try: async () => {
+      const viewId = values.defaultViewId;
+      if (viewId) {
+        const view = await db.orm.public.SavedView.first({ id: viewId });
+        if (!view || (view.userId !== userId && !view.isShared)) {
+          throw new AppError({
+            code: "NOT_FOUND",
+            message: "The default saved view was not found.",
+          });
+        }
+      }
+      await db.orm.public.UserPreference.upsert({
+        conflictOn: { key: preferenceKey, userId },
+        create: {
+          key: preferenceKey,
+          userId,
+          value: toJsonValue(values),
+        },
+        update: { updatedAt: new Date(), value: toJsonValue(values) },
+      });
+      return values;
+    },
+  });
+
+// A display save only sends the fields it owns. Column widths are saved on their
+// own, so an absent width map keeps whatever is already stored.
+const saveValues = (
+  userId: string,
+  rawValues: unknown
+): Effect.Effect<PersonalPreferenceValues, AppError> =>
+  validateValues(rawValues).pipe(
+    Effect.flatMap((values) =>
+      values.taskTableColumnWidths === undefined
+        ? readValues(userId).pipe(
+            // An absent key, not an undefined one, keeps the saved result schema-valid.
+            Effect.map((current) =>
+              current.taskTableColumnWidths === undefined
+                ? values
+                : {
+                    ...values,
+                    taskTableColumnWidths: current.taskTableColumnWidths,
+                  }
+            )
+          )
+        : Effect.succeed(values)
+    ),
+    Effect.flatMap((values) => writeValues(userId, values))
+  );
 
 export class PersonalPreferences extends Context.Service<
   PersonalPreferences,
@@ -93,49 +180,20 @@ export class PersonalPreferences extends Context.Service<
       userId: string,
       values: unknown
     ) => Effect.Effect<PersonalPreferenceValues, AppError>;
+    readonly saveColumnWidths: (
+      userId: string,
+      widths: unknown
+    ) => Effect.Effect<PersonalPreferenceValues, AppError>;
   }
 >()("metsys/server/PersonalPreferences") {}
 
 export const PersonalPreferencesLive = Layer.succeed(PersonalPreferences, {
-  get: (userId) =>
-    Effect.tryPromise({
-      catch: mapError,
-      try: () => getPreferenceQuery(userId),
-    }).pipe(
-      Effect.flatMap((record: PreferenceQueryResult) =>
-        Schema.decodeUnknownEffect(PersonalPreferenceSchema)(
-          record?.value ?? {}
-        ).pipe(Effect.mapError(() => validationError()))
-      )
-    ),
-  save: (userId, rawValues) =>
-    validateValues(rawValues).pipe(
-      Effect.flatMap((values) =>
-        Effect.tryPromise({
-          catch: mapError,
-          try: async () => {
-            const viewId = values.defaultViewId;
-            if (viewId) {
-              const view = await db.orm.public.SavedView.first({ id: viewId });
-              if (!view || (view.userId !== userId && !view.isShared)) {
-                throw new AppError({
-                  code: "NOT_FOUND",
-                  message: "The default saved view was not found.",
-                });
-              }
-            }
-            await db.orm.public.UserPreference.upsert({
-              conflictOn: { key: preferenceKey, userId },
-              create: {
-                key: preferenceKey,
-                userId,
-                value: toJsonValue(values),
-              },
-              update: { updatedAt: new Date(), value: toJsonValue(values) },
-            });
-            return values;
-          },
-        })
+  get: readValues,
+  save: saveValues,
+  saveColumnWidths: (userId, widths) =>
+    readValues(userId).pipe(
+      Effect.flatMap((current) =>
+        saveValues(userId, { ...current, taskTableColumnWidths: widths })
       )
     ),
 });

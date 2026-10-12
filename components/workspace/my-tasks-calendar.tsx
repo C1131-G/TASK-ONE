@@ -15,6 +15,7 @@ interface ProjectOption {
 }
 
 export const MyTasksCalendar = ({
+  hrefPrefix,
   monthOffset,
   monthLabel,
   tasks,
@@ -24,6 +25,8 @@ export const MyTasksCalendar = ({
   isAdmin,
   viewMode,
 }: {
+  // Month links carry the active filters, so the prefix is built by the caller.
+  readonly hrefPrefix: string;
   readonly monthOffset: number;
   readonly monthLabel: string;
   readonly tasks: readonly CalendarTask[];
@@ -61,7 +64,7 @@ export const MyTasksCalendar = ({
       <TaskCalendarGrid
         events={[]}
         employees={employees}
-        hrefPrefix="/my-tasks?view=calendar&monthOffset="
+        hrefPrefix={hrefPrefix}
         monthLabel={monthLabel}
         monthOffset={monthOffset}
         onAddTask={openTaskForDate}

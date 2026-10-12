@@ -68,17 +68,21 @@ export const projectViewActions = ({
 export type ProjectViewActions = ReturnType<typeof projectViewActions>;
 
 export const createInitialProjectViewState = (
-  search: ProjectViewSearch
+  search: ProjectViewSearch,
+  columnWidths: ProjectViewState["columnWidths"] = {}
 ): ProjectViewState => ({
   announcement: "",
-  columnWidths: {},
+  columnWidths,
   search,
   selectedTaskIds: [],
 });
 
-export const createProjectViewStore = (search: ProjectViewSearch) =>
+export const createProjectViewStore = (
+  search: ProjectViewSearch,
+  columnWidths: ProjectViewState["columnWidths"] = {}
+) =>
   createStore<ProjectViewState, ProjectViewActions>(
-    createInitialProjectViewState(search),
+    createInitialProjectViewState(search, columnWidths),
     projectViewActions as StoreActionsFactory<
       ProjectViewState,
       ProjectViewActions

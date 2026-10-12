@@ -1,19 +1,28 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
+"use client";
+
+import type { Route } from "next";
 import Link from "next/link";
+import { useMemo } from "react";
 
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { GlobalTaskFilterBar } from "@/components/workspace/global-task-filter-bar";
+import type { DueGroup } from "@/components/workspace/global-task-view-state";
+import {
+  MY_TASK_VIEWS,
+  filterGlobalTasks,
+  globalTaskHref,
+  groupTasksByDueDate,
+  sortGlobalTasks,
+} from "@/components/workspace/global-task-view-state";
 import { MyTasksCalendar } from "@/components/workspace/my-tasks-calendar";
 import { QuickTaskForm } from "@/components/workspace/quick-task-form";
 import type { CalendarTask } from "@/components/workspace/task-calendar-grid";
 import { TaskManageControls } from "@/components/workspace/task-manage-controls";
 import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import { useGlobalTaskView } from "@/components/workspace/use-global-task-view";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
-import { WorkspaceInput } from "@/components/workspace/workspace-controls";
-import {
-  WorkspaceSelect,
-  WorkspaceSelectItem,
-} from "@/components/workspace/workspace-select";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -26,22 +35,6 @@ export interface AssignedTask extends Omit<
   readonly projectName: string;
 }
 
-interface DueGroup {
-  readonly id: string;
-  readonly label: string;
-  readonly tasks: readonly AssignedTask[];
-}
-
-interface MyTasksSearchParams {
-  readonly calendarMode?: string;
-  readonly monthOffset?: string;
-  readonly priority?: string;
-  readonly q?: string;
-  readonly sort?: string;
-  readonly status?: string;
-  readonly view?: string;
-}
-
 interface CalendarProject {
   readonly color: string;
   readonly id: string;
@@ -51,20 +44,21 @@ interface CalendarProject {
 interface MyTasksWorkspaceProps {
   readonly calendarMode: "month" | "week";
   readonly calendarProjects: readonly CalendarProject[];
-  readonly calendarTasks: readonly CalendarTask[];
+  readonly employees: readonly EmployeeDirectoryEntry[];
   readonly favoriteTaskIds: ReadonlySet<string>;
-  readonly groups: readonly DueGroup[];
   readonly isAdmin: boolean;
   readonly monthLabel: string;
   readonly monthOffset: number;
-  readonly params: MyTasksSearchParams;
   readonly tasks: readonly AssignedTask[];
-  readonly totalAssignedTasks: number;
+  readonly today: string;
   readonly userId: string;
-  readonly view: "calendar" | "list";
-  readonly employees: readonly EmployeeDirectoryEntry[];
-  readonly dueSummary: string;
 }
+
+const DUE_SUMMARY_DESCRIPTIONS: Readonly<Record<string, string>> = {
+  overdue: "overdue",
+  today: "due today",
+  upcoming: "upcoming",
+};
 
 const TaskRows = ({
   groups,
@@ -72,10 +66,13 @@ const TaskRows = ({
   employees,
   userId,
   isAdmin,
-}: Pick<
-  MyTasksWorkspaceProps,
-  "groups" | "favoriteTaskIds" | "employees" | "userId" | "isAdmin"
->) => (
+}: {
+  readonly groups: readonly DueGroup<AssignedTask>[];
+  readonly favoriteTaskIds: ReadonlySet<string>;
+  readonly employees: readonly EmployeeDirectoryEntry[];
+  readonly userId: string;
+  readonly isAdmin: boolean;
+}) => (
   <div className="list-wrap">
     <div className="tlist task-table-global my-task-table">
       <div className="thead">
@@ -140,159 +137,145 @@ const TaskRows = ({
   </div>
 );
 
-const TaskResults = (props: MyTasksWorkspaceProps) => {
-  if (props.view === "calendar") {
-    return (
-      <MyTasksCalendar
-        monthLabel={props.monthLabel}
-        monthOffset={props.monthOffset}
-        projects={props.calendarProjects}
-        tasks={props.calendarTasks}
-        viewMode={props.calendarMode}
-        employees={props.employees}
-        currentUserId={props.userId}
-        isAdmin={props.isAdmin}
-      />
-    );
-  }
-  if (props.tasks.length > 0) {
-    return (
-      <TaskRows
-        employees={props.employees}
-        favoriteTaskIds={props.favoriteTaskIds}
-        groups={props.groups}
-        isAdmin={props.isAdmin}
-        userId={props.userId}
-      />
-    );
-  }
-  const hasTasks = props.totalAssignedTasks > 0;
+// Tabs are links so the server recomputes the calendar range, and each link keeps
+// every filter the user has set.
+export const MyTasksWorkspace = ({
+  calendarMode,
+  calendarProjects,
+  employees,
+  favoriteTaskIds,
+  isAdmin,
+  monthLabel,
+  monthOffset,
+  tasks,
+  today,
+  userId,
+}: MyTasksWorkspaceProps) => {
+  const { raw, search, update } = useGlobalTaskView(MY_TASK_VIEWS);
+  const visibleTasks = useMemo(
+    () => sortGlobalTasks(filterGlobalTasks(tasks, search, today), search.sort),
+    [tasks, search, today]
+  );
+  const groups = useMemo(
+    () => groupTasksByDueDate(visibleTasks, today),
+    [visibleTasks, today]
+  );
+  const dueSummary = groups
+    .flatMap((group) => {
+      const description = DUE_SUMMARY_DESCRIPTIONS[group.id];
+      return description ? [`${group.tasks.length} ${description}`] : [];
+    })
+    .join(" · ");
+  const calendarTasks: CalendarTask[] = useMemo(
+    () =>
+      visibleTasks.map((task) => ({
+        assigneeIds: task.assigneeIds,
+        createdById: task.createdById,
+        dependencyIds: task.dependencyIds,
+        dueDate: task.dueDate,
+        id: task.id,
+        labelIds: task.labelIds,
+        position: task.position,
+        priority: task.priority,
+        projectId: task.projectId,
+        projectName: task.projectName,
+        recurrence: task.recurrence,
+        status: task.status,
+        title: task.title,
+        version: task.version,
+      })),
+    [visibleTasks]
+  );
+  const view = search.view === "calendar" ? "calendar" : "list";
+  const calendarHrefPrefix = `${globalTaskHref("/my-tasks", raw, {
+    monthOffset: "",
+    view: "calendar",
+  })}&monthOffset=`;
+
   return (
-    <section className="panel panel-b">
-      <h2>
-        {hasTasks ? "No tasks match these filters" : "No tasks assigned to you"}
-      </h2>
-      <p className="muted">
-        {hasTasks
-          ? "Change the filters to see more of your tasks."
-          : "Tasks assigned to your account will appear here."}
-      </p>
-    </section>
+    <div className="page flush">
+      <div className="ph my-tasks-header">
+        <div>
+          <h1>My Tasks</h1>
+          <p>{dueSummary || `${visibleTasks.length} assigned tasks`}</p>
+        </div>
+        {calendarProjects.length > 0 ? (
+          <QuickTaskForm
+            projects={calendarProjects.map(({ id, name }) => ({ id, name }))}
+          />
+        ) : null}
+        <nav aria-label="My Tasks view" className="row">
+          <WorkspaceButton
+            asChild
+            size="sm"
+            variant={view === "list" ? "default" : "secondary"}
+          >
+            <Link
+              aria-current={view === "list" ? "page" : undefined}
+              href={globalTaskHref("/my-tasks", raw, { view: "list" }) as Route}
+            >
+              List
+            </Link>
+          </WorkspaceButton>
+          <WorkspaceButton
+            asChild
+            size="sm"
+            variant={view === "calendar" ? "default" : "secondary"}
+          >
+            <Link
+              aria-current={view === "calendar" ? "page" : undefined}
+              href={
+                globalTaskHref("/my-tasks", raw, { view: "calendar" }) as Route
+              }
+            >
+              Calendar
+            </Link>
+          </WorkspaceButton>
+        </nav>
+      </div>
+      <GlobalTaskFilterBar
+        idPrefix="my-tasks"
+        onChange={update}
+        raw={raw}
+        searchLabel="Search my tasks"
+        showGroup={false}
+      />
+      {view === "calendar" ? (
+        <MyTasksCalendar
+          currentUserId={userId}
+          employees={employees}
+          hrefPrefix={calendarHrefPrefix}
+          isAdmin={isAdmin}
+          monthLabel={monthLabel}
+          monthOffset={monthOffset}
+          projects={calendarProjects}
+          tasks={calendarTasks}
+          viewMode={calendarMode}
+        />
+      ) : null}
+      {view === "list" && visibleTasks.length > 0 ? (
+        <TaskRows
+          employees={employees}
+          favoriteTaskIds={favoriteTaskIds}
+          groups={groups}
+          isAdmin={isAdmin}
+          userId={userId}
+        />
+      ) : null}
+      {view === "list" && visibleTasks.length === 0 ? (
+        <section className="panel panel-b">
+          <h2>
+            {tasks.length
+              ? "No tasks match these filters"
+              : "No tasks assigned to you"}
+          </h2>
+          <p className="muted">
+            {tasks.length
+              ? "Change the filters to see more of your tasks."
+              : "Tasks assigned to your account will appear here."}
+          </p>
+        </section>
+      ) : null}
+    </div>
   );
 };
-
-const MyTasksWorkspace = (props: MyTasksWorkspaceProps) => (
-  <div className="page flush">
-    <div className="ph my-tasks-header">
-      <div>
-        <h1>My Tasks</h1>
-        <p>{props.dueSummary || `${props.tasks.length} assigned tasks`}</p>
-      </div>
-      {props.calendarProjects.length > 0 ? (
-        <QuickTaskForm
-          projects={props.calendarProjects.map(({ id, name }) => ({
-            id,
-            name,
-          }))}
-        />
-      ) : null}
-      <nav aria-label="My Tasks view" className="row">
-        <WorkspaceButton
-          asChild
-          size="sm"
-          variant={props.view === "list" ? "default" : "secondary"}
-        >
-          <Link
-            aria-current={props.view === "list" ? "page" : undefined}
-            href="/my-tasks?view=list"
-          >
-            List
-          </Link>
-        </WorkspaceButton>
-        <WorkspaceButton
-          asChild
-          size="sm"
-          variant={props.view === "calendar" ? "default" : "secondary"}
-        >
-          <Link
-            aria-current={props.view === "calendar" ? "page" : undefined}
-            href="/my-tasks?view=calendar"
-          >
-            Calendar
-          </Link>
-        </WorkspaceButton>
-      </nav>
-    </div>
-    <form className="toolbar task-filter" method="get">
-      <input name="view" type="hidden" value={props.view} />
-      {props.view === "calendar" ? (
-        <>
-          <input name="monthOffset" type="hidden" value={props.monthOffset} />
-          <input name="calendarMode" type="hidden" value={props.calendarMode} />
-        </>
-      ) : null}
-      <label className="field" htmlFor="my-tasks-search">
-        <WorkspaceInput
-          aria-label="Search my tasks"
-          defaultValue={props.params.q ?? ""}
-          id="my-tasks-search"
-          name="q"
-          placeholder="Search tasks"
-          type="search"
-        />
-      </label>
-      <label className="field" htmlFor="my-tasks-status">
-        <WorkspaceSelect
-          aria-label="Filter my tasks by status"
-          defaultValue={props.params.status ?? "all"}
-          id="my-tasks-status"
-          name="status"
-        >
-          <WorkspaceSelectItem value="all">All statuses</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="backlog">Backlog</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="todo">To Do</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="progress">
-            In Progress
-          </WorkspaceSelectItem>
-          <WorkspaceSelectItem value="review">Review</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="done">Done</WorkspaceSelectItem>
-        </WorkspaceSelect>
-      </label>
-      <label className="field" htmlFor="my-tasks-priority">
-        <WorkspaceSelect
-          aria-label="Filter my tasks by priority"
-          defaultValue={props.params.priority ?? "all"}
-          id="my-tasks-priority"
-          name="priority"
-        >
-          <WorkspaceSelectItem value="all">All priorities</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="high">High</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="medium">Medium</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="low">Low</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="none">No priority</WorkspaceSelectItem>
-        </WorkspaceSelect>
-      </label>
-      <label className="field" htmlFor="my-tasks-sort">
-        <WorkspaceSelect
-          aria-label="Sort my tasks"
-          defaultValue={props.params.sort ?? "due"}
-          id="my-tasks-sort"
-          name="sort"
-        >
-          <WorkspaceSelectItem value="due">Sort: Due date</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="name">Sort: Name</WorkspaceSelectItem>
-          <WorkspaceSelectItem value="priority">
-            Sort: Priority
-          </WorkspaceSelectItem>
-        </WorkspaceSelect>
-      </label>
-      <WorkspaceButton size="sm" type="submit" variant="secondary">
-        Apply filters
-      </WorkspaceButton>
-    </form>
-    <TaskResults {...props} />
-  </div>
-);
-
-export { MyTasksWorkspace };

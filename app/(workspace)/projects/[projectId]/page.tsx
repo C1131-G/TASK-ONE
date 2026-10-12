@@ -11,6 +11,7 @@ import { listCalendarEventsAction } from "@/app/actions/calendar";
 import { getPersonalWorkspaceAction } from "@/app/actions/discovery";
 import { listEmployeesAction } from "@/app/actions/employees";
 import { listLabelsAction } from "@/app/actions/labels";
+import { getPersonalPreferencesAction } from "@/app/actions/personal-preferences";
 import {
   listProjectMilestonesAction,
   listProjectsAction,
@@ -32,6 +33,7 @@ import { ProjectSavedViews } from "@/components/workspace/project-saved-views";
 import { ProjectTaskViews } from "@/components/workspace/project-task-views";
 import { ProjectViewTabs } from "@/components/workspace/project-view-tabs";
 import { TaskCreateForm } from "@/components/workspace/task-create-form";
+import { columnWidthsFromPreferences } from "@/components/workspace/task-table-columns";
 import { ProjectViewStoreProvider } from "@/components/workspace/view-store/project-view-store-provider";
 import {
   currentUtcMonthRange,
@@ -470,6 +472,7 @@ const getProjectPageData = async (
     teamResult,
     savedViewsResult,
     labelResult,
+    preferences,
   ] = await Promise.all([
     getPageSession(),
     loadProjects(),
@@ -479,6 +482,7 @@ const getProjectPageData = async (
     listTeamsAction({}),
     listSavedViewsAction({}),
     listLabelsAction({}),
+    getPersonalPreferencesAction({}),
   ]);
   if (!projects.ok) {
     return { kind: "error" as const };
@@ -535,6 +539,9 @@ const getProjectPageData = async (
     currentUserId,
     employeeResult,
     favoriteProjectIds,
+    initialColumnWidths: columnWidthsFromPreferences(
+      preferences.ok ? preferences.data.taskTableColumnWidths : undefined
+    ),
     isAdmin,
     kind: "ready" as const,
     labelResult,
@@ -569,6 +576,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
     calendarEvents,
     calendarMode,
     calendarRange,
+    initialColumnWidths,
     currentUserId,
     editableTaskIds,
     employeeResult,
@@ -592,7 +600,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
     employees.map((employee) => [employee.id, employee] as const)
   );
   return (
-    <ProjectViewStoreProvider>
+    <ProjectViewStoreProvider initialColumnWidths={initialColumnWidths}>
       <div className="page flush">
         <div className="proj-h">
           <div className="row">

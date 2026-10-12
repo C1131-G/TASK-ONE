@@ -12,14 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 
-import type { TaskTableColumnId } from "./task-table-columns";
+import type {
+  TaskTableColumnDef,
+  TaskTableColumnId,
+} from "./task-table-columns";
 import { HIDEABLE_COLUMNS } from "./task-table-columns";
 
 // Lists only hideable columns; the task name and actions columns always show.
 export const TaskTableColumnMenu = ({
+  columns = HIDEABLE_COLUMNS,
   hidden,
   onHiddenChange,
 }: {
+  readonly columns?: readonly TaskTableColumnDef[];
   readonly hidden: readonly TaskTableColumnId[];
   readonly onHiddenChange: (hidden: readonly TaskTableColumnId[]) => void;
 }) => {
@@ -37,7 +42,7 @@ export const TaskTableColumnMenu = ({
         className="workspace-menu"
         data-workspace-menu=""
       >
-        {HIDEABLE_COLUMNS.map((column) => (
+        {columns.map((column) => (
           <DropdownMenuCheckboxItem
             checked={!hiddenSet.has(column.id)}
             key={column.id}

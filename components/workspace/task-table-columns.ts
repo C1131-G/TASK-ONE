@@ -1,6 +1,6 @@
-// One registry for the project task table. Column order, labels, sort fields and
-// width bounds live here so the table, the visibility menu, saved views and the
-// URL all agree on the same column IDs.
+// Column registries for the task tables. Column order, labels, sort fields and
+// width bounds live here so the tables, the visibility menus, saved views, the
+// URL and personal width preferences all agree on the same column IDs.
 export const TASK_TABLE_COLUMNS = [
   {
     defaultWidth: 320,
@@ -85,38 +85,78 @@ export const TASK_TABLE_COLUMNS = [
 ] as const;
 
 export type TaskTableColumn = (typeof TASK_TABLE_COLUMNS)[number];
-export type TaskTableColumnId = TaskTableColumn["id"];
+
+// The workspace-wide task tables also show the owning project.
+const PROJECT_COLUMN = {
+  defaultWidth: 160,
+  hideable: true,
+  id: "project",
+  label: "Project",
+  minWidth: 120,
+  sortField: null,
+} as const;
+
+export type TaskTableColumnId =
+  | TaskTableColumn["id"]
+  | typeof PROJECT_COLUMN.id;
+
+export interface TaskTableColumnDef {
+  readonly defaultWidth: number;
+  readonly hideable: boolean;
+  readonly id: TaskTableColumnId;
+  readonly label: string;
+  readonly minWidth: number;
+  // Each table sorts by its own field names, so the definition carries the field.
+  readonly sortField: string | null;
+}
+
+// Workspace task tables (/tasks and /my-tasks) sort on title, priority and due.
+export const GLOBAL_TASK_COLUMNS: readonly TaskTableColumnDef[] = [
+  { ...TASK_TABLE_COLUMNS[0], sortField: "title" },
+  TASK_TABLE_COLUMNS[1],
+  TASK_TABLE_COLUMNS[3],
+  TASK_TABLE_COLUMNS[2],
+  TASK_TABLE_COLUMNS[5],
+  PROJECT_COLUMN,
+  TASK_TABLE_COLUMNS[9],
+];
 
 const MAX_COLUMN_WIDTH = 800;
 
-export const HIDEABLE_COLUMNS: readonly TaskTableColumn[] =
+export const HIDEABLE_COLUMNS: readonly TaskTableColumnDef[] =
   TASK_TABLE_COLUMNS.filter((column) => column.hideable);
 
-const HIDEABLE_IDS: ReadonlySet<string> = new Set(
-  HIDEABLE_COLUMNS.map((column) => column.id)
-);
+export const GLOBAL_HIDEABLE_COLUMNS: readonly TaskTableColumnDef[] =
+  GLOBAL_TASK_COLUMNS.filter((column) => column.hideable);
+
+const findColumn = (id: TaskTableColumnId): TaskTableColumnDef | undefined =>
+  [...TASK_TABLE_COLUMNS, PROJECT_COLUMN].find((column) => column.id === id);
 
 export const parseHiddenColumns = (
-  value: string | null | undefined
+  value: string | null | undefined,
+  columns: readonly TaskTableColumnDef[] = HIDEABLE_COLUMNS
 ): readonly TaskTableColumnId[] => {
   if (!value) {
     return [];
   }
   const requested = new Set(value.split(","));
   const ids: TaskTableColumnId[] = [];
-  for (const column of HIDEABLE_COLUMNS) {
-    if (requested.has(column.id)) {
+  for (const column of columns) {
+    if (column.hideable && requested.has(column.id)) {
       ids.push(column.id);
     }
   }
   return ids;
 };
 
-export const serializeHiddenColumns = (ids: readonly string[]): string => {
+export const serializeHiddenColumns = (
+  ids: readonly string[],
+  columns: readonly TaskTableColumnDef[] = HIDEABLE_COLUMNS
+): string => {
   const selected = new Set(ids);
   const ordered: string[] = [];
-  for (const column of HIDEABLE_COLUMNS) {
-    if (HIDEABLE_IDS.has(column.id) && selected.has(column.id)) {
+  for (const column of columns) {
+    if (column.hideable && selected.has(column.id)) {
       ordered.push(column.id);
     }
   }
@@ -127,10 +167,23 @@ export const clampColumnWidth = (
   id: TaskTableColumnId,
   width: number
 ): number => {
-  const column = TASK_TABLE_COLUMNS.find((item) => item.id === id);
-  const minimum = column?.minWidth ?? 80;
+  const minimum = findColumn(id)?.minWidth ?? 80;
   return Math.min(MAX_COLUMN_WIDTH, Math.max(minimum, Math.round(width)));
 };
 
 export const defaultColumnWidth = (id: TaskTableColumnId): number =>
-  TASK_TABLE_COLUMNS.find((column) => column.id === id)?.defaultWidth ?? 120;
+  findColumn(id)?.defaultWidth ?? 120;
+
+// Stored widths can name columns from an older layout, so only known IDs are kept.
+export const columnWidthsFromPreferences = (
+  widths?: Readonly<Record<string, number>>
+): Partial<Record<TaskTableColumnId, number>> => {
+  const result: Partial<Record<TaskTableColumnId, number>> = {};
+  for (const column of [...TASK_TABLE_COLUMNS, PROJECT_COLUMN]) {
+    const width = widths?.[column.id];
+    if (width !== undefined) {
+      result[column.id] = clampColumnWidth(column.id, width);
+    }
+  }
+  return result;
+};

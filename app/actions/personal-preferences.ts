@@ -14,6 +14,7 @@ import {
   PersonalPreferenceSchema,
   PersonalPreferences,
   PersonalPreferencesLive,
+  TaskTableColumnWidthsSchema,
 } from "@/src/server/preferences/personal-preferences";
 
 const getRequestHeaders = () =>
@@ -71,6 +72,41 @@ export async function savePersonalPreferencesAction(input: unknown) {
           input: validated.preferences,
           key: validated.idempotencyKey,
           operation: "preferences.save",
+          resultSchema: PersonalPreferenceSchema,
+        });
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(PersonalPreferencesLive),
+        Effect.provide(IdempotencyLive)
+      ),
+    undefined,
+    ServerActionOutputSchema
+  );
+  return result;
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function saveTaskTableColumnWidthsAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    Schema.Struct({
+      columnWidths: TaskTableColumnWidthsSchema,
+      idempotencyKey: IdempotencyKeySchema,
+    }),
+    (validated) =>
+      Effect.gen(function* saveColumnWidths() {
+        const requestHeaders = yield* getRequestHeaders();
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const preferences = yield* PersonalPreferences;
+        const idempotency = yield* Idempotency;
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () =>
+            preferences.saveColumnWidths(user.id, validated.columnWidths),
+          input: validated.columnWidths,
+          key: validated.idempotencyKey,
+          operation: "preferences.columnWidths.save",
           resultSchema: PersonalPreferenceSchema,
         });
       }).pipe(

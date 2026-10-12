@@ -98,3 +98,54 @@ it("rejects malformed UUIDs and unsupported time zones as schema errors", async 
     await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);
   }
 });
+
+it("keeps saved column widths through display saves and rejects out-of-range widths", async () => {
+  const userId = randomUUID();
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, $4, false)',
+    [userId, "Width Preferences", `${userId}@prefs-widths.example`, "employee"]
+  );
+
+  try {
+    const saveWidths = Effect.gen(function* saveWidths() {
+      const preferences = yield* PersonalPreferences;
+      yield* preferences.saveColumnWidths(userId, { due: 140, task: 320 });
+      yield* preferences.save(userId, { density: "compact" });
+      return yield* preferences.get(userId);
+    });
+    const tooNarrow = Effect.gen(function* saveNarrowWidth() {
+      const preferences = yield* PersonalPreferences;
+      return yield* preferences.saveColumnWidths(userId, { due: 20 });
+    });
+    const tooMany = Effect.gen(function* saveManyWidths() {
+      const preferences = yield* PersonalPreferences;
+      const widths = Object.fromEntries(
+        Array.from({ length: 33 }, (_, index) => [`col${index}`, 120])
+      );
+      return yield* preferences.saveColumnWidths(userId, widths);
+    });
+
+    const saved = await Effect.runPromise(
+      Effect.provide(saveWidths, PersonalPreferencesLive)
+    );
+    const [narrowResult, manyResult] = await Promise.all([
+      runEffectResult(Effect.provide(tooNarrow, PersonalPreferencesLive)),
+      runEffectResult(Effect.provide(tooMany, PersonalPreferencesLive)),
+    ]);
+
+    expect(saved).toEqual({
+      density: "compact",
+      taskTableColumnWidths: { due: 140, task: 320 },
+    });
+    expect(narrowResult).toMatchObject({
+      error: { code: "VALIDATION_FAILED" },
+      ok: false,
+    });
+    expect(manyResult).toMatchObject({
+      error: { code: "VALIDATION_FAILED" },
+      ok: false,
+    });
+  } finally {
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);
+  }
+});
