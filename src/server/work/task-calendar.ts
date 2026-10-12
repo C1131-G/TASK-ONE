@@ -5,6 +5,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { TaskRecurrenceInputSchema } from "./work-contracts";
 
 const TaskStatusSchema = Schema.Literals([
   "backlog",
@@ -50,16 +51,21 @@ export type TaskCalendarQuery = typeof TaskCalendarQuerySchema.Type;
 
 export const TaskCalendarEntrySchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String),
+  createdById: Schema.String,
+  dependencyIds: Schema.Array(Schema.String),
   dueDate: Schema.NullOr(Schema.String),
   groupKey: Schema.NullOr(Schema.String),
   id: Schema.String,
+  labelIds: Schema.Array(Schema.String),
   position: Schema.Number,
   priority: TaskPrioritySchema,
   projectId: Schema.String,
   projectName: Schema.String,
+  recurrence: Schema.NullOr(TaskRecurrenceInputSchema),
   startDate: Schema.NullOr(Schema.String),
   status: TaskStatusSchema,
   title: Schema.String,
+  version: Schema.Number,
 });
 
 export type TaskCalendarEntry = typeof TaskCalendarEntrySchema.Type;
@@ -125,6 +131,19 @@ const getAssignments = (
     .select("taskId", "userId")
     .all();
 
+const getTaskLabels = (taskIds: readonly string[]) =>
+  db.orm.public.TaskLabel.where((label) => label.taskId.in([...taskIds])).all();
+
+const getTaskDependencies = (taskIds: readonly string[]) =>
+  db.orm.public.TaskDependency.where((dependency) =>
+    dependency.taskId.in([...taskIds])
+  ).all();
+
+const getTaskRecurrences = (taskIds: readonly string[]) =>
+  db.orm.public.TaskRecurrence.where((recurrence) =>
+    recurrence.taskId.in([...taskIds])
+  ).all();
+
 const taskGroupKey = (
   groupBy: TaskCalendarQuery["groupBy"],
   status: TaskCalendarEntry["status"],
@@ -165,6 +184,96 @@ const sortCalendarEntries = (
   return entries.slice(0, query.limit);
 };
 
+const mapCalendarEntries = ({
+  query,
+  projects,
+  rows,
+  assignments,
+  labels,
+  dependencies,
+  recurrences,
+}: {
+  readonly query: TaskCalendarQuery;
+  readonly projects: Awaited<ReturnType<typeof getProjects>>;
+  readonly rows: Awaited<ReturnType<typeof getTasks>>;
+  readonly assignments: Awaited<ReturnType<typeof getAssignments>>;
+  readonly labels: Awaited<ReturnType<typeof getTaskLabels>>;
+  readonly dependencies: Awaited<ReturnType<typeof getTaskDependencies>>;
+  readonly recurrences: Awaited<ReturnType<typeof getTaskRecurrences>>;
+}): readonly TaskCalendarEntry[] => {
+  const taskIds = rows.map(({ id }) => id);
+  const matchingTaskIds = new Set(
+    query.assigneeIds?.length
+      ? assignments.map(({ taskId }) => taskId)
+      : taskIds
+  );
+  const assignmentsByTask = new Map<string, string[]>();
+  for (const assignment of assignments) {
+    const ids = assignmentsByTask.get(assignment.taskId) ?? [];
+    ids.push(assignment.userId);
+    assignmentsByTask.set(assignment.taskId, ids);
+  }
+  const labelsByTask = new Map<string, string[]>();
+  for (const label of labels) {
+    const ids = labelsByTask.get(label.taskId) ?? [];
+    ids.push(label.labelId);
+    labelsByTask.set(label.taskId, ids);
+  }
+  const dependenciesByTask = new Map<string, string[]>();
+  for (const dependency of dependencies) {
+    const ids = dependenciesByTask.get(dependency.taskId) ?? [];
+    ids.push(dependency.dependsOnTaskId);
+    dependenciesByTask.set(dependency.taskId, ids);
+  }
+  const recurrencesByTask = new Map(
+    recurrences.map((recurrence) => [recurrence.taskId, recurrence])
+  );
+  const projectsById = new Map(
+    projects.map((project) => [project.id, project])
+  );
+  const entries: TaskCalendarEntry[] = [];
+  for (const task of rows) {
+    if (!matchingTaskIds.has(task.id)) {
+      continue;
+    }
+    const assigneeIds = assignmentsByTask.get(task.id) ?? [];
+    const taskRecurrence = recurrencesByTask.get(task.id);
+    const project = projectsById.get(task.projectId);
+    const status = Schema.decodeUnknownSync(TaskStatusSchema)(task.status);
+    const priority = Schema.decodeUnknownSync(TaskPrioritySchema)(
+      task.priority
+    );
+    entries.push({
+      assigneeIds,
+      createdById: task.createdById,
+      dependencyIds: dependenciesByTask.get(task.id) ?? [],
+      dueDate: task.dueDate,
+      groupKey: taskGroupKey(query.groupBy, status, project?.name, assigneeIds),
+      id: task.id,
+      labelIds: labelsByTask.get(task.id) ?? [],
+      position: task.position,
+      priority,
+      projectId: task.projectId,
+      projectName: project?.name ?? "",
+      recurrence: taskRecurrence
+        ? Schema.decodeUnknownSync(TaskRecurrenceInputSchema)({
+            endsOn: taskRecurrence.endsOn,
+            frequency: taskRecurrence.frequency,
+            interval: taskRecurrence.interval,
+            weekDays: Array.isArray(taskRecurrence.weekDays)
+              ? taskRecurrence.weekDays
+              : [],
+          })
+        : null,
+      startDate: task.startDate,
+      status,
+      title: task.title,
+      version: task.version,
+    });
+  }
+  return sortCalendarEntries(entries, query);
+};
+
 const loadCalendarEntries = async (
   query: TaskCalendarQuery
 ): Promise<readonly TaskCalendarEntry[]> => {
@@ -185,47 +294,21 @@ const loadCalendarEntries = async (
     return [];
   }
   const taskIds = rows.map(({ id }) => id);
-  const assignments = await getAssignments(taskIds, query.assigneeIds);
-  const matchingTaskIds = new Set(
-    query.assigneeIds?.length
-      ? assignments.map(({ taskId }) => taskId)
-      : taskIds
-  );
-  const assignmentsByTask = new Map<string, string[]>();
-  for (const assignment of assignments) {
-    const ids = assignmentsByTask.get(assignment.taskId) ?? [];
-    ids.push(assignment.userId);
-    assignmentsByTask.set(assignment.taskId, ids);
-  }
-  const projectsById = new Map(
-    projects.map((project) => [project.id, project])
-  );
-  const entries: TaskCalendarEntry[] = [];
-  for (const task of rows) {
-    if (!matchingTaskIds.has(task.id)) {
-      continue;
-    }
-    const assigneeIds = assignmentsByTask.get(task.id) ?? [];
-    const project = projectsById.get(task.projectId);
-    const status = Schema.decodeUnknownSync(TaskStatusSchema)(task.status);
-    const priority = Schema.decodeUnknownSync(TaskPrioritySchema)(
-      task.priority
-    );
-    entries.push({
-      assigneeIds,
-      dueDate: task.dueDate,
-      groupKey: taskGroupKey(query.groupBy, status, project?.name, assigneeIds),
-      id: task.id,
-      position: task.position,
-      priority,
-      projectId: task.projectId,
-      projectName: project?.name ?? "",
-      startDate: task.startDate,
-      status,
-      title: task.title,
-    });
-  }
-  return sortCalendarEntries(entries, query);
+  const [assignments, labels, dependencies, recurrences] = await Promise.all([
+    getAssignments(taskIds, query.assigneeIds),
+    getTaskLabels(taskIds),
+    getTaskDependencies(taskIds),
+    getTaskRecurrences(taskIds),
+  ]);
+  return mapCalendarEntries({
+    assignments,
+    dependencies,
+    labels,
+    projects,
+    query,
+    recurrences,
+    rows,
+  });
 };
 
 const list: TaskCalendar["Service"]["list"] = (actorId, query) =>

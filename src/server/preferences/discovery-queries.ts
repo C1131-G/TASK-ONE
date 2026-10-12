@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import type { AppError } from "../core/action-result";
+import { decodeTaskPriority, decodeTaskStatus } from "../work/work-contracts";
 import type {
   PersonalWorkspace,
   WorkspaceSearchResults,
@@ -37,7 +38,7 @@ export const listPersonalWorkspace = (
         ({ projectId }) => projectId
       );
       const favoriteTaskIds = taskFavorites.map(({ taskId }) => taskId);
-      const [projects, tasks] = await Promise.all([
+      const [projects, tasks, assignments] = await Promise.all([
         favoriteProjectIds.length === 0
           ? []
           : db.orm.public.Project.where((project) =>
@@ -56,22 +57,54 @@ export const listPersonalWorkspace = (
               )
               .include("project")
               .all(),
+        favoriteTaskIds.length === 0
+          ? []
+          : db.orm.public.TaskAssignee.include("user")
+              .where((assignment) => assignment.taskId.in(favoriteTaskIds))
+              .all(),
       ]);
       const activeProjects = new Set(projects.map(({ id }) => id));
+      const assigneesByTask = new Map<string, typeof assignments>();
+      for (const assignment of assignments) {
+        const taskAssignees = assigneesByTask.get(assignment.taskId) ?? [];
+        taskAssignees.push(assignment);
+        assigneesByTask.set(assignment.taskId, taskAssignees);
+      }
+      const favoriteTaskOrder = new Map(
+        favoriteTaskIds.map((taskId, index) => [taskId, index])
+      );
       const activeTasks = [];
       for (const task of tasks) {
         if (activeProjects.has(task.projectId)) {
           activeTasks.push({
+            assignees: (assigneesByTask.get(task.id) ?? []).map(({ user }) => ({
+              id: user.id,
+              name: user.name,
+            })),
+            completedAt: task.completedAt?.toISOString() ?? null,
+            createdById: task.createdById,
+            dueDate: task.dueDate,
             id: task.id,
+            priority: decodeTaskPriority(task.priority),
             projectId: task.projectId,
+            projectName: task.project.name,
+            projectTaskNumber: task.projectTaskNumber,
+            startDate: task.startDate,
+            status: decodeTaskStatus(task.status),
             title: task.title,
+            version: task.version,
           });
         }
       }
+      const orderedTasks = activeTasks.toSorted(
+        (left, right) =>
+          (favoriteTaskOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
+          (favoriteTaskOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER)
+      );
       return {
         projects,
         recentSearches,
-        tasks: activeTasks,
+        tasks: orderedTasks,
       };
     },
   });

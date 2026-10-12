@@ -149,6 +149,17 @@ export const updateTask = (
           projectId: task.projectId,
           taskId,
         });
+        if (task.status !== rawInput.status) {
+          await transaction.orm.public.Activity.create({
+            action: "task.status_changed",
+            actorId,
+            createdAt: now,
+            details: { from: task.status, to: rawInput.status },
+            id: randomUUID(),
+            projectId: task.projectId,
+            taskId,
+          });
+        }
         let completionUndo: TaskArchiveUndoReceipt | undefined;
         let recurrenceSuccessorId: string | undefined;
         if (task.status !== "done" && rawInput.status === "done") {

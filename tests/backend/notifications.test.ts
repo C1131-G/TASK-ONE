@@ -48,6 +48,82 @@ it("marks one recipient's notification read through the inbox service", async ()
   }
 });
 
+it("separates unread inbox items from unread update notifications", async () => {
+  const userId = randomUUID();
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, \'employee\', false)',
+    [userId, "Unread Count Reader", `${userId}@unread-count.example`]
+  );
+  await authPool.query(
+    "INSERT INTO notification (id, \"userId\", type, text) VALUES ($1, $2, 'mention', $3), ($4, $2, 'update', $5)",
+    [randomUUID(), userId, "A new mention", randomUUID(), "A task update"]
+  );
+
+  try {
+    const inbox = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* listInbox() {
+          const notifications = yield* Notifications;
+          return yield* notifications.listInbox(userId, {
+            limit: 20,
+            unreadOnly: false,
+          });
+        }),
+        NotificationsLive
+      )
+    );
+
+    expect(inbox.unreadCount).toBe(2);
+    expect(inbox.unreadInboxCount).toBe(1);
+  } finally {
+    await authPool.query('DELETE FROM notification WHERE "userId" = $1', [
+      userId,
+    ]);
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);
+  }
+});
+
+it("includes the linked project name in each inbox notification", async () => {
+  const userId = randomUUID();
+  const projectId = randomUUID();
+  const notificationId = randomUUID();
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, \'employee\', false)',
+    [userId, "Inbox Reader", `${userId}@inbox-project.example`]
+  );
+  await authPool.query(
+    "INSERT INTO project (id, key, name) VALUES ($1, $2, $3)",
+    [projectId, `I${userId.slice(0, 6)}`, "Inbox Project"]
+  );
+  await authPool.query(
+    'INSERT INTO notification (id, "userId", "projectId", type, text) VALUES ($1, $2, $3, \'update\', $4)',
+    [notificationId, userId, projectId, "A project update"]
+  );
+
+  try {
+    const inbox = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* listInbox() {
+          const notifications = yield* Notifications;
+          return yield* notifications.listInbox(userId, {
+            limit: 10,
+            unreadOnly: false,
+          });
+        }),
+        NotificationsLive
+      )
+    );
+
+    expect(inbox.items[0]?.projectName).toBe("Inbox Project");
+  } finally {
+    await authPool.query('DELETE FROM notification WHERE "userId" = $1', [
+      userId,
+    ]);
+    await authPool.query("DELETE FROM project WHERE id = $1", [projectId]);
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);
+  }
+});
+
 it("delivers one local 9 a.m. due summary and suppresses duplicate scans", async () => {
   const userId = randomUUID();
   const projectId = randomUUID();

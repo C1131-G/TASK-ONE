@@ -12,7 +12,9 @@ export const ActivityEntrySchema = Schema.Struct({
   details: Schema.NullOr(Schema.Json),
   id: Schema.String,
   projectId: Schema.NullOr(Schema.String),
+  projectName: Schema.NullOr(Schema.String),
   taskId: Schema.NullOr(Schema.String),
+  taskTitle: Schema.NullOr(Schema.String),
 });
 
 export type ActivityEntry = typeof ActivityEntrySchema.Type;
@@ -22,7 +24,11 @@ export class ActivityManagement extends Context.Service<
   {
     readonly list: (
       actorId: string,
-      scope: { readonly projectId?: string; readonly taskId?: string },
+      scope: {
+        readonly actorId?: string;
+        readonly projectId?: string;
+        readonly taskId?: string;
+      },
       limit: number
     ) => Effect.Effect<readonly ActivityEntry[], AppError>;
   }
@@ -59,24 +65,33 @@ const list: ActivityManagement["Service"]["list"] = (
         !Number.isSafeInteger(requestedLimit) ||
         requestedLimit < 1 ||
         requestedLimit > 100 ||
-        (!scope.projectId && !scope.taskId) ||
         (scope.projectId !== undefined &&
           !Schema.is(Schema.String.check(Schema.isUUID()))(scope.projectId)) ||
         (scope.taskId !== undefined &&
-          !Schema.is(Schema.String.check(Schema.isUUID()))(scope.taskId))
+          !Schema.is(Schema.String.check(Schema.isUUID()))(scope.taskId)) ||
+        (scope.actorId !== undefined &&
+          !Schema.is(Schema.String.check(Schema.isUUID()))(scope.actorId))
       ) {
         throw new AppError({
           code: "VALIDATION_FAILED",
           message: "Choose a valid activity feed and page size.",
         });
       }
-      const rows = await db.orm.public.Activity.include("actor")
-        .where(
-          scope.taskId
-            ? { taskId: scope.taskId }
-            : { projectId: scope.projectId }
-        )
-        .orderBy((activity) => activity.createdAt.desc())
+      const activityQuery = db.orm.public.Activity.include("actor")
+        .include("task")
+        .include("project");
+      let scopedActivity = activityQuery;
+      if (scope.actorId) {
+        scopedActivity = scopedActivity.where({ actorId: scope.actorId });
+      }
+      if (scope.taskId) {
+        scopedActivity = scopedActivity.where({ taskId: scope.taskId });
+      }
+      if (scope.projectId) {
+        scopedActivity = scopedActivity.where({ projectId: scope.projectId });
+      }
+      const rows = await scopedActivity
+        .orderBy((row) => row.createdAt.desc())
         .limit(requestedLimit)
         .all();
       return rows.map((activity) => ({
@@ -87,7 +102,9 @@ const list: ActivityManagement["Service"]["list"] = (
         details: activity.details,
         id: activity.id,
         projectId: activity.projectId,
+        projectName: activity.project?.name ?? null,
         taskId: activity.taskId,
+        taskTitle: activity.task?.title ?? null,
       }));
     },
   });

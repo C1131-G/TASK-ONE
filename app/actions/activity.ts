@@ -14,6 +14,7 @@ import { UUIDSchema } from "@/src/server/core/input-schemas";
 import { runServerAction } from "@/src/server/core/server-action";
 
 const ActivityFeedInputSchema = Schema.Struct({
+  actorId: Schema.optional(UUIDSchema),
   limit: Schema.optional(
     Schema.Number.check(
       Schema.isInt(),
@@ -23,11 +24,7 @@ const ActivityFeedInputSchema = Schema.Struct({
   ),
   projectId: Schema.optional(UUIDSchema),
   taskId: Schema.optional(UUIDSchema),
-}).check(
-  Schema.makeFilter(({ projectId, taskId }) =>
-    projectId || taskId ? undefined : "Choose a task or project activity feed."
-  )
-);
+});
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
 export async function listActivityAction(input: unknown) {
@@ -50,6 +47,7 @@ export async function listActivityAction(input: unknown) {
         return yield* activity.list(
           actor.id,
           {
+            ...(validated.actorId ? { actorId: validated.actorId } : {}),
             ...(validated.projectId ? { projectId: validated.projectId } : {}),
             ...(validated.taskId ? { taskId: validated.taskId } : {}),
           },

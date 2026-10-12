@@ -3,6 +3,7 @@
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
 import {
+  getNotificationPreferencesAction as getPreferences,
   listNotificationInboxAction as listInbox,
   markNotificationReadAction as markRead,
   markAllNotificationsReadAction as markAllRead,
@@ -15,6 +16,10 @@ import {
 
 export async function listNotificationInboxAction(input: unknown) {
   return await listInbox(input);
+}
+
+export async function getNotificationPreferencesAction(input: unknown) {
+  return await getPreferences(input);
 }
 
 export async function markNotificationReadAction(input: unknown) {

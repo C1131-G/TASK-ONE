@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { getUtcToday } from "@/src/lib/utc-today";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
@@ -41,18 +42,22 @@ export const listProjects = (
           .select("projectId", "userId")
           .all(),
         db.orm.public.Task.where((task) => task.projectId.in(projectIds))
-          .select("projectId", "status", "archivedAt")
+          .select("projectId", "status", "archivedAt", "dueDate")
           .all(),
       ]);
+      const today = getUtcToday();
       return projects.map((project) => {
         const projectTasks = tasks.flatMap((task) =>
           task.projectId === project.id && !task.archivedAt ? [task] : []
         );
         const taskCount = projectTasks.length;
         let completedTaskCount = 0;
+        let overdueTaskCount = 0;
         for (const task of projectTasks) {
           if (task.status === "done") {
             completedTaskCount += 1;
+          } else if (task.dueDate && task.dueDate < today) {
+            overdueTaskCount += 1;
           }
         }
         return {
@@ -62,11 +67,14 @@ export const listProjects = (
           memberIds: members.flatMap((member) =>
             member.projectId === project.id ? [member.userId] : []
           ),
+          openTaskCount: taskCount - completedTaskCount,
+          overdueTaskCount,
           progress:
             taskCount === 0
               ? 0
               : Math.round((completedTaskCount / taskCount) * 100),
           taskCount,
+          updatedAt: project.updatedAt.toISOString(),
         };
       });
     },

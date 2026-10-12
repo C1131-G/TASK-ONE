@@ -30,10 +30,13 @@ export interface CreatedEmployee {
 }
 
 export interface EmployeeDirectoryEntry {
+  readonly activeProjectCount: number;
   readonly id: string;
   readonly employeeId: string;
   readonly name: string;
   readonly email: string;
+  readonly mustChangePassword: boolean;
+  readonly openAssignedTaskCount: number;
   readonly role: "admin" | "employee";
   readonly jobTitle: string | null;
   readonly teamId: string | null;
@@ -56,12 +59,21 @@ export const CreatedEmployeeSchema = Schema.Struct({
 });
 
 export const EmployeeDirectoryEntrySchema = Schema.Struct({
+  activeProjectCount: Schema.Number.check(
+    Schema.isInt(),
+    Schema.isGreaterThanOrEqualTo(0)
+  ),
   avatar: Schema.NullOr(Schema.String),
   email: Schema.String,
   employeeId: Schema.String,
   id: Schema.String,
   jobTitle: Schema.NullOr(Schema.String),
+  mustChangePassword: Schema.Boolean,
   name: Schema.String,
+  openAssignedTaskCount: Schema.Number.check(
+    Schema.isInt(),
+    Schema.isGreaterThanOrEqualTo(0)
+  ),
   role: Schema.Literals(["admin", "employee"]),
   teamId: Schema.NullOr(Schema.String),
   teamName: Schema.NullOr(Schema.String),

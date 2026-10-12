@@ -1,6 +1,7 @@
 import { and } from "@prisma/orm-postgres/orm-client";
 import { Context, Effect, Layer, Schema } from "effect";
 
+import { getUtcToday } from "@/src/lib/utc-today";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
@@ -21,6 +22,13 @@ export interface DashboardOverview {
     readonly done: number;
   };
   readonly overdueCount: number;
+  readonly upcomingMilestones: readonly {
+    readonly dueDate: string;
+    readonly id: string;
+    readonly name: string;
+    readonly projectId: string;
+    readonly projectName: string;
+  }[];
   readonly workload: readonly {
     readonly employeeId: string;
     readonly employeeName: string;
@@ -44,6 +52,15 @@ export const DashboardOverviewSchema = Schema.Struct({
     review: Schema.Number,
     todo: Schema.Number,
   }),
+  upcomingMilestones: Schema.Array(
+    Schema.Struct({
+      dueDate: Schema.String,
+      id: Schema.String,
+      name: Schema.String,
+      projectId: Schema.String,
+      projectName: Schema.String,
+    })
+  ),
   workload: Schema.Array(
     Schema.Struct({
       employeeId: Schema.String,
@@ -107,9 +124,9 @@ const getOverview = (
         });
       }
 
-      const [projects, tasks, employees] = await Promise.all([
+      const [projects, tasks, employees, milestones] = await Promise.all([
         db.orm.public.Project.where({ archivedAt: null })
-          .select("status")
+          .select("id", "name", "status")
           .all(),
         db.orm.public.Task.where({ archivedAt: null })
           .include("project")
@@ -120,7 +137,29 @@ const getOverview = (
         )
           .select("id", "name")
           .all(),
+        db.orm.public.ProjectMilestone.include("project").all(),
       ]);
+      const today = getUtcToday();
+      const projectIds = new Set(projects.map(({ id }) => id));
+      const upcomingMilestones = milestones
+        .filter(
+          (milestone) =>
+            milestone.completedAt === null &&
+            milestone.dueDate !== null &&
+            milestone.dueDate >= today &&
+            projectIds.has(milestone.projectId)
+        )
+        .toSorted((left, right) =>
+          (left.dueDate ?? "").localeCompare(right.dueDate ?? "")
+        )
+        .slice(0, 6)
+        .map((milestone) => ({
+          dueDate: milestone.dueDate ?? "",
+          id: milestone.id,
+          name: milestone.name,
+          projectId: milestone.projectId,
+          projectName: milestone.project.name,
+        }));
       const activeTasks = [];
       const openTaskIds: string[] = [];
       for (const task of tasks) {
@@ -146,7 +185,6 @@ const getOverview = (
         assigned.add(assignment.taskId);
         workloadByEmployee.set(assignment.userId, assigned);
       }
-      const today = new Date().toISOString().slice(0, 10);
       const projectCounts = {
         active: 0,
         complete: 0,
@@ -179,6 +217,7 @@ const getOverview = (
         overdueCount,
         projects: projectCounts,
         tasks: taskCounts,
+        upcomingMilestones,
         workload: employees
           .map((employee) => ({
             employeeId: employee.id,

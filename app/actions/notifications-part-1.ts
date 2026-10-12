@@ -22,6 +22,7 @@ import {
   Notifications,
   NotificationsLive,
   InboxSchema,
+  NotificationPreferencesSchema,
 } from "@/src/server/notifications/service";
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -56,6 +57,34 @@ export async function listNotificationInboxAction(input: unknown) {
       ),
     undefined,
     InboxSchema
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function getNotificationPreferencesAction(input: unknown) {
+  return await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getNotificationPreferences() {
+        const requestHeaders = yield* Effect.tryPromise({
+          catch: () =>
+            new AppError({
+              code: "UNAVAILABLE",
+              message: "The request could not be completed.",
+            }),
+          try: () => headers(),
+        });
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const notifications = yield* Notifications;
+        return yield* notifications.listPreferences(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(NotificationsLive)
+      ),
+    undefined,
+    NotificationPreferencesSchema
   );
 }
 
@@ -203,7 +232,7 @@ export async function setNotificationPreferenceAction(input: unknown) {
       })
   );
   if (result.ok) {
-    revalidatePath("/settings/notifications");
+    revalidatePath("/settings");
   }
   return result;
 }

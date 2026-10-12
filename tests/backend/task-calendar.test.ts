@@ -86,6 +86,14 @@ it("filters, sorts, and groups active tasks in a calendar range", async () => {
       "2026-10-10",
       "2026-11-05",
     ]);
+    expect(result[0]).toMatchObject({
+      assigneeIds: [actorId],
+      createdById: actorId,
+      dependencyIds: [],
+      labelIds: [],
+      recurrence: null,
+      version: 1,
+    });
     expect(
       result.every(({ groupKey }) => groupKey === "Calendar project")
     ).toBe(true);

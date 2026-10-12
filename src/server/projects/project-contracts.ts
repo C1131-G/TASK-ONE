@@ -81,8 +81,11 @@ export const ProjectWithPeopleSchema = Schema.Struct({
 export const ProjectListItemSchema = Schema.Struct({
   ...ProjectWithPeopleSchema.fields,
   completedTaskCount: Schema.Number,
+  openTaskCount: Schema.Number,
+  overdueTaskCount: Schema.Number,
   progress: Schema.Number,
   taskCount: Schema.Number,
+  updatedAt: Schema.String,
 });
 
 export const ProjectMilestonesResultSchema = Schema.Struct({
@@ -121,7 +124,10 @@ export interface ProjectWithPeople extends ProjectSummary {
 export interface ProjectListItem extends ProjectWithPeople {
   readonly taskCount: number;
   readonly completedTaskCount: number;
+  readonly openTaskCount: number;
+  readonly overdueTaskCount: number;
   readonly progress: number;
+  readonly updatedAt: string;
 }
 export interface SetProjectPeopleInput {
   readonly leadId: string | null;

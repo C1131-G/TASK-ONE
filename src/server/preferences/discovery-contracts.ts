@@ -2,13 +2,27 @@ import type { Effect } from "effect";
 import { Context, Schema } from "effect";
 
 import type { AppError } from "../core/action-result";
+import { TaskPrioritySchema, TaskStatusSchema } from "../work/work-contracts";
 
 export interface PersonalWorkspace {
   readonly projects: readonly { readonly id: string; readonly name: string }[];
   readonly tasks: readonly {
+    readonly assignees: readonly {
+      readonly id: string;
+      readonly name: string;
+    }[];
+    readonly completedAt: string | null;
+    readonly createdById: string;
+    readonly dueDate: string | null;
     readonly id: string;
-    readonly title: string;
+    readonly priority: typeof TaskPrioritySchema.Type;
     readonly projectId: string;
+    readonly projectName: string;
+    readonly projectTaskNumber: number;
+    readonly startDate: string | null;
+    readonly status: typeof TaskStatusSchema.Type;
+    readonly title: string;
+    readonly version: number;
   }[];
   readonly recentSearches: readonly string[];
 }
@@ -30,9 +44,21 @@ export const PersonalWorkspaceSchema = Schema.Struct({
   recentSearches: Schema.Array(Schema.String),
   tasks: Schema.Array(
     Schema.Struct({
+      assignees: Schema.Array(
+        Schema.Struct({ id: Schema.String, name: Schema.String })
+      ),
+      completedAt: Schema.NullOr(Schema.String),
+      createdById: Schema.String,
+      dueDate: Schema.NullOr(Schema.String),
       id: Schema.String,
+      priority: TaskPrioritySchema,
       projectId: Schema.String,
+      projectName: Schema.String,
+      projectTaskNumber: Schema.Number,
+      startDate: Schema.NullOr(Schema.String),
+      status: TaskStatusSchema,
       title: Schema.String,
+      version: Schema.Number,
     })
   ),
 });

@@ -58,13 +58,56 @@ export const listEmployees = (
         .orderBy((user) => user.employeeNumber.asc())
         .limit(500)
         .all();
+      const userIds = users.map(({ id }) => id);
+      if (userIds.length === 0) {
+        return [];
+      }
+      const [projectMemberships, assignments, visibleProjects] =
+        await Promise.all([
+          db.orm.public.ProjectMember.include("project")
+            .where((member) => member.userId.in(userIds))
+            .all(),
+          db.orm.public.TaskAssignee.include("task")
+            .where((assignment) => assignment.userId.in(userIds))
+            .all(),
+          db.orm.public.Project.where({ archivedAt: null }).select("id").all(),
+        ]);
+      const visibleProjectIds = new Set(visibleProjects.map(({ id }) => id));
+      const activeProjectCounts = new Map<string, number>();
+      for (const membership of projectMemberships) {
+        if (
+          !membership.project.archivedAt &&
+          membership.project.status !== "complete"
+        ) {
+          activeProjectCounts.set(
+            membership.userId,
+            (activeProjectCounts.get(membership.userId) ?? 0) + 1
+          );
+        }
+      }
+      const openTaskCounts = new Map<string, number>();
+      for (const assignment of assignments) {
+        if (
+          !assignment.task.archivedAt &&
+          assignment.task.status !== "done" &&
+          visibleProjectIds.has(assignment.task.projectId)
+        ) {
+          openTaskCounts.set(
+            assignment.userId,
+            (openTaskCounts.get(assignment.userId) ?? 0) + 1
+          );
+        }
+      }
       return users.map((user) => ({
+        activeProjectCount: activeProjectCounts.get(user.id) ?? 0,
         avatar: user.image,
         email: user.email,
         employeeId: `EMP${String(user.employeeNumber).padStart(6, "0")}`,
         id: user.id,
         jobTitle: user.jobTitle,
+        mustChangePassword: user.mustChangePassword,
         name: user.name,
+        openAssignedTaskCount: openTaskCounts.get(user.id) ?? 0,
         role: Schema.is(Schema.Literals(["admin", "employee"]))(user.role)
           ? user.role
           : "employee",

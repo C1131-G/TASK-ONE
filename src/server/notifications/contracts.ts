@@ -10,6 +10,7 @@ export interface NotificationItem {
   readonly snippet: string | null;
   readonly taskId: string | null;
   readonly projectId: string | null;
+  readonly projectName: string | null;
   readonly actorId: string | null;
   readonly actorName: string | null;
   readonly readAt: string | null;
@@ -19,11 +20,18 @@ export interface NotificationItem {
 export interface InboxPage {
   readonly items: readonly NotificationItem[];
   readonly unreadCount: number;
+  readonly unreadInboxCount: number;
 }
 
 export interface InboxOptions {
   readonly unreadOnly: boolean;
   readonly limit: number;
+}
+
+export interface NotificationPreferenceValue {
+  readonly channel: "in-app" | "web-push";
+  readonly enabled: boolean;
+  readonly eventType: "mention" | "assignment" | "comment" | "update" | "due";
 }
 
 export const InboxSchema = Schema.Struct({
@@ -34,6 +42,7 @@ export const InboxSchema = Schema.Struct({
       createdAt: Schema.String,
       id: Schema.String,
       projectId: Schema.NullOr(Schema.String),
+      projectName: Schema.NullOr(Schema.String),
       readAt: Schema.NullOr(Schema.String),
       snippet: Schema.NullOr(Schema.String),
       taskId: Schema.NullOr(Schema.String),
@@ -42,7 +51,22 @@ export const InboxSchema = Schema.Struct({
     })
   ),
   unreadCount: Schema.Number,
+  unreadInboxCount: Schema.Number,
 });
+
+export const NotificationPreferencesSchema = Schema.Array(
+  Schema.Struct({
+    channel: Schema.Literals(["in-app", "web-push"]),
+    enabled: Schema.Boolean,
+    eventType: Schema.Literals([
+      "mention",
+      "assignment",
+      "comment",
+      "update",
+      "due",
+    ]),
+  })
+);
 
 export class Notifications extends Context.Service<
   Notifications,
@@ -51,6 +75,9 @@ export class Notifications extends Context.Service<
       userId: string,
       options: InboxOptions
     ) => Effect.Effect<InboxPage, AppError>;
+    readonly listPreferences: (
+      userId: string
+    ) => Effect.Effect<readonly NotificationPreferenceValue[], AppError>;
     readonly markRead: (
       userId: string,
       notificationId: string

@@ -191,6 +191,11 @@ export const actionCatalog1: readonly ActionEntry[] = [
     () => ({ limit: 10, unreadOnly: false })
   ),
   entry(
+    "getNotificationPreferencesAction",
+    notifications.getNotificationPreferencesAction,
+    () => ({})
+  ),
+  entry(
     "markNotificationReadAction",
     notifications.markNotificationReadAction,
     () => ({

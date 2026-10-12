@@ -190,6 +190,8 @@ it("duplicates project members, milestones, and active task structure", async ()
       key: duplicateKey,
       memberIds: [employeeId],
       name: "Duplicated project",
+      openTaskCount: 1,
+      overdueTaskCount: 0,
       progress: 0,
       taskCount: 1,
     });

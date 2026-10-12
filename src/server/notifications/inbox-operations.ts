@@ -1,9 +1,14 @@
+import { not } from "@prisma/orm-postgres/orm-client";
 import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
-import type { InboxOptions, InboxPage } from "./contracts";
+import type {
+  InboxOptions,
+  InboxPage,
+  NotificationPreferenceValue,
+} from "./contracts";
 import { mapError, verifyUser } from "./service-internal";
 
 export const listInbox = (
@@ -15,16 +20,17 @@ export const listInbox = (
     try: async () => {
       await verifyUser(userId);
       const limit = Math.max(1, Math.min(100, Math.trunc(options.limit)));
-      const allUnread = await db.orm.public.Notification.where({
-        readAt: null,
-        userId,
-      })
-        .select("id")
-        .all();
-      const base = db.orm.public.Notification.include("actor").where({
-        userId,
-        ...(options.unreadOnly ? { readAt: null } : {}),
-      });
+      const [allUnread, inboxUnread] = await Promise.all([
+        db.orm.public.Notification.where({ readAt: null, userId }).aggregate(
+          (aggregates) => ({ count: aggregates.count() })
+        ),
+        db.orm.public.Notification.where({ readAt: null, userId })
+          .where((notification) => not(notification.type.eq("update")))
+          .aggregate((aggregates) => ({ count: aggregates.count() })),
+      ]);
+      const base = db.orm.public.Notification.include("actor")
+        .include("project")
+        .where({ userId, ...(options.unreadOnly ? { readAt: null } : {}) });
       const notifications = await base
         .orderBy((notification) => notification.createdAt.desc())
         .limit(limit)
@@ -36,14 +42,35 @@ export const listInbox = (
           createdAt: notification.createdAt.toISOString(),
           id: notification.id,
           projectId: notification.projectId,
+          projectName: notification.project?.name ?? null,
           readAt: notification.readAt?.toISOString() ?? null,
           snippet: notification.snippet,
           taskId: notification.taskId,
           text: notification.text,
           type: notification.type,
         })),
-        unreadCount: allUnread.length,
+        unreadCount: allUnread.count,
+        unreadInboxCount: inboxUnread.count,
       };
+    },
+  });
+
+export const listPreferences = (
+  userId: string
+): Effect.Effect<readonly NotificationPreferenceValue[], AppError> =>
+  Effect.tryPromise({
+    catch: mapError,
+    try: async () => {
+      await verifyUser(userId);
+      const preferences = await db.orm.public.NotificationPreference.where({
+        userId,
+      }).all();
+      return preferences.map((preference) => ({
+        channel: preference.channel as NotificationPreferenceValue["channel"],
+        enabled: preference.enabled,
+        eventType:
+          preference.eventType as NotificationPreferenceValue["eventType"],
+      }));
     },
   });
 

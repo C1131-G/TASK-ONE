@@ -1,7 +1,7 @@
 import { expect, it } from "bun:test";
 import { randomUUID } from "node:crypto";
 
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 
 import { auth } from "../../src/server/auth/auth";
 import { authPool } from "../../src/server/auth/database";
@@ -10,6 +10,10 @@ import {
   UserManagement,
   UserManagementLive,
 } from "../../src/server/people/user-management";
+import {
+  WorkManagement,
+  WorkManagementLive,
+} from "../../src/server/work/work-management";
 
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
@@ -194,5 +198,143 @@ it("lets admins update an employee's login email, title, and optional team", asy
       [administratorId, employeeId],
     ]);
     await authPool.query("DELETE FROM team WHERE id = $1", [teamId]);
+  }
+});
+
+it("returns active project, open task, and setup counts in the member directory", async () => {
+  const administratorId = randomUUID();
+  const employeeId = randomUUID();
+  const projectId = randomUUID();
+  const completedProjectId = randomUUID();
+  const suffix = randomUUID();
+  const taskIds: string[] = [];
+
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, $4, false), ($5, $6, $7, $7, $8, true)',
+    [
+      administratorId,
+      "Directory Admin",
+      `${administratorId}@directory-counts.example`,
+      "admin",
+      employeeId,
+      "Directory Employee",
+      `${employeeId}@directory-counts.example`,
+      "employee",
+    ]
+  );
+  await Promise.all([
+    authPool.query(
+      "INSERT INTO project (id, key, name, status) VALUES ($1, $2, $3, $4)",
+      [projectId, `A${suffix.slice(0, 5)}`, "Active Member Project", "active"]
+    ),
+    authPool.query(
+      "INSERT INTO project (id, key, name, status) VALUES ($1, $2, $3, $4)",
+      [
+        completedProjectId,
+        `C${suffix.slice(0, 5)}`,
+        "Completed Member Project",
+        "complete",
+      ]
+    ),
+  ]);
+  await Promise.all([
+    authPool.query(
+      'INSERT INTO project_member ("projectId", "userId") VALUES ($1, $2)',
+      [projectId, employeeId]
+    ),
+    authPool.query(
+      'INSERT INTO project_member ("projectId", "userId") VALUES ($1, $2)',
+      [completedProjectId, employeeId]
+    ),
+  ]);
+
+  try {
+    const member = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* readDirectoryCounts() {
+          const work = yield* WorkManagement;
+          const openTask = yield* work.createTask(administratorId, {
+            assigneeIds: [employeeId],
+            description: null,
+            dueDate: null,
+            priority: "none",
+            projectId,
+            title: "Open assigned task",
+          });
+          const completedTask = yield* work.createTask(administratorId, {
+            assigneeIds: [employeeId],
+            description: null,
+            dueDate: null,
+            priority: "none",
+            projectId,
+            title: "Completed assigned task",
+          });
+          taskIds.push(openTask.id, completedTask.id);
+          yield* work.updateTask(
+            administratorId,
+            completedTask.id,
+            completedTask.version,
+            {
+              assigneeIds: [employeeId],
+              description: null,
+              dueDate: null,
+              priority: "none",
+              status: "done",
+              title: completedTask.title,
+            }
+          );
+          const management = yield* UserManagement;
+          const employees = yield* management.listEmployees(
+            administratorId,
+            "Directory Employee"
+          );
+          return employees.find(({ id }) => id === employeeId);
+        }),
+        Layer.mergeAll(UserManagementLive, WorkManagementLive)
+      )
+    );
+
+    expect(member).toMatchObject({
+      activeProjectCount: 1,
+      mustChangePassword: true,
+      openAssignedTaskCount: 1,
+    });
+  } finally {
+    await authPool.query(
+      'DELETE FROM undo_record WHERE "actorId" = ANY($1::text[])',
+      [[administratorId, employeeId]]
+    );
+    await Promise.all(
+      taskIds.map((taskId) =>
+        authPool.query('DELETE FROM activity WHERE "taskId" = $1', [taskId])
+      )
+    );
+    await Promise.all(
+      taskIds.map((taskId) =>
+        authPool.query("DELETE FROM task WHERE id = $1", [taskId])
+      )
+    );
+    await authPool.query(
+      'DELETE FROM activity WHERE "actorId" = $1 OR "actorId" = $2',
+      [administratorId, employeeId]
+    );
+    await authPool.query(
+      "DELETE FROM job WHERE payload ->> 'actorId' = $1 OR payload ->> 'userId' = $2",
+      [administratorId, employeeId]
+    );
+    await authPool.query(
+      'DELETE FROM notification WHERE "userId" = ANY($1::text[])',
+      [[administratorId, employeeId]]
+    );
+    await authPool.query(
+      'DELETE FROM project_member WHERE "projectId" = ANY($1::uuid[])',
+      [[projectId, completedProjectId]]
+    );
+    await authPool.query('DELETE FROM "user" WHERE id = ANY($1::text[])', [
+      [administratorId, employeeId],
+    ]);
+    await authPool.query("DELETE FROM project WHERE id = ANY($1::uuid[])", [
+      [projectId, completedProjectId],
+    ]);
   }
 });

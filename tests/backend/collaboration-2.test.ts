@@ -70,8 +70,10 @@ it("queues and delivers a push job when a comment mentions an employee", async (
   const pushLayer = Layer.succeed(
     PushTransport,
     PushTransport.of({
-      send: (_subscription, message) => {
-        deliveredNotifications.push(message.notificationId);
+      send: (subscription, message) => {
+        if (subscription.endpoint.endsWith(recipientId)) {
+          deliveredNotifications.push(message.notificationId);
+        }
         return Effect.succeed("delivered");
       },
     })
@@ -129,7 +131,20 @@ it("queues and delivers a push job when a comment mentions an employee", async (
     );
     const workerProgram = Effect.gen(function* program() {
       const processor = yield* JobProcessor;
-      return yield* processor.processBatch(`comment-push-${taskId}`, 10);
+      let result = {
+        claimed: 0,
+        completed: 0,
+        deadLettered: 0,
+        retried: 0,
+      };
+      for (
+        let batch = 0;
+        batch < 20 && deliveredNotifications.length < 2;
+        batch += 1
+      ) {
+        result = yield* processor.processBatch(`comment-push-${taskId}`, 25);
+      }
+      return result;
     });
     const workerResult = await Effect.runPromise(
       Effect.provide(workerProgram, workerLayer)

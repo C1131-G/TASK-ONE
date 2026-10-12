@@ -10,6 +10,7 @@ it("summarizes active projects, task statuses, overdue work, and employee worklo
   const suffix = randomUUID();
   const employeeId = randomUUID();
   const projectId = randomUUID();
+  const milestoneId = randomUUID();
   const todoTaskId = randomUUID();
   const doneTaskId = randomUUID();
   const email = `${employeeId}@dashboard-test.example`;
@@ -28,6 +29,10 @@ it("summarizes active projects, task statuses, overdue work, and employee worklo
   await authPool.query(
     "INSERT INTO project (id, key, name, status) VALUES ($1, $2, $3, $4)",
     [projectId, projectKey, "Dashboard Project", "active"]
+  );
+  await authPool.query(
+    'INSERT INTO project_milestone (id, "projectId", name, "dueDate") VALUES ($1, $2, $3, current_date + 1)',
+    [milestoneId, projectId, "Dashboard milestone"]
   );
   await authPool.query(
     'INSERT INTO task (id, "projectId", "projectTaskNumber", title, status, "dueDate", "createdById") VALUES ($1, $2, 1, $3, $4, current_date - 1, $5), ($6, $2, 2, $7, $8, NULL, $5)',
@@ -65,6 +70,14 @@ it("summarizes active projects, task statuses, overdue work, and employee worklo
       employeeName: "Dashboard Employee",
       openTaskCount: 1,
     });
+    expect(Reflect.get(overview, "upcomingMilestones")).toContainEqual(
+      expect.objectContaining({
+        id: milestoneId,
+        name: "Dashboard milestone",
+        projectId,
+        projectName: "Dashboard Project",
+      })
+    );
   } finally {
     await authPool.query('DELETE FROM task_assignee WHERE "userId" = $1', [
       employeeId,

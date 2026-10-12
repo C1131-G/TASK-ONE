@@ -73,6 +73,13 @@ export const actionCatalog2: readonly ActionEntry[] = [
     () => ({ idempotencyKey: nextKey(), preferences: {} })
   ),
   entry("listProjectsAction", projects.listProjectsAction, () => ({})),
+  entry(
+    "listProjectMilestonesAction",
+    projects.listProjectMilestonesAction,
+    () => ({
+      projectId: ids.projectId,
+    })
+  ),
   entry("createProjectAction", projects.createProjectAction, () => ({
     description: null,
     idempotencyKey: nextKey(),
