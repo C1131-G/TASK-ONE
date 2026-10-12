@@ -75,3 +75,15 @@ export const validateInput = (input: CreateTaskInput): CreateTaskInput => {
 };
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+export const assertStartNotAfterDue = (
+  startDate: string | null | undefined,
+  dueDate: string | null
+): void => {
+  if (startDate && dueDate && startDate > dueDate) {
+    throw new AppError({
+      code: "VALIDATION_FAILED",
+      message: "The start date must be on or before the due date.",
+    });
+  }
+};

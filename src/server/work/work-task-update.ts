@@ -11,7 +11,7 @@ import type {
   UpdateTaskInput,
 } from "./work-contracts";
 import { decodeTaskStatus } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertStartNotAfterDue, databaseError } from "./work-internal";
 import { notifyTaskAssignees } from "./work-notifications";
 import {
   assertActiveTaskAssignees,
@@ -69,6 +69,11 @@ export const updateTask = (
             .all(),
           transaction.orm.public.TaskRecurrence.where({ taskId }).first(),
         ]);
+        const startDate =
+          rawInput.startDate === undefined
+            ? task.startDate
+            : rawInput.startDate;
+        assertStartNotAfterDue(startDate, rawInput.dueDate);
         if (recurrence && !rawInput.dueDate) {
           throw new AppError({
             code: "VALIDATION_FAILED",
@@ -89,7 +94,7 @@ export const updateTask = (
           dueDate: rawInput.dueDate,
           estimate: rawInput.estimate ?? task.estimate,
           priority: rawInput.priority,
-          startDate: rawInput.startDate ?? task.startDate,
+          startDate,
           status: rawInput.status,
           title,
           updatedAt: now,

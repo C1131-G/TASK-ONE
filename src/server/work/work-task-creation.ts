@@ -6,7 +6,11 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import type { CreatedTask, CreateTaskInput } from "./work-contracts";
-import { databaseError, validateInput } from "./work-internal";
+import {
+  assertStartNotAfterDue,
+  databaseError,
+  validateInput,
+} from "./work-internal";
 import type { Transaction } from "./work-internal";
 import { notifyTaskAssignees } from "./work-notifications";
 
@@ -86,6 +90,7 @@ export const createTaskInTransaction = async (
     transaction,
     input.projectId
   );
+  assertStartNotAfterDue(input.startDate, input.dueDate);
   const taskId = randomUUID();
   const now = new Date();
   await transaction.orm.public.Task.create({
