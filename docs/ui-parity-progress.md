@@ -170,3 +170,15 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Browser (`tests/e2e/project-view-state.spec.ts`): typing a board search writes `q` to the URL, and a reload restores the value. Passes with the smoke tests.
 - Production build passes with no Suspense warning.
 - Deferred by plan: the drawer, undo, upload and schedule-drag stores ship with Phases 3, 5 and 4. Selection moves into the store in Phase 2, with the column registry. The mutation helper (one idempotency key per attempt, CONFLICT recovery) lands with the first mutation batch that needs it.
+
+## Phase 2 evidence (2026-10-12)
+
+- Project table columns: one registry (`task-table-columns.ts`) defines order, labels, sort fields, default and minimum widths, and which columns can be hidden. The Columns menu hides and shows columns. Hidden columns are the `hidden` URL param, so they survive a reload and are saved with saved views. The task and actions columns always show.
+- Sorting: Task, Priority and Due headers are buttons with `aria-sort`. Clicking the active header returns to manual order.
+- Resizing: each column has a focusable separator. Pointer drag and Arrow keys (8px steps) resize it, clamped to each column's minimum and an 800px maximum. Widths live in the view store, so they last for the page visit but are not yet saved to personal preferences.
+- Selection moved into the view store and is capped at the backend's 100-task limit.
+- Board: cards within a column reorder through the "Move up/down" buttons, or Alt+ArrowUp/ArrowDown on a focused card. The move calls `reorderTasksAction` and announces the new position in a live region. Reordering is available only with manual sort and no search or priority filter.
+- Browser tests (`tests/e2e/project-table-and-board.spec.ts`): hiding a column, sorting, resizing and reloading pass; Alt+arrow reordering persists across a reload. All five browser tests pass with the smoke tests.
+- Unit tests: column parsing, width clamping, store selection cap, and reorder math (`tests/ui/task-table-state.test.ts`, `tests/ui/board-order.test.ts`). 16 UI tests pass.
+- Lint, typecheck (0 errors) and the production build pass.
+- Not done in this phase: `/tasks` and `/my-tasks` on the view store (so `/my-tasks` tabs still drop filters), saving column widths to personal preferences, and the global bulk-update dialog reading from the store.

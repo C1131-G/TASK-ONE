@@ -2,7 +2,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useSelector } from "@tanstack/react-store";
+import { useMemo } from "react";
 
 import { GlobalTaskBulkDialog } from "@/components/workspace/global-task-bulk-dialog";
 import { ProjectTaskFilters } from "@/components/workspace/project-task-filters";
@@ -11,12 +12,15 @@ import type { ProjectTaskViewItem } from "@/components/workspace/project-task-vi
 import { TaskCreateForm } from "@/components/workspace/task-create-form";
 import { TaskManageControls } from "@/components/workspace/task-manage-controls";
 import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import { TaskTableColumnMenu } from "@/components/workspace/task-table-column-menu";
+import { serializeHiddenColumns } from "@/components/workspace/task-table-columns";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
 import { useProjectViewSearch } from "./use-project-view-search";
+import { useProjectViewStore } from "./view-store/project-view-store-provider";
 
 const priorityOrder = {
   high: 1,
@@ -63,8 +67,18 @@ export const ProjectTaskListViewContent = ({
   const setPriority = (value: string) => updateSearch({ priority: value });
   const setSort = (value: string) => updateSearch({ sort: value });
   const setGroupBy = (value: string) => updateSearch({ group: value });
-  const [selectedTaskIds, setSelectedTaskIds] = useState<ReadonlySet<string>>(
-    new Set()
+  const projectViewStore = useProjectViewStore();
+  const selectedTaskIdList = useSelector(
+    projectViewStore,
+    (state) => state.selectedTaskIds
+  );
+  const columnWidths = useSelector(
+    projectViewStore,
+    (state) => state.columnWidths
+  );
+  const selectedTaskIds: ReadonlySet<string> = useMemo(
+    () => new Set(selectedTaskIdList),
+    [selectedTaskIdList]
   );
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -115,29 +129,19 @@ export const ProjectTaskListViewContent = ({
         })
       : [{ id: "all", label: "", tasks: visibleTasks }];
 
-  const clearSelection = () => setSelectedTaskIds(new Set());
+  const clearSelection = () => projectViewStore.actions.clearSelection();
   const updateFilter = (update: () => void) => {
     clearSelection();
     update();
   };
-  const toggleTaskSelection = (taskId: string, selected: boolean) => {
-    setSelectedTaskIds((current) => {
-      const next = new Set(current);
-      if (selected) {
-        next.add(taskId);
-      } else {
-        next.delete(taskId);
-      }
-      return next;
-    });
-  };
-  const selectVisibleTasks = (selected: boolean) => {
-    setSelectedTaskIds(
-      selected
-        ? new Set(editableVisibleTasks.slice(0, 100).map((task) => task.id))
-        : new Set()
+  const toggleTaskSelection = (taskId: string, selected: boolean) =>
+    projectViewStore.actions.toggleTaskSelected(taskId, selected);
+  const selectVisibleTasks = (selected: boolean) =>
+    projectViewStore.actions.setSelectedTaskIds(
+      selected ? editableVisibleTasks.map((task) => task.id) : []
     );
-  };
+  const sortByColumn = (field: string) =>
+    updateSearch({ sort: sort === field ? "manual" : field });
 
   return (
     <section className="panel">
@@ -174,15 +178,32 @@ export const ProjectTaskListViewContent = ({
         </div>
       ) : null}
       {view === "table" ? (
+        <div className="project-task-table-tools">
+          <TaskTableColumnMenu
+            hidden={search.hidden}
+            onHiddenChange={(next) =>
+              updateSearch({ hidden: serializeHiddenColumns(next) })
+            }
+          />
+        </div>
+      ) : null}
+      {view === "table" ? (
         <ProjectTaskTable
+          activeSort={sort}
+          columnWidths={columnWidths}
           currentUserId={currentUserId}
           editableTaskIds={editableTaskIds}
           employees={employees}
           groups={tableGroups}
+          hiddenColumns={search.hidden}
           isAdmin={isAdmin}
           labels={labels}
+          onResizeColumn={(columnId, width) =>
+            projectViewStore.actions.setColumnWidth(columnId, width)
+          }
           onSelectAll={selectVisibleTasks}
           onSelectTask={toggleTaskSelection}
+          onSort={sortByColumn}
           projectKey={project.key}
           selectableTaskIds={
             new Set(editableVisibleTasks.map((task) => task.id))

@@ -26,7 +26,7 @@ import {
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
 
 import {
-  normalizeProjectViewSearch,
+  isSameNormalizedProjectViewSearch,
   projectViewHref,
   projectViewSearchToSettings,
   projectViewSettingsToSearch,
@@ -70,10 +70,10 @@ export const ProjectSavedViews = ({
     selectedView !== null && (isAdmin || selectedView.userId === userId);
   const hasUnsavedChanges =
     selectedView !== null &&
-    JSON.stringify(normalizeProjectViewSearch(search)) !==
-      JSON.stringify(
-        normalizeProjectViewSearch(projectViewSettingsToSearch(selectedView))
-      );
+    !isSameNormalizedProjectViewSearch(
+      search,
+      projectViewSettingsToSearch(selectedView)
+    );
 
   const create = (formData: FormData) =>
     startTransition(async () => {
@@ -82,7 +82,7 @@ export const ProjectSavedViews = ({
         view: {
           filters: currentSettings.filters,
           groupBy: currentSettings.groupBy,
-          hiddenColumns: [],
+          hiddenColumns: [...currentSettings.hiddenColumns],
           isShared: isAdmin && formData.get("isShared") === "on",
           name: String(formData.get("name") ?? "").trim(),
           projectId,
@@ -106,7 +106,7 @@ export const ProjectSavedViews = ({
         view: {
           filters: currentSettings.filters,
           groupBy: currentSettings.groupBy,
-          hiddenColumns: [...view.hiddenColumns],
+          hiddenColumns: [...currentSettings.hiddenColumns],
           isShared: view.isShared,
           name: view.name,
           projectId: view.projectId,

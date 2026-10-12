@@ -17,6 +17,15 @@ import {
 } from "@/components/ui/table";
 import { TaskManageControls } from "@/components/workspace/task-manage-controls";
 import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import type {
+  TaskTableColumn,
+  TaskTableColumnId,
+} from "@/components/workspace/task-table-columns";
+import {
+  TASK_TABLE_COLUMNS,
+  defaultColumnWidth,
+} from "@/components/workspace/task-table-columns";
+import { TaskTableHeaderCell } from "@/components/workspace/task-table-header-cell";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -56,22 +65,30 @@ const formatDate = (date: string | null): string => {
 };
 
 export const ProjectTaskTable = ({
+  activeSort,
+  columnWidths,
   currentUserId,
   editableTaskIds,
   employees,
+  hiddenColumns,
   isAdmin,
   labels,
   groups,
+  onResizeColumn,
   onSelectAll,
   onSelectTask,
+  onSort,
   projectKey,
   selectableTaskIds,
   selectedTaskIds,
   tasks,
 }: {
+  readonly activeSort: string;
+  readonly columnWidths: Partial<Record<TaskTableColumnId, number>>;
   readonly currentUserId: string | null;
   readonly editableTaskIds: ReadonlySet<string>;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
+  readonly hiddenColumns: readonly TaskTableColumnId[];
   readonly isAdmin: boolean;
   readonly labels: readonly LabelSummary[];
   readonly groups: readonly {
@@ -79,14 +96,19 @@ export const ProjectTaskTable = ({
     readonly label: string;
     readonly tasks: readonly ProjectTaskTableItem[];
   }[];
+  readonly onResizeColumn: (columnId: TaskTableColumnId, width: number) => void;
   readonly onSelectAll: (selected: boolean) => void;
   readonly onSelectTask: (taskId: string, selected: boolean) => void;
+  readonly onSort: (field: string) => void;
   readonly projectKey: string;
   readonly selectableTaskIds: ReadonlySet<string>;
   readonly selectedTaskIds: ReadonlySet<string>;
   readonly tasks: readonly ProjectTaskTableItem[];
 }) => {
   const labelsById = new Map(labels.map((label) => [label.id, label]));
+  const visibleColumns = TASK_TABLE_COLUMNS.filter(
+    (column) => !hiddenColumns.includes(column.id)
+  );
   const selectableCount = tasks.filter((task) =>
     selectableTaskIds.has(task.id)
   ).length;
@@ -101,6 +123,96 @@ export const ProjectTaskTable = ({
   } else if (someSelected) {
     headerChecked = "indeterminate";
   }
+
+  const widthOf = (column: TaskTableColumn) =>
+    columnWidths[column.id] ?? defaultColumnWidth(column.id);
+
+  const renderCell = (
+    column: TaskTableColumn,
+    task: ProjectTaskTableItem,
+    editable: boolean
+  ) => {
+    switch (column.id) {
+      case "task": {
+        return (
+          <>
+            <span className="mono faint">
+              {projectKey}-{task.projectTaskNumber}
+            </span>
+            <span className="project-task-name">{task.title}</span>
+          </>
+        );
+      }
+      case "status": {
+        return editable ? (
+          <TaskStatusSelect
+            status={task.status}
+            taskId={task.id}
+            version={task.version}
+          />
+        ) : (
+          <span className={`pstatus ${task.status}`}>{task.status}</span>
+        );
+      }
+      case "priority": {
+        return task.priority;
+      }
+      case "assignees": {
+        return task.assignees.length
+          ? task.assignees.map((assignee) => assignee.name).join(", ")
+          : "Unassigned";
+      }
+      case "start": {
+        return formatDate(task.startDate);
+      }
+      case "due": {
+        return formatDate(task.dueDate);
+      }
+      case "estimate": {
+        return task.estimate ?? "—";
+      }
+      case "labels": {
+        const taskLabels = task.labelIds.flatMap((id) => {
+          const label = labelsById.get(id);
+          return label ? [label] : [];
+        });
+        return (
+          <span className="project-task-labels">
+            {taskLabels.length
+              ? taskLabels.map((label) => (
+                  <Badge
+                    key={label.id}
+                    style={{ borderColor: label.color, color: label.color }}
+                    variant="outline"
+                  >
+                    {label.name}
+                  </Badge>
+                ))
+              : "—"}
+          </span>
+        );
+      }
+      case "dependencies": {
+        return task.dependencyIds.length
+          ? `${task.dependencyIds.length} task${task.dependencyIds.length === 1 ? "" : "s"}`
+          : "—";
+      }
+      case "actions": {
+        return (
+          <TaskManageControls
+            canEdit={editable}
+            currentUserId={currentUserId}
+            employees={employees}
+            isAdmin={isAdmin}
+            task={task}
+          />
+        );
+      }
+      default: {
+        return null;
+      }
+    }
+  };
 
   return (
     <Table className="project-task-data-table">
@@ -117,16 +229,16 @@ export const ProjectTaskTable = ({
               onCheckedChange={(checked) => onSelectAll(checked === true)}
             />
           </TableHead>
-          <TableHead>Task</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Priority</TableHead>
-          <TableHead>Assignees</TableHead>
-          <TableHead>Start</TableHead>
-          <TableHead>Due</TableHead>
-          <TableHead>Estimate</TableHead>
-          <TableHead>Labels</TableHead>
-          <TableHead>Dependencies</TableHead>
-          <TableHead>Actions</TableHead>
+          {visibleColumns.map((column) => (
+            <TaskTableHeaderCell
+              activeSort={activeSort}
+              column={column}
+              key={column.id}
+              onResize={onResizeColumn}
+              onSort={onSort}
+              width={widthOf(column)}
+            />
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -134,7 +246,7 @@ export const ProjectTaskTable = ({
           <Fragment key={group.id}>
             {group.label ? (
               <TableRow className="project-task-group-row">
-                <TableCell colSpan={11}>
+                <TableCell colSpan={visibleColumns.length + 1}>
                   {group.label}{" "}
                   <span className="muted">{group.tasks.length}</span>
                 </TableCell>
@@ -142,10 +254,6 @@ export const ProjectTaskTable = ({
             ) : null}
             {group.tasks.map((task) => {
               const editable = editableTaskIds.has(task.id);
-              const taskLabels = task.labelIds.flatMap((id) => {
-                const label = labelsById.get(id);
-                return label ? [label] : [];
-              });
               return (
                 <TableRow key={task.id}>
                   <TableCell>
@@ -162,85 +270,19 @@ export const ProjectTaskTable = ({
                       }
                     />
                   </TableCell>
-                  <TableCell
-                    className="project-task-name-cell"
-                    data-label="Task"
-                  >
-                    <span className="mono faint">
-                      {projectKey}-{task.projectTaskNumber}
-                    </span>
-                    <span className="project-task-name">{task.title}</span>
-                  </TableCell>
-                  <TableCell data-label="Status">
-                    {editable ? (
-                      <TaskStatusSelect
-                        status={task.status}
-                        taskId={task.id}
-                        version={task.version}
-                      />
-                    ) : (
-                      <span className={`pstatus ${task.status}`}>
-                        {task.status}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    className="project-task-priority"
-                    data-label="Priority"
-                  >
-                    {task.priority}
-                  </TableCell>
-                  <TableCell
-                    className="project-task-assignees"
-                    data-label="Assignees"
-                  >
-                    {task.assignees.length
-                      ? task.assignees
-                          .map((assignee) => assignee.name)
-                          .join(", ")
-                      : "Unassigned"}
-                  </TableCell>
-                  <TableCell data-label="Start">
-                    {formatDate(task.startDate)}
-                  </TableCell>
-                  <TableCell data-label="Due">
-                    {formatDate(task.dueDate)}
-                  </TableCell>
-                  <TableCell data-label="Estimate">
-                    {task.estimate ?? "—"}
-                  </TableCell>
-                  <TableCell data-label="Labels">
-                    <span className="project-task-labels">
-                      {taskLabels.length
-                        ? taskLabels.map((label) => (
-                            <Badge
-                              key={label.id}
-                              variant="outline"
-                              style={{
-                                borderColor: label.color,
-                                color: label.color,
-                              }}
-                            >
-                              {label.name}
-                            </Badge>
-                          ))
-                        : "—"}
-                    </span>
-                  </TableCell>
-                  <TableCell data-label="Dependencies">
-                    {task.dependencyIds.length
-                      ? `${task.dependencyIds.length} task${task.dependencyIds.length === 1 ? "" : "s"}`
-                      : "—"}
-                  </TableCell>
-                  <TableCell data-label="Actions">
-                    <TaskManageControls
-                      canEdit={editable}
-                      currentUserId={currentUserId}
-                      employees={employees}
-                      isAdmin={isAdmin}
-                      task={task}
-                    />
-                  </TableCell>
+                  {visibleColumns.map((column) => (
+                    <TableCell
+                      className={
+                        column.id === "task"
+                          ? "project-task-name-cell"
+                          : undefined
+                      }
+                      data-label={column.label}
+                      key={column.id}
+                    >
+                      {renderCell(column, task, editable)}
+                    </TableCell>
+                  ))}
                 </TableRow>
               );
             })}

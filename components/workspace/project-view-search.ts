@@ -3,6 +3,11 @@ import type {
   SavedViewGroupBy,
   SavedViewSort,
 } from "../../src/server/preferences/saved-view-settings";
+import type { TaskTableColumnId } from "./task-table-columns";
+import {
+  parseHiddenColumns,
+  serializeHiddenColumns,
+} from "./task-table-columns";
 
 export const PROJECT_VIEW_STATUSES = [
   "backlog",
@@ -39,6 +44,7 @@ export interface ProjectViewSearch {
   readonly priority: string;
   readonly sort: string;
   readonly group: string;
+  readonly hidden: string;
 }
 
 export interface NormalizedProjectViewSearch {
@@ -47,10 +53,12 @@ export interface NormalizedProjectViewSearch {
   readonly priority: ProjectViewPriority | "all";
   readonly sort: ProjectViewSortField;
   readonly group: ProjectViewGroup;
+  readonly hidden: readonly TaskTableColumnId[];
 }
 
 export const defaultProjectViewSearch: ProjectViewSearch = {
   group: "status",
+  hidden: "",
   priority: "all",
   q: "",
   sort: "manual",
@@ -68,6 +76,7 @@ export const normalizeProjectViewSearch = (
   raw: ProjectViewSearch
 ): NormalizedProjectViewSearch => ({
   group: pick(PROJECT_VIEW_GROUPS, raw.group) ?? "status",
+  hidden: parseHiddenColumns(raw.hidden),
   priority: pick(PROJECT_VIEW_PRIORITIES, raw.priority) ?? "all",
   q: raw.q.slice(0, MAX_QUERY_LENGTH),
   sort: pick(PROJECT_VIEW_SORTS, raw.sort) ?? "manual",
@@ -79,6 +88,7 @@ export const readProjectViewSearchRaw = (
   params: URLSearchParams
 ): ProjectViewSearch => ({
   group: params.get("group") ?? defaultProjectViewSearch.group,
+  hidden: params.get("hidden") ?? defaultProjectViewSearch.hidden,
   priority: params.get("priority") ?? defaultProjectViewSearch.priority,
   q: params.get("q") ?? defaultProjectViewSearch.q,
   sort: params.get("sort") ?? defaultProjectViewSearch.sort,
@@ -102,6 +112,7 @@ export const writeProjectViewSearch = (
     ["priority", search.priority, defaultProjectViewSearch.priority],
     ["sort", search.sort, defaultProjectViewSearch.sort],
     ["group", search.group, defaultProjectViewSearch.group],
+    ["hidden", search.hidden, defaultProjectViewSearch.hidden],
   ];
   for (const [key, value, fallback] of entries) {
     if (value === fallback || value === "") {
@@ -113,45 +124,58 @@ export const writeProjectViewSearch = (
   return next;
 };
 
+// Saved views store normalized values; the URL stores the raw form.
+export const toRawProjectViewSearch = (
+  search: NormalizedProjectViewSearch
+): ProjectViewSearch => ({
+  group: search.group,
+  hidden: serializeHiddenColumns(search.hidden),
+  priority: search.priority,
+  q: search.q,
+  sort: search.sort,
+  status: search.status,
+});
+
 export const projectViewSearchToSettings = (
-  search: ProjectViewSearch
+  search: NormalizedProjectViewSearch
 ): {
   readonly filters: SavedViewFilters;
   readonly sort: SavedViewSort;
   readonly groupBy: SavedViewGroupBy;
-} => {
-  const normalized = normalizeProjectViewSearch(search);
-  return {
-    filters: {
-      priority: normalized.priority === "all" ? [] : [normalized.priority],
-      query: normalized.q,
-      status: normalized.status === "all" ? [] : [normalized.status],
-    },
-    groupBy: normalized.group,
-    sort: { direction: "asc", field: normalized.sort },
-  };
-};
+  readonly hiddenColumns: readonly TaskTableColumnId[];
+} => ({
+  filters: {
+    priority: search.priority === "all" ? [] : [search.priority],
+    query: search.q,
+    status: search.status === "all" ? [] : [search.status],
+  },
+  groupBy: search.group,
+  hiddenColumns: search.hidden,
+  sort: { direction: "asc", field: search.sort },
+});
 
 export const projectViewSettingsToSearch = (settings: {
   readonly filters: SavedViewFilters;
   readonly sort: SavedViewSort;
   readonly groupBy: SavedViewGroupBy;
-}): ProjectViewSearch => ({
-  group: settings.groupBy ?? defaultProjectViewSearch.group,
-  priority: settings.filters.priority[0] ?? defaultProjectViewSearch.priority,
+  readonly hiddenColumns: readonly string[];
+}): NormalizedProjectViewSearch => ({
+  group: settings.groupBy ?? "status",
+  hidden: parseHiddenColumns(serializeHiddenColumns(settings.hiddenColumns)),
+  priority: settings.filters.priority[0] ?? "all",
   q: settings.filters.query,
   sort: settings.sort.field,
-  status: settings.filters.status[0] ?? defaultProjectViewSearch.status,
+  status: settings.filters.status[0] ?? "all",
 });
 
 export const projectViewHref = (
   projectId: string,
   viewId: string,
-  search: ProjectViewSearch
+  search: NormalizedProjectViewSearch
 ): string => {
   const params = writeProjectViewSearch(
     new URLSearchParams({ view: `saved-${viewId}` }),
-    search
+    toRawProjectViewSearch(search)
   );
   return `/projects/${projectId}?${params.toString()}`;
 };
@@ -164,4 +188,14 @@ export const isSameProjectViewSearch = (
   first.priority === second.priority &&
   first.q === second.q &&
   first.sort === second.sort &&
-  first.status === second.status;
+  first.status === second.status &&
+  first.hidden === second.hidden;
+
+export const isSameNormalizedProjectViewSearch = (
+  first: NormalizedProjectViewSearch,
+  second: NormalizedProjectViewSearch
+): boolean =>
+  isSameProjectViewSearch(
+    toRawProjectViewSearch(first),
+    toRawProjectViewSearch(second)
+  );

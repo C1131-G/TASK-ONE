@@ -3,50 +3,21 @@
 
 "use client";
 
-import { CheckCircle, ListChecks, Repeat } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import { changeTaskColumnAction } from "@/app/actions/tasks";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-} from "@/components/ui/avatar";
-import { TaskManageControls } from "@/components/workspace/task-manage-controls";
-import { TaskStatusSelect } from "@/components/workspace/task-status-select";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
-import type { TaskRecurrenceInput } from "@/src/server/work/work-contracts";
 
+import { ProjectBoardCard } from "./project-board-card";
+import type { BoardTask as Task } from "./project-board-types";
+import { useBoardReorder } from "./use-board-reorder";
 import { useProjectViewSearch } from "./use-project-view-search";
-
-interface Task {
-  readonly id: string;
-  readonly projectId: string;
-  readonly title: string;
-  readonly status: "backlog" | "todo" | "progress" | "review" | "done";
-  readonly priority: "urgent" | "high" | "medium" | "low" | "none";
-  readonly version: number;
-  readonly createdById: string;
-  readonly assigneeIds: readonly string[];
-  readonly description: string | null;
-  readonly dueDate: string | null;
-  readonly startDate: string | null;
-  readonly estimate: string | null;
-  readonly projectTaskNumber: number;
-  readonly assignees: readonly { readonly id: string; readonly name: string }[];
-  readonly labelIds: readonly string[];
-  readonly dependencyIds: readonly string[];
-  readonly recurrence: TaskRecurrenceInput | null;
-  readonly subtaskCount: number;
-  readonly completedSubtaskCount: number;
-}
 
 interface Employee {
   readonly id: string;
@@ -95,6 +66,16 @@ export const ProjectBoard = ({
     updateSearch({ priority: value });
   const setSort = (value: string) => updateSearch({ sort: value });
   const labelsById = new Map(labels.map((label) => [label.id, label]));
+  // Manual reordering needs the full column in view: no search or priority filter.
+  const canReorder =
+    sort === "manual" && query.trim() === "" && priorityFilter === "all";
+
+  const reorder = useBoardReorder({
+    canReorder,
+    onError: setError,
+    tasks,
+  });
+  const handleMove = reorder.move;
 
   const visibleTasks = tasks
     .filter((task) => {
@@ -203,6 +184,15 @@ export const ProjectBoard = ({
           {error}
         </p>
       ) : null}
+      <p aria-live="polite" className="sr-only">
+        {reorder.announcement}
+      </p>
+      {canReorder ? null : (
+        <p className="muted board-reorder-hint">
+          Clear search and priority filters and sort by manual order to reorder
+          cards.
+        </p>
+      )}
       <div aria-busy={pending} className="board">
         {columns.map((column) => {
           const columnTasks = visibleTasks.filter(
@@ -228,138 +218,32 @@ export const ProjectBoard = ({
                   moveTask(column.id);
                 }}
               >
-                {columnTasks.map((task) => {
-                  const canEdit =
-                    isAdmin ||
-                    task.createdById === currentUserId ||
-                    task.assigneeIds.includes(currentUserId ?? "");
-                  return (
-                    <article
-                      aria-labelledby={`task-${task.id}-title`}
-                      className={`kcard${task.status === "done" ? " done" : ""}`}
-                      draggable={canEdit && !pending}
-                      key={task.id}
-                      onDragEnd={() => {
-                        draggedTaskId.current = null;
-                      }}
-                      onDragStart={() => {
-                        draggedTaskId.current = task.id;
-                      }}
-                    >
-                      {task.labelIds.length > 0 ? (
-                        <div className="labels">
-                          {task.labelIds.flatMap((labelId) => {
-                            const label = labelsById.get(labelId);
-                            return label ? (
-                              <span
-                                className="lbl"
-                                key={label.id}
-                                style={
-                                  { "--c": label.color } as React.CSSProperties
-                                }
-                              >
-                                <span aria-hidden="true" className="lbl-dot" />
-                                {label.name}
-                              </span>
-                            ) : (
-                              []
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                      <div className="top">
-                        {task.status === "done" ? (
-                          <span className="done-ic">
-                            <CheckCircle aria-hidden="true" size={15} />
-                            <span className="sr-only">Completed</span>
-                          </span>
-                        ) : null}
-                        <span className="key">
-                          {projectKey}-{task.projectTaskNumber}
-                        </span>
-                        <h3 className="title" id={`task-${task.id}-title`}>
-                          {task.title}
-                        </h3>
-                      </div>
-                      {task.subtaskCount > 0 ? (
-                        <div className="subp">
-                          <ListChecks aria-hidden="true" size={13} />
-                          <span>
-                            {task.completedSubtaskCount}/{task.subtaskCount}
-                          </span>
-                          <progress
-                            aria-label={`${task.completedSubtaskCount} of ${task.subtaskCount} subtasks complete`}
-                            className="board-subtask-progress"
-                            max={task.subtaskCount}
-                            value={task.completedSubtaskCount}
-                          />
-                        </div>
-                      ) : null}
-                      <div className="meta">
-                        <span className="m">{task.priority}</span>
-                        {task.dueDate ? (
-                          <span className="m">{task.dueDate}</span>
-                        ) : null}
-                        {canEdit ? (
-                          <TaskStatusSelect
-                            status={task.status}
-                            taskId={task.id}
-                            version={task.version}
-                          />
-                        ) : null}
-                        {task.recurrence ? (
-                          <span className="m">
-                            <Repeat aria-hidden="true" size={13} />
-                            <span className="sr-only">Recurring task</span>
-                          </span>
-                        ) : null}
-                        {task.assignees.length > 0 ? (
-                          <AvatarGroup className="avs">
-                            {task.assignees.slice(0, 3).map((assignee) => {
-                              const initials = assignee.name
-                                .split(" ")
-                                .filter(Boolean)
-                                .slice(0, 2)
-                                .map((part) => part[0]?.toUpperCase() ?? "")
-                                .join("");
-                              return (
-                                <Avatar
-                                  className="av sm"
-                                  key={assignee.id}
-                                  size="sm"
-                                >
-                                  <AvatarFallback className="av-fallback">
-                                    {initials}
-                                    <span className="sr-only">
-                                      {assignee.name}
-                                    </span>
-                                  </AvatarFallback>
-                                </Avatar>
-                              );
-                            })}
-                            {task.assignees.length > 3 ? (
-                              <AvatarGroupCount className="av sm more">
-                                <span aria-hidden="true">
-                                  +{task.assignees.length - 3}
-                                </span>
-                                <span className="sr-only">
-                                  {task.assignees.length - 3} more assignees
-                                </span>
-                              </AvatarGroupCount>
-                            ) : null}
-                          </AvatarGroup>
-                        ) : null}
-                      </div>
-                      <TaskManageControls
-                        canEdit={canEdit}
-                        currentUserId={currentUserId}
-                        employees={employees}
-                        isAdmin={isAdmin}
-                        task={task}
-                      />
-                    </article>
-                  );
-                })}
+                {columnTasks.map((task) => (
+                  <ProjectBoardCard
+                    canEdit={
+                      isAdmin ||
+                      task.createdById === currentUserId ||
+                      task.assigneeIds.includes(currentUserId ?? "")
+                    }
+                    canReorder={canReorder}
+                    column={column}
+                    currentUserId={currentUserId}
+                    employees={employees}
+                    isAdmin={isAdmin}
+                    key={task.id}
+                    labelsById={labelsById}
+                    onDragCancel={() => {
+                      draggedTaskId.current = null;
+                    }}
+                    onDragStart={(taskId) => {
+                      draggedTaskId.current = taskId;
+                    }}
+                    onMove={handleMove}
+                    projectKey={projectKey}
+                    reorderPending={reorder.pending}
+                    task={task}
+                  />
+                ))}
               </div>
             </section>
           );
