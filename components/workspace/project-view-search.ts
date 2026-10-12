@@ -74,16 +74,21 @@ export const normalizeProjectViewSearch = (
   status: pick(PROJECT_VIEW_STATUSES, raw.status) ?? "all",
 });
 
+// Raw form read from the URL, with defaults filled in but values not validated.
+export const readProjectViewSearchRaw = (
+  params: URLSearchParams
+): ProjectViewSearch => ({
+  group: params.get("group") ?? defaultProjectViewSearch.group,
+  priority: params.get("priority") ?? defaultProjectViewSearch.priority,
+  q: params.get("q") ?? defaultProjectViewSearch.q,
+  sort: params.get("sort") ?? defaultProjectViewSearch.sort,
+  status: params.get("status") ?? defaultProjectViewSearch.status,
+});
+
 export const readProjectViewSearch = (
   params: URLSearchParams
 ): NormalizedProjectViewSearch =>
-  normalizeProjectViewSearch({
-    group: params.get("group") ?? defaultProjectViewSearch.group,
-    priority: params.get("priority") ?? defaultProjectViewSearch.priority,
-    q: params.get("q") ?? defaultProjectViewSearch.q,
-    sort: params.get("sort") ?? defaultProjectViewSearch.sort,
-    status: params.get("status") ?? defaultProjectViewSearch.status,
-  });
+  normalizeProjectViewSearch(readProjectViewSearchRaw(params));
 
 // Defaults are omitted from the URL so that a plain project link stays clean.
 export const writeProjectViewSearch = (
@@ -150,3 +155,13 @@ export const projectViewHref = (
   );
   return `/projects/${projectId}?${params.toString()}`;
 };
+
+export const isSameProjectViewSearch = (
+  first: ProjectViewSearch,
+  second: ProjectViewSearch
+): boolean =>
+  first.group === second.group &&
+  first.priority === second.priority &&
+  first.q === second.q &&
+  first.sort === second.sort &&
+  first.status === second.status;

@@ -32,6 +32,7 @@ import { ProjectSavedViews } from "@/components/workspace/project-saved-views";
 import { ProjectTaskViews } from "@/components/workspace/project-task-views";
 import { ProjectViewTabs } from "@/components/workspace/project-view-tabs";
 import { TaskCreateForm } from "@/components/workspace/task-create-form";
+import { ProjectViewStoreProvider } from "@/components/workspace/view-store/project-view-store-provider";
 import {
   currentUtcMonthRange,
   currentUtcWeekRange,
@@ -591,71 +592,75 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
     employees.map((employee) => [employee.id, employee] as const)
   );
   return (
-    <div className="page flush">
-      <div className="proj-h">
-        <div className="row">
-          <ProjectIcon color={project.color} icon={project.icon} />
-          <span className="faint">Projects</span>
-          <span className="sep">/</span>
-          <h1>{project.name}</h1>
-          <FavoriteToggle
-            id={project.id}
-            initialFavorite={favoriteProjectIds.has(project.id)}
-            kind="project"
-          />
-        </div>
-        <p>{project.description || "Project workspace"}</p>
-        <div className="row project-meta">
-          <span className={`pstatus ${project.status}`}>{project.status}</span>
-          <span className="muted">
-            {project.startDate ?? "No start date"} —{" "}
-            {project.dueDate ?? "No due date"}
-          </span>
-          {project.memberIds.length > 0 ? (
-            <ProjectMemberAvatars
-              memberIds={project.memberIds}
-              membersById={membersById}
+    <ProjectViewStoreProvider>
+      <div className="page flush">
+        <div className="proj-h">
+          <div className="row">
+            <ProjectIcon color={project.color} icon={project.icon} />
+            <span className="faint">Projects</span>
+            <span className="sep">/</span>
+            <h1>{project.name}</h1>
+            <FavoriteToggle
+              id={project.id}
+              initialFavorite={favoriteProjectIds.has(project.id)}
+              kind="project"
             />
-          ) : null}
-          {isAdmin ? (
-            <ProjectAdminControls
-              employees={employeeResult.ok ? employeeResult.data : []}
-              project={project}
-              teams={teamResult.ok ? teamResult.data : []}
-            />
-          ) : null}
+          </div>
+          <p>{project.description || "Project workspace"}</p>
+          <div className="row project-meta">
+            <span className={`pstatus ${project.status}`}>
+              {project.status}
+            </span>
+            <span className="muted">
+              {project.startDate ?? "No start date"} —{" "}
+              {project.dueDate ?? "No due date"}
+            </span>
+            {project.memberIds.length > 0 ? (
+              <ProjectMemberAvatars
+                memberIds={project.memberIds}
+                membersById={membersById}
+              />
+            ) : null}
+            {isAdmin ? (
+              <ProjectAdminControls
+                employees={employeeResult.ok ? employeeResult.data : []}
+                project={project}
+                teams={teamResult.ok ? teamResult.data : []}
+              />
+            ) : null}
+          </div>
+          <ProjectViewTabs projectId={project.id} selected={view} />
         </div>
-        <ProjectViewTabs projectId={project.id} selected={view} />
+        <ProjectSavedViews
+          isAdmin={isAdmin}
+          projectId={project.id}
+          selectedId={savedViewState.selected?.id ?? null}
+          userId={currentUserId}
+          views={savedViewState.views}
+        />
+        <ProjectViewContent
+          activityResult={activityResult}
+          calendarEvents={calendarEvents}
+          calendarMode={calendarMode}
+          calendarRange={calendarRange}
+          currentUserId={currentUserId}
+          editableTaskIds={editableTaskIds}
+          employees={employees}
+          fileResult={fileResult}
+          isAdmin={isAdmin}
+          labelResult={labelResult}
+          milestonePanel={milestonePanel}
+          monthOffset={monthOffset}
+          project={project}
+          taskResult={taskResult}
+          tasks={tasks}
+          teams={teamResult.ok ? teamResult.data : []}
+          timelineRange={timelineRange}
+          today={today}
+          view={view}
+        />
       </div>
-      <ProjectSavedViews
-        isAdmin={isAdmin}
-        projectId={project.id}
-        selectedId={savedViewState.selected?.id ?? null}
-        userId={currentUserId}
-        views={savedViewState.views}
-      />
-      <ProjectViewContent
-        activityResult={activityResult}
-        calendarEvents={calendarEvents}
-        calendarMode={calendarMode}
-        calendarRange={calendarRange}
-        currentUserId={currentUserId}
-        editableTaskIds={editableTaskIds}
-        employees={employees}
-        fileResult={fileResult}
-        isAdmin={isAdmin}
-        labelResult={labelResult}
-        milestonePanel={milestonePanel}
-        monthOffset={monthOffset}
-        project={project}
-        taskResult={taskResult}
-        tasks={tasks}
-        teams={teamResult.ok ? teamResult.data : []}
-        timelineRange={timelineRange}
-        today={today}
-        view={view}
-      />
-    </div>
+    </ProjectViewStoreProvider>
   );
 };
 

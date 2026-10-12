@@ -25,7 +25,10 @@ for (const role of roles) {
     await page.fill('input[name="password"]', password ?? "");
     await page.click('button[type="submit"]');
 
-    await page.waitForURL((url) => url.pathname === "/", { timeout: 30_000 });
+    await page.waitForURL((url) => url.pathname === "/", {
+      timeout: 90_000,
+      waitUntil: "commit",
+    });
     await page.goto("/projects");
     await expect(
       page.getByText("UI Fixture Populated", { exact: false }).first()

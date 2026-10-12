@@ -1,47 +1,26 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSelector } from "@tanstack/react-store";
 import { useCallback, useMemo } from "react";
 
-import {
-  readProjectViewSearch,
-  writeProjectViewSearch,
-} from "./project-view-search";
+import { normalizeProjectViewSearch } from "./project-view-search";
 import type {
   NormalizedProjectViewSearch,
   ProjectViewSearch,
 } from "./project-view-search";
+import { useProjectViewStore } from "./view-store/project-view-store-provider";
 
-const readRawSearch = (params: URLSearchParams): ProjectViewSearch => {
-  const normalized = readProjectViewSearch(params);
-  return {
-    group: normalized.group,
-    priority: normalized.priority,
-    q: normalized.q,
-    sort: normalized.sort,
-    status: normalized.status,
-  };
-};
-
-// Filters live in the URL so refresh and back/forward keep them. replaceState
-// updates useSearchParams without a server round trip for each keystroke.
 export const useProjectViewSearch = () => {
-  const searchParams = useSearchParams();
+  const projectViewStore = useProjectViewStore();
+  const rawSearch = useSelector(projectViewStore, (state) => state.search);
   const search: NormalizedProjectViewSearch = useMemo(
-    () => readProjectViewSearch(new URLSearchParams(searchParams.toString())),
-    [searchParams]
+    () => normalizeProjectViewSearch(rawSearch),
+    [rawSearch]
   );
-
-  const update = useCallback((patch: Partial<ProjectViewSearch>) => {
-    const current = new URLSearchParams(window.location.search);
-    const merged = { ...readRawSearch(current), ...patch };
-    const next = writeProjectViewSearch(current, merged).toString();
-    window.history.replaceState(
-      window.history.state,
-      "",
-      `${window.location.pathname}${next ? `?${next}` : ""}`
-    );
-  }, []);
-
+  const update = useCallback(
+    (patch: Partial<ProjectViewSearch>) =>
+      projectViewStore.actions.setSearch(patch),
+    [projectViewStore]
+  );
   return { search, update };
 };

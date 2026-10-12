@@ -160,3 +160,13 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Fixtures: `bun run seed:ui-fixtures` seeds an empty project (`UIE`) and a populated project (`UIP`) with 60 tasks, multiple assignees, varied priorities, and a long title. Archived projects and tasks, milestones, recurrence, notifications and files are not yet seeded.
 - Playwright: `bun run test:e2e` signs in as both roles and reaches the seeded projects. Both pass.
 - Lint and typecheck pass; `bun run test:ui` passes (6 tests).
+
+## Phase 1 evidence (2026-10-12)
+
+- State: client UI state lives in a per-page TanStack Store (`@tanstack/react-store` 0.11), created with `useCreateStore` inside `ProjectViewStoreProvider` and shared through `createStoreContext`. Nothing is created at module level, so server requests never share state. Server data stays in Server Components and Server Actions.
+- The view store holds the raw search (query, status, priority, sort, grouping). The store-to-URL and URL-to-store sync uses `window.history.replaceState`, which Next's docs say integrates with `useSearchParams`, so typing does not trigger a server round trip.
+- The board, list/table and saved-view controls read and write the store through `useProjectViewSearch`. Saving a view, opening a saved view and updating a view keep working.
+- Unit tests (`tests/ui/project-view-store.test.ts`, `tests/ui/project-view-search.test.ts`): 9 pass.
+- Browser (`tests/e2e/project-view-state.spec.ts`): typing a board search writes `q` to the URL, and a reload restores the value. Passes with the smoke tests.
+- Production build passes with no Suspense warning.
+- Deferred by plan: the drawer, undo, upload and schedule-drag stores ship with Phases 3, 5 and 4. Selection moves into the store in Phase 2, with the column registry. The mutation helper (one idempotency key per attempt, CONFLICT recovery) lands with the first mutation batch that needs it.
