@@ -35,6 +35,7 @@ const ChangePasswordContent = async () => {
       </a>
       <main
         className="auth-backdrop flex min-h-svh items-center justify-center px-4 py-2 sm:py-4"
+        data-auth-page="change-password"
         id="password-main"
         tabIndex={-1}
       >

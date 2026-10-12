@@ -31,6 +31,7 @@ const LoginContent = async () => {
       </a>
       <main
         className="auth-backdrop flex min-h-svh items-center justify-center p-4 md:p-6"
+        data-auth-page="login"
         id="login-main"
         tabIndex={-1}
       >

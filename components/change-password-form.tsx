@@ -2,41 +2,14 @@
 
 /* eslint-disable shadcn/no-restyle */
 
-import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { changeOwnPasswordAction } from "@/app/actions/password";
+import { PasswordInput } from "@/components/password-input";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-
-const PasswordVisibilityButton = ({
-  label,
-  onToggle,
-  visible,
-}: {
-  readonly label: string;
-  readonly onToggle: () => void;
-  readonly visible: boolean;
-}) => (
-  <Button
-    aria-label={`${visible ? "Hide" : "Show"} ${label}`}
-    aria-pressed={visible}
-    className="absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-    onClick={onToggle}
-    size="icon"
-    type="button"
-    variant="ghost"
-  >
-    {visible ? (
-      <EyeSlash aria-hidden="true" size={18} />
-    ) : (
-      <Eye aria-hidden="true" size={18} />
-    )}
-  </Button>
-);
 
 const ChangePasswordForm = () => {
   const router = useRouter();
@@ -47,9 +20,6 @@ const ChangePasswordForm = () => {
   const [errorField, setErrorField] = useState<
     "currentPassword" | "confirmPassword" | null
   >(null);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -99,8 +69,8 @@ const ChangePasswordForm = () => {
           <label className="text-sm font-medium" htmlFor="current-password">
             Temporary password
           </label>
-          <div className="relative">
-            <Input
+          <div>
+            <PasswordInput
               aria-describedby={
                 errorField === "currentPassword"
                   ? "change-password-error"
@@ -113,13 +83,7 @@ const ChangePasswordForm = () => {
               name="currentPassword"
               ref={currentPasswordRef}
               required
-              trailingAction
-              type={showCurrentPassword ? "text" : "password"}
-            />
-            <PasswordVisibilityButton
-              label="temporary password"
-              onToggle={() => setShowCurrentPassword((visible) => !visible)}
-              visible={showCurrentPassword}
+              visibilityLabel="temporary password"
             />
           </div>
         </div>
@@ -127,21 +91,15 @@ const ChangePasswordForm = () => {
           <label className="text-sm font-medium" htmlFor="new-password">
             New password
           </label>
-          <div className="relative">
-            <Input
+          <div>
+            <PasswordInput
               autoComplete="new-password"
               id="new-password"
               maxLength={128}
               minLength={12}
               name="newPassword"
               required
-              trailingAction
-              type={showNewPassword ? "text" : "password"}
-            />
-            <PasswordVisibilityButton
-              label="new password"
-              onToggle={() => setShowNewPassword((visible) => !visible)}
-              visible={showNewPassword}
+              visibilityLabel="new password"
             />
           </div>
           <p className="text-xs leading-4 text-muted-foreground">
@@ -152,8 +110,8 @@ const ChangePasswordForm = () => {
           <label className="text-sm font-medium" htmlFor="confirm-password">
             Confirm new password
           </label>
-          <div className="relative">
-            <Input
+          <div>
+            <PasswordInput
               aria-describedby={
                 errorField === "confirmPassword"
                   ? "change-password-error"
@@ -167,13 +125,7 @@ const ChangePasswordForm = () => {
               name="confirmPassword"
               ref={confirmPasswordRef}
               required
-              trailingAction
-              type={showConfirmPassword ? "text" : "password"}
-            />
-            <PasswordVisibilityButton
-              label="confirmation password"
-              onToggle={() => setShowConfirmPassword((visible) => !visible)}
-              visible={showConfirmPassword}
+              visibilityLabel="confirmation password"
             />
           </div>
         </div>

@@ -7,6 +7,7 @@ import type { ComponentProps, FormEvent } from "react";
 
 import { AuthBrand } from "@/components/auth-brand";
 import { AuthVisualPanel } from "@/components/auth-visual-panel";
+import { PasswordInput } from "@/components/password-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -93,6 +94,7 @@ const LoginForm = ({ className, ...props }: ComponentProps<"div">) => {
                   id="login-email"
                   maxLength={320}
                   name="email"
+                  onChange={() => setError("")}
                   placeholder="you@company.com"
                   required
                   spellCheck={false}
@@ -101,17 +103,18 @@ const LoginForm = ({ className, ...props }: ComponentProps<"div">) => {
               </Field>
               <Field>
                 <FieldLabel htmlFor="login-password">Password</FieldLabel>
-                <Input
+                <PasswordInput
                   aria-describedby={error ? "login-error" : undefined}
                   aria-invalid={error ? true : undefined}
                   autoComplete="current-password"
                   id="login-password"
                   maxLength={128}
                   name="password"
+                  onChange={() => setError("")}
                   placeholder="Enter your password"
                   ref={passwordRef}
                   required
-                  type="password"
+                  visibilityLabel="password"
                 />
               </Field>
               <FieldError id="login-error">{error}</FieldError>

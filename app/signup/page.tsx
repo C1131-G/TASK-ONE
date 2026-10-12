@@ -31,6 +31,7 @@ const SignupContent = async () => {
       </a>
       <main
         className="auth-backdrop flex min-h-svh flex-col items-center justify-center p-4 md:p-8"
+        data-auth-page="signup"
         id="signup-main"
         tabIndex={-1}
       >
