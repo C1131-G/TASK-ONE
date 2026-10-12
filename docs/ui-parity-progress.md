@@ -150,3 +150,13 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Reference-source interaction inventory on 2026-10-12 covered Home, Projects and its five views, Tasks, Calendar, Timeline, Files, Inbox, Notifications, Favorites, Search, Activity, Members, Teams, Settings, and Archive. No empty click/submit handlers or placeholder links were found in the authored app/workspace TSX; sign-in is the remaining prerequisite for verifying protected screens and mutations visually.
 
 - 2026-10-12 (cloud session): Docker PostgreSQL 18 is running and `metsys_ui` is migrated and verified (11 of 11 migrations). Docker Hub denies the MinIO image and the proxy blocks dl.min.io, so storage is an S3-compatible stand-in (`s3rver` on port 9000) with bucket `metsys-ui-private`; it is not MinIO, and browser CORS is not verified against it. The UI admin was bootstrapped; the employee account is not created because the user service requires the admin to finish the forced password change first, and that browser step is still pending. Task dates now clear with an explicit `null` start date, and create/update reject a start date after the due date (`task-start-date.test.ts`). The full isolated backend suite (70 files) passes, `bun run check` passes, and typecheck has the same 27 pre-existing errors as clean `main` (generated Next types). Authenticated browser coverage, Playwright, saved views, table columns, scheduling UI, the drawer, and uploads are not started.
+
+## Phase 0 evidence (2026-10-12)
+
+- Tooling: `package.json` allowlists the Intent skill sources `@prisma/orm-postgres`, `prisma`, `ultracite` and `dotenv`. `bunx intent install` wrote `AGENTS.md`, which `CLAUDE.md` imports. `AGENTS.md` is gitignored by the repo, so it stays local and fresh clones still need `intent install`.
+- Typecheck: 0 errors after `next typegen` generated the route types (was 27).
+- Environment: Postgres 18 with the `metsys_ui` database (migrations verified), an S3-compatible stand-in on port 9000 for `metsys-ui-private`, and the dev server on port 3000. MinIO is still not available here.
+- Accounts: the UI admin (`EMP000001`) and the UI employee (`EMP000002`) each completed the forced password change through the real login and change-password pages in headless Chromium. Passwords are stored outside the repo.
+- Fixtures: `bun run seed:ui-fixtures` seeds an empty project (`UIE`) and a populated project (`UIP`) with 60 tasks, multiple assignees, varied priorities, and a long title. Archived projects and tasks, milestones, recurrence, notifications and files are not yet seeded.
+- Playwright: `bun run test:e2e` signs in as both roles and reaches the seeded projects. Both pass.
+- Lint and typecheck pass; `bun run test:ui` passes (6 tests).

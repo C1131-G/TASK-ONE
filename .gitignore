@@ -41,3 +41,7 @@ next-env.d.ts
 
 # Local agent instructions
 AGENTS.md
+
+# Playwright output
+/test-results/
+/playwright-report/
