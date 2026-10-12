@@ -1,40 +1,28 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
-import Link from "next/link";
+"use client";
 
+import { useState } from "react";
+
+import { ProjectTaskListViewContent } from "@/components/workspace/project-task-list-view-content";
+import type { ProjectTaskViewItem } from "@/components/workspace/project-task-view-types";
 import { TaskCalendarGrid } from "@/components/workspace/task-calendar-grid";
-import { TaskManageControls } from "@/components/workspace/task-manage-controls";
-import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import { TaskCreateForm } from "@/components/workspace/task-create-form";
 import { WorkspaceTimeline } from "@/components/workspace/workspace-timeline";
 import type { CalendarEventSummary } from "@/src/server/calendar/calendar-contracts";
+import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
-import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
-
-type ProjectTaskViewItem = Pick<
-  ProjectTaskListItem,
-  | "assigneeIds"
-  | "createdById"
-  | "dependencyIds"
-  | "description"
-  | "dueDate"
-  | "estimate"
-  | "id"
-  | "labelIds"
-  | "priority"
-  | "projectId"
-  | "projectTaskNumber"
-  | "recurrence"
-  | "startDate"
-  | "status"
-  | "title"
-  | "version"
->;
+import type { LabelSummary } from "@/src/server/tasks/label-management";
 
 const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en", {
   month: "long",
   timeZone: "UTC",
   year: "numeric",
+});
+const WEEK_LABEL_FORMATTER = new Intl.DateTimeFormat("en", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
 });
 
 export const ProjectTaskViews = ({
@@ -45,8 +33,10 @@ export const ProjectTaskViews = ({
   currentUserId,
   isAdmin,
   employees,
+  labels,
   monthOffset,
   calendarRange,
+  calendarMode,
   calendarEvents,
   timelineRange,
 }: {
@@ -56,12 +46,28 @@ export const ProjectTaskViews = ({
   readonly editableTaskIds: ReadonlySet<string>;
   readonly currentUserId: string | null;
   readonly isAdmin: boolean;
-  readonly employees: readonly { readonly id: string; readonly name: string }[];
+  readonly employees: readonly EmployeeDirectoryEntry[];
+  readonly labels: readonly LabelSummary[];
   readonly monthOffset: number;
-  readonly calendarRange: { readonly from: string } | null;
+  readonly calendarRange: { readonly from: string; readonly to: string } | null;
+  readonly calendarMode: "month" | "week";
   readonly calendarEvents: readonly CalendarEventSummary[] | null;
   readonly timelineRange: { readonly from: string; readonly to: string } | null;
 }) => {
+  const [calendarTaskOpen, setCalendarTaskOpen] = useState(false);
+  const [calendarTaskDueDate, setCalendarTaskDueDate] = useState("");
+
+  const openTaskForDate = (dueDate: string) => {
+    setCalendarTaskDueDate(dueDate);
+    setCalendarTaskOpen(true);
+  };
+  const updateCalendarTaskOpen = (open: boolean) => {
+    setCalendarTaskOpen(open);
+    if (!open) {
+      setCalendarTaskDueDate("");
+    }
+  };
+
   if (view === "calendar") {
     if (!calendarRange || !calendarEvents) {
       return (
@@ -70,34 +76,65 @@ export const ProjectTaskViews = ({
         </section>
       );
     }
+    const calendarLabel =
+      calendarMode === "week"
+        ? `${WEEK_LABEL_FORMATTER.format(new Date(`${calendarRange.from}T12:00:00Z`))} – ${WEEK_LABEL_FORMATTER.format(new Date(`${calendarRange.to}T12:00:00Z`))}`
+        : MONTH_LABEL_FORMATTER.format(
+            new Date(`${calendarRange.from}T12:00:00Z`)
+          );
     return (
-      <TaskCalendarGrid
-        events={calendarEvents}
-        hrefPrefix={`/projects/${project.id}?view=calendar&monthOffset=`}
-        monthLabel={MONTH_LABEL_FORMATTER.format(
-          new Date(`${calendarRange.from}T12:00:00Z`)
-        )}
-        monthOffset={monthOffset}
-        tasks={tasks.map((task) => ({
-          dueDate: task.dueDate,
-          id: task.id,
-          priority: task.priority,
-          projectId: project.id,
-          projectName: project.name,
-          status: task.status,
-          title: task.title,
-        }))}
-      />
+      <>
+        <TaskCalendarGrid
+          events={calendarEvents}
+          employees={employees}
+          hrefPrefix={`/projects/${project.id}?view=calendar&monthOffset=`}
+          monthLabel={calendarLabel}
+          monthOffset={monthOffset}
+          onAddTask={openTaskForDate}
+          projects={[project]}
+          currentUserId={currentUserId}
+          isAdmin={isAdmin}
+          viewMode={calendarMode}
+          tasks={tasks.map((task) => ({
+            assigneeIds: task.assigneeIds,
+            createdById: task.createdById,
+            dependencyIds: task.dependencyIds,
+            dueDate: task.dueDate,
+            id: task.id,
+            labelIds: task.labelIds,
+            position: task.position,
+            priority: task.priority,
+            projectId: project.id,
+            projectName: project.name,
+            recurrence: task.recurrence,
+            status: task.status,
+            title: task.title,
+            version: task.version,
+          }))}
+        />
+        <TaskCreateForm
+          defaultDueDate={calendarTaskDueDate}
+          key={calendarTaskDueDate}
+          onOpenChange={updateCalendarTaskOpen}
+          open={calendarTaskOpen}
+          projectId={project.id}
+          trigger={null}
+        />
+      </>
     );
   }
 
   if (view === "timeline" && timelineRange) {
     return (
       <WorkspaceTimeline
+        employees={employees}
         from={timelineRange.from}
         tasks={tasks.map((task) => ({
+          assigneeIds: task.assigneeIds,
           dueDate: task.dueDate,
           id: task.id,
+          position: task.position,
+          priority: task.priority,
           projectId: project.id,
           projectName: project.name,
           startDate: task.startDate,
@@ -109,70 +146,20 @@ export const ProjectTaskViews = ({
     );
   }
 
-  if (view !== "list" && view !== "table") {
-    return null;
+  if (view === "list" || view === "table") {
+    return (
+      <ProjectTaskListViewContent
+        currentUserId={currentUserId}
+        editableTaskIds={editableTaskIds}
+        employees={employees}
+        isAdmin={isAdmin}
+        labels={labels}
+        project={project}
+        tasks={tasks}
+        view={view}
+      />
+    );
   }
 
-  return (
-    <section className="panel">
-      <div className="panel-h">
-        <h2>{view === "list" ? "List" : "Table"}</h2>
-        <Link
-          className="btn btn-sm btn-primary"
-          href={`/projects/${project.id}?view=board` as Route}
-        >
-          New task
-        </Link>
-      </div>
-      <div className="list-wrap">
-        <div className={`tlist project-task-${view}`}>
-          <div className="thead">
-            <div>Task</div>
-            <div>Status</div>
-            <div>Priority</div>
-            <div>Due date</div>
-            <div>Actions</div>
-          </div>
-          {tasks.map((task) => (
-            <div className="trow" key={task.id}>
-              <div className="ttl">
-                <span className="mono faint">
-                  {project.key}-{task.projectTaskNumber}
-                </span>
-                <span className="trunc">{task.title}</span>
-              </div>
-              <div className="c-meta">
-                {editableTaskIds.has(task.id) ? (
-                  <TaskStatusSelect
-                    status={task.status}
-                    taskId={task.id}
-                    version={task.version}
-                  />
-                ) : (
-                  <span className={`pstatus ${task.status}`}>
-                    {task.status}
-                  </span>
-                )}
-              </div>
-              <div className="c-meta">{task.priority}</div>
-              <div className="c-meta num">{task.dueDate ?? "—"}</div>
-              <div className="c-meta">
-                {editableTaskIds.has(task.id) ? (
-                  <TaskManageControls
-                    currentUserId={currentUserId}
-                    employees={employees}
-                    isAdmin={isAdmin}
-                    task={task}
-                  />
-                ) : null}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {tasks.length ? null : (
-        <div className="panel-b muted">No tasks in this project yet.</div>
-      )}
-    </section>
-  );
+  return null;
 };

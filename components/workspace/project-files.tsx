@@ -1,50 +1,36 @@
 /* eslint-disable shadcn/no-unknown-classes */
-/* eslint-disable shadcn/no-restyle */
-
-/* eslint-disable jsx-a11y/label-has-associated-control */
 
 "use client";
 
+import { UploadSimple } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import type { FormEvent } from "react";
 
 import {
   duplicateFileAction,
   finalizeUploadAction,
   getFileDownloadUrlAction,
   getFilePreviewUrlAction,
+  listProjectFilesAction,
+  listTaskFilesAction,
   removeFileAction,
   renameFileAction,
   requestProjectUploadAction,
   requestTaskUploadAction,
-  listProjectFilesAction,
-  listTaskFilesAction,
   undoFileRemovalAction,
 } from "@/app/actions/uploads";
+import {
+  ProjectFileCard,
+  ProjectFileRenameDialog,
+  ProjectFilesToolbar,
+} from "@/components/workspace/project-file-parts";
+import type {
+  FileLayout,
+  FileSort,
+  ProjectFile,
+} from "@/components/workspace/project-file-types";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
-import { WorkspaceInput } from "@/components/workspace/workspace-controls";
-
-interface ProjectFile {
-  readonly id: string;
-  readonly projectId: string;
-  readonly taskId: string | null;
-  readonly originalName: string;
-  readonly contentType: string;
-  readonly sizeBytes: number;
-  readonly uploadedById: string;
-  readonly createdAt: string;
-  readonly copyState: "pending" | "ready" | "failed";
-}
-
-const formatBytes = (size: number) => {
-  if (size < 1024) {
-    return `${size} B`;
-  }
-  if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
-  }
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-};
 
 const uploadOne = async (
   projectId: string | null,
@@ -80,7 +66,7 @@ const uploadOne = async (
   return result.ok ? null : result.error.message;
 };
 
-export const ProjectFiles = ({
+const ProjectFiles = ({
   projectId,
   taskId,
   initialFiles,
@@ -99,8 +85,13 @@ export const ProjectFiles = ({
   const [pending, startTransition] = useTransition();
   const [files, setFiles] = useState(initialFiles);
   const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [sort, setSort] = useState<FileSort>("newest");
+  const [layout, setLayout] = useState<FileLayout>("grid");
   const [error, setError] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
+  const [renamingFile, setRenamingFile] = useState<ProjectFile | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const reloadFiles = async () => {
     const result = taskId
@@ -124,12 +115,11 @@ export const ProjectFiles = ({
           )
         );
         const firstError = errors.find((item): item is string => item !== null);
-        if (firstError) {
-          setError(firstError);
-          return;
-        }
         await reloadFiles();
         router.refresh();
+        if (firstError) {
+          setError(firstError);
+        }
       } catch {
         setError(
           "Upload failed. Check the storage configuration and try again."
@@ -141,9 +131,9 @@ export const ProjectFiles = ({
   const actOnFile = (
     fileId: string,
     action: "download" | "preview" | "duplicate" | "remove"
-  ) => {
-    setError(null);
+  ) =>
     startTransition(async () => {
+      setError(null);
       if (action === "download" || action === "preview") {
         const result =
           action === "download"
@@ -180,13 +170,29 @@ export const ProjectFiles = ({
       setUndo(result.data.undoId);
       setFiles((current) => current.filter((file) => file.id !== fileId));
     });
+
+  const openRename = (file: ProjectFile) => {
+    setError(null);
+    setRenamingFile(file);
+    setRenameValue(file.originalName);
   };
 
-  const rename = (file: ProjectFile, name: string) =>
+  const saveRename = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!renamingFile) {
+      return;
+    }
+    const currentFile = renamingFile;
+    const newName = renameValue.trim();
+    if (!newName || newName === currentFile.originalName) {
+      setRenamingFile(null);
+      return;
+    }
     startTransition(async () => {
+      setError(null);
       const result = await renameFileAction({
-        fileId: file.id,
-        fileName: name.trim(),
+        fileId: currentFile.id,
+        fileName: newName,
         idempotencyKey: crypto.randomUUID(),
       });
       if (!result.ok) {
@@ -194,9 +200,11 @@ export const ProjectFiles = ({
         return;
       }
       setFiles((current) =>
-        current.map((item) => (item.id === file.id ? result.data : item))
+        current.map((file) => (file.id === currentFile.id ? result.data : file))
       );
+      setRenamingFile(null);
     });
+  };
 
   const undoRemoval = () => {
     if (!undo) {
@@ -217,139 +225,122 @@ export const ProjectFiles = ({
     });
   };
 
-  const filteredFiles = files.filter((file) =>
-    file.originalName.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-  );
+  const fileTypes = [
+    ...new Set(files.map(({ contentType }) => contentType)),
+  ].toSorted((left, right) => left.localeCompare(right));
+  const filteredFiles = files
+    .filter((file) => {
+      const matchesQuery = `${file.originalName} ${file.contentType}`
+        .toLocaleLowerCase()
+        .includes(query.toLocaleLowerCase());
+      const matchesType =
+        typeFilter === "all" || file.contentType === typeFilter;
+      return matchesQuery && matchesType;
+    })
+    .toSorted((left, right) => {
+      if (sort === "name") {
+        return left.originalName.localeCompare(right.originalName);
+      }
+      if (sort === "size") {
+        return right.sizeBytes - left.sizeBytes;
+      }
+      const dateOrder = left.createdAt.localeCompare(right.createdAt);
+      return sort === "newest" ? -dateOrder : dateOrder;
+    });
 
   return (
     <section aria-busy={pending} className="panel project-files">
-      <div className="panel-h row">
-        <label className="inwrap">
-          <span className="sr-only">Search files</span>
-          <WorkspaceInput
-            aria-label="Search project files"
-            className="input search-sm"
-            onChange={(event) => setQuery(event.currentTarget.value)}
-            placeholder="Search files"
-            value={query}
-          />
-        </label>
-        <span className="sp" />
-        {canUpload ? (
-          <label className="btn btn-primary btn-sm">
-            Upload files
-            <WorkspaceInput
-              accept="*/*"
-              className="sr-only"
-              multiple
-              onChange={(event) => {
-                upload(event.currentTarget.files);
-                event.currentTarget.value = "";
-              }}
-              type="file"
-            />
-          </label>
-        ) : null}
-      </div>
-      {error ? (
+      <ProjectFilesToolbar
+        canUpload={canUpload}
+        fileTypes={fileTypes}
+        layout={layout}
+        onFilesSelected={upload}
+        onLayoutChange={setLayout}
+        onQueryChange={setQuery}
+        onSortChange={setSort}
+        onTypeChange={setTypeFilter}
+        query={query}
+        sort={sort}
+        typeFilter={typeFilter}
+      />
+      {canUpload ? (
+        <div
+          aria-label="Drop files to upload. Maximum size is 50 MB per file."
+          className="file-dropzone"
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            upload(event.dataTransfer.files);
+          }}
+        >
+          <UploadSimple aria-hidden="true" size={18} />
+          <span>Drop files here or use Upload — up to 50 MB each</span>
+        </div>
+      ) : null}
+      {error && !renamingFile ? (
         <p className="panel-b error" role="alert">
           {error}
         </p>
       ) : null}
       {undo ? (
-        <div className="panel-b row">
+        <div className="panel-b row file-undo-banner">
           <span>File removed.</span>
           <WorkspaceButton
-            className="btn btn-sm btn-ghost"
             disabled={pending}
             onClick={undoRemoval}
+            size="sm"
             type="button"
+            workspace
           >
             Undo
           </WorkspaceButton>
         </div>
       ) : null}
       {filteredFiles.length ? (
-        <div className="list-wrap">
+        <div data-layout={layout} className="file-results">
           {filteredFiles.map((file) => (
-            <article className="mini file-row" key={file.id}>
-              <span aria-hidden="true" className="ftype">
-                {file.contentType.split("/")[1]?.toUpperCase() ?? "FILE"}
-              </span>
-              <div className="grow">
-                <label className="field">
-                  <span className="sr-only">File name</span>
-                  <WorkspaceInput
-                    aria-label={`Rename ${file.originalName}`}
-                    className="input"
-                    defaultValue={file.originalName}
-                    disabled={pending || !canUpload}
-                    maxLength={255}
-                    onBlur={(event) => {
-                      if (
-                        event.currentTarget.value.trim() !== file.originalName
-                      ) {
-                        rename(file, event.currentTarget.value);
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.currentTarget.blur();
-                      }
-                    }}
-                  />
-                </label>
-                <span className="fm">
-                  {formatBytes(file.sizeBytes)} · {file.createdAt.slice(0, 10)}
-                </span>
-              </div>
-              <span className="muted">{file.copyState}</span>
-              <WorkspaceButton
-                className="ibtn ibtn-sm"
-                disabled={pending}
-                onClick={() => actOnFile(file.id, "preview")}
-                type="button"
-              >
-                Preview
-              </WorkspaceButton>
-              <WorkspaceButton
-                className="ibtn ibtn-sm"
-                disabled={pending}
-                onClick={() => actOnFile(file.id, "download")}
-                type="button"
-              >
-                Download
-              </WorkspaceButton>
-              {canUpload ? (
-                <WorkspaceButton
-                  className="ibtn ibtn-sm"
-                  disabled={pending}
-                  onClick={() => actOnFile(file.id, "duplicate")}
-                  type="button"
-                >
-                  Duplicate
-                </WorkspaceButton>
-              ) : null}
-              {isAdmin || file.uploadedById === currentUserId ? (
-                <WorkspaceButton
-                  className="ibtn ibtn-sm"
-                  disabled={pending}
-                  onClick={() => actOnFile(file.id, "remove")}
-                  type="button"
-                >
-                  Remove
-                </WorkspaceButton>
-              ) : null}
-            </article>
+            <ProjectFileCard
+              canManage={canUpload}
+              currentUserId={currentUserId}
+              file={file}
+              isAdmin={isAdmin}
+              key={file.id}
+              onAction={actOnFile}
+              onRename={openRename}
+              pending={pending}
+            />
           ))}
         </div>
       ) : (
-        <div className="panel-b muted">
-          {query
-            ? "No files match your search."
-            : "No files have been added to this project."}
+        <div className="panel-b file-empty-state">
+          <h3>
+            {query || typeFilter !== "all"
+              ? "No files match these filters"
+              : "No files yet"}
+          </h3>
+          <p className="muted">
+            {query || typeFilter !== "all"
+              ? "Change the search or file type to see more results."
+              : "Files shared with this project will appear here."}
+          </p>
         </div>
       )}
+      <ProjectFileRenameDialog
+        error={renamingFile ? error : null}
+        onNameChange={setRenameValue}
+        onOpenChange={(open) => {
+          setRenamingFile(open ? renamingFile : null);
+          if (open) {
+            setError(null);
+          }
+        }}
+        onSubmit={saveRename}
+        open={renamingFile !== null}
+        pending={pending}
+        value={renameValue}
+      />
     </section>
   );
 };
+
+export { ProjectFiles };

@@ -1,8 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -11,11 +9,14 @@ import { useState, useTransition } from "react";
 import { createCalendarEventAction } from "@/app/actions/calendar";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDateTimePicker } from "@/components/workspace/workspace-date-time-picker";
+import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 
 const CalendarEventForm = () => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   const createEvent = (formData: FormData) => {
     const startValue = String(formData.get("startsAt") ?? "");
@@ -40,23 +41,31 @@ const CalendarEventForm = () => {
         setError(result.error.message);
         return;
       }
+      setOpen(false);
       router.refresh();
     });
   };
 
   return (
-    <details className="panel">
-      <summary className="panel-h">
-        <span className="btn btn-primary btn-sm">New event</span>
-      </summary>
+    <WorkspaceModal
+      description="Schedule a calendar event for your workspace."
+      onOpenChange={setOpen}
+      open={open}
+      title="New event"
+      trigger={
+        <WorkspaceButton className="btn btn-primary btn-sm" type="button">
+          New event
+        </WorkspaceButton>
+      }
+    >
       <form
-        className="panel-b stack"
+        className="stack"
         onSubmit={(event) => {
           event.preventDefault();
           createEvent(new FormData(event.currentTarget));
         }}
       >
-        <label className="field">
+        <label className="field" htmlFor="metsys-calendar-event-form-field-67">
           <span>Event title</span>
           <WorkspaceInput
             autoComplete="off"
@@ -64,38 +73,59 @@ const CalendarEventForm = () => {
             maxLength={160}
             name="title"
             required
+            id="metsys-calendar-event-form-field-67"
           />
         </label>
         <div className="row">
-          <label className="field">
+          <label
+            className="field"
+            htmlFor="metsys-calendar-event-form-field-78"
+          >
             <span>Starts</span>
-            <WorkspaceInput
+            <WorkspaceDateTimePicker
+              ariaLabel="Choose event start date and time"
               className="input"
+              id="metsys-calendar-event-form-field-78"
               name="startsAt"
               required
-              type="datetime-local"
             />
           </label>
-          <label className="field">
+          <label
+            className="field"
+            htmlFor="metsys-calendar-event-form-field-87"
+          >
             <span>Ends</span>
-            <WorkspaceInput
+            <WorkspaceDateTimePicker
+              ariaLabel="Choose event end date and time"
               className="input"
+              id="metsys-calendar-event-form-field-87"
               name="endsAt"
-              type="datetime-local"
             />
           </label>
         </div>
         <div className="row">
-          <label className="field grow">
+          <label
+            className="field grow"
+            htmlFor="metsys-calendar-event-form-field-97"
+          >
             <span>Location</span>
-            <WorkspaceInput className="input" maxLength={160} name="location" />
+            <WorkspaceInput
+              className="input"
+              maxLength={160}
+              name="location"
+              id="metsys-calendar-event-form-field-97"
+            />
           </label>
-          <label className="field grow">
+          <label
+            className="field grow"
+            htmlFor="metsys-calendar-event-form-field-101"
+          >
             <span>Description</span>
             <WorkspaceInput
               className="input"
               maxLength={1000}
               name="description"
+              id="metsys-calendar-event-form-field-101"
             />
           </label>
         </div>
@@ -114,7 +144,7 @@ const CalendarEventForm = () => {
           </WorkspaceButton>
         </div>
       </form>
-    </details>
+    </WorkspaceModal>
   );
 };
 

@@ -3,6 +3,7 @@
 import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { Suspense } from "react";
 
 import { listProjectsAction } from "@/app/actions/projects";
 import { listProjectFilesAction } from "@/app/actions/uploads";
@@ -11,7 +12,7 @@ import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = { title: "Files | Metsys" };
 
-const FilesPage = async () => {
+const FilesContent = async () => {
   await connection();
   const [projects, session] = await Promise.all([
     listProjectsAction({}),
@@ -19,10 +20,8 @@ const FilesPage = async () => {
   ]);
   if (!projects.ok) {
     return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Files could not be loaded. Refresh to retry.
-        </div>
+      <div className="panel panel-b" role="alert">
+        Files could not be loaded. Refresh to retry.
       </div>
     );
   }
@@ -36,13 +35,7 @@ const FilesPage = async () => {
     session.kind === "authenticated" && session.user.role === "admin";
 
   return (
-    <div className="page wide">
-      <div className="ph">
-        <div>
-          <h1>Files</h1>
-          <p>Files shared with your projects.</p>
-        </div>
-      </div>
+    <>
       {fileResults.map(({ files, project }) => (
         <section className="stack file-project" key={project.id}>
           <div className="row">
@@ -77,8 +70,32 @@ const FilesPage = async () => {
           Create a project to start sharing files.
         </section>
       ) : null}
-    </div>
+    </>
   );
 };
+
+const FilesLoading = () => (
+  <output
+    aria-busy="true"
+    aria-live="polite"
+    className="file-loading-state panel panel-b muted"
+  >
+    Loading project files…
+  </output>
+);
+
+const FilesPage = () => (
+  <div className="page wide">
+    <div className="ph">
+      <div>
+        <h1>Files</h1>
+        <p>Files shared with your projects.</p>
+      </div>
+    </div>
+    <Suspense fallback={<FilesLoading />}>
+      <FilesContent />
+    </Suspense>
+  </div>
+);
 
 export default FilesPage;

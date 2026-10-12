@@ -1,38 +1,62 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
+import { Plus } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import type { ReactNode } from "react";
 
 import { createTaskAction } from "@/app/actions/tasks";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceCombobox } from "@/components/workspace/workspace-combobox";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import { WorkspaceModal } from "@/components/workspace/workspace-modal";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 
 interface ProjectOption {
   readonly id: string;
   readonly name: string;
 }
 
+const EMPTY_ASSIGNEE_IDS: readonly string[] = [];
+
 export const QuickTaskForm = ({
+  onOpenChange,
+  open: controlledOpen,
   projects,
+  defaultDueDate,
+  defaultAssigneeIds = EMPTY_ASSIGNEE_IDS,
+  description: modalDescription,
+  trigger,
 }: {
+  readonly onOpenChange?: (open: boolean) => void;
+  readonly open?: boolean;
+  readonly defaultDueDate?: string;
+  readonly defaultAssigneeIds?: readonly string[];
+  readonly description?: string;
   readonly projects: readonly ProjectOption[];
+  readonly trigger?: ReactNode | null;
 }) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
+  const setOpen = onOpenChange ?? setLocalOpen;
 
   const create = (formData: FormData) =>
     startTransition(async () => {
       const result = await createTaskAction({
-        assigneeIds: [],
+        assigneeIds: [...defaultAssigneeIds],
         description: String(formData.get("description") ?? "").trim() || null,
         dueDate: String(formData.get("dueDate") ?? "") || null,
         idempotencyKey: crypto.randomUUID(),
@@ -45,17 +69,32 @@ export const QuickTaskForm = ({
         return;
       }
       setError(null);
+      setOpen(false);
       router.push(`/projects/${result.data.projectId}?view=board`);
       router.refresh();
     });
 
   return (
-    <details className="panel quick-task-form">
-      <summary className="panel-h">
-        <span className="btn btn-primary btn-sm">＋ New task</span>
-      </summary>
-      <form action={create} className="panel-b stack">
-        <label className="field">
+    <WorkspaceModal
+      description={
+        modalDescription ?? "Add a task to a project and choose when it is due."
+      }
+      onOpenChange={setOpen}
+      open={open}
+      title="New task"
+      trigger={
+        trigger === undefined ? (
+          <WorkspaceButton className="btn btn-primary btn-sm" type="button">
+            <Plus aria-hidden="true" size={14} />
+            New task
+          </WorkspaceButton>
+        ) : (
+          trigger
+        )
+      }
+    >
+      <form action={create} className="stack">
+        <label className="field" htmlFor="metsys-quick-task-form-field-71">
           <span>Task name</span>
           <WorkspaceInput
             autoComplete="off"
@@ -63,41 +102,65 @@ export const QuickTaskForm = ({
             maxLength={200}
             name="title"
             required
+            id="metsys-quick-task-form-field-71"
           />
         </label>
-        <label className="field">
+        <label className="field" htmlFor="metsys-quick-task-form-field-81">
           <span>Project</span>
-          <select className="input" name="projectId" required>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
+          <WorkspaceCombobox
+            ariaLabel="Choose a project"
+            className="input"
+            defaultValue={projects[0]?.id ?? ""}
+            disabled={projects.length === 0}
+            emptyMessage="No projects found."
+            id="metsys-quick-task-form-field-81"
+            name="projectId"
+            options={projects.map((project) => ({
+              label: project.name,
+              value: project.id,
+            }))}
+            placeholder="Choose project"
+            searchPlaceholder="Search projects"
+          />
         </label>
-        <label className="field">
+        <label className="field" htmlFor="metsys-quick-task-form-field-99">
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
             maxLength={10_000}
             name="description"
             rows={2}
+            id="metsys-quick-task-form-field-99"
           />
         </label>
         <div className="row">
-          <label className="field">
+          <label className="field" htmlFor="metsys-quick-task-form-field-107">
             <span>Priority</span>
-            <select className="input" defaultValue="none" name="priority">
-              <option value="urgent">Urgent</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-              <option value="none">No priority</option>
-            </select>
+            <WorkspaceSelect
+              className="input"
+              defaultValue="none"
+              name="priority"
+              id="metsys-quick-task-form-field-107"
+            >
+              <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="high">High</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="medium">Medium</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="low">Low</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="none">
+                No priority
+              </WorkspaceSelectItem>
+            </WorkspaceSelect>
           </label>
-          <label className="field">
+          <label className="field" htmlFor="metsys-quick-task-form-field-123">
             <span>Due date</span>
-            <WorkspaceInput className="input" name="dueDate" type="date" />
+            <WorkspaceDatePicker
+              className="input"
+              {...(defaultDueDate === undefined
+                ? {}
+                : { defaultValue: defaultDueDate })}
+              name="dueDate"
+              id="metsys-quick-task-form-field-123"
+            />
           </label>
         </div>
         {error ? (
@@ -113,6 +176,6 @@ export const QuickTaskForm = ({
           {pending ? "Creating…" : "Create task"}
         </WorkspaceButton>
       </form>
-    </details>
+    </WorkspaceModal>
   );
 };

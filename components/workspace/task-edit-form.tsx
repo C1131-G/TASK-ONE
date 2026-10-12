@@ -1,19 +1,24 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { updateTaskAction } from "@/app/actions/tasks";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import { WorkspaceModal } from "@/components/workspace/workspace-modal";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 import type { TaskRecurrenceInput } from "@/src/server/work/work-contracts";
 
 export interface EditableTask {
@@ -43,12 +48,16 @@ export const TaskEditForm = ({
   task,
   employees,
   version,
+  open,
+  onOpenChange,
   onVersionChange,
   onCompletionUndo,
 }: {
   readonly task: EditableTask;
   readonly employees: readonly EmployeeOption[];
   readonly version: number;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
   readonly onVersionChange: (version: number) => void;
   readonly onCompletionUndo: (
     undo: { readonly undoId: string; readonly expiresAt: string } | null
@@ -57,6 +66,7 @@ export const TaskEditForm = ({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [assigneeSearch, setAssigneeSearch] = useState("");
   const selectedAssigneeIds = new Set(task.assigneeIds);
 
   const update = (formData: FormData) =>
@@ -83,14 +93,18 @@ export const TaskEditForm = ({
       onVersionChange(result.data.version);
       onCompletionUndo(result.data.completionUndo ?? null);
       setError(null);
+      onOpenChange(false);
       router.refresh();
     });
 
   return (
-    <details>
-      <summary aria-label={`Edit ${task.title}`} className="ibtn ibtn-sm">
-        Edit
-      </summary>
+    <WorkspaceModal
+      description="Update task details and save the changes to this task."
+      onOpenChange={onOpenChange}
+      open={open}
+      title={`Edit ${task.title}`}
+      trigger={null}
+    >
       <form
         className="panel-b stack"
         onSubmit={(event) => {
@@ -98,7 +112,7 @@ export const TaskEditForm = ({
           update(new FormData(event.currentTarget));
         }}
       >
-        <label className="field">
+        <label className="field" htmlFor={`task-${task.id}-field-119`}>
           <span>Title</span>
           <WorkspaceInput
             className="input"
@@ -106,9 +120,10 @@ export const TaskEditForm = ({
             maxLength={200}
             name="title"
             required
+            id={`task-${task.id}-field-119`}
           />
         </label>
-        <label className="field">
+        <label className="field" htmlFor={`task-${task.id}-field-130`}>
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
@@ -116,72 +131,105 @@ export const TaskEditForm = ({
             maxLength={10_000}
             name="description"
             rows={3}
+            id={`task-${task.id}-field-130`}
           />
         </label>
         <div className="row">
-          <label className="field">
+          <label className="field" htmlFor={`task-${task.id}-field-140`}>
             <span>Status</span>
-            <select className="input" defaultValue={task.status} name="status">
-              <option value="backlog">Backlog</option>
-              <option value="todo">To Do</option>
-              <option value="progress">In Progress</option>
-              <option value="review">Review</option>
-              <option value="done">Done</option>
-            </select>
+            <WorkspaceSelect
+              className="input"
+              defaultValue={task.status}
+              name="status"
+              id={`task-${task.id}-field-140`}
+            >
+              <WorkspaceSelectItem value="backlog">Backlog</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="todo">To Do</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="progress">
+                In Progress
+              </WorkspaceSelectItem>
+              <WorkspaceSelectItem value="review">Review</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="done">Done</WorkspaceSelectItem>
+            </WorkspaceSelect>
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`task-${task.id}-field-156`}>
             <span>Priority</span>
-            <select
+            <WorkspaceSelect
               className="input"
               defaultValue={task.priority}
               name="priority"
+              id={`task-${task.id}-field-156`}
             >
-              <option value="urgent">Urgent</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-              <option value="none">No priority</option>
-            </select>
+              <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="high">High</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="medium">Medium</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="low">Low</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="none">
+                No priority
+              </WorkspaceSelectItem>
+            </WorkspaceSelect>
           </label>
         </div>
         <div className="row">
-          <label className="field">
+          <label className="field" htmlFor={`task-${task.id}-field-174`}>
             <span>Start date</span>
-            <WorkspaceInput
+            <WorkspaceDatePicker
               className="input"
-              defaultValue={task.startDate ?? ""}
+              defaultValue={task.startDate}
               name="startDate"
-              type="date"
+              id={`task-${task.id}-field-174`}
             />
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`task-${task.id}-field-182`}>
             <span>Due date</span>
-            <WorkspaceInput
+            <WorkspaceDatePicker
               className="input"
-              defaultValue={task.dueDate ?? ""}
+              defaultValue={task.dueDate}
               name="dueDate"
-              type="date"
+              id={`task-${task.id}-field-182`}
             />
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`task-${task.id}-field-190`}>
             <span>Estimate</span>
             <WorkspaceInput
               className="input"
               defaultValue={task.estimate ?? ""}
               maxLength={40}
               name="estimate"
+              id={`task-${task.id}-field-190`}
             />
           </label>
         </div>
         <fieldset className="field">
           <legend>Assignees</legend>
+          <label className="field" htmlFor={`task-${task.id}-assignee-search`}>
+            <span className="sr-only">Search employees</span>
+            <WorkspaceInput
+              autoComplete="off"
+              className="input"
+              id={`task-${task.id}-assignee-search`}
+              onChange={(event) => setAssigneeSearch(event.currentTarget.value)}
+              placeholder="Search employees"
+              type="search"
+              value={assigneeSearch}
+            />
+          </label>
           {employees.map((employee) => (
-            <label className="row" key={employee.id}>
-              <input
+            <label
+              className="row"
+              hidden={
+                !employee.name
+                  .toLocaleLowerCase()
+                  .includes(assigneeSearch.trim().toLocaleLowerCase())
+              }
+              key={employee.id}
+              htmlFor={`task-${task.id}-employee-${employee.id}`}
+            >
+              <Checkbox
                 defaultChecked={selectedAssigneeIds.has(employee.id)}
                 name="assigneeIds"
-                type="checkbox"
                 value={employee.id}
+                id={`task-${task.id}-employee-${employee.id}`}
               />
               <span>{employee.name}</span>
             </label>
@@ -200,6 +248,6 @@ export const TaskEditForm = ({
           {pending ? "Saving…" : "Save task"}
         </WorkspaceButton>
       </form>
-    </details>
+    </WorkspaceModal>
   );
 };

@@ -10,7 +10,11 @@ import {
   changeTaskColumnAction,
   undoTaskCompletionAction,
 } from "@/app/actions/tasks";
-import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
+import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
 
 const statuses = [
   ["backlog", "Backlog"],
@@ -32,9 +36,9 @@ const TaskStatusSelect = ({
   readonly status: TaskStatus;
 }) => {
   const router = useRouter();
+  const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [completionUndo, setCompletionUndo] = useState<string | null>(null);
 
   const changeStatus = (nextStatus: TaskStatus) => {
     if (nextStatus === status) {
@@ -52,63 +56,52 @@ const TaskStatusSelect = ({
         setError(result.error.message);
         return;
       }
-      setCompletionUndo(result.data.completionUndo?.undoId ?? null);
+      const { completionUndo } = result.data;
+      if (completionUndo) {
+        addUndo({
+          expiresAt: completionUndo.expiresAt,
+          label: "Task completed",
+          run: async () => {
+            const undoResult = await undoTaskCompletionAction({
+              idempotencyKey: crypto.randomUUID(),
+              undoId: completionUndo.undoId,
+            });
+            if (!undoResult.ok) {
+              return undoResult.error.message;
+            }
+            router.refresh();
+            return null;
+          },
+        });
+      }
       router.refresh();
     });
   };
-
-  const undoCompletion = () =>
-    completionUndo &&
-    startTransition(async () => {
-      const result = await undoTaskCompletionAction({
-        idempotencyKey: crypto.randomUUID(),
-        undoId: completionUndo,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        setCompletionUndo(null);
-        router.refresh();
-        return;
-      }
-      setCompletionUndo(null);
-      router.refresh();
-    });
 
   return (
     <div className="status-control-wrap">
       <label className="status-control">
         <span className="sr">Change task status</span>
-        <select
-          aria-invalid={error ? true : undefined}
-          className={`pstatus ${status}`}
+        <WorkspaceSelect
+          {...(error ? { ariaInvalid: true } : {})}
+          className="pstatus"
           disabled={pending}
-          onChange={(event) =>
-            changeStatus(event.currentTarget.value as TaskStatus)
-          }
+          onValueChange={(nextStatus) => changeStatus(nextStatus as TaskStatus)}
+          status={status}
           value={status}
         >
           {statuses.map(([value, label]) => (
-            <option key={value} value={value}>
+            <WorkspaceSelectItem key={value} value={value}>
               {label}
-            </option>
+            </WorkspaceSelectItem>
           ))}
-        </select>
+        </WorkspaceSelect>
         {error ? (
           <span className="error" role="alert">
             {error}
           </span>
         ) : null}
       </label>
-      {completionUndo ? (
-        <WorkspaceButton
-          className="btn btn-sm btn-ghost"
-          disabled={pending}
-          onClick={undoCompletion}
-          type="button"
-        >
-          Undo completion
-        </WorkspaceButton>
-      ) : null}
     </div>
   );
 };

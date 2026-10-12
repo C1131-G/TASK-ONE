@@ -3,6 +3,7 @@
 
 "use client";
 
+import { DotsThree, ListBullets } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -12,10 +13,18 @@ import {
   undoTaskArchiveAction,
   undoTaskCompletionAction,
 } from "@/app/actions/tasks";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { TaskDetailsPanel } from "@/components/workspace/task-details-panel";
 import { TaskEditForm } from "@/components/workspace/task-edit-form";
 import type { EditableTask } from "@/components/workspace/task-edit-form";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
 
 interface EmployeeOption {
   readonly id: string;
@@ -25,15 +34,18 @@ interface EmployeeOption {
 const TaskManageControls = ({
   task,
   isAdmin,
+  canEdit,
   employees,
   currentUserId,
 }: {
   readonly task: EditableTask;
   readonly isAdmin: boolean;
+  readonly canEdit: boolean;
   readonly employees: readonly EmployeeOption[];
   readonly currentUserId: string | null;
 }) => {
   const router = useRouter();
+  const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [versionState, setVersionState] = useState({
     sourceVersion: task.version,
@@ -46,14 +58,32 @@ const TaskManageControls = ({
   const setVersion = (value: number) =>
     setVersionState({ sourceVersion: task.version, value });
   const [error, setError] = useState<string | null>(null);
-  const [completionUndo, setCompletionUndo] = useState<{
-    readonly undoId: string;
-    readonly expiresAt: string;
-  } | null>(null);
-  const [archiveUndo, setArchiveUndo] = useState<{
-    readonly undoId: string;
-    readonly expiresAt: string;
-  } | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const registerCompletionUndo = (
+    undo: {
+      readonly undoId: string;
+      readonly expiresAt: string;
+    } | null
+  ) => {
+    if (!undo) {
+      return;
+    }
+    addUndo({
+      expiresAt: undo.expiresAt,
+      label: `Completed “${task.title}”`,
+      run: async () => {
+        const result = await undoTaskCompletionAction({
+          idempotencyKey: crypto.randomUUID(),
+          undoId: undo.undoId,
+        });
+        if (!result.ok) {
+          return result.error.message;
+        }
+        router.refresh();
+        return null;
+      },
+    });
+  };
 
   const duplicate = () =>
     startTransition(async () => {
@@ -81,99 +111,73 @@ const TaskManageControls = ({
         setError(result.error.message);
         return;
       }
-      setArchiveUndo(result.data);
       setError(null);
-    });
-
-  const undoCompletion = () =>
-    completionUndo &&
-    startTransition(async () => {
-      const result = await undoTaskCompletionAction({
-        idempotencyKey: crypto.randomUUID(),
-        undoId: completionUndo.undoId,
+      addUndo({
+        expiresAt: result.data.expiresAt,
+        label: `Archived “${task.title}”`,
+        run: async () => {
+          const undoResult = await undoTaskArchiveAction({
+            idempotencyKey: crypto.randomUUID(),
+            undoId: result.data.undoId,
+          });
+          if (!undoResult.ok) {
+            return undoResult.error.message;
+          }
+          router.refresh();
+          return null;
+        },
       });
-      if (!result.ok) {
-        setError(result.error.message);
-        setCompletionUndo(null);
-        router.refresh();
-        return;
-      }
-      setCompletionUndo(null);
-      setError(null);
-      router.refresh();
-    });
-
-  const undoArchive = () =>
-    archiveUndo &&
-    startTransition(async () => {
-      const result = await undoTaskArchiveAction({
-        idempotencyKey: crypto.randomUUID(),
-        undoId: archiveUndo.undoId,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        setArchiveUndo(null);
-        router.refresh();
-        return;
-      }
-      setArchiveUndo(null);
-      setError(null);
-      router.refresh();
     });
 
   return (
     <div className="task-manage">
-      <TaskEditForm
-        employees={employees}
-        onCompletionUndo={setCompletionUndo}
-        onVersionChange={setVersion}
-        task={task}
-        version={version}
-      />
-      <WorkspaceButton
-        aria-label={`Duplicate ${task.title}`}
-        className="ibtn ibtn-sm"
-        disabled={pending}
-        onClick={duplicate}
-        type="button"
-      >
-        Duplicate
-      </WorkspaceButton>
-      {isAdmin && archiveUndo ? (
-        <WorkspaceButton
-          className="btn btn-sm btn-secondary"
-          disabled={pending}
-          onClick={undoArchive}
-          type="button"
-        >
-          Undo archive
-        </WorkspaceButton>
+      {canEdit ? (
+        <TaskEditForm
+          employees={employees}
+          onCompletionUndo={registerCompletionUndo}
+          onOpenChange={setEditOpen}
+          onVersionChange={setVersion}
+          open={editOpen}
+          task={task}
+          version={version}
+        />
       ) : null}
-      {isAdmin && !archiveUndo ? (
-        <WorkspaceButton
-          aria-label={`Archive ${task.title}`}
-          className="ibtn ibtn-sm"
-          disabled={pending}
-          onClick={archive}
-          type="button"
-        >
-          Archive
-        </WorkspaceButton>
-      ) : null}
-      {completionUndo ? (
-        <WorkspaceButton
-          className="btn btn-sm btn-secondary"
-          disabled={pending}
-          onClick={undoCompletion}
-          type="button"
-        >
-          Undo completion
-        </WorkspaceButton>
-      ) : null}
-      {archiveUndo ? (
-        <span className="faint">
-          Archived. Undo is available for five minutes.
-        </span>
+      {canEdit || isAdmin ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <WorkspaceButton
+              aria-label={`More actions for ${task.title}`}
+              className="ibtn ibtn-sm"
+              disabled={pending}
+              size="icon-sm"
+              type="button"
+            >
+              <DotsThree aria-hidden="true" size={18} weight="bold" />
+            </WorkspaceButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="workspace-menu"
+            data-workspace-menu=""
+          >
+            {canEdit ? (
+              <>
+                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                  Edit task
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={duplicate}>
+                  Duplicate task
+                </DropdownMenuItem>
+              </>
+            ) : null}
+            {isAdmin && canEdit ? <DropdownMenuSeparator /> : null}
+            {isAdmin ? (
+              <DropdownMenuItem onSelect={archive} variant="destructive">
+                Archive task
+              </DropdownMenuItem>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : null}
       {error ? (
         <p className="error" role="alert">
@@ -182,11 +186,7 @@ const TaskManageControls = ({
       ) : null}
       <TaskDetailsPanel
         currentUserId={currentUserId}
-        editable={
-          isAdmin ||
-          task.createdById === currentUserId ||
-          task.assigneeIds.includes(currentUserId ?? "")
-        }
+        editable={canEdit}
         isAdmin={isAdmin}
         projectId={task.projectId}
         taskId={task.id}
@@ -197,6 +197,17 @@ const TaskManageControls = ({
         dependencyIds={task.dependencyIds}
         recurrence={task.recurrence}
         dueDate={task.dueDate}
+        trigger={
+          <WorkspaceButton
+            aria-label={`Open details for ${task.title}`}
+            className="ibtn ibtn-sm"
+            size="icon-sm"
+            title={`Open details for ${task.title}`}
+            type="button"
+          >
+            <ListBullets aria-hidden="true" size={16} />
+          </WorkspaceButton>
+        }
       />
     </div>
   );

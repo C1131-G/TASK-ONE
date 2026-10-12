@@ -1,8 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -13,10 +11,13 @@ import {
   updateCalendarEventAction,
 } from "@/app/actions/calendar";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import { WorkspaceDateTimePicker } from "@/components/workspace/workspace-date-time-picker";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
 import type { CalendarEventSummary } from "@/src/server/calendar/calendar-contracts";
 
 const toLocalInputValue = (date: Date): string => {
@@ -27,18 +28,25 @@ const toLocalInputValue = (date: Date): string => {
 export const CalendarEventManager = ({
   events,
   isAdmin,
+  period = "month",
 }: {
   readonly events: readonly CalendarEventSummary[];
   readonly isAdmin: boolean;
+  readonly period?: "month" | "week";
 }) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const updateEvent = (event: CalendarEventSummary, formData: FormData) =>
+  const updateEvent = (event: CalendarEventSummary, formData: FormData) => {
+    const startsAt = String(formData.get("startsAt") ?? "");
+    const endsAt = String(formData.get("endsAt") ?? "");
+    if (!startsAt) {
+      setError("Choose a start time.");
+      return;
+    }
+    setError(null);
     startTransition(async () => {
-      const startsAt = String(formData.get("startsAt") ?? "");
-      const endsAt = String(formData.get("endsAt") ?? "");
       const result = await updateCalendarEventAction({
         attendeeIds: event.attendeeIds,
         description: String(formData.get("description") ?? "").trim() || null,
@@ -54,9 +62,9 @@ export const CalendarEventManager = ({
         setError(result.error.message);
         return;
       }
-      setError(null);
       router.refresh();
     });
+  };
 
   const deleteEvent = (eventId: string) =>
     startTransition(async () => {
@@ -75,7 +83,7 @@ export const CalendarEventManager = ({
   return (
     <section className="panel">
       <div className="panel-h">
-        <h2>Events this month</h2>
+        <h2>Events this {period}</h2>
       </div>
       {error ? (
         <p className="panel-b error" role="alert">
@@ -85,23 +93,39 @@ export const CalendarEventManager = ({
       {events.length ? (
         <div className="panel-b feed lined">
           {events.map((event) => (
-            <details className="calendar-event-row" key={event.id}>
-              <summary className="row">
-                <span aria-hidden="true" className="pdot" />
-                <span className="trunc grow">{event.title}</span>
-                <time
-                  className="num faint"
-                  dateTime={event.startsAt.toISOString()}
+            <WorkspaceDisclosure
+              description={
+                isAdmin
+                  ? "View or update this workspace calendar event."
+                  : "View this workspace calendar event."
+              }
+              key={event.id}
+              title={event.title}
+              trigger={
+                <WorkspaceButton
+                  className="row w-full justify-start text-left"
+                  type="button"
                 >
-                  {event.startsAt.toLocaleString()}
-                </time>
-              </summary>
+                  <span aria-hidden="true" className="pdot" />
+                  <span className="trunc grow">{event.title}</span>
+                  <time
+                    className="num faint"
+                    dateTime={event.startsAt.toISOString()}
+                  >
+                    {event.startsAt.toLocaleString()}
+                  </time>
+                </WorkspaceButton>
+              }
+            >
               {isAdmin ? (
                 <form
                   action={(formData) => updateEvent(event, formData)}
                   className="panel-b stack"
                 >
-                  <label className="field">
+                  <label
+                    className="field"
+                    htmlFor={`event-${event.id}-field-116`}
+                  >
                     <span>Title</span>
                     <WorkspaceInput
                       className="input"
@@ -109,41 +133,57 @@ export const CalendarEventManager = ({
                       maxLength={160}
                       name="title"
                       required
+                      id={`event-${event.id}-field-116`}
                     />
                   </label>
                   <div className="row">
-                    <label className="field">
+                    <label
+                      className="field"
+                      htmlFor={`event-${event.id}-field-127`}
+                    >
                       <span>Starts</span>
-                      <WorkspaceInput
+                      <WorkspaceDateTimePicker
+                        ariaLabel={`Choose start date and time for ${event.title}`}
                         className="input"
-                        defaultValue={toLocalInputValue(event.startsAt)}
+                        id={`event-${event.id}-field-127`}
                         name="startsAt"
                         required
-                        type="datetime-local"
+                        defaultValue={toLocalInputValue(event.startsAt)}
                       />
                     </label>
-                    <label className="field">
+                    <label
+                      className="field"
+                      htmlFor={`event-${event.id}-field-137`}
+                    >
                       <span>Ends</span>
-                      <WorkspaceInput
+                      <WorkspaceDateTimePicker
+                        ariaLabel={`Choose end date and time for ${event.title}`}
                         className="input"
+                        id={`event-${event.id}-field-137`}
+                        name="endsAt"
                         defaultValue={
                           event.endsAt ? toLocalInputValue(event.endsAt) : ""
                         }
-                        name="endsAt"
-                        type="datetime-local"
                       />
                     </label>
                   </div>
-                  <label className="field">
+                  <label
+                    className="field"
+                    htmlFor={`event-${event.id}-field-149`}
+                  >
                     <span>Location</span>
                     <WorkspaceInput
                       className="input"
                       defaultValue={event.location ?? ""}
                       maxLength={160}
                       name="location"
+                      id={`event-${event.id}-field-149`}
                     />
                   </label>
-                  <label className="field">
+                  <label
+                    className="field"
+                    htmlFor={`event-${event.id}-field-174`}
+                  >
                     <span>Description</span>
                     <WorkspaceTextarea
                       className="input"
@@ -151,6 +191,7 @@ export const CalendarEventManager = ({
                       maxLength={1000}
                       name="description"
                       rows={2}
+                      id={`event-${event.id}-field-174`}
                     />
                   </label>
                   <div className="acts">
@@ -161,14 +202,20 @@ export const CalendarEventManager = ({
                     >
                       Save event
                     </WorkspaceButton>
-                    <WorkspaceButton
-                      className="btn btn-secondary btn-sm"
-                      disabled={pending}
-                      onClick={() => deleteEvent(event.id)}
-                      type="button"
+                    <WorkspaceConfirmDialog
+                      confirmLabel="Delete event"
+                      description={`Delete “${event.title}” from the workspace calendar?`}
+                      onConfirm={() => deleteEvent(event.id)}
+                      title="Delete calendar event"
                     >
-                      Delete
-                    </WorkspaceButton>
+                      <WorkspaceButton
+                        className="btn btn-secondary btn-sm"
+                        disabled={pending}
+                        type="button"
+                      >
+                        Delete
+                      </WorkspaceButton>
+                    </WorkspaceConfirmDialog>
                   </div>
                 </form>
               ) : (
@@ -176,7 +223,7 @@ export const CalendarEventManager = ({
                   {event.location ?? event.description ?? "Workspace event"}
                 </p>
               )}
-            </details>
+            </WorkspaceDisclosure>
           ))}
         </div>
       ) : (

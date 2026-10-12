@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import type { ReactNode } from "react";
 
 import {
   createCommentAction,
@@ -15,6 +16,14 @@ import {
 } from "@/app/actions/comments";
 import { listTaskSubtasksAction } from "@/app/actions/subtasks";
 import { listTaskFilesAction } from "@/app/actions/uploads";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ProjectFiles } from "@/components/workspace/project-files";
 import {
   TaskCommentsSection,
@@ -44,6 +53,7 @@ interface TaskFile {
 
 export const TaskDetailsPanel = ({
   taskId,
+  taskTitle,
   projectId,
   version,
   editable,
@@ -55,8 +65,10 @@ export const TaskDetailsPanel = ({
   dueDate,
   onVersionChange,
   employees,
+  trigger,
 }: {
   readonly taskId: string;
+  readonly taskTitle?: string;
   readonly projectId: string;
   readonly version: number;
   readonly editable: boolean;
@@ -68,6 +80,7 @@ export const TaskDetailsPanel = ({
   readonly dueDate: string | null;
   readonly onVersionChange: (version: number) => void;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
+  readonly trigger?: ReactNode;
 }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -95,7 +108,6 @@ export const TaskDetailsPanel = ({
   const handleToggleSubtask = subtaskActions.toggle;
 
   const load = () => {
-    setOpen((current) => !current);
     if (loaded) {
       return;
     }
@@ -202,78 +214,99 @@ export const TaskDetailsPanel = ({
 
   return (
     <section className="task-details-panel">
-      <WorkspaceButton
-        aria-expanded={open}
-        className="btn btn-sm btn-ghost"
-        onClick={load}
-        type="button"
+      <Sheet
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen);
+          if (nextOpen) {
+            load();
+          }
+        }}
+        open={open}
       >
-        {open ? "Hide details" : "Comments, subtasks & files"}
-      </WorkspaceButton>
-      {open ? (
-        <div className="panel-b stack">
-          {visibleError ? (
-            <p className="error" role="alert">
-              {visibleError}
-            </p>
-          ) : null}
-          {pending && !loaded ? (
-            <p className="muted">Loading task details…</p>
-          ) : null}
-          <TaskSubtasksSection
-            editable={editable}
-            onAdd={handleAddSubtask}
-            onRemove={handleRemoveSubtask}
-            onUpdate={handleUpdateSubtask}
-            onReorder={handleReorderSubtask}
-            onPromote={handlePromoteSubtask}
-            onToggle={handleToggleSubtask}
-            employees={employees}
-            pending={pending || subtaskActions.pending}
-            subtasks={subtasks}
-          />
-          <TaskRelationsEditor
-            dependencyIds={dependencyIds}
-            editable={editable}
-            labelIds={labelIds}
-            projectId={projectId}
-            taskId={taskId}
-            version={version}
-            onVersionChange={onVersionChange}
-          />
-          <TaskRecurrenceEditor
-            dueDate={dueDate}
-            onVersionChange={onVersionChange}
-            recurrence={recurrence}
-            taskId={taskId}
-            version={version}
-          />
-          <TaskCommentsSection
-            body={commentBody}
-            comments={comments}
-            currentUserId={currentUserId}
-            isAdmin={isAdmin}
-            onBodyChange={setCommentBody}
-            onReact={toggleReaction}
-            onRemove={removeComment}
-            onSubmit={addComment}
-            onUndo={undoComment}
-            pending={pending}
-            undoAvailable={undoId !== null}
-          />
-          <section className="stack">
-            <h3>Attachments</h3>
-            <ProjectFiles
-              canUpload={editable}
-              currentUserId={currentUserId}
-              initialFiles={files}
-              isAdmin={isAdmin}
+        <SheetTrigger asChild>
+          {trigger ?? (
+            <WorkspaceButton className="btn btn-sm btn-ghost" type="button">
+              Comments, subtasks & files
+            </WorkspaceButton>
+          )}
+        </SheetTrigger>
+        <SheetContent
+          className="workspace-app"
+          data-workspace-sheet=""
+          side="right"
+        >
+          <SheetHeader>
+            <SheetTitle>{taskTitle ?? "Task details"}</SheetTitle>
+            <SheetDescription>
+              Manage subtasks, labels, dependencies, recurrence, comments, and
+              files.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-6">
+            {visibleError ? (
+              <p className="error" role="alert">
+                {visibleError}
+              </p>
+            ) : null}
+            {pending && !loaded ? (
+              <p className="muted">Loading task details…</p>
+            ) : null}
+            <TaskSubtasksSection
+              editable={editable}
+              onAdd={handleAddSubtask}
+              onRemove={handleRemoveSubtask}
+              onUpdate={handleUpdateSubtask}
+              onReorder={handleReorderSubtask}
+              onPromote={handlePromoteSubtask}
+              onToggle={handleToggleSubtask}
+              employees={employees}
+              pending={pending || subtaskActions.pending}
+              subtasks={subtasks}
+            />
+            <TaskRelationsEditor
+              dependencyIds={dependencyIds}
+              editable={editable}
+              labelIds={labelIds}
               projectId={projectId}
               taskId={taskId}
+              version={version}
+              onVersionChange={onVersionChange}
             />
-          </section>
-        </div>
-      ) : null}
+            <TaskRecurrenceEditor
+              dueDate={dueDate}
+              editable={editable}
+              onVersionChange={onVersionChange}
+              recurrence={recurrence}
+              taskId={taskId}
+              version={version}
+            />
+            <TaskCommentsSection
+              body={commentBody}
+              comments={comments}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              onBodyChange={setCommentBody}
+              onReact={toggleReaction}
+              onRemove={removeComment}
+              onSubmit={addComment}
+              onUndo={undoComment}
+              pending={pending}
+              undoAvailable={undoId !== null}
+            />
+            <section className="stack">
+              <h3>Attachments</h3>
+              <ProjectFiles
+                canUpload={editable}
+                currentUserId={currentUserId}
+                initialFiles={files}
+                isAdmin={isAdmin}
+                projectId={projectId}
+                taskId={taskId}
+              />
+            </section>
+          </div>
+        </SheetContent>
+      </Sheet>
     </section>
   );
 };

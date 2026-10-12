@@ -1,15 +1,19 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
+import { ArrowDown, ArrowUp } from "@phosphor-icons/react";
+
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceCombobox } from "@/components/workspace/workspace-combobox";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
 
 export interface TaskCommentView {
   readonly id: string;
@@ -73,12 +77,16 @@ export const TaskRelationsSection = ({
             <legend>Labels</legend>
             {labels.length ? (
               labels.map((label) => (
-                <label className="row" key={label.id}>
-                  <input
+                <label
+                  className="row"
+                  key={label.id}
+                  htmlFor={`label-${label.id}-field-81`}
+                >
+                  <Checkbox
                     defaultChecked={selectedLabels.has(label.id)}
                     name="labelIds"
-                    type="checkbox"
                     value={label.id}
+                    id={`label-${label.id}-field-81`}
                   />
                   <span
                     className="pdot"
@@ -95,12 +103,16 @@ export const TaskRelationsSection = ({
             <legend>Blocked by</legend>
             {dependencies.length ? (
               dependencies.map((dependency) => (
-                <label className="row" key={dependency.id}>
-                  <input
+                <label
+                  className="row"
+                  key={dependency.id}
+                  htmlFor={`dependency-${dependency.id}-field-102`}
+                >
+                  <Checkbox
                     defaultChecked={selectedDependencies.has(dependency.id)}
                     name="dependencyTaskIds"
-                    type="checkbox"
                     value={dependency.id}
+                    id={`dependency-${dependency.id}-field-102`}
                   />
                   <span>{dependency.name}</span>
                 </label>
@@ -168,27 +180,35 @@ export const TaskSubtasksSection = ({
     <h3>Subtasks</h3>
     {subtasks.map((subtask, index) => (
       <div className="row" key={subtask.id}>
-        <WorkspaceInput
+        <Checkbox
           aria-label={`Mark ${subtask.title} ${subtask.completed ? "incomplete" : "complete"}`}
           checked={subtask.completed}
           disabled={!editable || pending}
-          onChange={() => onToggle(subtask)}
-          type="checkbox"
+          onCheckedChange={() => onToggle(subtask)}
         />
         <span className="grow">{subtask.title}</span>
         {editable ? (
-          <details>
-            <summary
-              aria-label={`Edit ${subtask.title}`}
-              className="btn btn-sm btn-ghost"
-            >
-              Edit
-            </summary>
+          <WorkspaceDisclosure
+            description={`Edit the title, notes, due date, and assignee for ${subtask.title}.`}
+            title={`Edit ${subtask.title}`}
+            trigger={
+              <WorkspaceButton
+                aria-label={`Edit ${subtask.title}`}
+                className="btn btn-sm btn-ghost"
+                type="button"
+              >
+                Edit
+              </WorkspaceButton>
+            }
+          >
             <form
               action={(formData) => onUpdate(subtask, formData)}
               className="panel-b stack"
             >
-              <label className="field">
+              <label
+                className="field"
+                htmlFor={`subtask-${subtask.id}-field-199`}
+              >
                 <span>Title</span>
                 <WorkspaceInput
                   className="input"
@@ -196,9 +216,13 @@ export const TaskSubtasksSection = ({
                   maxLength={240}
                   name="title"
                   required
+                  id={`subtask-${subtask.id}-field-199`}
                 />
               </label>
-              <label className="field">
+              <label
+                className="field"
+                htmlFor={`subtask-${subtask.id}-field-223`}
+              >
                 <span>Notes</span>
                 <WorkspaceTextarea
                   className="input"
@@ -206,32 +230,45 @@ export const TaskSubtasksSection = ({
                   maxLength={10_000}
                   name="description"
                   rows={2}
+                  id={`subtask-${subtask.id}-field-223`}
                 />
               </label>
               <div className="row">
-                <label className="field">
+                <label
+                  className="field"
+                  htmlFor={`subtask-${subtask.id}-field-220`}
+                >
                   <span>Due date</span>
-                  <WorkspaceInput
+                  <WorkspaceDatePicker
                     className="input"
                     defaultValue={subtask.dueDate ?? ""}
                     name="dueDate"
-                    type="date"
+                    id={`subtask-${subtask.id}-field-220`}
                   />
                 </label>
-                <label className="field">
+                <label
+                  className="field"
+                  htmlFor={`subtask-${subtask.id}-field-228`}
+                >
                   <span>Assignee</span>
-                  <select
+                  <WorkspaceCombobox
+                    ariaLabel={`Choose assignee for ${subtask.title}`}
                     className="input"
                     defaultValue={subtask.assigneeId ?? ""}
+                    emptyMessage="No employees found."
+                    id={`subtask-${subtask.id}-field-228`}
+                    key={`${subtask.id}-assignee-${subtask.assigneeId ?? "none"}`}
                     name="assigneeId"
-                  >
-                    <option value="">Unassigned</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.name}
-                      </option>
-                    ))}
-                  </select>
+                    options={[
+                      { label: "Unassigned", value: "" },
+                      ...employees.map((employee) => ({
+                        label: employee.name,
+                        value: employee.id,
+                      })),
+                    ]}
+                    placeholder="Unassigned"
+                    searchPlaceholder="Search employees"
+                  />
                 </label>
               </div>
               <WorkspaceButton
@@ -242,7 +279,7 @@ export const TaskSubtasksSection = ({
                 Save subtask
               </WorkspaceButton>
             </form>
-          </details>
+          </WorkspaceDisclosure>
         ) : null}
         {editable ? (
           <WorkspaceButton
@@ -252,7 +289,7 @@ export const TaskSubtasksSection = ({
             onClick={() => onReorder(index, -1)}
             type="button"
           >
-            ↑
+            <ArrowUp aria-hidden="true" size={14} />
           </WorkspaceButton>
         ) : null}
         {editable && index < subtasks.length - 1 ? (
@@ -263,7 +300,7 @@ export const TaskSubtasksSection = ({
             onClick={() => onReorder(index, 1)}
             type="button"
           >
-            ↓
+            <ArrowDown aria-hidden="true" size={14} />
           </WorkspaceButton>
         ) : null}
         {editable && !subtask.completed ? (
@@ -395,13 +432,14 @@ export const TaskCommentsSection = ({
         Undo comment removal
       </WorkspaceButton>
     ) : null}
-    <label className="field">
+    <label className="field" htmlFor="metsys-task-details-sections-field-432">
       <span>Add a comment</span>
       <WorkspaceTextarea
         className="input"
         maxLength={10_000}
         onChange={(event) => onBodyChange(event.currentTarget.value)}
         value={body}
+        id="metsys-task-details-sections-field-432"
       />
     </label>
     <WorkspaceButton

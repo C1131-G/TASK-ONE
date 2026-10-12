@@ -1,15 +1,20 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useState, useTransition } from "react";
 
 import { setTaskRecurrenceAction } from "@/app/actions/tasks";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 import type { TaskRecurrenceInput } from "@/src/server/work/work-contracts";
 
 const frequencies = ["daily", "weekly", "biweekly", "monthly"] as const;
@@ -34,12 +39,14 @@ export const TaskRecurrenceEditor = ({
   recurrence,
   version,
   onVersionChange,
+  editable,
 }: {
   readonly taskId: string;
   readonly dueDate: string | null;
   readonly recurrence: TaskRecurrenceInput | null;
   readonly version: number;
   readonly onVersionChange: (version: number) => void;
+  readonly editable: boolean;
 }) => {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -87,41 +94,55 @@ export const TaskRecurrenceEditor = ({
   }
 
   return (
-    <details className="stack">
-      <summary className="btn btn-sm btn-ghost">Repeat task</summary>
+    <WorkspaceDisclosure
+      description="Choose how this task repeats and when recurrence ends."
+      title="Repeat task"
+      trigger={
+        <WorkspaceButton className="btn btn-sm btn-ghost" type="button">
+          Repeat task
+        </WorkspaceButton>
+      }
+    >
       <form action={save} className="stack">
         <div className="row">
-          <label className="field">
+          <label className="field" htmlFor={`task-${taskId}-field-106`}>
             <span>Frequency</span>
-            <select
+            <WorkspaceSelect
               className="input"
               defaultValue={recurrence?.frequency ?? "weekly"}
+              disabled={!editable}
               name="frequency"
+              id={`task-${taskId}-field-106`}
             >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Every 2 weeks</option>
-              <option value="monthly">Monthly</option>
-            </select>
+              <WorkspaceSelectItem value="daily">Daily</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="weekly">Weekly</WorkspaceSelectItem>
+              <WorkspaceSelectItem value="biweekly">
+                Every 2 weeks
+              </WorkspaceSelectItem>
+              <WorkspaceSelectItem value="monthly">Monthly</WorkspaceSelectItem>
+            </WorkspaceSelect>
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`task-${taskId}-field-121`}>
             <span>Every</span>
             <WorkspaceInput
               className="input"
               defaultValue={recurrence?.interval ?? 1}
+              disabled={!editable}
               max={365}
               min={1}
               name="interval"
               type="number"
+              id={`task-${taskId}-field-121`}
             />
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`task-${taskId}-field-132`}>
             <span>Until</span>
-            <WorkspaceInput
+            <WorkspaceDatePicker
               className="input"
               defaultValue={recurrence?.endsOn ?? ""}
+              disabled={!editable}
               name="endsOn"
-              type="date"
+              id={`task-${taskId}-field-132`}
             />
           </label>
         </div>
@@ -129,14 +150,19 @@ export const TaskRecurrenceEditor = ({
           <legend>Repeat on weekdays (weekly schedules)</legend>
           <div className="row">
             {weekdays.map((day) => (
-              <label className="row" key={day.id}>
-                <input
+              <label
+                className="row"
+                htmlFor={`task-${taskId}-weekday-${day.id}`}
+                key={day.id}
+              >
+                <Checkbox
                   defaultChecked={
                     recurrence?.weekDays.includes(day.id) ?? false
                   }
+                  disabled={!editable}
                   name="weekDays"
-                  type="checkbox"
                   value={day.id}
+                  id={`task-${taskId}-weekday-${day.id}`}
                 />
                 <span>{day.name.slice(0, 3)}</span>
               </label>
@@ -154,7 +180,7 @@ export const TaskRecurrenceEditor = ({
         <div className="acts">
           <WorkspaceButton
             className="btn btn-sm btn-primary"
-            disabled={pending || !dueDate}
+            disabled={!editable || pending || !dueDate}
             type="submit"
           >
             {saveLabel}
@@ -162,7 +188,7 @@ export const TaskRecurrenceEditor = ({
           {recurrence ? (
             <WorkspaceButton
               className="btn btn-sm btn-secondary"
-              disabled={pending}
+              disabled={!editable || pending}
               onClick={clear}
               type="button"
             >
@@ -171,6 +197,6 @@ export const TaskRecurrenceEditor = ({
           ) : null}
         </div>
       </form>
-    </details>
+    </WorkspaceDisclosure>
   );
 };
