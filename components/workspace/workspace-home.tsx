@@ -9,7 +9,6 @@ import { getDashboardOverviewAction } from "@/app/actions/dashboard";
 import { listEmployeesAction } from "@/app/actions/employees";
 import { listProjectsAction } from "@/app/actions/projects";
 import { listProjectTasksAction } from "@/app/actions/tasks";
-import { listTeamsAction } from "@/app/actions/teams";
 import {
   HomeStats,
   MyTasksPanel,
@@ -61,19 +60,13 @@ const WorkspaceHome = async ({
   readonly taskView?: "upcoming" | "overdue" | "completed";
 }) => {
   await connection();
-  const [
-    dashboardResult,
-    projectResult,
-    session,
-    teamsResult,
-    employeesResult,
-  ] = await Promise.all([
-    getDashboardOverviewAction({}),
-    listProjectsAction({}),
-    getPageSession(),
-    listTeamsAction({}),
-    listEmployeesAction({ search: "" }),
-  ]);
+  const [dashboardResult, projectResult, session, employeesResult] =
+    await Promise.all([
+      getDashboardOverviewAction({}),
+      listProjectsAction({}),
+      getPageSession(),
+      listEmployeesAction({ search: "" }),
+    ]);
   if (!dashboardResult.ok || !projectResult.ok) {
     return (
       <div className="page">
@@ -188,8 +181,13 @@ const WorkspaceHome = async ({
     .flatMap((result) => (result.ok ? result.data : []))
     .toSorted((left, right) => right.createdAt.localeCompare(left.createdAt))
     .slice(0, 7);
-  const teamNameById = new Map(
-    teamsResult.ok ? teamsResult.data.map((team) => [team.id, team.name]) : []
+  const membersById = new Map(
+    employeesResult.ok
+      ? employeesResult.data.map((directoryEmployee) => [
+          directoryEmployee.id,
+          directoryEmployee,
+        ])
+      : []
   );
   // eslint-disable-next-line react/purity -- This server-rendered date follows the user's workspace time zone.
   const todayLabel = FULL_DATE_FORMATTER.format(now);
@@ -208,14 +206,7 @@ const WorkspaceHome = async ({
           <Link className="btn btn-secondary hide-m" href={"/members" as Route}>
             Invite member
           </Link>
-          {isAdmin ? (
-            <Link
-              className="btn btn-secondary hide-m"
-              href={"/projects" as Route}
-            >
-              New project
-            </Link>
-          ) : null}
+          {isAdmin ? <ProjectCreateForm /> : null}
           {projectResult.data.length ? (
             <QuickTaskForm
               projects={projectResult.data.map(({ id, name }) => ({
@@ -226,7 +217,6 @@ const WorkspaceHome = async ({
           ) : null}
         </div>
       </div>
-      {isAdmin ? <ProjectCreateForm /> : null}
       <HomeStats
         activeProjects={activeProjects.length}
         atRisk={dashboardResult.data.projects.risk}
@@ -240,7 +230,7 @@ const WorkspaceHome = async ({
           <MyTasksPanel taskView={taskView} taskViews={taskViews} />
           <ProjectProgressPanel
             projects={activeProjects}
-            teamNames={teamNameById}
+            membersById={membersById}
           />
         </div>
         <div className="stack">

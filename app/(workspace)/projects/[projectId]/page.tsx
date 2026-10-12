@@ -3,11 +3,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { cache } from "react";
+import type { ReactNode } from "react";
 
 import { listActivityAction } from "@/app/actions/activity";
 import { listCalendarEventsAction } from "@/app/actions/calendar";
 import { getPersonalWorkspaceAction } from "@/app/actions/discovery";
 import { listEmployeesAction } from "@/app/actions/employees";
+import { listLabelsAction } from "@/app/actions/labels";
 import {
   listProjectMilestonesAction,
   listProjectsAction,
@@ -17,20 +20,90 @@ import { listProjectTasksAction } from "@/app/actions/tasks";
 import { listTeamsAction } from "@/app/actions/teams";
 import { listProjectFilesAction } from "@/app/actions/uploads";
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { ProjectActivityFeed } from "@/components/workspace/project-activity-feed";
 import { ProjectAdminControls } from "@/components/workspace/project-admin-controls";
 import { ProjectBoard } from "@/components/workspace/project-board";
 import { ProjectFiles } from "@/components/workspace/project-files";
 import { ProjectIcon } from "@/components/workspace/project-icon";
+import { ProjectMemberAvatars } from "@/components/workspace/project-list-layouts";
 import { ProjectMilestones } from "@/components/workspace/project-milestones";
+import { ProjectOverview } from "@/components/workspace/project-overview";
 import { ProjectSavedViews } from "@/components/workspace/project-saved-views";
 import { ProjectTaskViews } from "@/components/workspace/project-task-views";
 import { ProjectViewTabs } from "@/components/workspace/project-view-tabs";
 import { TaskCreateForm } from "@/components/workspace/task-create-form";
-import { currentUtcMonthRange } from "@/src/lib/utc-date-range";
+import {
+  currentUtcMonthRange,
+  currentUtcWeekRange,
+} from "@/src/lib/utc-date-range";
+import { getUtcToday } from "@/src/lib/utc-today";
 import { getPageSession } from "@/src/server/auth/page-session";
+import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
 
-export const metadata: Metadata = { title: "Project | Metsys" };
+interface ProjectPageProps {
+  readonly params: Promise<{ projectId: string }>;
+  readonly searchParams: Promise<{
+    calendarMode?: string;
+    view?: string;
+    monthOffset?: string;
+  }>;
+}
+
+const loadProjects = cache(() => listProjectsAction({}));
+
+export const generateMetadata = async ({
+  params,
+}: ProjectPageProps): Promise<Metadata> => {
+  await connection();
+  const [{ projectId }, result] = await Promise.all([params, loadProjects()]);
+  const project = result.ok
+    ? result.data.find((item) => item.id === projectId)
+    : null;
+  return { title: `${project?.name ?? "Project"} | Metsys` };
+};
+
+type ProjectTaskActionResult = Awaited<
+  ReturnType<typeof listProjectTasksAction>
+>;
+type ProjectTasks = Extract<
+  ProjectTaskActionResult,
+  { readonly ok: true }
+>["data"];
+
+const loadProjectTasks = async (
+  projectId: string,
+  taskCount: number
+): Promise<ProjectTaskActionResult> => {
+  const pageSize = 200;
+  const pageCount = Math.max(1, Math.ceil(taskCount / pageSize));
+  const results = await Promise.all(
+    Array.from({ length: pageCount }, (_, pageIndex) =>
+      listProjectTasksAction({
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        projectId,
+      })
+    )
+  );
+  for (const result of results) {
+    if (!result.ok) {
+      return result;
+    }
+  }
+  const [firstResult] = results;
+  if (!firstResult) {
+    throw new Error("Project task pagination returned no page results.");
+  }
+  if (!firstResult.ok) {
+    return firstResult;
+  }
+  return {
+    data: results.flatMap((result) => (result.ok ? result.data : [])),
+    ok: true,
+    requestId: firstResult.requestId,
+  };
+};
 
 const resolveSavedViews = (
   result: Awaited<ReturnType<typeof listSavedViewsAction>>,
@@ -92,50 +165,328 @@ const ProjectFileView = ({
   );
 };
 
-const ProjectPage = async ({
-  params,
-  searchParams,
+type ProjectActivityActionResult = Awaited<
+  ReturnType<typeof listActivityAction>
+>;
+type ProjectCalendarActionResult = Awaited<
+  ReturnType<typeof listCalendarEventsAction>
+>;
+type ProjectCalendarEvent = Extract<
+  ProjectCalendarActionResult,
+  { readonly ok: true }
+>["data"][number];
+type ProjectCalendarRange = ReturnType<typeof currentUtcMonthRange> | null;
+
+interface ProjectViewContentProps {
+  readonly activityResult: ProjectActivityActionResult | null;
+  readonly calendarEvents: readonly ProjectCalendarEvent[] | null;
+  readonly calendarMode: "month" | "week";
+  readonly calendarRange: ProjectCalendarRange;
+  readonly currentUserId: string | null;
+  readonly editableTaskIds: ReadonlySet<string>;
+  readonly employees: readonly EmployeeDirectoryEntry[];
+  readonly fileResult: Awaited<
+    ReturnType<typeof listProjectFilesAction>
+  > | null;
+  readonly labelResult: Awaited<ReturnType<typeof listLabelsAction>>;
+  readonly isAdmin: boolean;
+  readonly milestonePanel: ReactNode;
+  readonly monthOffset: number;
+  readonly project: NonNullable<
+    Extract<
+      Awaited<ReturnType<typeof listProjectsAction>>,
+      { readonly ok: true }
+    >["data"][number]
+  >;
+  readonly taskResult: ProjectTaskActionResult | null;
+  readonly tasks: Extract<
+    ProjectTaskActionResult,
+    { readonly ok: true }
+  >["data"];
+  readonly teams: readonly { readonly id: string; readonly name: string }[];
+  readonly timelineRange: ProjectCalendarRange;
+  readonly today: string;
+  readonly view: string;
+}
+
+const renderProjectOverview = ({
+  activityResult,
+  currentUserId,
+  employees,
+  isAdmin,
+  milestonePanel,
+  project,
+  taskResult,
+  tasks,
+  teams,
+  today,
+}: ProjectViewContentProps): ReactNode => {
+  if (!taskResult?.ok) {
+    return (
+      <section className="panel panel-b" role="alert">
+        Project tasks could not be loaded. Refresh to retry.
+      </section>
+    );
+  }
+  return (
+    <ProjectOverview
+      activity={activityResult?.ok ? activityResult.data : []}
+      activityUnavailable={!activityResult?.ok}
+      currentUserId={currentUserId}
+      employees={employees}
+      isAdmin={isAdmin}
+      milestones={milestonePanel}
+      project={project}
+      tasks={tasks}
+      teams={teams}
+      today={today}
+    />
+  );
+};
+
+const renderProjectBoard = ({
+  currentUserId,
+  employees,
+  isAdmin,
+  labelResult,
+  project,
+  taskResult,
+  tasks,
+}: ProjectViewContentProps): ReactNode => {
+  if (!taskResult?.ok) {
+    return (
+      <section className="panel panel-b" role="alert">
+        Tasks could not be loaded.
+      </section>
+    );
+  }
+  return (
+    <>
+      <TaskCreateForm projectId={project.id} />
+      <ProjectBoard
+        currentUserId={currentUserId}
+        employees={employees}
+        isAdmin={isAdmin}
+        labels={labelResult.ok ? labelResult.data : []}
+        projectKey={project.key}
+        tasks={tasks}
+      />
+    </>
+  );
+};
+
+const renderProjectFiles = ({
+  currentUserId,
+  fileResult,
+  isAdmin,
+  project,
+}: ProjectViewContentProps): ReactNode => {
+  if (!fileResult) {
+    return null;
+  }
+  return (
+    <ProjectFileView
+      canUpload={isAdmin}
+      currentUserId={currentUserId}
+      isAdmin={isAdmin}
+      projectId={project.id}
+      result={fileResult}
+    />
+  );
+};
+
+const renderProjectActivity = ({
+  activityResult,
+}: ProjectViewContentProps): ReactNode => (
+  <ProjectActivityFeed
+    entries={activityResult?.ok ? activityResult.data : []}
+    error={!activityResult?.ok}
+  />
+);
+
+const renderProjectTasks = ({
+  calendarEvents,
+  calendarMode,
+  calendarRange,
+  currentUserId,
+  editableTaskIds,
+  employees,
+  isAdmin,
+  labelResult,
+  monthOffset,
+  project,
+  taskResult,
+  tasks,
+  timelineRange,
+  view,
+}: ProjectViewContentProps): ReactNode => {
+  if (!taskResult?.ok) {
+    return (
+      <section className="panel panel-b" role="alert">
+        Project tasks could not be loaded. Refresh to retry.
+      </section>
+    );
+  }
+  return (
+    <ProjectTaskViews
+      calendarEvents={calendarEvents}
+      calendarRange={calendarRange}
+      calendarMode={calendarMode}
+      currentUserId={currentUserId}
+      editableTaskIds={editableTaskIds}
+      employees={employees}
+      isAdmin={isAdmin}
+      labels={labelResult.ok ? labelResult.data : []}
+      monthOffset={monthOffset}
+      project={project}
+      tasks={tasks}
+      timelineRange={timelineRange}
+      view={view}
+    />
+  );
+};
+
+const projectViewRenderers: Readonly<
+  Record<string, (props: ProjectViewContentProps) => ReactNode>
+> = {
+  activity: renderProjectActivity,
+  board: renderProjectBoard,
+  calendar: renderProjectTasks,
+  files: renderProjectFiles,
+  list: renderProjectTasks,
+  overview: renderProjectOverview,
+  table: renderProjectTasks,
+  timeline: renderProjectTasks,
+};
+
+const ProjectViewContent = (props: ProjectViewContentProps) =>
+  projectViewRenderers[props.view]?.(props) ?? null;
+
+interface ProjectPageQuery {
+  readonly calendarMode?: string;
+  readonly view?: string;
+  readonly monthOffset?: string;
+}
+
+const getEditableTaskIds = (
+  tasks: ProjectTasks,
+  isAdmin: boolean,
+  currentUserId: string | null
+) => {
+  const editableTaskIds = new Set<string>();
+  for (const task of tasks) {
+    const canEdit =
+      isAdmin ||
+      task.createdById === currentUserId ||
+      task.assigneeIds.includes(currentUserId ?? "");
+    if (canEdit) {
+      editableTaskIds.add(task.id);
+    }
+  }
+  return editableTaskIds;
+};
+
+const getCalendarRange = (
+  calendarMode: "month" | "week",
+  monthOffset: number
+): ProjectCalendarRange =>
+  calendarMode === "week"
+    ? currentUtcWeekRange(monthOffset)
+    : currentUtcMonthRange(monthOffset, 1);
+
+const loadProjectViewData = async ({
+  calendarMode,
+  isAdmin,
+  monthOffset,
+  project,
+  currentUserId,
+  view,
 }: {
-  readonly params: Promise<{ projectId: string }>;
-  readonly searchParams: Promise<{ view?: string; monthOffset?: string }>;
+  readonly calendarMode: "month" | "week";
+  readonly currentUserId: string | null;
+  readonly isAdmin: boolean;
+  readonly monthOffset: number;
+  readonly project: Extract<
+    Awaited<ReturnType<typeof listProjectsAction>>,
+    { readonly ok: true }
+  >["data"][number];
+  readonly view: string;
 }) => {
-  await connection();
-  const [{ projectId }, query] = await Promise.all([params, searchParams]);
+  const requiresTaskList = [
+    "overview",
+    "board",
+    "list",
+    "table",
+    "calendar",
+    "timeline",
+  ].includes(view);
+  const taskResult = requiresTaskList
+    ? await loadProjectTasks(project.id, project.taskCount)
+    : null;
+  const tasks = taskResult?.ok ? taskResult.data : [];
+  const editableTaskIds = getEditableTaskIds(tasks, isAdmin, currentUserId);
+  const [fileResult, activityResult] = await Promise.all([
+    view === "files" ? listProjectFilesAction({ projectId: project.id }) : null,
+    view === "activity" || view === "overview"
+      ? listActivityAction({ limit: 100, projectId: project.id })
+      : null,
+  ]);
+  const calendarRange =
+    view === "calendar" ? getCalendarRange(calendarMode, monthOffset) : null;
+  const calendarResult = calendarRange
+    ? await listCalendarEventsAction({
+        from: calendarRange.fromInstant,
+        to: calendarRange.toInstant,
+      })
+    : null;
+  const calendarEvents = calendarResult?.ok
+    ? calendarResult.data.filter((event) => event.projectId === project.id)
+    : null;
+  const timelineRange = view === "timeline" ? currentUtcMonthRange(0, 4) : null;
+  return {
+    activityResult,
+    calendarEvents,
+    calendarRange,
+    editableTaskIds,
+    fileResult,
+    taskResult,
+    tasks,
+    timelineRange,
+  };
+};
+
+const getProjectPageData = async (
+  projectId: string,
+  query: ProjectPageQuery
+) => {
   const requestedView = query.view ?? "board";
   const [
     session,
     projects,
-    taskResult,
     employeeResult,
     personal,
     milestoneResult,
     teamResult,
     savedViewsResult,
+    labelResult,
   ] = await Promise.all([
     getPageSession(),
-    listProjectsAction({}),
-    listProjectTasksAction({ limit: 100, offset: 0, projectId }),
+    loadProjects(),
     listEmployeesAction({ search: "" }),
     getPersonalWorkspaceAction({}),
     listProjectMilestonesAction({ projectId }),
     listTeamsAction({}),
     listSavedViewsAction({}),
+    listLabelsAction({}),
   ]);
   if (!projects.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Project could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
+    return { kind: "error" as const };
   }
   const project = projects.data.find((item) => item.id === projectId);
   if (!project) {
-    notFound();
+    return { kind: "not-found" as const };
   }
 
-  const tasks = taskResult.ok ? taskResult.data : [];
   const isAdmin =
     session.kind === "authenticated" && session.user.role === "admin";
   const currentUserId =
@@ -151,38 +502,94 @@ const ProjectPage = async ({
   const monthOffset = Number.isInteger(requestedMonthOffset)
     ? Math.max(-24, Math.min(24, requestedMonthOffset))
     : 0;
-  const editableTaskIds = new Set<string>();
-  for (const task of tasks) {
-    if (
-      isAdmin ||
-      task.createdById === currentUserId ||
-      task.assigneeIds.includes(currentUserId ?? "")
-    ) {
-      editableTaskIds.add(task.id);
-    }
-  }
+  const calendarMode: "month" | "week" =
+    query.calendarMode === "week" ? "week" : "month";
+  const viewData = await loadProjectViewData({
+    calendarMode,
+    currentUserId,
+    isAdmin,
+    monthOffset,
+    project,
+    view,
+  });
   const favoriteProjectIds = new Set(
     personal.ok ? personal.data.projects.map(({ id }) => id) : []
   );
-  const fileResult =
-    view === "files" ? await listProjectFilesAction({ projectId }) : null;
-  const activityResult =
-    view === "activity"
-      ? await listActivityAction({ limit: 100, projectId })
-      : null;
-  const calendarRange =
-    view === "calendar" ? currentUtcMonthRange(monthOffset, 1) : null;
-  const calendarEvents = calendarRange
-    ? await listCalendarEventsAction({
-        from: calendarRange.fromInstant,
-        to: calendarRange.toInstant,
-      })
-    : null;
-  const timelineRange = view === "timeline" ? currentUtcMonthRange(0, 4) : null;
-  const projectCalendarEvents = calendarEvents?.ok
-    ? calendarEvents.data.filter((event) => event.projectId === project.id)
-    : null;
+  const milestonePanel = milestoneResult.ok ? (
+    <ProjectMilestones
+      editable={isAdmin}
+      initialMilestones={milestoneResult.data.milestones}
+      projectId={project.id}
+      version={milestoneResult.data.version}
+    />
+  ) : (
+    <section className="panel panel-b muted" role="alert">
+      Milestones could not be loaded.
+    </section>
+  );
 
+  return {
+    ...viewData,
+    calendarMode,
+    currentUserId,
+    employeeResult,
+    favoriteProjectIds,
+    isAdmin,
+    kind: "ready" as const,
+    labelResult,
+    milestonePanel,
+    monthOffset,
+    project,
+    savedViewState,
+    teamResult,
+    today: getUtcToday(),
+    view,
+  };
+};
+
+const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
+  await connection();
+  const [{ projectId }, query] = await Promise.all([params, searchParams]);
+  const model = await getProjectPageData(projectId, query);
+  if (model.kind === "error") {
+    return (
+      <div className="page">
+        <div className="panel panel-b" role="alert">
+          Project could not be loaded. Refresh to retry.
+        </div>
+      </div>
+    );
+  }
+  if (model.kind === "not-found") {
+    notFound();
+  }
+  const {
+    activityResult,
+    calendarEvents,
+    calendarMode,
+    calendarRange,
+    currentUserId,
+    editableTaskIds,
+    employeeResult,
+    fileResult,
+    favoriteProjectIds,
+    isAdmin,
+    labelResult,
+    milestonePanel,
+    monthOffset,
+    project,
+    savedViewState,
+    taskResult,
+    tasks,
+    teamResult,
+    timelineRange,
+    today,
+    view,
+  } = model;
+  const employees = employeeResult.ok ? employeeResult.data : [];
+  const membersById = new Map(
+    employees.map((employee) => [employee.id, employee] as const)
+  );
   return (
     <div className="page flush">
       <div className="proj-h">
@@ -198,15 +605,28 @@ const ProjectPage = async ({
           />
         </div>
         <p>{project.description || "Project workspace"}</p>
-        <div className="acts">
+        <div className="row project-meta">
           <span className={`pstatus ${project.status}`}>{project.status}</span>
           <span className="muted">
             {project.startDate ?? "No start date"} —{" "}
             {project.dueDate ?? "No due date"}
           </span>
+          {project.memberIds.length > 0 ? (
+            <ProjectMemberAvatars
+              memberIds={project.memberIds}
+              membersById={membersById}
+            />
+          ) : null}
+          {isAdmin ? (
+            <ProjectAdminControls
+              employees={employeeResult.ok ? employeeResult.data : []}
+              project={project}
+              teams={teamResult.ok ? teamResult.data : []}
+            />
+          ) : null}
         </div>
+        <ProjectViewTabs projectId={project.id} selected={view} />
       </div>
-      <ProjectViewTabs projectId={project.id} selected={view} />
       <ProjectSavedViews
         isAdmin={isAdmin}
         projectId={project.id}
@@ -214,131 +634,27 @@ const ProjectPage = async ({
         userId={currentUserId}
         views={savedViewState.views}
       />
-      {isAdmin ? (
-        <ProjectAdminControls
-          employees={employeeResult.ok ? employeeResult.data : []}
-          project={project}
-          teams={teamResult.ok ? teamResult.data : []}
-        />
-      ) : null}
-
-      {view === "overview" ? (
-        <div className="grid2">
-          <div className="stack">
-            <section className="stats">
-              <div className="stat">
-                <span className="k">Tasks</span>
-                <span className="v">{project.taskCount}</span>
-                <span className="d">{project.completedTaskCount} complete</span>
-              </div>
-              <div className="stat">
-                <span className="k">Progress</span>
-                <span className="v">{project.progress}%</span>
-                <span className="d">Current completion</span>
-              </div>
-              <div className="stat">
-                <span className="k">Status</span>
-                <span className="v" style={{ fontSize: "var(--fs-lg)" }}>
-                  {project.status}
-                </span>
-                <span className="d">Project health</span>
-              </div>
-            </section>
-            <section className="panel panel-b">
-              <h2>About</h2>
-              <p>{project.description || "No description"}</p>
-            </section>
-          </div>
-          {milestoneResult.ok ? (
-            <ProjectMilestones
-              editable={isAdmin}
-              initialMilestones={milestoneResult.data.milestones}
-              projectId={project.id}
-              version={milestoneResult.data.version}
-            />
-          ) : (
-            <section className="panel panel-b muted">
-              Milestones could not be loaded.
-            </section>
-          )}
-        </div>
-      ) : null}
-
-      {view === "board" ? (
-        <>
-          <TaskCreateForm projectId={project.id} />
-          {taskResult.ok ? (
-            <ProjectBoard
-              currentUserId={currentUserId}
-              employees={employeeResult.ok ? employeeResult.data : []}
-              isAdmin={isAdmin}
-              projectKey={project.key}
-              tasks={tasks}
-            />
-          ) : (
-            <section className="panel panel-b" role="alert">
-              Tasks could not be loaded.
-            </section>
-          )}
-        </>
-      ) : null}
-
-      {view === "files" && fileResult ? (
-        <ProjectFileView
-          canUpload={isAdmin}
-          currentUserId={currentUserId}
-          isAdmin={isAdmin}
-          projectId={project.id}
-          result={fileResult}
-        />
-      ) : null}
-
-      {view === "activity" ? (
-        <section className="panel">
-          <div className="panel-h">
-            <h2>Project activity</h2>
-          </div>
-          {activityResult?.ok && activityResult.data.length ? (
-            activityResult.data.map((entry) => (
-              <article className="mini" key={entry.id}>
-                <span className="av">{entry.actorName.slice(0, 1)}</span>
-                <div className="grow">
-                  <strong>{entry.actorName}</strong>
-                  <span className="muted">
-                    {" "}
-                    {entry.action.replaceAll("_", " ")}
-                  </span>
-                </div>
-                <time className="muted" dateTime={entry.createdAt}>
-                  {entry.createdAt.slice(0, 10)}
-                </time>
-              </article>
-            ))
-          ) : (
-            <div className="panel-b muted">
-              {activityResult?.ok
-                ? "No project activity yet."
-                : "Activity could not be loaded."}
-            </div>
-          )}
-        </section>
-      ) : null}
-
-      {["list", "table", "calendar", "timeline"].includes(view) ? (
-        <ProjectTaskViews
-          calendarEvents={projectCalendarEvents}
-          calendarRange={calendarRange}
-          currentUserId={currentUserId}
-          editableTaskIds={editableTaskIds}
-          employees={employeeResult.ok ? employeeResult.data : []}
-          isAdmin={isAdmin}
-          monthOffset={monthOffset}
-          project={project}
-          tasks={tasks}
-          timelineRange={timelineRange}
-          view={view}
-        />
-      ) : null}
+      <ProjectViewContent
+        activityResult={activityResult}
+        calendarEvents={calendarEvents}
+        calendarMode={calendarMode}
+        calendarRange={calendarRange}
+        currentUserId={currentUserId}
+        editableTaskIds={editableTaskIds}
+        employees={employees}
+        fileResult={fileResult}
+        isAdmin={isAdmin}
+        labelResult={labelResult}
+        milestonePanel={milestonePanel}
+        monthOffset={monthOffset}
+        project={project}
+        taskResult={taskResult}
+        tasks={tasks}
+        teams={teamResult.ok ? teamResult.data : []}
+        timelineRange={timelineRange}
+        today={today}
+        view={view}
+      />
     </div>
   );
 };

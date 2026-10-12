@@ -1,16 +1,17 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
+import { CheckCircle, Circle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import { saveProjectMilestonesAction } from "@/app/actions/projects";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
 
 interface MilestoneData {
   readonly id: string | null;
@@ -97,18 +98,23 @@ export const ProjectMilestones = ({
         {milestones.map((milestone, index) => (
           <div className="row milestone" key={milestone.key}>
             {editable ? (
-              <WorkspaceInput
+              <Checkbox
                 aria-label={`Milestone ${index + 1} complete`}
                 checked={milestone.completed}
-                onChange={(event) =>
+                onCheckedChange={(checked) =>
                   updateMilestone(index, {
-                    completed: event.currentTarget.checked,
+                    completed: checked === true,
                   })
                 }
-                type="checkbox"
               />
             ) : (
-              <span aria-hidden="true">{milestone.completed ? "✓" : "○"}</span>
+              <span aria-hidden="true">
+                {milestone.completed ? (
+                  <CheckCircle size={16} weight="fill" />
+                ) : (
+                  <Circle size={16} />
+                )}
+              </span>
             )}
             {editable ? (
               <WorkspaceInput
@@ -124,15 +130,12 @@ export const ProjectMilestones = ({
               <strong className="grow">{milestone.name}</strong>
             )}
             {editable ? (
-              <WorkspaceInput
-                aria-label={`Milestone ${index + 1} due date`}
+              <WorkspaceDatePicker
+                ariaLabel={`Milestone ${index + 1} due date`}
                 className="input"
-                onChange={(event) =>
-                  updateMilestone(index, {
-                    dueDate: event.currentTarget.value || null,
-                  })
+                onValueChange={(value) =>
+                  updateMilestone(index, { dueDate: value || null })
                 }
-                type="date"
                 value={milestone.dueDate ?? ""}
               />
             ) : (

@@ -3,9 +3,25 @@
 import type { Route } from "next";
 import Link from "next/link";
 
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  OpenTasksIcon,
+  ViewAllTasksIcon,
+} from "@/components/workspace/home-action-icons";
 import { ProjectIcon } from "@/components/workspace/project-icon";
-import { TaskStatusSelect } from "@/components/workspace/task-status-select";
+import { ProjectMemberAvatars } from "@/components/workspace/project-list-layouts";
+import { TaskCompletionCheckbox } from "@/components/workspace/task-completion-checkbox";
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
+import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -41,6 +57,26 @@ const formatDate = (value: string | null): string => {
     return "No due date";
   }
   return HOME_DATE_FORMATTER.format(new Date(`${value}T00:00:00Z`));
+};
+
+const projectStatusLabel = (status: ProjectListItem["status"]): string => {
+  switch (status) {
+    case "active": {
+      return "In Progress";
+    }
+    case "risk": {
+      return "At Risk";
+    }
+    case "complete": {
+      return "Completed";
+    }
+    case "hold": {
+      return "On Hold";
+    }
+    default: {
+      return "Planning";
+    }
+  }
 };
 
 export const HomeStats = ({
@@ -121,16 +157,17 @@ export const MyTasksPanel = ({
             className="ibtn ibtn-sm"
             href={"/my-tasks" as Route}
           >
-            ↗
+            <OpenTasksIcon />
           </Link>
         </div>
       </div>
       {visible.length ? (
         visible.map((task) => (
           <article className="mini home-task-row" key={task.id}>
-            <TaskStatusSelect
+            <TaskCompletionCheckbox
               status={task.status}
               taskId={task.id}
+              title={task.title}
               version={task.version}
             />
             <Link
@@ -152,19 +189,21 @@ export const MyTasksPanel = ({
       )}
       {taskViews[taskView].length > 7 ? (
         <Link className="addrow" href={"/my-tasks" as Route}>
-          View all {taskViews[taskView].length} tasks →
+          View all {taskViews[taskView].length} tasks
+          <ViewAllTasksIcon />
         </Link>
       ) : null}
     </section>
   );
 };
 
+/* eslint-disable shadcn/no-restyle */
 export const ProjectProgressPanel = ({
   projects,
-  teamNames,
+  membersById,
 }: {
   readonly projects: readonly ProjectListItem[];
-  readonly teamNames: ReadonlyMap<string, string>;
+  readonly membersById: ReadonlyMap<string, EmployeeDirectoryEntry>;
 }) => (
   <section className="panel">
     <div className="panel-h">
@@ -173,58 +212,62 @@ export const ProjectProgressPanel = ({
         All projects
       </Link>
     </div>
-    <div className="list-wrap">
-      <table className="perm-t home-progress-table">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th>Status</th>
-            <th>Progress</th>
-            <th>Due</th>
-            <th>Team</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.slice(0, 8).map((project) => (
-            <tr key={project.id}>
-              <td>
-                <Link
-                  className="row"
-                  href={`/projects/${project.id}?view=overview` as Route}
-                >
-                  <ProjectIcon
-                    color={project.color}
-                    icon={project.icon}
-                    size={14}
-                  />
-                  <strong>{project.name}</strong>
-                </Link>
-              </td>
-              <td>
-                <span className={`pstatus ${project.status}`}>
-                  {project.status}
-                </span>
-              </td>
-              <td>
-                <span className="row">
-                  <progress
-                    aria-label={`${project.progress}% complete`}
-                    className="prog"
-                    max={100}
-                    value={project.progress}
-                  />
-                  <span className="num faint">{project.progress}%</span>
-                </span>
-              </td>
-              <td className="num muted">{formatDate(project.dueDate)}</td>
-              <td className="muted">
-                {project.teamId ? teamNames.get(project.teamId) : "—"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table className="perm-t home-progress-table">
+      <TableCaption className="sr-only">Project progress</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Project</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Progress</TableHead>
+          <TableHead>Due</TableHead>
+          <TableHead>Team</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {projects.slice(0, 8).map((project) => (
+          <TableRow key={project.id}>
+            <TableCell>
+              <Link
+                className="row"
+                href={`/projects/${project.id}?view=overview` as Route}
+              >
+                <ProjectIcon
+                  color={project.color}
+                  icon={project.icon}
+                  size={14}
+                />
+                <strong>{project.name}</strong>
+              </Link>
+            </TableCell>
+            <TableCell>
+              <span className={`pstatus ${project.status}`}>
+                {projectStatusLabel(project.status)}
+              </span>
+            </TableCell>
+            <TableCell>
+              <span className="row">
+                <Progress
+                  aria-label={`${project.progress}% complete`}
+                  max={100}
+                  value={project.progress}
+                  workspace
+                />
+                <span className="num faint">{project.progress}%</span>
+              </span>
+            </TableCell>
+            <TableCell className="num muted">
+              {formatDate(project.dueDate)}
+            </TableCell>
+            <TableCell>
+              <ProjectMemberAvatars
+                memberIds={project.memberIds}
+                membersById={membersById}
+              />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   </section>
 );
 

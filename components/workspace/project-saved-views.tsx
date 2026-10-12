@@ -1,10 +1,9 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
+import { Plus, X } from "@phosphor-icons/react";
 import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,8 +13,15 @@ import {
   createSavedViewAction,
   deleteSavedViewAction,
 } from "@/app/actions/saved-views";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
 
 const selectedViewType = (
@@ -110,45 +116,83 @@ export const ProjectSavedViews = ({
               {view.name}
             </Link>
             {isAdmin || view.userId === userId ? (
-              <WorkspaceButton
-                aria-label={`Delete saved view ${view.name}`}
-                className="ibtn ibtn-xs"
-                disabled={pending}
-                onClick={() => remove(view.id)}
-                type="button"
+              <WorkspaceConfirmDialog
+                confirmLabel="Delete view"
+                description={`Delete the saved view “${view.name}”?`}
+                onConfirm={() => remove(view.id)}
+                title="Delete saved view"
               >
-                ×
-              </WorkspaceButton>
+                <WorkspaceButton
+                  aria-label={`Delete saved view ${view.name}`}
+                  className="ibtn ibtn-xs"
+                  disabled={pending}
+                  type="button"
+                >
+                  <X aria-hidden="true" size={14} />
+                </WorkspaceButton>
+              </WorkspaceConfirmDialog>
             ) : null}
           </span>
         ))}
-        <details className="saved-view-create">
-          <summary aria-label="Save project view" className="tab">
-            + Save view
-          </summary>
+        <WorkspaceDisclosure
+          description="Save this project layout as a reusable view."
+          title="Save project view"
+          trigger={
+            <WorkspaceButton
+              aria-label="Save project view"
+              className="tab"
+              type="button"
+            >
+              <Plus aria-hidden="true" size={14} />
+              Save view
+            </WorkspaceButton>
+          }
+        >
           <form action={create} className="panel-b stack">
-            <label className="field">
+            <label
+              className="field"
+              htmlFor="metsys-project-saved-views-field-143"
+            >
               <span>Name</span>
               <WorkspaceInput
                 className="input"
                 maxLength={80}
                 name="name"
                 required
+                id="metsys-project-saved-views-field-143"
               />
             </label>
-            <label className="field">
+            <label
+              className="field"
+              htmlFor="metsys-project-saved-views-field-152"
+            >
               <span>Layout</span>
-              <select className="input" defaultValue="board" name="type">
-                <option value="board">Board</option>
-                <option value="list">List</option>
-                <option value="table">Table</option>
-                <option value="calendar">Calendar</option>
-                <option value="timeline">Timeline</option>
-              </select>
+              <WorkspaceSelect
+                className="input"
+                defaultValue="board"
+                name="type"
+                id="metsys-project-saved-views-field-152"
+              >
+                <WorkspaceSelectItem value="board">Board</WorkspaceSelectItem>
+                <WorkspaceSelectItem value="list">List</WorkspaceSelectItem>
+                <WorkspaceSelectItem value="table">Table</WorkspaceSelectItem>
+                <WorkspaceSelectItem value="calendar">
+                  Calendar
+                </WorkspaceSelectItem>
+                <WorkspaceSelectItem value="timeline">
+                  Timeline
+                </WorkspaceSelectItem>
+              </WorkspaceSelect>
             </label>
             {isAdmin ? (
-              <label className="row">
-                <input name="isShared" type="checkbox" />
+              <label
+                className="row"
+                htmlFor="metsys-project-saved-views-field-171"
+              >
+                <Checkbox
+                  name="isShared"
+                  id="metsys-project-saved-views-field-171"
+                />
                 <span>Share with workspace</span>
               </label>
             ) : null}
@@ -165,7 +209,7 @@ export const ProjectSavedViews = ({
               {pending ? "Saving…" : "Save view"}
             </WorkspaceButton>
           </form>
-        </details>
+        </WorkspaceDisclosure>
       </nav>
     </>
   );

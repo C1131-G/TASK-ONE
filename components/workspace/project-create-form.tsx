@@ -1,8 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -14,6 +12,11 @@ import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import { WorkspaceModal } from "@/components/workspace/workspace-modal";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 
 const templates = [
   ["blank", "Blank project"],
@@ -29,6 +32,7 @@ const ProjectCreateForm = () => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   const createProject = (formData: FormData) => {
     const name = String(formData.get("name") ?? "").trim();
@@ -51,25 +55,36 @@ const ProjectCreateForm = () => {
         setError(result.error.message);
         return;
       }
+      setOpen(false);
       router.push(`/projects/${result.data.id}`);
       router.refresh();
     });
   };
 
   return (
-    <details className="panel project-create">
-      <summary className="panel-h">
-        <span className="btn btn-primary btn-sm">New project</span>
-      </summary>
+    <WorkspaceModal
+      description="Create a project workspace and choose a starter template."
+      onOpenChange={setOpen}
+      open={open}
+      title="New project"
+      trigger={
+        <WorkspaceButton className="btn btn-primary btn-sm" type="button">
+          New project
+        </WorkspaceButton>
+      }
+    >
       <form
-        className="panel-b stack"
+        className="stack"
         onSubmit={(event) => {
           event.preventDefault();
           createProject(new FormData(event.currentTarget));
         }}
       >
         <div className="row">
-          <label className="field grow">
+          <label
+            className="field grow"
+            htmlFor="metsys-project-create-form-field-84"
+          >
             <span>Project name</span>
             <WorkspaceInput
               autoComplete="off"
@@ -77,9 +92,13 @@ const ProjectCreateForm = () => {
               maxLength={120}
               name="name"
               required
+              id="metsys-project-create-form-field-84"
             />
           </label>
-          <label className="field">
+          <label
+            className="field"
+            htmlFor="metsys-project-create-form-field-94"
+          >
             <span>Project key</span>
             <WorkspaceInput
               autoComplete="off"
@@ -87,27 +106,34 @@ const ProjectCreateForm = () => {
               maxLength={12}
               name="key"
               required
+              id="metsys-project-create-form-field-94"
             />
           </label>
         </div>
-        <label className="field">
+        <label className="field" htmlFor="metsys-project-create-form-field-113">
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
             maxLength={1000}
             name="description"
             rows={2}
+            id="metsys-project-create-form-field-113"
           />
         </label>
-        <label className="field">
+        <label className="field" htmlFor="metsys-project-create-form-field-114">
           <span>Template</span>
-          <select className="input" defaultValue="blank" name="templateId">
+          <WorkspaceSelect
+            className="input"
+            defaultValue="blank"
+            name="templateId"
+            id="metsys-project-create-form-field-114"
+          >
             {templates.map(([id, label]) => (
-              <option key={id} value={id}>
+              <WorkspaceSelectItem key={id} value={id}>
                 {label}
-              </option>
+              </WorkspaceSelectItem>
             ))}
-          </select>
+          </WorkspaceSelect>
         </label>
         {error ? (
           <p className="error" role="alert">
@@ -124,7 +150,7 @@ const ProjectCreateForm = () => {
           </WorkspaceButton>
         </div>
       </form>
-    </details>
+    </WorkspaceModal>
   );
 };
 
