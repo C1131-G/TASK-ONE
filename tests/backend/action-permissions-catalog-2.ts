@@ -208,6 +208,13 @@ export const actionCatalog2: readonly ActionEntry[] = [
     idempotencyKey: nextKey(),
     projectId: ids.projectId,
   })),
+  entry("rescheduleTaskAction", tasks.rescheduleTaskAction, () => ({
+    dueDate: "2026-03-20",
+    expectedVersion: 1,
+    idempotencyKey: nextKey(),
+    startDate: "2026-03-10",
+    taskId: ids.taskId,
+  })),
   entry("updateTaskAction", tasks.updateTaskAction, () => ({
     ...taskBody(),
     expectedVersion: 1,

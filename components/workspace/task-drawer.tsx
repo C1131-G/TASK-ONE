@@ -7,6 +7,7 @@ import { TaskDetailsPanel } from "@/components/workspace/task-details-panel";
 
 interface DrawerTask {
   readonly id: string;
+  readonly projectId: string;
   readonly title: string;
   readonly version: number;
 }
@@ -54,7 +55,6 @@ export const TaskDrawerProvider = ({
   employees,
   initialTaskId,
   isAdmin,
-  projectId,
   tasks,
 }: {
   readonly children: ReactNode;
@@ -64,7 +64,6 @@ export const TaskDrawerProvider = ({
   // The ?task= value the server saw, so a deep link renders on the first response.
   readonly initialTaskId: string | null;
   readonly isAdmin: boolean;
-  readonly projectId: string;
   readonly tasks: readonly DrawerTask[];
 }) => {
   // Kept in state rather than read from useSearchParams, which does not follow
@@ -131,7 +130,7 @@ export const TaskDrawerProvider = ({
             })
           }
           open
-          projectId={projectId}
+          projectId={selected.projectId}
           taskId={selected.id}
           taskTitle={selected.title}
           version={version}

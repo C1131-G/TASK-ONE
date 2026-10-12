@@ -180,6 +180,7 @@ export const MyTasksWorkspace = ({
         projectId: task.projectId,
         projectName: task.projectName,
         recurrence: task.recurrence,
+        startDate: task.startDate,
         status: task.status,
         title: task.title,
         version: task.version,

@@ -1,20 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-const signIn = async (page: Page) => {
-  await page.goto("/login");
-  await page.fill('input[name="email"]', "ui-admin@metsys.test");
-  await page.fill(
-    'input[name="password"]',
-    process.env["E2E_ADMIN_PASSWORD"] ?? ""
-  );
-  await page.click('button[type="submit"]');
-  await page.waitForURL((url) => url.pathname === "/", {
-    timeout: 90_000,
-    waitUntil: "commit",
-  });
-};
-
 const openPopulatedProject = async (page: Page, view: string) => {
   await page.goto("/projects");
   const href = await page
@@ -36,7 +22,6 @@ test.describe("project table and board", () => {
   test("columns can be hidden, sorted and resized, and hidden columns survive a reload", async ({
     page,
   }) => {
-    await signIn(page);
     await openPopulatedProject(page, "table");
 
     await page.getByRole("button", { name: "Columns" }).click();
@@ -74,7 +59,6 @@ test.describe("project table and board", () => {
   test("a card moves within its column with Alt+arrow and the order survives a reload", async ({
     page,
   }) => {
-    await signIn(page);
     await openPopulatedProject(page, "board");
 
     const todoCards = page.locator(
@@ -86,6 +70,18 @@ test.describe("project table and board", () => {
     const secondTitle =
       (await todoCards.nth(1).locator(".title").textContent()) ?? "";
 
+    // Keys sent before React hydrates the cards do nothing, so wait for hydration.
+    await page.waitForFunction(
+      () => {
+        const card = document.querySelector("section.bcol article.kcard");
+        return (
+          card !== null &&
+          Object.keys(card).some((key) => key.startsWith("__reactProps"))
+        );
+      },
+      undefined,
+      { timeout: 60_000 }
+    );
     await todoCards.nth(0).focus();
     await page.keyboard.press("Alt+ArrowDown");
     await expect(

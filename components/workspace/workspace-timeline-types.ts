@@ -9,6 +9,20 @@ export interface TimelineTask {
   readonly priority?: string;
   readonly assigneeIds?: readonly string[];
   readonly position?: number;
+  readonly version: number;
+}
+
+export interface TimelineMilestone {
+  readonly completed: boolean;
+  readonly dueDate: string;
+  readonly id: string;
+  readonly name: string;
+}
+
+export interface TimelineMilestoneLane {
+  readonly milestones: readonly TimelineMilestone[];
+  readonly projectId: string;
+  readonly projectName: string;
 }
 
 export interface TimelineEmployee {
@@ -24,6 +38,11 @@ export interface TimelineGroup {
 
 export type TimelineRow =
   | { readonly type: "group"; readonly key: string; readonly label: string }
+  | {
+      readonly type: "milestones";
+      readonly key: string;
+      readonly lane: TimelineMilestoneLane;
+    }
   | {
       readonly type: "task";
       readonly key: string;

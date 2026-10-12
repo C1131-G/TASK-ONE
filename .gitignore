@@ -45,3 +45,4 @@ AGENTS.md
 # Playwright output
 /test-results/
 /playwright-report/
+/tests/e2e/.auth/

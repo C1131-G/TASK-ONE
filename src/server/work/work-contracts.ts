@@ -194,6 +194,15 @@ export class WorkManagement extends Context.Service<
       actorId: string,
       input: CreateTaskInput
     ) => Effect.Effect<CreatedTask, AppError>;
+    readonly rescheduleTask: (
+      actorId: string,
+      taskId: string,
+      expectedVersion: number,
+      input: {
+        readonly dueDate: string | null;
+        readonly startDate: string | null;
+      }
+    ) => Effect.Effect<{ readonly version: number }, AppError>;
     readonly updateTask: (
       actorId: string,
       taskId: string,

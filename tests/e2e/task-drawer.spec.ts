@@ -1,19 +1,7 @@
 import type { BrowserContext, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-const signIn = async (page: Page) => {
-  await page.goto("/login");
-  await page.fill('input[name="email"]', "ui-admin@metsys.test");
-  await page.fill(
-    'input[name="password"]',
-    process.env["E2E_ADMIN_PASSWORD"] ?? ""
-  );
-  await page.click('button[type="submit"]');
-  await page.waitForURL((url) => url.pathname === "/", {
-    timeout: 90_000,
-    waitUntil: "commit",
-  });
-};
+import { ADMIN_STATE } from "./auth-state";
 
 const openPopulatedTable = async (page: Page) => {
   await page.goto("/projects");
@@ -54,9 +42,8 @@ test.describe("task drawer", () => {
     if (!process.env["E2E_ADMIN_PASSWORD"]) {
       return;
     }
-    context = await browser.newContext();
+    context = await browser.newContext({ storageState: ADMIN_STATE });
     page = await context.newPage();
-    await signIn(page);
   });
 
   test.afterAll(async () => {

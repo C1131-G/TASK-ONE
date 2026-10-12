@@ -2,9 +2,16 @@
 
 import type { Route } from "next";
 import Link from "next/link";
-import type { CSSProperties, RefObject } from "react";
+import type { RefObject } from "react";
 
-import type { TimelineRow, TimelineScale } from "./workspace-timeline-types";
+import type { TaskSpan } from "@/components/workspace/task-dates";
+import { dayDiff } from "@/components/workspace/task-dates";
+import { TimelineBar } from "@/components/workspace/workspace-timeline-bar";
+import type {
+  TimelineRow,
+  TimelineScale,
+  TimelineTask,
+} from "@/components/workspace/workspace-timeline-types";
 
 const DAY_MS = 86_400_000;
 const ROW_HEIGHT = 36;
@@ -23,21 +30,22 @@ const DAY_FORMATTER = new Intl.DateTimeFormat("en", {
   timeZone: "UTC",
 });
 
-const getOffset = (value: string, start: number): number =>
-  Math.round((Date.parse(`${value}T00:00:00Z`) - start) / DAY_MS);
-
 export const WorkspaceTimelineChart = ({
-  from,
   dayCount,
   dayWidth,
+  editableIds,
+  from,
+  onMove,
   rows,
   scale,
   today,
   viewportRef,
 }: {
-  readonly from: string;
   readonly dayCount: number;
   readonly dayWidth: number;
+  readonly editableIds: ReadonlySet<string>;
+  readonly from: string;
+  readonly onMove: (task: TimelineTask, dates: TaskSpan) => void;
   readonly rows: readonly TimelineRow[];
   readonly scale: TimelineScale;
   readonly today: number;
@@ -70,12 +78,22 @@ export const WorkspaceTimelineChart = ({
       <div className="tl-left">
         <div className="tl-head">Task</div>
         <ul aria-label="Timeline tasks" className="tl-rows">
-          {rows.map((row) =>
-            row.type === "group" ? (
-              <li className="tl-row g" key={row.key}>
-                {row.label}
-              </li>
-            ) : (
+          {rows.map((row) => {
+            if (row.type === "group") {
+              return (
+                <li className="tl-row g" key={row.key}>
+                  {row.label}
+                </li>
+              );
+            }
+            if (row.type === "milestones") {
+              return (
+                <li className="tl-row g" key={row.key}>
+                  Milestones · {row.lane.projectName}
+                </li>
+              );
+            }
+            return (
               <li className="tl-row" key={row.key}>
                 <Link
                   className="timeline-row-link"
@@ -85,8 +103,8 @@ export const WorkspaceTimelineChart = ({
                   <span className="faint">{row.task.projectName}</span>
                 </Link>
               </li>
-            )
-          )}
+            );
+          })}
         </ul>
       </div>
       <div className="tl-right" ref={viewportRef}>
@@ -100,7 +118,7 @@ export const WorkspaceTimelineChart = ({
           </div>
           <div className="tl-days">
             {dateTicks.map((date) => {
-              const offset = getOffset(date.toISOString().slice(0, 10), start);
+              const offset = dayDiff(from, date.toISOString().slice(0, 10));
               const tickDays = Math.min(tickInterval, dayCount - offset);
               return (
                 <div
@@ -125,8 +143,7 @@ export const WorkspaceTimelineChart = ({
               className="tl-gl"
               key={date.toISOString()}
               style={{
-                left:
-                  getOffset(date.toISOString().slice(0, 10), start) * dayWidth,
+                left: dayDiff(from, date.toISOString().slice(0, 10)) * dayWidth,
               }}
             />
           ))}
@@ -140,42 +157,42 @@ export const WorkspaceTimelineChart = ({
                 <div className="tl-rowbg g" key={row.key} style={{ top }} />
               );
             }
+            if (row.type === "milestones") {
+              return (
+                <div className="tl-rowbg g" key={row.key} style={{ top }}>
+                  {row.lane.milestones.flatMap((milestone) => {
+                    const offset = dayDiff(from, milestone.dueDate);
+                    if (offset < 0 || offset >= dayCount) {
+                      return [];
+                    }
+                    return [
+                      <span
+                        className={`tl-milestone${milestone.completed ? " done" : ""}`}
+                        key={milestone.id}
+                        style={{ left: offset * dayWidth + dayWidth / 2 - 6 }}
+                        title={`${milestone.name} · ${milestone.dueDate}`}
+                      >
+                        <span className="sr-only">
+                          {milestone.name}, due {milestone.dueDate}
+                          {milestone.completed ? ", completed" : ""}
+                        </span>
+                      </span>,
+                    ];
+                  })}
+                </div>
+              );
+            }
             const { task } = row;
-            const taskStart = task.startDate ?? task.dueDate;
-            const taskEnd = task.dueDate ?? task.startDate;
-            if (!taskStart || !taskEnd) {
-              return <div className="tl-rowbg" key={task.id} style={{ top }} />;
-            }
-            const rawStart = getOffset(taskStart, start);
-            const rawEnd = getOffset(taskEnd, start);
-            if (rawEnd < 0 || rawStart >= dayCount) {
-              return <div className="tl-rowbg" key={task.id} style={{ top }} />;
-            }
-            const clippedStart = Math.max(0, rawStart);
-            const clippedEnd = Math.min(dayCount - 1, rawEnd);
-            const left = clippedStart * dayWidth;
-            const barWidth = Math.max(
-              dayWidth,
-              (clippedEnd - clippedStart + 1) * dayWidth
-            );
             return (
               <div className="tl-rowbg" key={task.id} style={{ top }}>
-                <Link
-                  aria-label={`${task.title}, ${taskStart} to ${taskEnd}`}
-                  className={`bar${task.status === "done" ? " done" : ""}`}
-                  href={`/projects/${task.projectId}?view=board` as Route}
-                  style={
-                    {
-                      "--c": "var(--accent)",
-                      left,
-                      top: 6,
-                      width: barWidth,
-                    } as CSSProperties
-                  }
-                  title={`${task.title} · ${taskStart} → ${taskEnd}`}
-                >
-                  <span className="trunc">{task.title}</span>
-                </Link>
+                <TimelineBar
+                  dayCount={dayCount}
+                  dayWidth={dayWidth}
+                  editable={editableIds.has(task.id)}
+                  from={from}
+                  onMove={onMove}
+                  task={task}
+                />
               </div>
             );
           })}

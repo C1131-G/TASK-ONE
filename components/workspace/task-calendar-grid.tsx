@@ -27,6 +27,9 @@ import type {
   CalendarTask,
 } from "@/components/workspace/task-calendar-chips";
 import { TaskCalendarDays } from "@/components/workspace/task-calendar-days";
+import { datesForDueDay } from "@/components/workspace/task-dates";
+import { canEditTaskRecord } from "@/components/workspace/task-permissions";
+import { useTaskReschedule } from "@/components/workspace/use-task-reschedule";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 
 export type {
@@ -209,7 +212,20 @@ export const TaskCalendarGrid = ({
     }
   );
   const normalizedQuery = query.trim().toLowerCase();
-  const visibleTasks = tasks
+  // Moves show at once and roll back if the server refuses them.
+  const reschedule = useTaskReschedule(tasks);
+  const moveToDay = (taskId: string, day: string) => {
+    // Read the displayed task: a move made a moment ago is not in the props yet.
+    const task = reschedule.tasks.find((item) => item.id === taskId);
+    if (!task || !canEditTaskRecord(task, currentUserId, isAdmin)) {
+      return;
+    }
+    const dates = datesForDueDay(task, day);
+    if (dates) {
+      reschedule.move(task, dates);
+    }
+  };
+  const visibleTasks = reschedule.tasks
     .filter((task) => {
       const matchesQuery =
         !normalizedQuery ||
@@ -347,6 +363,14 @@ export const TaskCalendarGrid = ({
           <div key={day}>{day}</div>
         ))}
       </div>
+      <output aria-live="polite" className="sr-only">
+        {reschedule.announcement}
+      </output>
+      {reschedule.error ? (
+        <p className="error" role="alert">
+          {reschedule.error}
+        </p>
+      ) : null}
       <TaskCalendarDays
         currentMonth={current}
         currentUserId={currentUserId}
@@ -355,6 +379,7 @@ export const TaskCalendarGrid = ({
         eventByDay={eventByDay}
         isAdmin={isAdmin}
         onAddTask={onAddTask}
+        onMoveTask={moveToDay}
         projectById={projectById}
         taskByDay={taskByDay}
         today={today}

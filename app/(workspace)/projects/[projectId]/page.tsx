@@ -44,6 +44,7 @@ import { getUtcToday } from "@/src/lib/utc-today";
 import { getPageSession } from "@/src/server/auth/page-session";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
+import type { ProjectMilestone } from "@/src/server/projects/project-contracts";
 
 interface ProjectPageProps {
   readonly params: Promise<{ projectId: string }>;
@@ -196,6 +197,7 @@ interface ProjectViewContentProps {
   readonly labelResult: Awaited<ReturnType<typeof listLabelsAction>>;
   readonly isAdmin: boolean;
   readonly milestonePanel: ReactNode;
+  readonly milestones: readonly ProjectMilestone[];
   readonly monthOffset: number;
   readonly project: NonNullable<
     Extract<
@@ -318,6 +320,7 @@ const renderProjectTasks = ({
   employees,
   isAdmin,
   labelResult,
+  milestones,
   monthOffset,
   project,
   taskResult,
@@ -342,6 +345,7 @@ const renderProjectTasks = ({
       employees={employees}
       isAdmin={isAdmin}
       labels={labelResult.ok ? labelResult.data : []}
+      milestones={milestones}
       monthOffset={monthOffset}
       project={project}
       tasks={tasks}
@@ -548,6 +552,7 @@ const getProjectPageData = async (
     kind: "ready" as const,
     labelResult,
     milestonePanel,
+    milestones: milestoneResult.ok ? milestoneResult.data.milestones : [],
     monthOffset,
     project,
     savedViewState,
@@ -593,6 +598,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
     taskResult,
     tasks,
     teamResult,
+    milestones,
     timelineRange,
     today,
     view,
@@ -609,7 +615,6 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
         employees={employees}
         initialTaskId={query.task ?? null}
         isAdmin={isAdmin}
-        projectId={project.id}
         tasks={tasks}
       >
         <div className="page flush">
@@ -669,6 +674,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
             isAdmin={isAdmin}
             labelResult={labelResult}
             milestonePanel={milestonePanel}
+            milestones={milestones}
             monthOffset={monthOffset}
             project={project}
             taskResult={taskResult}

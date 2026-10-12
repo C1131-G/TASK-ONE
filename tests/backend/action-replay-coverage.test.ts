@@ -91,6 +91,7 @@ const replayedMutations = new Set([
   "updateProjectAction",
   "updateSavedViewAction",
   "updateSubtaskAction",
+  "rescheduleTaskAction",
   "updateTaskAction",
   "updateTeamAction",
 ]);

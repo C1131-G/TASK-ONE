@@ -9,6 +9,7 @@ import { duplicateTask } from "./work-task-duplicate";
 import { moveTask } from "./work-task-move";
 import { changeTaskStatus, listProjectTasks } from "./work-task-queries";
 import { setTaskRecurrence } from "./work-task-recurrence";
+import { rescheduleTask } from "./work-task-reschedule";
 import { updateTask } from "./work-task-update";
 
 export {
@@ -43,6 +44,7 @@ export const WorkManagementLive = Layer.succeed(
     duplicateTask,
     listProjectTasks,
     moveTask,
+    rescheduleTask,
     restoreTask,
     setTaskRecurrence,
     undoTaskArchive,

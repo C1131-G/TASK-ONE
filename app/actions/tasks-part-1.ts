@@ -18,6 +18,7 @@ import {
 import {
   CreatedTaskSchema,
   ProjectTaskListItemSchema,
+  TaskVersionResultSchema,
   WorkManagement,
   WorkManagementLive,
 } from "@/src/server/work/work-management";
@@ -253,3 +254,53 @@ export async function changeTaskColumnAction(input: unknown) {
 }
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+
+// Moves a task's start and due dates only. Used by the calendar and timeline, so
+// it needs no title, assignee or status, and it still checks version and access.
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function rescheduleTaskAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    Schema.Struct({
+      dueDate: Schema.NullOr(CalendarDateSchema),
+      expectedVersion: Schema.Number,
+      idempotencyKey: IdempotencyKeySchema,
+      startDate: Schema.NullOr(CalendarDateSchema),
+      taskId: UUIDSchema,
+    }),
+    (validated) =>
+      Effect.gen(function* rescheduleTask() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const work = yield* WorkManagement;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...dates } = validated;
+        return yield* idempotency.run({
+          actorId: actor.id,
+          execute: () =>
+            work.rescheduleTask(actor.id, dates.taskId, dates.expectedVersion, {
+              dueDate: dates.dueDate,
+              startDate: dates.startDate,
+            }),
+          input: dates,
+          key: idempotencyKey,
+          operation: "task.reschedule",
+          resultSchema: TaskVersionResultSchema,
+        });
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(WorkManagementLive),
+        Effect.provide(IdempotencyLive)
+      ),
+    undefined,
+    ServerActionOutputSchema
+  );
+  if (result.ok) {
+    revalidatePath("/timeline");
+    revalidatePath("/my-tasks");
+    revalidatePath("/tasks");
+  }
+  return result;
+}

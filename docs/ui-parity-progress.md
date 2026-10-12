@@ -199,3 +199,18 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Browser tests: `tests/e2e/task-drawer.spec.ts` covers opening from a row with `?task=` and reloading, the discard guard, saving the estimate on the same task after a reload, the mention picker, and the comment undo. Each test opens its own starting state.
 - Unit tests: mention parsing and insertion, and the details dirty check (`tests/ui/task-mentions.test.ts`, `tests/ui/task-details-draft.test.ts`).
 - Known gaps: the mention picker is a plain listbox, not the shared Command component. The drawer is not yet wired on `/tasks` and `/my-tasks`, which keep their own panels. Search and favourites results still open the project page rather than the drawer (Phase 5).
+
+## Phase 4 evidence (2026-10-12)
+
+- Reschedule: `rescheduleTaskAction` moves only a task's start and due dates. It checks the expected version and the same edit rule as a full edit (admin, creator or assignee), keeps start on or before due, leaves a recurring task's due date set, and writes a `task.rescheduled` activity. A move that changes nothing does not bump the version. It is idempotent like the other mutations.
+- Calendar: a task chip can be dragged onto another day, which keeps the start-to-due span. Days show a drop highlight. The keyboard path is the chip's Move control, which opens a date form (its submit stays off until the day changes). Chips the viewer cannot edit are static.
+- Timeline bars: a bar is one button. Dragging its body moves it, and dragging either edge resizes it, in whole days (32px a day in week scale, 12px in month). Arrow keys move a bar a day, Shift with arrows changes the due date, and Alt with arrows changes the start date. A click opens the task drawer and does not move the bar. Start never passes due, and due never passes start.
+- Milestones: each project with tasks in view gets a milestone lane. Diamonds sit on their due date, and completed ones are marked. Lanes are read-only here; milestones are still edited in the project panel.
+- Optimistic moves: a move shows at once and rolls back if the server refuses it. Moves are queued, so a second move waits for the first and sends the version the first returned. Results are announced in a live region.
+- Permissions: an editor sees the same rule as the task drawer. The timeline page passes the viewer's editable task IDs to the drawer, so a bar and its drawer agree.
+- Deep links: the workspace timeline now has the task drawer too, and it accepts `?task=`.
+- Browser tests (`tests/e2e/scheduling.spec.ts`): a calendar chip dragged to another day and back, the Move control's disabled submit, a bar click opening the drawer, arrow-key moves persisted across reload, and a mouse drag. The e2e suite now signs in once through a setup project, which fixed the auth rate-limit failures across specs. The full suite passes on the production build (19 pass, employee smoke skipped).
+- Backend tests (`tests/backend/task-reschedule.test.ts`): moves keep the span and other fields, a reversed span is refused, a stale version is refused, a non-editor is refused, and an unchanged move keeps its version.
+- Unit tests: date arithmetic for drags and drops, and the edit rule (`tests/ui/task-dates.test.ts`).
+- Lint, typecheck and the production build pass.
+- Known gaps: milestones cannot be dragged on the timeline. Calendar moves apply to tasks with a due date only, which are the only ones the calendar shows. Dragging on touch screens relies on the Move control.

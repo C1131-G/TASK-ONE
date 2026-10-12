@@ -11,7 +11,10 @@ import { TaskCreateForm } from "@/components/workspace/task-create-form";
 import { WorkspaceTimeline } from "@/components/workspace/workspace-timeline";
 import type { CalendarEventSummary } from "@/src/server/calendar/calendar-contracts";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
-import type { ProjectListItem } from "@/src/server/projects/project-contracts";
+import type {
+  ProjectListItem,
+  ProjectMilestone,
+} from "@/src/server/projects/project-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 
 const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en", {
@@ -38,6 +41,7 @@ export const ProjectTaskViews = ({
   calendarRange,
   calendarMode,
   calendarEvents,
+  milestones,
   timelineRange,
 }: {
   readonly view: string;
@@ -52,6 +56,7 @@ export const ProjectTaskViews = ({
   readonly calendarRange: { readonly from: string; readonly to: string } | null;
   readonly calendarMode: "month" | "week";
   readonly calendarEvents: readonly CalendarEventSummary[] | null;
+  readonly milestones: readonly ProjectMilestone[];
   readonly timelineRange: { readonly from: string; readonly to: string } | null;
 }) => {
   const [calendarTaskOpen, setCalendarTaskOpen] = useState(false);
@@ -107,6 +112,7 @@ export const ProjectTaskViews = ({
             projectId: project.id,
             projectName: project.name,
             recurrence: task.recurrence,
+            startDate: task.startDate,
             status: task.status,
             title: task.title,
             version: task.version,
@@ -127,8 +133,27 @@ export const ProjectTaskViews = ({
   if (view === "timeline" && timelineRange) {
     return (
       <WorkspaceTimeline
+        editableTaskIds={[...editableTaskIds]}
         employees={employees}
         from={timelineRange.from}
+        milestoneLanes={[
+          {
+            milestones: milestones.flatMap((milestone) =>
+              milestone.dueDate
+                ? [
+                    {
+                      completed: milestone.completed,
+                      dueDate: milestone.dueDate,
+                      id: milestone.id,
+                      name: milestone.name,
+                    },
+                  ]
+                : []
+            ),
+            projectId: project.id,
+            projectName: project.name,
+          },
+        ]}
         tasks={tasks.map((task) => ({
           assigneeIds: task.assigneeIds,
           dueDate: task.dueDate,
@@ -140,6 +165,7 @@ export const ProjectTaskViews = ({
           startDate: task.startDate,
           status: task.status,
           title: task.title,
+          version: task.version,
         }))}
         to={timelineRange.to}
       />

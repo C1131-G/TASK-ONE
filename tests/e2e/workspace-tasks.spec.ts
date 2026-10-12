@@ -1,19 +1,7 @@
 import type { BrowserContext, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-const signIn = async (page: Page) => {
-  await page.goto("/login");
-  await page.fill('input[name="email"]', "ui-admin@metsys.test");
-  await page.fill(
-    'input[name="password"]',
-    process.env["E2E_ADMIN_PASSWORD"] ?? ""
-  );
-  await page.click('button[type="submit"]');
-  await page.waitForURL((url) => url.pathname === "/", {
-    timeout: 90_000,
-    waitUntil: "commit",
-  });
-};
+import { ADMIN_STATE } from "./auth-state";
 
 const pickStatus = async (page: Page, label: string) => {
   await page.getByRole("combobox", { name: "Filter by status" }).click();
@@ -30,9 +18,8 @@ test.describe("workspace task pages", () => {
     if (!process.env["E2E_ADMIN_PASSWORD"]) {
       return;
     }
-    context = await browser.newContext();
+    context = await browser.newContext({ storageState: ADMIN_STATE });
     page = await context.newPage();
-    await signIn(page);
   });
 
   test.afterAll(async () => {
@@ -83,10 +70,17 @@ test.describe("workspace task pages", () => {
 
     const viewNav = page.getByRole("navigation", { name: "My Tasks view" });
     await viewNav.getByRole("link", { name: "Calendar" }).click();
-    await expect(page).toHaveURL(/[?&]view=calendar(?:&|$)/u);
+    // The calendar view is a server render, so allow for a cold compile.
+    await expect(page).toHaveURL(/[?&]view=calendar(?:&|$)/u, {
+      timeout: 30_000,
+    });
     await expect(page).toHaveURL(/[?&]status=done(?:&|$)/u);
 
-    await viewNav.getByRole("link", { name: "List" }).click();
+    const listLink = viewNav.getByRole("link", { name: "List" });
+    await listLink.click();
+    await expect(listLink).toHaveAttribute("aria-current", "page", {
+      timeout: 30_000,
+    });
     await expect(page).toHaveURL(/[?&]status=done(?:&|$)/u);
     await expect(page).not.toHaveURL(/view=calendar/u);
   });

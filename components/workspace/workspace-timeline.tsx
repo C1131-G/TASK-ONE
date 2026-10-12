@@ -4,11 +4,13 @@
 
 import { useId, useRef, useState } from "react";
 
+import { useTaskReschedule } from "@/components/workspace/use-task-reschedule";
 import { WorkspaceTimelineChart } from "@/components/workspace/workspace-timeline-chart";
 import { WorkspaceTimelineControls } from "@/components/workspace/workspace-timeline-controls";
 import type {
   TimelineEmployee,
   TimelineGroup,
+  TimelineMilestoneLane,
   TimelineRow,
   TimelineScale,
   TimelineTask,
@@ -31,6 +33,8 @@ const PRIORITY_ORDER: Readonly<Record<string, number>> = {
   urgent: 0,
 };
 const EMPTY_EMPLOYEES: readonly TimelineEmployee[] = [];
+const EMPTY_IDS: readonly string[] = [];
+const EMPTY_LANES: readonly TimelineMilestoneLane[] = [];
 
 const getOffset = (value: string, start: number): number =>
   Math.round((Date.parse(`${value}T00:00:00Z`) - start) / DAY_MS);
@@ -72,9 +76,13 @@ export const WorkspaceTimeline = ({
   from,
   to,
   tasks,
+  editableTaskIds = EMPTY_IDS,
   employees = EMPTY_EMPLOYEES,
+  milestoneLanes = EMPTY_LANES,
 }: {
+  readonly editableTaskIds?: readonly string[];
   readonly from: string;
+  readonly milestoneLanes?: readonly TimelineMilestoneLane[];
   readonly to: string;
   readonly tasks: readonly TimelineTask[];
   readonly employees?: readonly TimelineEmployee[];
@@ -98,7 +106,10 @@ export const WorkspaceTimeline = ({
     employees.map(({ id: employeeId, name }) => [employeeId, name])
   );
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const visibleTasks = tasks
+  // Drags and arrow-key moves show at once and roll back if the server refuses them.
+  const reschedule = useTaskReschedule(tasks);
+  const handleMove = reschedule.move;
+  const visibleTasks = reschedule.tasks
     .filter((task) => {
       const assigneeIds = task.assigneeIds ?? [];
       return (
@@ -137,6 +148,16 @@ export const WorkspaceTimeline = ({
       ? [{ key: "all", label: "Tasks", tasks: visibleTasks }]
       : groupTasks(visibleTasks, groupBy, employeesById);
   const rows: TimelineRow[] = [];
+  const projectsWithTasks = new Set(tasks.map((task) => task.projectId));
+  for (const lane of milestoneLanes) {
+    if (projectsWithTasks.has(lane.projectId)) {
+      rows.push({
+        key: `milestones:${lane.projectId}`,
+        lane,
+        type: "milestones",
+      });
+    }
+  }
   for (const group of groups) {
     if (groupBy !== "none") {
       rows.push({
@@ -188,11 +209,21 @@ export const WorkspaceTimeline = ({
         sortBy={sortBy}
         status={status}
       />
+      <output aria-live="polite" className="sr-only">
+        {reschedule.announcement}
+      </output>
+      {reschedule.error ? (
+        <p className="error panel-b" role="alert">
+          {reschedule.error}
+        </p>
+      ) : null}
       {rows.length ? (
         <WorkspaceTimelineChart
           dayCount={dayCount}
           dayWidth={dayWidth}
+          editableIds={new Set(editableTaskIds)}
           from={from}
+          onMove={handleMove}
           rows={rows}
           scale={scale}
           today={today}

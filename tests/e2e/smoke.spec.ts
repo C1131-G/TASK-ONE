@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// These specs test the login form itself, so they start without a saved session.
+test.use({ storageState: { cookies: [], origins: [] } });
+
 const roles = [
   {
     email: "ui-admin@metsys.test",

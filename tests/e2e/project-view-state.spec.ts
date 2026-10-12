@@ -11,18 +11,6 @@ test.describe("project board view state", () => {
   test("board search is kept in the URL and survives a reload", async ({
     page,
   }) => {
-    await page.goto("/login");
-    await page.fill('input[name="email"]', "ui-admin@metsys.test");
-    await page.fill(
-      'input[name="password"]',
-      process.env["E2E_ADMIN_PASSWORD"] ?? ""
-    );
-    await page.click('button[type="submit"]');
-    await page.waitForURL((url) => url.pathname === "/", {
-      timeout: 90_000,
-      waitUntil: "commit",
-    });
-
     await page.goto("/projects");
     const projectLink = page
       .getByRole("link", { name: /UI Fixture Populated/u })
