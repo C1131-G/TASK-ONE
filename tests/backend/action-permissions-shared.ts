@@ -25,13 +25,13 @@ export const entry = (
 });
 
 export const view = () => ({
-  filters: {},
+  filters: { priority: [], query: "", status: [] },
   groupBy: null,
   hiddenColumns: [],
   isShared: false,
   name: "Permission view",
   projectId: null,
-  sort: [],
+  sort: { direction: "asc", field: "manual" },
   type: "list",
 });
 

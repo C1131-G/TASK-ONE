@@ -19,6 +19,10 @@ import {
   SavedViewSummarySchema,
 } from "../../src/server/preferences/saved-view-management";
 import {
+  defaultSavedViewFilters,
+  defaultSavedViewSort,
+} from "../../src/server/preferences/saved-view-settings";
+import {
   LabelManagement,
   LabelManagementLive,
   LabelSummarySchema,
@@ -99,13 +103,13 @@ it("replays team, label, and saved-view creates without duplicating rows", async
           const labelReplay = yield* createLabel();
 
           const viewInput = {
-            filters: {},
+            filters: defaultSavedViewFilters,
             groupBy: null,
             hiddenColumns: [],
             isShared: false,
             name: viewName,
             projectId: null,
-            sort: [],
+            sort: defaultSavedViewSort,
             type: "list" as const,
           };
           const createView = () =>

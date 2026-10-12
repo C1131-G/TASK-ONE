@@ -111,13 +111,13 @@ afterAll(teardownHarness);
 it("replays personal, notification, and favorite mutations", async () => {
   const ownerId = personaId("owner");
   const viewBody = {
-    filters: {},
+    filters: { priority: [], query: "", status: [] },
     groupBy: null,
     hiddenColumns: [],
     isShared: false,
     name: "Replay view",
     projectId: null,
-    sort: [],
+    sort: { direction: "asc", field: "manual" },
     type: "list",
   };
   const view = await replay<{ id: string }>(

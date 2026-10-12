@@ -23,6 +23,10 @@ import {
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import type { SavedViewSummary } from "@/src/server/preferences/saved-view-contracts";
+import {
+  defaultSavedViewFilters,
+  defaultSavedViewSort,
+} from "@/src/server/preferences/saved-view-settings";
 
 const selectedViewType = (
   value: FormDataEntryValue | null
@@ -60,13 +64,13 @@ export const ProjectSavedViews = ({
       const result = await createSavedViewAction({
         idempotencyKey: crypto.randomUUID(),
         view: {
-          filters: {},
+          filters: defaultSavedViewFilters,
           groupBy: null,
           hiddenColumns: [],
           isShared: isAdmin && formData.get("isShared") === "on",
           name: String(formData.get("name") ?? "").trim(),
           projectId,
-          sort: {},
+          sort: defaultSavedViewSort,
           type: selectedViewType(formData.get("type")),
         },
       });

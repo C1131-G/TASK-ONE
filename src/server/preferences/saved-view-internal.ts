@@ -5,7 +5,11 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import { SavedViewTypeSchema } from "./saved-view-contracts";
 import type { SavedViewSummary } from "./saved-view-contracts";
-import { SavedViewJsonSchema } from "./saved-view-validation";
+import {
+  decodeSavedViewFilters,
+  decodeSavedViewHiddenColumns,
+  decodeSavedViewSort,
+} from "./saved-view-settings";
 
 interface Actor {
   readonly role: string;
@@ -47,16 +51,15 @@ export const toSummary = (view: {
   readonly updatedAt: Date;
 }): SavedViewSummary => ({
   createdAt: view.createdAt.toISOString(),
-  filters: Schema.decodeUnknownSync(SavedViewJsonSchema)(view.filters),
-  groupBy: view.groupBy,
-  hiddenColumns: Schema.decodeUnknownSync(SavedViewJsonSchema)(
-    view.hiddenColumns
-  ),
+  filters: decodeSavedViewFilters(view.filters),
+  groupBy:
+    view.groupBy === "none" || view.groupBy === "status" ? view.groupBy : null,
+  hiddenColumns: decodeSavedViewHiddenColumns(view.hiddenColumns),
   id: view.id,
   isShared: view.isShared,
   name: view.name,
   projectId: view.projectId,
-  sort: Schema.decodeUnknownSync(SavedViewJsonSchema)(view.sort),
+  sort: decodeSavedViewSort(view.sort),
   type: Schema.decodeUnknownSync(SavedViewTypeSchema)(view.type),
   updatedAt: view.updatedAt.toISOString(),
   userId: view.userId,

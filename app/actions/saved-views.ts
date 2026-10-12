@@ -11,10 +11,7 @@ import {
   Idempotency,
   IdempotencyLive,
 } from "@/src/server/core/idempotency";
-import {
-  IdempotencyKeySchema,
-  UUIDSchema,
-} from "@/src/server/core/input-schemas";
+import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
 import {
   ServerActionOutputSchema,
   runServerAction,
@@ -24,17 +21,7 @@ import {
   SavedViewManagementLive,
   SavedViewSummarySchema,
 } from "@/src/server/preferences/saved-view-management";
-
-const SavedViewInputSchema = Schema.Struct({
-  filters: Schema.Json,
-  groupBy: Schema.NullOr(Schema.String),
-  hiddenColumns: Schema.Json,
-  isShared: Schema.Boolean,
-  name: Schema.String,
-  projectId: Schema.NullOr(UUIDSchema),
-  sort: Schema.Json,
-  type: Schema.Literals(["board", "list", "table", "calendar", "timeline"]),
-});
+import { SavedViewInputSchema } from "@/src/server/preferences/saved-view-validation";
 
 const getRequestHeaders = () =>
   Effect.tryPromise({

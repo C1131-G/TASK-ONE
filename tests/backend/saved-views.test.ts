@@ -10,6 +10,10 @@ import {
   SavedViewManagementLive,
   SavedViewSummarySchema,
 } from "../../src/server/preferences/saved-view-management";
+import {
+  defaultSavedViewFilters,
+  defaultSavedViewSort,
+} from "../../src/server/preferences/saved-view-settings";
 
 it("rejects non-JSON values in saved-view output settings", () => {
   expect(() =>
@@ -22,7 +26,7 @@ it("rejects non-JSON values in saved-view output settings", () => {
       isShared: false,
       name: "Invalid saved view",
       projectId: null,
-      sort: {},
+      sort: defaultSavedViewSort,
       type: "board",
       updatedAt: new Date().toISOString(),
       userId: randomUUID(),
@@ -51,13 +55,13 @@ it("shares admin views with employees while keeping personal views private", asy
     const createShared = Effect.gen(function* createShared() {
       const views = yield* SavedViewManagement;
       return yield* views.createView(administratorId, {
-        filters: [{ field: "status", value: "todo" }],
-        groupBy: "assignee",
+        filters: { priority: ["high"], query: "", status: ["todo"] },
+        groupBy: "status",
         hiddenColumns: ["estimate"],
         isShared: true,
         name: "Team backlog",
         projectId: null,
-        sort: { by: "dueDate", direction: "asc" },
+        sort: { direction: "asc", field: "due" },
         type: "board",
       });
     });
@@ -74,13 +78,13 @@ it("shares admin views with employees while keeping personal views private", asy
     const createPrivate = Effect.gen(function* createPrivate() {
       const views = yield* SavedViewManagement;
       return yield* views.createView(employeeId, {
-        filters: [],
+        filters: defaultSavedViewFilters,
         groupBy: null,
         hiddenColumns: [],
         isShared: false,
         name: "My list",
         projectId: null,
-        sort: {},
+        sort: defaultSavedViewSort,
         type: "list",
       });
     });
@@ -90,13 +94,13 @@ it("shares admin views with employees while keeping personal views private", asy
     const employeeAttempt = Effect.gen(function* employeeAttempt() {
       const views = yield* SavedViewManagement;
       return yield* views.createView(employeeId, {
-        filters: [],
+        filters: defaultSavedViewFilters,
         groupBy: null,
         hiddenColumns: [],
         isShared: true,
         name: "Public attempt",
         projectId: null,
-        sort: {},
+        sort: defaultSavedViewSort,
         type: "board",
       });
     });
@@ -114,5 +118,86 @@ it("shares admin views with employees while keeping personal views private", asy
     await authPool.query('DELETE FROM "user" WHERE id = ANY($1::text[])', [
       [administratorId, employeeId],
     ]);
+  }
+});
+
+it("rejects saved-view settings outside the supported typed shape", async () => {
+  const administratorId = randomUUID();
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, \'admin\', false)',
+    [
+      administratorId,
+      "Typed Views Admin",
+      `${administratorId}@views-typed.example`,
+    ]
+  );
+  try {
+    const invalid = await runEffectResult(
+      Effect.provide(
+        Effect.gen(function* createInvalid() {
+          const views = yield* SavedViewManagement;
+          return yield* views.createView(administratorId, {
+            filters: { priority: ["high"], query: "", status: ["todo"] },
+            groupBy: "assignee" as never,
+            hiddenColumns: [],
+            isShared: false,
+            name: "Unsupported grouping",
+            projectId: null,
+            sort: { direction: "asc", field: "dueDate" as never },
+            type: "list",
+          });
+        }),
+        SavedViewManagementLive
+      )
+    );
+    expect(invalid).toMatchObject({
+      error: { code: "VALIDATION_FAILED" },
+      ok: false,
+    });
+  } finally {
+    await authPool.query('DELETE FROM saved_view WHERE "userId" = $1', [
+      administratorId,
+    ]);
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [administratorId]);
+  }
+});
+
+it("reads legacy empty settings rows as the typed defaults", async () => {
+  const administratorId = randomUUID();
+  await authPool.query(
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, \'admin\', false)',
+    [
+      administratorId,
+      "Legacy Views Admin",
+      `${administratorId}@views-legacy.example`,
+    ]
+  );
+  try {
+    await authPool.query(
+      `INSERT INTO saved_view (id, "userId", name, type, "isShared", filters, sort, "hiddenColumns", "createdAt", "updatedAt")
+       VALUES ($1, $2, 'Legacy view', 'list', false, '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, now(), now())`,
+      [randomUUID(), administratorId]
+    );
+    const listed = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* listLegacy() {
+          const views = yield* SavedViewManagement;
+          return yield* views.listViews(administratorId);
+        }),
+        SavedViewManagementLive
+      )
+    );
+    expect(listed).toHaveLength(1);
+    expect(listed[0]).toMatchObject({
+      filters: defaultSavedViewFilters,
+      groupBy: null,
+      hiddenColumns: [],
+      sort: defaultSavedViewSort,
+    });
+  } finally {
+    await authPool.query('DELETE FROM saved_view WHERE "userId" = $1', [
+      administratorId,
+    ]);
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [administratorId]);
   }
 });

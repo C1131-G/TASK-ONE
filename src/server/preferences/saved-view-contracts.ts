@@ -2,6 +2,17 @@ import type { Effect } from "effect";
 import { Context, Schema } from "effect";
 
 import type { AppError } from "../core/action-result";
+import {
+  SavedViewFiltersSchema,
+  SavedViewGroupBySchema,
+  SavedViewHiddenColumnsSchema,
+  SavedViewSortSchema,
+} from "./saved-view-settings";
+import type {
+  SavedViewFilters,
+  SavedViewGroupBy,
+  SavedViewSort,
+} from "./saved-view-settings";
 
 export type SavedViewType =
   | "board"
@@ -22,10 +33,10 @@ export interface SavedViewInput {
   readonly name: string;
   readonly type: SavedViewType;
   readonly projectId: string | null;
-  readonly filters: typeof Schema.Json.Type;
-  readonly sort: typeof Schema.Json.Type;
-  readonly groupBy: string | null;
-  readonly hiddenColumns: typeof Schema.Json.Type;
+  readonly filters: SavedViewFilters;
+  readonly sort: SavedViewSort;
+  readonly groupBy: SavedViewGroupBy;
+  readonly hiddenColumns: readonly string[];
   readonly isShared: boolean;
 }
 
@@ -38,14 +49,14 @@ export interface SavedViewSummary extends SavedViewInput {
 
 export const SavedViewSummarySchema = Schema.Struct({
   createdAt: Schema.String,
-  filters: Schema.Json,
-  groupBy: Schema.NullOr(Schema.String),
-  hiddenColumns: Schema.Json,
+  filters: SavedViewFiltersSchema,
+  groupBy: SavedViewGroupBySchema,
+  hiddenColumns: SavedViewHiddenColumnsSchema,
   id: Schema.String,
   isShared: Schema.Boolean,
   name: Schema.String,
   projectId: Schema.NullOr(Schema.String),
-  sort: Schema.Json,
+  sort: SavedViewSortSchema,
   type: SavedViewTypeSchema,
   updatedAt: Schema.String,
   userId: Schema.String,
