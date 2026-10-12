@@ -1,14 +1,12 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { searchWorkspaceAction } from "@/app/actions/discovery";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -16,20 +14,50 @@ import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import type { WorkspaceSearchResults } from "@/src/server/preferences/discovery-contracts";
 
 const SearchForm = ({
+  initialQuery,
   recentSearches,
 }: {
+  readonly initialQuery: string;
   readonly recentSearches: readonly string[];
 }) => {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<WorkspaceSearchResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const search = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  useEffect(() => {
+    if (!initialQuery.trim()) {
+      return;
+    }
+    let cancelled = false;
+    const loadInitialResults = async () => {
+      const result = await searchWorkspaceAction({ query: initialQuery });
+      if (cancelled) {
+        return;
+      }
+      if (!result.ok) {
+        setError(result.error.message);
+        setResults(null);
+        return;
+      }
+      setError(null);
+      setResults(result.data);
+    };
+    void loadInitialResults();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialQuery]);
+
+  const executeSearch = (searchQuery: string) => {
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) {
+      return;
+    }
+    setQuery(searchQuery);
     startTransition(async () => {
-      const result = await searchWorkspaceAction({ query });
+      const result = await searchWorkspaceAction({ query: trimmedQuery });
       if (!result.ok) {
         setError(result.error.message);
         setResults(null);
@@ -39,6 +67,11 @@ const SearchForm = ({
       setResults(result.data);
       router.refresh();
     });
+  };
+
+  const search = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    executeSearch(query);
   };
 
   return (
@@ -120,7 +153,7 @@ const SearchForm = ({
               <WorkspaceButton
                 className="chip"
                 key={item}
-                onClick={() => setQuery(item)}
+                onClick={() => executeSearch(item)}
                 type="button"
               >
                 {item}

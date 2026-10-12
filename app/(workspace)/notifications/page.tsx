@@ -25,12 +25,6 @@ const NotificationsPage = async () => {
   }
   return (
     <div className="page">
-      <div className="ph">
-        <div>
-          <h1>Notifications</h1>
-          <p>Activity and updates from your workspace.</p>
-        </div>
-      </div>
       <NotificationList
         items={result.data.items}
         unreadCount={result.data.unreadCount}

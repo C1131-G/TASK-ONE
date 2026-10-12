@@ -1,8 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -10,7 +8,9 @@ import { useState, useTransition } from "react";
 
 import { deleteTeamAction, updateTeamAction } from "@/app/actions/teams";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
 
 interface Team {
   readonly id: string;
@@ -20,7 +20,13 @@ interface Team {
   readonly memberCount: number;
 }
 
-export const TeamAdminControls = ({ team }: { readonly team: Team }) => {
+export const TeamAdminControls = ({
+  team,
+  triggerLabel = "Manage",
+}: {
+  readonly team: Team;
+  readonly triggerLabel?: string;
+}) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -58,13 +64,22 @@ export const TeamAdminControls = ({ team }: { readonly team: Team }) => {
     });
 
   return (
-    <details className="team-admin-controls">
-      <summary className="ibtn ibtn-sm" aria-label={`Manage ${team.name}`}>
-        Manage
-      </summary>
+    <WorkspaceDisclosure
+      description={`Manage the ${team.name} team details and membership.`}
+      title={`Manage ${team.name}`}
+      trigger={
+        <WorkspaceButton
+          aria-label={`${triggerLabel} ${team.name}`}
+          className="ibtn ibtn-sm"
+          type="button"
+        >
+          {triggerLabel}
+        </WorkspaceButton>
+      }
+    >
       <div className="panel-b stack">
         <form action={save} className="stack">
-          <label className="field">
+          <label className="field" htmlFor={`team-${team.id}-field-75`}>
             <span>Team name</span>
             <WorkspaceInput
               className="input"
@@ -72,24 +87,27 @@ export const TeamAdminControls = ({ team }: { readonly team: Team }) => {
               maxLength={80}
               name="name"
               required
+              id={`team-${team.id}-field-75`}
             />
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`team-${team.id}-field-85`}>
             <span>Description</span>
             <WorkspaceInput
               className="input"
               defaultValue={team.description ?? ""}
               maxLength={500}
               name="description"
+              id={`team-${team.id}-field-85`}
             />
           </label>
-          <label className="field">
+          <label className="field" htmlFor={`team-${team.id}-field-94`}>
             <span>Color</span>
             <WorkspaceInput
               className="input"
               defaultValue={team.color}
               name="color"
               type="color"
+              id={`team-${team.id}-field-94`}
             />
           </label>
           <WorkspaceButton
@@ -106,15 +124,21 @@ export const TeamAdminControls = ({ team }: { readonly team: Team }) => {
             {error}
           </p>
         ) : null}
-        <WorkspaceButton
-          className="btn btn-sm btn-ghost"
-          disabled={pending || team.memberCount > 0}
-          onClick={remove}
-          type="button"
+        <WorkspaceConfirmDialog
+          confirmLabel="Delete team"
+          description={`Delete the ${team.name} team? This cannot be undone.`}
+          onConfirm={remove}
+          title="Delete team"
         >
-          Delete team
-        </WorkspaceButton>
+          <WorkspaceButton
+            className="btn btn-sm btn-ghost"
+            disabled={pending || team.memberCount > 0}
+            type="button"
+          >
+            Delete team
+          </WorkspaceButton>
+        </WorkspaceConfirmDialog>
       </div>
-    </details>
+    </WorkspaceDisclosure>
   );
 };

@@ -43,10 +43,12 @@ const ArchiveRestoreButton = ({
   return (
     <span className="col">
       <WorkspaceButton
-        className="btn btn-sm btn-secondary"
         disabled={pending}
         onClick={restore}
+        size="sm"
         type="button"
+        variant="secondary"
+        workspace
       >
         {pending ? "Restoring…" : "Restore"}
       </WorkspaceButton>

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 
 import { listNotificationInboxAction } from "@/app/actions/notifications";
-import { NotificationList } from "@/components/workspace/notification-list";
+import { InboxWorkspace } from "@/components/workspace/inbox-workspace";
 
 export const metadata: Metadata = { title: "Inbox | Metsys" };
 
@@ -12,7 +12,7 @@ const InboxPage = async () => {
   await connection();
   const result = await listNotificationInboxAction({
     limit: 100,
-    unreadOnly: true,
+    unreadOnly: false,
   });
   if (!result.ok) {
     return (
@@ -28,10 +28,9 @@ const InboxPage = async () => {
       <div className="ph">
         <div>
           <h1>Inbox</h1>
-          <p>Updates that need your attention.</p>
         </div>
       </div>
-      <NotificationList
+      <InboxWorkspace
         items={result.data.items}
         unreadCount={result.data.unreadCount}
       />

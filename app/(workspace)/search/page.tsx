@@ -8,9 +8,14 @@ import { SearchForm } from "@/components/workspace/search-form";
 
 export const metadata: Metadata = { title: "Search | Metsys" };
 
-const SearchPage = async () => {
+const SearchPage = async ({ searchParams }: PageProps<"/search">) => {
   await connection();
-  const result = await getPersonalWorkspaceAction({});
+  const [params, result] = await Promise.all([
+    searchParams,
+    getPersonalWorkspaceAction({}),
+  ]);
+  const initialQuery =
+    typeof params.q === "string" ? params.q.slice(0, 120) : "";
   return (
     <div className="page">
       <div className="ph">
@@ -20,6 +25,8 @@ const SearchPage = async () => {
         </div>
       </div>
       <SearchForm
+        initialQuery={initialQuery}
+        key={initialQuery}
         recentSearches={result.ok ? result.data.recentSearches : []}
       />
     </div>

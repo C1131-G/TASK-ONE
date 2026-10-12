@@ -1,6 +1,7 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 
 import { listTeamsAction } from "@/app/actions/teams";
@@ -48,7 +49,13 @@ const TeamsPage = async () => {
                 >
                   ●
                 </span>
-                <strong className="grow">{team.name}</strong>
+                <Link
+                  className="team-card-link grow"
+                  href={`/teams/${team.id}` as Route}
+                >
+                  <strong>{team.name}</strong>
+                  <span className="muted">{team.memberCount} members</span>
+                </Link>
               </div>
               <p className="desc">{team.description || "No description"}</p>
               {session.kind === "authenticated" &&

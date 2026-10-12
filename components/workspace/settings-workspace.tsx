@@ -1,0 +1,169 @@
+/* eslint-disable shadcn/no-unknown-classes */
+/* eslint-disable shadcn/no-restyle */
+
+"use client";
+
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import type { ReactNode } from "react";
+
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const ThemeChoice = ({
+  description,
+  id,
+  label,
+}: {
+  readonly description: string;
+  readonly id: string;
+  readonly label: string;
+}) => (
+  <label className="settings-theme-choice" htmlFor={id}>
+    <span
+      aria-hidden="true"
+      className="settings-theme-preview"
+      data-theme-preview={id}
+    >
+      <span className="settings-preview-sidebar" />
+      <span className="settings-preview-main">
+        <i />
+        <i />
+        <i />
+        <b />
+      </span>
+    </span>
+    <span className="settings-theme-choice-caption">
+      <RadioGroupItem id={id} value={id} />
+      <span>
+        <strong>{label}</strong>
+        <span>{description}</span>
+      </span>
+    </span>
+  </label>
+);
+
+const SettingsWorkspace = ({
+  canManageWorkspace,
+  initialSection,
+  notificationPreferences,
+  preferences,
+  profile,
+  sessions,
+  workspace,
+}: {
+  readonly canManageWorkspace: boolean;
+  readonly initialSection: "appearance" | "preferences";
+  readonly notificationPreferences: ReactNode;
+  readonly preferences: ReactNode;
+  readonly profile: ReactNode;
+  readonly sessions: ReactNode;
+  readonly workspace: ReactNode;
+}) => {
+  const { setTheme, theme } = useTheme();
+
+  return (
+    <Tabs
+      className="settings-workspace"
+      data-workspace-settings="true"
+      defaultValue={initialSection}
+      orientation="horizontal"
+    >
+      <TabsList aria-label="Settings sections" className="settings-nav">
+        <TabsTrigger value="appearance">Appearance</TabsTrigger>
+        <TabsTrigger value="profile">Profile</TabsTrigger>
+        <TabsTrigger value="preferences">Preferences</TabsTrigger>
+        <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        {canManageWorkspace ? (
+          <TabsTrigger value="workspace">Workspace</TabsTrigger>
+        ) : null}
+      </TabsList>
+      <div className="settings-content">
+        <TabsContent value="appearance">
+          <section className="panel">
+            <div className="panel-h">
+              <h2>Appearance</h2>
+              <p>Customize how Metsys looks on this device.</p>
+            </div>
+            <div className="panel-b stack">
+              <div>
+                <h3 className="settings-section-title">Theme</h3>
+                <p className="muted">
+                  Choose a theme or follow your device setting.
+                </p>
+              </div>
+              <RadioGroup
+                aria-label="Theme"
+                className="settings-theme-options"
+                onValueChange={setTheme}
+                value={theme ?? "system"}
+              >
+                <ThemeChoice
+                  description="Use your device appearance setting."
+                  id="system"
+                  label="System"
+                />
+                <ThemeChoice
+                  description="Use a light workspace."
+                  id="light"
+                  label="Light"
+                />
+                <ThemeChoice
+                  description="Use a dark workspace."
+                  id="dark"
+                  label="Dark"
+                />
+              </RadioGroup>
+            </div>
+          </section>
+        </TabsContent>
+        <TabsContent value="profile">
+          <section className="panel">
+            <div className="panel-h">
+              <h2>Profile</h2>
+              <p>Update the name and profile photo shown to your team.</p>
+            </div>
+            {profile}
+            <div className="panel-b settings-password-link">
+              <Link className="btn btn-secondary" href="/change-password">
+                Change password
+              </Link>
+            </div>
+          </section>
+        </TabsContent>
+        <TabsContent value="preferences">
+          <section className="panel">
+            <div className="panel-h">
+              <h2>Preferences</h2>
+              <p>Choose how dates and task lists are shown for your account.</p>
+            </div>
+            {preferences}
+          </section>
+          {notificationPreferences}
+        </TabsContent>
+        <TabsContent value="sessions">
+          <section className="panel">
+            <div className="panel-h">
+              <h2>Active sessions</h2>
+              <p>Review and revoke sessions for this account.</p>
+            </div>
+            {sessions}
+          </section>
+        </TabsContent>
+        {canManageWorkspace ? (
+          <TabsContent value="workspace">
+            <section className="panel">
+              <div className="panel-h">
+                <h2>Workspace</h2>
+                <p>Manage company identity and default time zone.</p>
+              </div>
+              {workspace}
+            </section>
+          </TabsContent>
+        ) : null}
+      </div>
+    </Tabs>
+  );
+};
+
+export { SettingsWorkspace };

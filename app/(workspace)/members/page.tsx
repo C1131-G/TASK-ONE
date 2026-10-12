@@ -5,14 +5,16 @@ import { connection } from "next/server";
 
 import { listEmployeesAction } from "@/app/actions/employees";
 import { listTeamsAction } from "@/app/actions/teams";
-import { EmployeeAdminControls } from "@/components/workspace/employee-admin-controls";
+import { MembersDirectory } from "@/components/workspace/members-directory";
 import { EmployeeCreateForm } from "@/components/workspace/people-admin-forms";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = { title: "Members | Metsys" };
 
-const MembersPage = async () => {
+const MembersPage = async ({ searchParams }: PageProps<"/members">) => {
   await connection();
+  const params = await searchParams;
+  const section = params.section === "roles" ? "roles" : "members";
   const [result, teams, session] = await Promise.all([
     listEmployeesAction({ search: "" }),
     listTeamsAction({}),
@@ -32,50 +34,20 @@ const MembersPage = async () => {
       <div className="ph">
         <div>
           <h1>Members</h1>
-          <p>People in your Metsys workspace.</p>
+          <p>{result.data.length} people in your Metsys workspace.</p>
         </div>
+        {session.kind === "authenticated" && session.user.role === "admin" ? (
+          <EmployeeCreateForm teams={teams.ok ? teams.data : []} />
+        ) : null}
       </div>
-      {session.kind === "authenticated" && session.user.role === "admin" ? (
-        <EmployeeCreateForm teams={teams.ok ? teams.data : []} />
-      ) : null}
-      {result.data.length ? (
-        <section className="panel">
-          <div className="panel-h">
-            <h2>People</h2>
-            <span className="ct">{result.data.length}</span>
-          </div>
-          <div className="panel-b feed lined">
-            {result.data.map((employee) => (
-              <article className="row" key={employee.id}>
-                <span aria-hidden="true" className="av">
-                  {employee.name.slice(0, 1).toUpperCase()}
-                </span>
-                <div className="grow">
-                  <strong>{employee.name}</strong>
-                  <p className="muted">
-                    {employee.jobTitle || "Team member"}
-                    {employee.teamName ? ` · ${employee.teamName}` : ""}
-                  </p>
-                </div>
-                <span className="ct">
-                  {employee.role === "admin" ? "Admin" : "Employee"}
-                </span>
-                {session.kind === "authenticated" &&
-                session.user.role === "admin" ? (
-                  <EmployeeAdminControls
-                    employee={employee}
-                    teams={teams.ok ? teams.data : []}
-                  />
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : (
-        <section className="panel panel-b">
-          <h2>No members found</h2>
-        </section>
-      )}
+      <MembersDirectory
+        canManageMembers={
+          session.kind === "authenticated" && session.user.role === "admin"
+        }
+        employees={result.data}
+        section={section}
+        teams={teams.ok ? teams.data : []}
+      />
     </div>
   );
 };

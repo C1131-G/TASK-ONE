@@ -1,8 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -16,6 +14,11 @@ import {
 } from "@/app/actions/employees";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
+import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 
 interface Employee {
   readonly id: string;
@@ -104,8 +107,15 @@ export const EmployeeAdminControls = ({
     });
 
   return (
-    <details className="employee-admin-controls">
-      <summary className="btn btn-sm btn-ghost">Manage</summary>
+    <WorkspaceDisclosure
+      description={`Manage the account and access for ${employee.email}.`}
+      title="Manage employee"
+      trigger={
+        <WorkspaceButton className="btn btn-sm btn-ghost" type="button">
+          Manage
+        </WorkspaceButton>
+      }
+    >
       <div className="panel-b stack">
         {error ? (
           <p className="error" role="alert">
@@ -113,7 +123,10 @@ export const EmployeeAdminControls = ({
           </p>
         ) : null}
         <form action={saveDetails} className="stack">
-          <label className="field">
+          <label
+            className="field"
+            htmlFor={`employee-${employee.id}-field-126`}
+          >
             <span>Login email</span>
             <WorkspaceInput
               autoComplete="email"
@@ -123,31 +136,40 @@ export const EmployeeAdminControls = ({
               name="email"
               required
               type="email"
+              id={`employee-${employee.id}-field-126`}
             />
           </label>
-          <label className="field">
+          <label
+            className="field"
+            htmlFor={`employee-${employee.id}-field-138`}
+          >
             <span>Job title</span>
             <WorkspaceInput
               className="input"
               defaultValue={employee.jobTitle ?? ""}
               maxLength={120}
               name="jobTitle"
+              id={`employee-${employee.id}-field-138`}
             />
           </label>
-          <label className="field">
+          <label
+            className="field"
+            htmlFor={`employee-${employee.id}-field-147`}
+          >
             <span>Team</span>
-            <select
+            <WorkspaceSelect
               className="input"
               defaultValue={employee.teamId ?? ""}
               name="teamId"
+              id={`employee-${employee.id}-field-147`}
             >
-              <option value="">No team</option>
+              <WorkspaceSelectItem value="">No team</WorkspaceSelectItem>
               {teams.map((team) => (
-                <option key={team.id} value={team.id}>
+                <WorkspaceSelectItem key={team.id} value={team.id}>
                   {team.name}
-                </option>
+                </WorkspaceSelectItem>
               ))}
-            </select>
+            </WorkspaceSelect>
           </label>
           <WorkspaceButton
             className="btn btn-sm btn-secondary"
@@ -157,19 +179,18 @@ export const EmployeeAdminControls = ({
             Save details
           </WorkspaceButton>
         </form>
-        <label className="field">
+        <label className="field" htmlFor={`employee-${employee.id}-field-170`}>
           <span>Role</span>
-          <select
+          <WorkspaceSelect
             className="input"
             disabled={pending}
-            onChange={(event) =>
-              changeRole(event.currentTarget.value as "admin" | "employee")
-            }
+            onValueChange={(role) => changeRole(role as "admin" | "employee")}
             value={employee.role}
+            id={`employee-${employee.id}-field-170`}
           >
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-          </select>
+            <WorkspaceSelectItem value="employee">Employee</WorkspaceSelectItem>
+            <WorkspaceSelectItem value="admin">Admin</WorkspaceSelectItem>
+          </WorkspaceSelect>
         </label>
         <div className="row">
           <WorkspaceButton
@@ -199,6 +220,6 @@ export const EmployeeAdminControls = ({
           </output>
         ) : null}
       </div>
-    </details>
+    </WorkspaceDisclosure>
   );
 };

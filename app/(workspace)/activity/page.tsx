@@ -15,7 +15,7 @@ const ActivityPage = () => (
     <div className="ph">
       <div>
         <h1>Activity</h1>
-        <p>Recent changes across your projects.</p>
+        <p>Everything that&apos;s changed across the workspace.</p>
       </div>
     </div>
     <Suspense fallback={<ActivityFeedSkeleton />}>

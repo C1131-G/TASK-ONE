@@ -5,6 +5,7 @@ import { connection } from "next/server";
 
 import { getCompanySettingsAction } from "@/app/actions/company-settings";
 import { listEmployeesAction } from "@/app/actions/employees";
+import { getNotificationPreferencesAction } from "@/app/actions/notifications";
 import { getPersonalPreferencesAction } from "@/app/actions/personal-preferences";
 import { listMySessionsAction } from "@/app/actions/sessions";
 import { getAvatarDownloadUrlAction } from "@/app/actions/uploads";
@@ -12,23 +13,35 @@ import { AvatarUpload } from "@/components/workspace/avatar-upload";
 import { SessionList } from "@/components/workspace/session-list";
 import {
   CompanySettingsForm,
+  NotificationPreferencesForm,
   PreferencesForm,
   ProfileForm,
 } from "@/components/workspace/settings-forms";
+import { SettingsWorkspace } from "@/components/workspace/settings-workspace";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = { title: "Settings | Metsys" };
 
-const SettingsPage = async () => {
+const SettingsPage = async ({ searchParams }: PageProps<"/settings">) => {
   await connection();
-  const [session, preferences, company, employees, sessions] =
-    await Promise.all([
-      getPageSession(),
-      getPersonalPreferencesAction({}),
-      getCompanySettingsAction({}),
-      listEmployeesAction({ search: "" }),
-      listMySessionsAction({}),
-    ]);
+  const params = await searchParams;
+  const initialSection =
+    params.section === "preferences" ? "preferences" : "appearance";
+  const [
+    session,
+    preferences,
+    company,
+    employees,
+    sessions,
+    notificationPrefs,
+  ] = await Promise.all([
+    getPageSession(),
+    getPersonalPreferencesAction({}),
+    getCompanySettingsAction({}),
+    listEmployeesAction({ search: "" }),
+    listMySessionsAction({}),
+    getNotificationPreferencesAction({}),
+  ]);
   const user = session.kind === "authenticated" ? session.user : null;
   const employee =
     user && employees.ok
@@ -46,12 +59,29 @@ const SettingsPage = async () => {
           <p>Manage your account and workspace preferences.</p>
         </div>
       </div>
-      <div className="stack">
-        <section className="panel">
-          <div className="panel-h">
-            <h2>Profile</h2>
-          </div>
-          {employee ? (
+      <SettingsWorkspace
+        canManageWorkspace={isAdmin}
+        initialSection={initialSection}
+        notificationPreferences={
+          notificationPrefs.ok ? (
+            <NotificationPreferencesForm values={notificationPrefs.data} />
+          ) : (
+            <div className="panel-b muted">
+              Notification preferences could not be loaded.
+            </div>
+          )
+        }
+        preferences={
+          preferences.ok ? (
+            <PreferencesForm values={preferences.data} />
+          ) : (
+            <div className="panel-b muted">
+              Preferences could not be loaded.
+            </div>
+          )
+        }
+        profile={
+          employee ? (
             <div className="stack">
               <div className="panel-b">
                 <AvatarUpload
@@ -65,36 +95,25 @@ const SettingsPage = async () => {
             <div className="panel-b muted">
               Profile details are unavailable.
             </div>
-          )}
-        </section>
-        {sessions.ok ? <SessionList sessions={sessions.data} /> : null}
-        <section className="panel">
-          <div className="panel-h">
-            <h2>Personal preferences</h2>
-          </div>
-          {preferences.ok ? (
-            <PreferencesForm values={preferences.data} />
+          )
+        }
+        sessions={
+          sessions.ok ? (
+            <SessionList sessions={sessions.data} />
+          ) : (
+            <div className="panel-b muted">Sessions could not be loaded.</div>
+          )
+        }
+        workspace={
+          company.ok ? (
+            <CompanySettingsForm values={company.data} />
           ) : (
             <div className="panel-b muted">
-              Preferences could not be loaded.
+              Workspace settings could not be loaded.
             </div>
-          )}
-        </section>
-        {isAdmin ? (
-          <section className="panel">
-            <div className="panel-h">
-              <h2>Company settings</h2>
-            </div>
-            {company.ok ? (
-              <CompanySettingsForm values={company.data} />
-            ) : (
-              <div className="panel-b muted">
-                Company settings could not be loaded.
-              </div>
-            )}
-          </section>
-        ) : null}
-      </div>
+          )
+        }
+      />
     </div>
   );
 };

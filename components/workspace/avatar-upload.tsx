@@ -3,13 +3,15 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import {
   finalizeAvatarUploadAction,
   getAvatarDownloadUrlAction,
   requestAvatarUploadAction,
 } from "@/app/actions/uploads";
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 
 export const AvatarUpload = ({
   userId,
@@ -21,6 +23,7 @@ export const AvatarUpload = ({
   const [avatarUrl, setAvatarUrl] = useState(initialUrl);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const uploadInput = useRef<HTMLInputElement>(null);
 
   const upload = (file: File | undefined) => {
     if (!file) {
@@ -94,19 +97,28 @@ export const AvatarUpload = ({
           M
         </span>
       )}
-      <label className="btn btn-sm btn-secondary">
+      <WorkspaceButton
+        disabled={pending}
+        onClick={() => uploadInput.current?.click()}
+        size="sm"
+        type="button"
+        variant="secondary"
+        workspace
+      >
         {pending ? "Uploading…" : "Change photo"}
-        <input
-          accept="image/jpeg,image/png,image/webp"
-          className="sr-only"
-          disabled={pending}
-          onChange={(event) => {
-            upload(event.currentTarget.files?.[0]);
-            event.currentTarget.value = "";
-          }}
-          type="file"
-        />
-      </label>
+      </WorkspaceButton>
+      <WorkspaceInput
+        accept="image/jpeg,image/png,image/webp"
+        aria-label="Choose a profile photo"
+        className="sr-only"
+        disabled={pending}
+        onChange={(event) => {
+          upload(event.currentTarget.files?.[0]);
+          event.currentTarget.value = "";
+        }}
+        ref={uploadInput}
+        type="file"
+      />
       {error ? (
         <span className="error" role="alert">
           {error}
