@@ -5,6 +5,7 @@
 import {
   changeTaskColumnAction as changeColumn,
   createTaskAction as createTask,
+  getProjectTaskAction as getProjectTask,
   listProjectTasksAction as listTasks,
   updateTaskAction as updateTask,
 } from "./tasks-part-1";
@@ -24,6 +25,10 @@ import {
   reorderTasksAction as reorderTasks,
   setTaskRelationsAction as setRelations,
 } from "./tasks-part-4";
+
+export async function getProjectTaskAction(input: unknown) {
+  return await getProjectTask(input);
+}
 
 export async function listProjectTasksAction(input: unknown) {
   return await listTasks(input);

@@ -11,7 +11,6 @@ import {
   archiveTaskAction,
   duplicateTaskAction,
   undoTaskArchiveAction,
-  undoTaskCompletionAction,
 } from "@/app/actions/tasks";
 import {
   DropdownMenu,
@@ -20,9 +19,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { EditableTask } from "@/components/workspace/task-details-draft";
 import { TaskDetailsPanel } from "@/components/workspace/task-details-panel";
-import { TaskEditForm } from "@/components/workspace/task-edit-form";
-import type { EditableTask } from "@/components/workspace/task-edit-form";
+import { useTaskDrawer } from "@/components/workspace/task-drawer";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
 
@@ -58,31 +57,15 @@ const TaskManageControls = ({
   const setVersion = (value: number) =>
     setVersionState({ sourceVersion: task.version, value });
   const [error, setError] = useState<string | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
-  const registerCompletionUndo = (
-    undo: {
-      readonly undoId: string;
-      readonly expiresAt: string;
-    } | null
-  ) => {
-    if (!undo) {
-      return;
+  const [localDetailsOpen, setLocalDetailsOpen] = useState(false);
+  // Inside a page drawer the details open there, so the row renders no panel.
+  const drawer = useTaskDrawer();
+  const openDetails = () => {
+    if (drawer) {
+      drawer.openTask(task.id);
+    } else {
+      setLocalDetailsOpen(true);
     }
-    addUndo({
-      expiresAt: undo.expiresAt,
-      label: `Completed “${task.title}”`,
-      run: async () => {
-        const result = await undoTaskCompletionAction({
-          idempotencyKey: crypto.randomUUID(),
-          undoId: undo.undoId,
-        });
-        if (!result.ok) {
-          return result.error.message;
-        }
-        router.refresh();
-        return null;
-      },
-    });
   };
 
   const duplicate = () =>
@@ -131,17 +114,6 @@ const TaskManageControls = ({
 
   return (
     <div className="task-manage">
-      {canEdit ? (
-        <TaskEditForm
-          employees={employees}
-          onCompletionUndo={registerCompletionUndo}
-          onOpenChange={setEditOpen}
-          onVersionChange={setVersion}
-          open={editOpen}
-          task={task}
-          version={version}
-        />
-      ) : null}
       {canEdit || isAdmin ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -162,7 +134,7 @@ const TaskManageControls = ({
           >
             {canEdit ? (
               <>
-                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                <DropdownMenuItem onSelect={openDetails}>
                   Edit task
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={duplicate}>
@@ -184,31 +156,43 @@ const TaskManageControls = ({
           {error}
         </p>
       ) : null}
-      <TaskDetailsPanel
-        currentUserId={currentUserId}
-        editable={canEdit}
-        isAdmin={isAdmin}
-        projectId={task.projectId}
-        taskId={task.id}
-        version={version}
-        onVersionChange={setVersion}
-        employees={employees}
-        labelIds={task.labelIds}
-        dependencyIds={task.dependencyIds}
-        recurrence={task.recurrence}
-        dueDate={task.dueDate}
-        trigger={
-          <WorkspaceButton
-            aria-label={`Open details for ${task.title}`}
-            className="ibtn ibtn-sm"
-            size="icon-sm"
-            title={`Open details for ${task.title}`}
-            type="button"
-          >
-            <ListBullets aria-hidden="true" size={16} />
-          </WorkspaceButton>
-        }
-      />
+      {drawer ? (
+        <WorkspaceButton
+          aria-label={`Open details for ${task.title}`}
+          className="ibtn ibtn-sm"
+          onClick={openDetails}
+          size="icon-sm"
+          title={`Open details for ${task.title}`}
+          type="button"
+        >
+          <ListBullets aria-hidden="true" size={16} />
+        </WorkspaceButton>
+      ) : (
+        <TaskDetailsPanel
+          currentUserId={currentUserId}
+          editable={canEdit}
+          employees={employees}
+          isAdmin={isAdmin}
+          onOpenChange={setLocalDetailsOpen}
+          onVersionChange={setVersion}
+          open={localDetailsOpen}
+          projectId={task.projectId}
+          taskId={task.id}
+          taskTitle={task.title}
+          trigger={
+            <WorkspaceButton
+              aria-label={`Open details for ${task.title}`}
+              className="ibtn ibtn-sm"
+              size="icon-sm"
+              title={`Open details for ${task.title}`}
+              type="button"
+            >
+              <ListBullets aria-hidden="true" size={16} />
+            </WorkspaceButton>
+          }
+          version={version}
+        />
+      )}
     </div>
   );
 };

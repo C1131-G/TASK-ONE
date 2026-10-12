@@ -51,15 +51,11 @@ export const CalendarTaskChip = ({
   return (
     <TaskDetailsPanel
       currentUserId={currentUserId}
-      dependencyIds={task.dependencyIds}
-      dueDate={task.dueDate}
       editable={editable}
       employees={employees}
       isAdmin={isAdmin}
-      labelIds={task.labelIds}
       onVersionChange={setVersion}
       projectId={task.projectId}
-      recurrence={task.recurrence}
       taskId={task.id}
       taskTitle={task.title}
       trigger={

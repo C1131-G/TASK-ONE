@@ -44,17 +44,13 @@ export const ProjectUpcomingTaskDetails = ({
   return (
     <TaskDetailsPanel
       currentUserId={currentUserId}
-      dependencyIds={task.dependencyIds}
-      dueDate={task.dueDate}
       editable={canEdit}
       employees={employees}
       isAdmin={isAdmin}
-      labelIds={task.labelIds}
       onVersionChange={(value) =>
         setVersionState({ sourceVersion: task.version, value })
       }
       projectId={task.projectId}
-      recurrence={task.recurrence}
       taskId={task.id}
       trigger={
         <WorkspaceButton

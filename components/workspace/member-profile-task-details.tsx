@@ -38,17 +38,13 @@ export const MemberProfileTaskDetails = ({
   return (
     <TaskDetailsPanel
       currentUserId={viewerId}
-      dependencyIds={task.dependencyIds}
-      dueDate={task.dueDate}
       editable={editable}
       employees={employees}
       isAdmin={isAdmin}
-      labelIds={task.labelIds}
       onVersionChange={(value) =>
         setVersionState({ sourceVersion: task.version, value })
       }
       projectId={task.projectId}
-      recurrence={task.recurrence}
       taskId={task.id}
       taskTitle={task.title}
       trigger={

@@ -187,6 +187,7 @@ export class WorkManagement extends Context.Service<
         readonly includeArchived?: boolean;
         readonly limit: number;
         readonly offset: number;
+        readonly taskId?: string;
       }
     ) => Effect.Effect<readonly ProjectTaskListItem[], AppError>;
     readonly createTask: (

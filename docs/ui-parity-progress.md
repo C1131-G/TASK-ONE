@@ -186,3 +186,16 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Backend tests: preference widths round-trip, survive display saves, and reject out-of-range or oversized maps (`tests/backend/personal-preferences.test.ts`). The full backend suite passes.
 - Lint, typecheck (0 errors) and the production build pass.
 - Phase 2 is complete. Remaining work is in later phases: the drawer and mention picker (Phase 3), calendar and timeline scheduling (Phase 4), uploads (Phase 5), and the personal, people and settings pages (Phase 6).
+
+## Phase 3 evidence (2026-10-12)
+
+- Task drawer: one panel per task with Details, subtasks, labels and dependencies, recurrence, comments and attachments. The Details section holds the fields the old edit modal had: title, description, status, priority, start and due dates, estimate and assignees. Saving uses the task's current version, and a version conflict shows a Reload action.
+- Deep links: on a project page, opening a task writes `?task=<id>` without a server round trip. A reload or a shared link reopens the same task, and back and forward follow the URL. Rows outside a project page (home, member profile) still open their own panel.
+- Dirty guard: closing the drawer with unsaved details or an unsent comment opens a "Discard unsaved changes?" dialog. "Keep editing" keeps the draft.
+- Full task reads: the panel loads the task with the new `getProjectTaskAction`, so no caller can save a partial task. The read uses the list query's access rules and excludes archived tasks.
+- Mentions: typing `@` opens a keyboard-driven list of employees (Arrow keys, Enter or Tab to pick, Escape to close). The body stores the `@[employeeId]` token that the server's `extractMentionIds` reads, and comments show the employee's name.
+- Comment removal uses the global Undo stack, so it can be restored after the drawer has closed.
+- Split: `task-details-sections.tsx` is now `task-details-comments.tsx`, `task-details-subtasks.tsx` and `task-relations-section.tsx`. The edit modal (`task-edit-form.tsx`) is removed.
+- Browser tests: `tests/e2e/task-drawer.spec.ts` covers opening from a row with `?task=` and reloading, the discard guard, saving the estimate on the same task after a reload, the mention picker, and the comment undo. Each test opens its own starting state.
+- Unit tests: mention parsing and insertion, and the details dirty check (`tests/ui/task-mentions.test.ts`, `tests/ui/task-details-draft.test.ts`).
+- Known gaps: the mention picker is a plain listbox, not the shared Command component. The drawer is not yet wired on `/tasks` and `/my-tasks`, which keep their own panels. Search and favourites results still open the project page rather than the drawer (Phase 5).

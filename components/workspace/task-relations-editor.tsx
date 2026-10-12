@@ -11,11 +11,11 @@ import {
   listProjectTasksAction,
   setTaskRelationsAction,
 } from "@/app/actions/tasks";
-import { TaskRelationsSection } from "@/components/workspace/task-details-sections";
+import { TaskRelationsSection } from "@/components/workspace/task-relations-section";
 import type {
   TaskLabelOption,
   TaskRelationOption,
-} from "@/components/workspace/task-details-sections";
+} from "@/components/workspace/task-relations-section";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 
 export const TaskRelationsEditor = ({

@@ -194,6 +194,10 @@ export const actionCatalog2: readonly ActionEntry[] = [
     idempotencyKey: nextKey(),
     subtaskId: ids.random,
   })),
+  entry("getProjectTaskAction", tasks.getProjectTaskAction, () => ({
+    projectId: ids.projectId,
+    taskId: ids.taskId,
+  })),
   entry("listProjectTasksAction", tasks.listProjectTasksAction, () => ({
     limit: 10,
     offset: 0,

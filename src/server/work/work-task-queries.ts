@@ -77,6 +77,7 @@ export const listProjectTasks = (
     readonly includeArchived?: boolean;
     readonly limit: number;
     readonly offset: number;
+    readonly taskId?: string;
   }
 ): Effect.Effect<readonly ProjectTaskListItem[], AppError> =>
   Effect.tryPromise({
@@ -107,11 +108,11 @@ export const listProjectTasks = (
           message: "The project was not found.",
         });
       }
-      const tasks = await db.orm.public.Task.where(
-        pagination.includeArchived
-          ? { projectId }
-          : { archivedAt: null, projectId }
-      )
+      const tasks = await db.orm.public.Task.where({
+        ...(pagination.includeArchived ? {} : { archivedAt: null }),
+        projectId,
+        ...(pagination.taskId ? { id: pagination.taskId } : {}),
+      })
         .orderBy((task) => task.position.asc())
         .orderBy((task) => task.projectTaskNumber.asc())
         .limit(pagination.limit)

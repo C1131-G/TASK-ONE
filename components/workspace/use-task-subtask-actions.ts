@@ -10,7 +10,7 @@ import {
   reorderSubtasksAction,
   updateSubtaskAction,
 } from "@/app/actions/subtasks";
-import type { TaskSubtaskView } from "@/components/workspace/task-details-sections";
+import type { TaskSubtaskView } from "@/components/workspace/task-details-subtasks";
 
 export const useTaskSubtaskActions = ({
   taskId,
