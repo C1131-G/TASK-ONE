@@ -1,7 +1,11 @@
+/* eslint-disable shadcn/no-unknown-classes -- Auth screens are styled by app/auth.css. */
+
 import type { Metadata, Route } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { AuthShell } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/signup-form";
 import { getPageSession } from "@/src/server/auth/page-session";
 
@@ -22,33 +26,28 @@ const SignupContent = async () => {
   }
 
   return (
-    <>
-      <a
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
-        href="#signup-main"
-      >
-        Skip to main content
-      </a>
-      <main
-        className="auth-backdrop flex min-h-svh flex-col items-center justify-center p-4 md:p-8"
-        data-auth-page="signup"
-        id="signup-main"
-        tabIndex={-1}
-      >
-        <div className="w-full max-w-sm md:max-w-4xl">
-          <SignupForm />
-        </div>
-      </main>
-    </>
+    <AuthShell
+      actions={
+        <Link className="auth-ghost" href="/login">
+          Sign in
+        </Link>
+      }
+      mainId="signup-main"
+      page="signup"
+    >
+      <SignupForm />
+    </AuthShell>
   );
 };
 
 const Page = () => (
   <Suspense
     fallback={
-      <main className="flex min-h-svh items-center justify-center bg-muted p-4">
-        <p aria-live="polite">Checking your session…</p>
-      </main>
+      <AuthShell mainId="signup-main" page="signup">
+        <p aria-live="polite" className="auth-hint">
+          Checking your session…
+        </p>
+      </AuthShell>
     }
   >
     <SignupContent />

@@ -1,62 +1,62 @@
+/* eslint-disable shadcn/no-unknown-classes -- Auth screens are styled by app/auth.css to match the reference UI. */
+
+import { ArrowRight, UserPlus } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import type { ComponentProps } from "react";
 
-import { AuthBrand } from "@/components/auth-brand";
-import { AuthVisualPanel } from "@/components/auth-visual-panel";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { FieldDescription, FieldGroup } from "@/components/ui/field";
-import { cn } from "@/lib/utils";
+const steps = [
+  {
+    detail: "Your administrator creates your employee account.",
+    title: "Ask your administrator",
+  },
+  {
+    detail: "They share your work email and a temporary password.",
+    title: "Get your sign-in details",
+  },
+  {
+    detail: "Sign in once, then choose a password only you know.",
+    title: "Set your own password",
+  },
+] as const;
 
-const SignupForm = ({ className, ...props }: ComponentProps<"div">) => (
-  <div className={cn("flex flex-col gap-6", className)} {...props}>
-    <Card size="auth">
-      <CardContent className="grid md:grid-cols-[0.95fr_1.05fr]" size="flush">
-        <section
-          aria-labelledby="signup-title"
-          className="flex flex-col justify-center p-6 sm:p-8 lg:p-10"
-        >
-          <div className="mb-8 md:hidden">
-            <AuthBrand />
-          </div>
-          <FieldGroup density="auth">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-                Employee access
-              </p>
-              <h1
-                className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
-                id="signup-title"
-              >
-                Request access
-              </h1>
-              <p className="max-w-xs text-sm leading-6 text-balance text-muted-foreground">
-                Metsys accounts are created by an administrator.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border/80 bg-muted/60 p-4 text-sm leading-6 text-secondary-foreground">
-              Ask your administrator to create your employee account. They’ll
-              provide your work email and a temporary password for your first
-              sign-in.
-            </div>
-            <Button asChild className="h-11 w-full">
-              <Link href="/login">Back to sign in</Link>
-            </Button>
-            <FieldDescription className="text-center">
-              Already have an account?{" "}
-              <Link
-                className="font-medium text-foreground underline"
-                href="/login"
-              >
-                Sign in
-              </Link>
-            </FieldDescription>
-          </FieldGroup>
-        </section>
-        <AuthVisualPanel mode="signup" />
-      </CardContent>
-    </Card>
-  </div>
+const SignupForm = () => (
+  <section aria-labelledby="signup-title" className="auth-card">
+    <div className="auth-head">
+      <span aria-hidden="true" className="auth-badge">
+        <UserPlus size={22} weight="duotone" />
+      </span>
+      <h1 id="signup-title">Request access</h1>
+      <p>Metsys accounts are created by an administrator.</p>
+    </div>
+    <ol className="auth-steps">
+      {steps.map((step, index) => (
+        <li key={step.title}>
+          <span aria-hidden="true" className="auth-step-num">
+            {index + 1}
+          </span>
+          <span className="auth-step-copy">
+            <b>{step.title}</b>
+            <span>{step.detail}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+    <Link className="auth-submit auth-submit-link" href="/login">
+      Back to sign in
+      <ArrowRight
+        aria-hidden="true"
+        className="auth-submit-arrow"
+        size={15}
+        weight="bold"
+      />
+    </Link>
+    <div aria-hidden="true" className="auth-divider" />
+    <p className="auth-foot-note">
+      Already have an account?{" "}
+      <Link className="auth-link" href="/login">
+        Sign in
+      </Link>
+    </p>
+  </section>
 );
 
 export { SignupForm };

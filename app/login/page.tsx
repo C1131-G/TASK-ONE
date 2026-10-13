@@ -1,13 +1,17 @@
+/* eslint-disable shadcn/no-unknown-classes -- Auth screens are styled by app/auth.css. */
+
 import type { Metadata, Route } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/login-form";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
-  description: "Sign in to your Metsys Task System workspace.",
-  title: "Sign in | Metsys Task System",
+  description: "Sign in to your Metsys workspace.",
+  title: "Sign in | Metsys",
 };
 
 const CHANGE_PASSWORD_PATH: Route<"/change-password"> = "/change-password";
@@ -22,33 +26,28 @@ const LoginContent = async () => {
   }
 
   return (
-    <>
-      <a
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
-        href="#login-main"
-      >
-        Skip to main content
-      </a>
-      <main
-        className="auth-backdrop flex min-h-svh items-center justify-center p-4 md:p-6"
-        data-auth-page="login"
-        id="login-main"
-        tabIndex={-1}
-      >
-        <div className="w-full max-w-[76rem]">
-          <LoginForm />
-        </div>
-      </main>
-    </>
+    <AuthShell
+      actions={
+        <Link className="auth-ghost" href="/signup">
+          Request access
+        </Link>
+      }
+      mainId="login-main"
+      page="login"
+    >
+      <LoginForm />
+    </AuthShell>
   );
 };
 
 const Page = () => (
   <Suspense
     fallback={
-      <main className="flex min-h-svh items-center justify-center bg-muted p-4">
-        <p aria-live="polite">Checking your session…</p>
-      </main>
+      <AuthShell mainId="login-main" page="login">
+        <p aria-live="polite" className="auth-hint">
+          Checking your session…
+        </p>
+      </AuthShell>
     }
   >
     <LoginContent />

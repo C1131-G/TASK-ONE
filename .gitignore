@@ -41,6 +41,8 @@ next-env.d.ts
 
 # Local agent instructions
 AGENTS.md
+/.agents/skills/
+/.claude/
 
 # Playwright output
 /test-results/

@@ -1,11 +1,13 @@
+/* eslint-disable shadcn/no-unknown-classes -- Auth screens are styled by app/auth.css. */
+
+import { Password } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata, Route } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { AuthBrand } from "@/components/auth-brand";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthSignOutButton } from "@/components/auth/auth-sign-out-button";
 import { ChangePasswordForm } from "@/components/change-password-form";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
@@ -26,56 +28,33 @@ const ChangePasswordContent = async () => {
   }
 
   return (
-    <>
-      <a
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
-        href="#password-main"
-      >
-        Skip to main content
-      </a>
-      <main
-        className="auth-backdrop flex min-h-svh items-center justify-center px-4 py-2 sm:py-4"
-        data-auth-page="change-password"
-        id="password-main"
-        tabIndex={-1}
-      >
-        <div className="w-full max-w-md">
-          <div className="mb-2 flex justify-center">
-            <AuthBrand />
-          </div>
-          <Card className="w-full" size="sm">
-            <CardHeader>
-              <h1 className="font-heading text-xl font-semibold">
-                Set a new password
-              </h1>
-              <p className="text-sm leading-5 text-muted-foreground">
-                Change your temporary password to continue to your workspace.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3">
-                <ChangePasswordForm />
-                <Link
-                  className="text-sm underline underline-offset-4"
-                  href="/login"
-                >
-                  Sign out and return to sign in
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+    <AuthShell
+      actions={<AuthSignOutButton />}
+      mainId="password-main"
+      page="change-password"
+    >
+      <section aria-labelledby="password-title" className="auth-card">
+        <div className="auth-head">
+          <span aria-hidden="true" className="auth-badge">
+            <Password size={22} weight="duotone" />
+          </span>
+          <h1 id="password-title">Set a new password</h1>
+          <p>Replace your temporary password to open your workspace.</p>
         </div>
-      </main>
-    </>
+        <ChangePasswordForm />
+      </section>
+    </AuthShell>
   );
 };
 
 const Page = () => (
   <Suspense
     fallback={
-      <main className="flex min-h-svh items-center justify-center bg-muted p-4">
-        <p aria-live="polite">Checking your session…</p>
-      </main>
+      <AuthShell mainId="password-main" page="change-password">
+        <p aria-live="polite" className="auth-hint">
+          Checking your session…
+        </p>
+      </AuthShell>
     }
   >
     <ChangePasswordContent />
