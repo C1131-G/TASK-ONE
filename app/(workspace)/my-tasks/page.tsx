@@ -11,6 +11,8 @@ import { listProjectsAction } from "@/app/actions/projects";
 import { listProjectTasksAction } from "@/app/actions/tasks";
 import type { AssignedTask } from "@/components/workspace/my-tasks-workspace";
 import { MyTasksWorkspace } from "@/components/workspace/my-tasks-workspace";
+import { TaskDrawerProvider } from "@/components/workspace/task-drawer";
+import { canEditTaskRecord } from "@/components/workspace/task-permissions";
 import { columnWidthsFromPreferences } from "@/components/workspace/task-table-columns";
 import { GlobalTaskViewStoreProvider } from "@/components/workspace/view-store/global-task-view-store-provider";
 import {
@@ -24,6 +26,7 @@ export const metadata: Metadata = { title: "My Tasks | Metsys" };
 interface MyTasksSearchParams {
   readonly calendarMode?: string;
   readonly monthOffset?: string;
+  readonly task?: string;
 }
 
 const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en", {
@@ -124,26 +127,46 @@ const MyTasksContent = async ({
     name,
   }));
 
+  const isAdmin = session.user.role === "admin";
+  const employees = employeeResult.ok ? employeeResult.data : [];
+  const editableTaskIds = assignedTasks.flatMap((task) =>
+    canEditTaskRecord(task, session.user.id, isAdmin) ? [task.id] : []
+  );
+
   return (
     <GlobalTaskViewStoreProvider
       initialColumnWidths={columnWidthsFromPreferences(
         preferences.ok ? preferences.data.taskTableColumnWidths : undefined
       )}
     >
-      <MyTasksWorkspace
-        calendarMode={calendarMode}
-        calendarProjects={calendarProjects}
-        employees={employeeResult.ok ? employeeResult.data : []}
-        favoriteTaskIds={
-          new Set(personal.ok ? personal.data.tasks.map(({ id }) => id) : [])
-        }
-        isAdmin={session.user.role === "admin"}
-        monthLabel={monthLabel}
-        monthOffset={monthOffset}
-        tasks={assignedTasks}
-        today={dateKey()}
-        userId={session.user.id}
-      />
+      <TaskDrawerProvider
+        currentUserId={session.user.id}
+        editableTaskIds={editableTaskIds}
+        employees={employees.map(({ id, name }) => ({ id, name }))}
+        initialTaskId={params.task ?? null}
+        isAdmin={isAdmin}
+        tasks={assignedTasks.map((task) => ({
+          id: task.id,
+          projectId: task.projectId,
+          title: task.title,
+          version: task.version,
+        }))}
+      >
+        <MyTasksWorkspace
+          calendarMode={calendarMode}
+          calendarProjects={calendarProjects}
+          employees={employees}
+          favoriteTaskIds={
+            new Set(personal.ok ? personal.data.tasks.map(({ id }) => id) : [])
+          }
+          isAdmin={isAdmin}
+          monthLabel={monthLabel}
+          monthOffset={monthOffset}
+          tasks={assignedTasks}
+          today={dateKey()}
+          userId={session.user.id}
+        />
+      </TaskDrawerProvider>
     </GlobalTaskViewStoreProvider>
   );
 };
