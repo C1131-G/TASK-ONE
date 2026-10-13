@@ -20,10 +20,12 @@ import {
 import { ProjectIcon } from "@/components/workspace/project-icon";
 import { ProjectMemberAvatars } from "@/components/workspace/project-list-layouts";
 import { TaskCompletionCheckbox } from "@/components/workspace/task-completion-checkbox";
-import type { ActivityEntry } from "@/src/server/activity/activity-management";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
+
+export { HomeStats } from "@/components/workspace/home-stats";
+export { RecentActivityPanel } from "@/components/workspace/home-activity-panel";
 
 const HOME_DATE_FORMATTER = new Intl.DateTimeFormat("en", {
   day: "numeric",
@@ -78,52 +80,6 @@ const projectStatusLabel = (status: ProjectListItem["status"]): string => {
     }
   }
 };
-
-export const HomeStats = ({
-  activeProjects,
-  atRisk,
-  openTasks,
-  assignedTasks,
-  completed,
-  overdue,
-}: {
-  readonly activeProjects: number;
-  readonly atRisk: number;
-  readonly openTasks: number;
-  readonly assignedTasks: number;
-  readonly completed: number;
-  readonly overdue: number;
-}) => (
-  <div className="stats" style={{ marginBottom: 16 }}>
-    <Link className="stat" href={"/projects" as Route}>
-      <span className="k">Active projects</span>
-      <span className="v">{activeProjects}</span>
-      <span className="d">{atRisk} at risk</span>
-    </Link>
-    <Link className="stat" href={"/tasks" as Route}>
-      <span className="k">Open tasks</span>
-      <span className="v">{openTasks}</span>
-      <span className="d">{assignedTasks} assigned to you</span>
-    </Link>
-    <Link className="stat" href={"/tasks?status=done" as Route}>
-      <span className="k">Completed</span>
-      <span className="v">{completed}</span>
-      <span className="d">this week</span>
-    </Link>
-    <Link className="stat" href={"/tasks?overdue=true" as Route}>
-      <span className="k">Overdue</span>
-      <span
-        className="v"
-        style={overdue > 0 ? { color: "var(--red)" } : undefined}
-      >
-        {overdue}
-      </span>
-      <span className={`d${overdue > 0 ? " bad" : ""}`}>
-        {overdue > 0 ? "need attention" : "all on track"}
-      </span>
-    </Link>
-  </div>
-);
 
 export const MyTasksPanel = ({
   taskView,
@@ -320,41 +276,6 @@ export const UpcomingDeadlinesPanel = ({
           ) : null}
         </div>
       ))}
-    </div>
-  </section>
-);
-
-export const RecentActivityPanel = ({
-  activities,
-}: {
-  readonly activities: readonly ActivityEntry[];
-}) => (
-  <section className="panel">
-    <div className="panel-h">
-      <h2>Recent activity</h2>
-      <Link className="btn btn-sm btn-ghost" href={"/activity" as Route}>
-        View all
-      </Link>
-    </div>
-    <div className="panel-b feed lined">
-      {activities.length ? (
-        activities.map((activity) => (
-          <article className="mini" key={activity.id}>
-            <span aria-hidden="true" className="av">
-              {activity.actorName.slice(0, 1)}
-            </span>
-            <div className="grow">
-              <strong>{activity.actorName}</strong>
-              <p className="muted">{activity.action.replaceAll("_", " ")}</p>
-            </div>
-            <time className="muted" dateTime={activity.createdAt}>
-              {activity.createdAt.slice(0, 10)}
-            </time>
-          </article>
-        ))
-      ) : (
-        <p className="muted">No recent activity.</p>
-      )}
     </div>
   </section>
 );

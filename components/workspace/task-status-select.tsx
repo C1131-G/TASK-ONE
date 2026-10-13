@@ -86,7 +86,14 @@ const TaskStatusSelect = ({
           {...(error ? { ariaInvalid: true } : {})}
           className="pstatus"
           disabled={pending}
-          onValueChange={(nextStatus) => changeStatus(nextStatus as TaskStatus)}
+          onValueChange={(nextStatus) => {
+            const selectedStatus = statuses.find(
+              ([value]) => value === nextStatus
+            )?.[0];
+            if (selectedStatus) {
+              changeStatus(selectedStatus);
+            }
+          }}
           status={status}
           value={status}
         >

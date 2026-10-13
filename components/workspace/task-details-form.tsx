@@ -7,7 +7,8 @@ import { useEffect, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 
 import { updateTaskAction } from "@/app/actions/tasks";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TaskAssigneesFieldset } from "@/components/workspace/task-assignees-fieldset";
+import type { TaskEmployeeOption } from "@/components/workspace/task-assignees-fieldset";
 import type {
   EditableTask,
   TaskDetailsDraft,
@@ -27,10 +28,20 @@ import {
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 
-interface EmployeeOption {
-  readonly id: string;
-  readonly name: string;
-}
+const TASK_STATUSES: readonly TaskDetailsDraft["status"][] = [
+  "backlog",
+  "todo",
+  "progress",
+  "review",
+  "done",
+];
+const TASK_PRIORITIES: readonly TaskDetailsDraft["priority"][] = [
+  "urgent",
+  "high",
+  "medium",
+  "low",
+  "none",
+];
 
 export const TaskDetailsForm = ({
   editable,
@@ -42,7 +53,7 @@ export const TaskDetailsForm = ({
   version,
 }: {
   readonly editable: boolean;
-  readonly employees: readonly EmployeeOption[];
+  readonly employees: readonly TaskEmployeeOption[];
   readonly onDirtyChange: (dirty: boolean) => void;
   readonly onReload: () => void;
   readonly onSaved: (
@@ -64,7 +75,6 @@ export const TaskDetailsForm = ({
   } | null>(null);
   const [pending, startTransition] = useTransition();
   const dirty = isDraftDirty(draft, task);
-  const assigneeSet = new Set(draft.assigneeIds);
 
   // Dirty state is reported from the change handlers, not from an effect, so the
   // panel never re-renders just to mirror the form.
@@ -111,11 +121,6 @@ export const TaskDetailsForm = ({
   };
 
   const fieldId = (name: string) => `task-${task.id}-${name}`;
-  const visibleEmployees = employees.filter((employee) =>
-    employee.name
-      .toLocaleLowerCase()
-      .includes(assigneeSearch.trim().toLocaleLowerCase())
-  );
 
   return (
     <form className="stack" onSubmit={save}>
@@ -152,9 +157,14 @@ export const TaskDetailsForm = ({
             className="input"
             disabled={!editable}
             id={fieldId("status")}
-            onValueChange={(value) =>
-              patch({ status: value as TaskDetailsDraft["status"] })
-            }
+            onValueChange={(value) => {
+              const status = TASK_STATUSES.find(
+                (candidate) => candidate === value
+              );
+              if (status) {
+                patch({ status });
+              }
+            }}
             value={draft.status}
           >
             <WorkspaceSelectItem value="backlog">Backlog</WorkspaceSelectItem>
@@ -172,9 +182,14 @@ export const TaskDetailsForm = ({
             className="input"
             disabled={!editable}
             id={fieldId("priority")}
-            onValueChange={(value) =>
-              patch({ priority: value as TaskDetailsDraft["priority"] })
-            }
+            onValueChange={(value) => {
+              const priority = TASK_PRIORITIES.find(
+                (candidate) => candidate === value
+              );
+              if (priority) {
+                patch({ priority });
+              }
+            }}
             value={draft.priority}
           >
             <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
@@ -218,38 +233,15 @@ export const TaskDetailsForm = ({
           />
         </label>
       </div>
-      <fieldset className="field">
-        <legend>Assignees</legend>
-        <label className="field" htmlFor={fieldId("assignee-search")}>
-          <span className="sr-only">Search employees</span>
-          <WorkspaceInput
-            autoComplete="off"
-            className="input"
-            id={fieldId("assignee-search")}
-            onChange={(event) => setAssigneeSearch(event.currentTarget.value)}
-            placeholder="Search employees"
-            type="search"
-            value={assigneeSearch}
-          />
-        </label>
-        {visibleEmployees.map((employee) => (
-          <label
-            className="row"
-            htmlFor={fieldId(`employee-${employee.id}`)}
-            key={employee.id}
-          >
-            <Checkbox
-              checked={assigneeSet.has(employee.id)}
-              disabled={!editable}
-              id={fieldId(`employee-${employee.id}`)}
-              onCheckedChange={(checked) =>
-                toggleAssignee(employee.id, checked === true)
-              }
-            />
-            <span>{employee.name}</span>
-          </label>
-        ))}
-      </fieldset>
+      <TaskAssigneesFieldset
+        editable={editable}
+        employees={employees}
+        onSearchChange={setAssigneeSearch}
+        onToggle={toggleAssignee}
+        search={assigneeSearch}
+        selectedIds={draft.assigneeIds}
+        taskId={task.id}
+      />
       {error ? (
         <p className="error" role="alert">
           {error.message}

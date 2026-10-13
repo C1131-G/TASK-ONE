@@ -2,40 +2,43 @@
 
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useState } from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, Ref } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
-type PasswordInputProps = Omit<
-  ComponentProps<typeof Input>,
-  "trailingAction" | "type"
-> & {
+type PasswordInputProps = Omit<ComponentProps<"input">, "type"> & {
   readonly visibilityLabel: string;
+  readonly ref?: Ref<HTMLInputElement>;
 };
 
-const PasswordInput = ({ visibilityLabel, ...props }: PasswordInputProps) => {
+const PasswordInput = ({
+  className,
+  ref,
+  visibilityLabel,
+  ...props
+}: PasswordInputProps) => {
   const [visible, setVisible] = useState(false);
   const toggleVisibility = () => setVisible((current) => !current);
 
   return (
-    <div className="relative">
-      <Input {...props} trailingAction type={visible ? "text" : "password"} />
-      <Button
+    <div className="auth-password-field">
+      <input
+        {...props}
+        className={cn("auth-input auth-password-input", className)}
+        ref={ref}
+        type={visible ? "text" : "password"}
+      />
+      <button
         aria-label={`${visible ? "Hide" : "Show"} ${visibilityLabel}`}
         aria-pressed={visible}
-        className="absolute top-1/2 right-1 z-10 -translate-y-1/2"
+        className="auth-password-toggle"
         onClick={toggleVisibility}
-        size="icon-lg"
         type="button"
-        variant="ghost"
       >
-        {visible ? (
-          <EyeSlash aria-hidden="true" size={18} />
-        ) : (
-          <Eye aria-hidden="true" size={18} />
-        )}
-      </Button>
+        <span aria-hidden="true" className="auth-password-icon">
+          {visible ? <EyeSlash size={20} /> : <Eye size={20} />}
+        </span>
+      </button>
     </div>
   );
 };

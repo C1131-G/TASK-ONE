@@ -6,19 +6,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { BugTaskDetail } from "@/components/workspace/bug-task-detail";
 import { ProjectFiles } from "@/components/workspace/project-files";
 import { TaskCommentsSection } from "@/components/workspace/task-details-comments";
 import type { EditableTask } from "@/components/workspace/task-details-draft";
 import { TaskDetailsForm } from "@/components/workspace/task-details-form";
+import { TaskDetailsHeading } from "@/components/workspace/task-details-heading";
 import { readTaskBundle } from "@/components/workspace/task-details-panel-data";
 import type {
   EmployeeOption,
@@ -197,16 +191,10 @@ export const TaskDetailsPanel = ({
           data-workspace-sheet=""
           side="right"
         >
-          <SheetHeader>
-            <SheetTitle>
-              {task?.title ?? taskTitle ?? "Task details"}
-            </SheetTitle>
-            <SheetDescription>
-              {taskType === "bug"
-                ? "Review discovery, investigation, evidence, verification, and release history."
-                : "Edit details, subtasks, labels, dependencies, recurrence, comments, and files."}
-            </SheetDescription>
-          </SheetHeader>
+          <TaskDetailsHeading
+            isBug={taskType === "bug"}
+            title={task?.title ?? taskTitle ?? "Task details"}
+          />
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-6">
             {visibleError ? (
               <p className="error" role="alert">

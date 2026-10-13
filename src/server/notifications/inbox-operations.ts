@@ -1,5 +1,5 @@
 import { not } from "@prisma/orm-postgres/orm-client";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
@@ -9,6 +9,7 @@ import type {
   InboxPage,
   NotificationPreferenceValue,
 } from "./contracts";
+import { NotificationPreferencesSchema } from "./contracts";
 import { mapError, verifyUser } from "./service-internal";
 
 export const listInbox = (
@@ -65,12 +66,13 @@ export const listPreferences = (
       const preferences = await db.orm.public.NotificationPreference.where({
         userId,
       }).all();
-      return preferences.map((preference) => ({
-        channel: preference.channel as NotificationPreferenceValue["channel"],
-        enabled: preference.enabled,
-        eventType:
-          preference.eventType as NotificationPreferenceValue["eventType"],
-      }));
+      return Schema.decodeUnknownSync(NotificationPreferencesSchema)(
+        preferences.map((preference) => ({
+          channel: preference.channel,
+          enabled: preference.enabled,
+          eventType: preference.eventType,
+        }))
+      );
     },
   });
 

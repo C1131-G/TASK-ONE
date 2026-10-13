@@ -19,8 +19,9 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description: "The Metsys team workspace.",
-  title: "Metsys",
+  description:
+    "Metsys Task System keeps your team’s projects and work in one workspace.",
+  title: "Metsys Task System",
 };
 
 export const viewport: Viewport = {

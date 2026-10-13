@@ -3,8 +3,6 @@
 "use client";
 
 import { Bell, Check, EnvelopeOpen } from "@phosphor-icons/react";
-import type { Route } from "next";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
@@ -22,115 +20,17 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { InboxDetailContent } from "@/components/workspace/inbox-detail-content";
+import {
+  DATE_FORMATTER,
+  FILTERS,
+  formatRelativeTime,
+  getInitials,
+  typeMatchesFilter,
+} from "@/components/workspace/inbox-format";
+import type { InboxFilter } from "@/components/workspace/inbox-format";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import type { NotificationItem } from "@/src/server/notifications/contracts";
-
-type InboxFilter = "all" | "mention" | "assignment" | "comment" | "update";
-
-const FILTERS: readonly { readonly id: InboxFilter; readonly label: string }[] =
-  [
-    { id: "all", label: "All" },
-    { id: "mention", label: "Mentions" },
-    { id: "assignment", label: "Assignments" },
-    { id: "comment", label: "Comments" },
-    { id: "update", label: "Updates" },
-  ];
-const DATE_FORMATTER = new Intl.DateTimeFormat("en", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-const DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en", {
-  day: "numeric",
-  month: "short",
-});
-
-const typeMatchesFilter = (type: string, filter: InboxFilter): boolean => {
-  if (filter === "all") {
-    return true;
-  }
-  if (filter === "update") {
-    return type === "update" || type === "due";
-  }
-  return type === filter;
-};
-
-const getInitials = (name: string): string =>
-  name
-    .split(" ")
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-const formatRelativeTime = (value: string): string => {
-  const elapsed = Date.now() - new Date(value).getTime();
-  const minutes = Math.max(1, Math.round(elapsed / 60_000));
-  if (minutes < 60) {
-    return `${minutes}m ago`;
-  }
-  const hours = Math.round(elapsed / 3_600_000);
-  if (hours < 24) {
-    return `${hours}h ago`;
-  }
-  const days = Math.round(elapsed / 86_400_000);
-  return days < 7
-    ? `${days}d ago`
-    : DATE_ONLY_FORMATTER.format(new Date(value));
-};
-
-const InboxDetailContent = ({
-  item,
-  pending,
-  onMarkRead,
-}: {
-  readonly item: NotificationItem | null;
-  readonly pending: boolean;
-  readonly onMarkRead: (notificationId: string) => void;
-}) =>
-  item ? (
-    <div className="inbox-detail-body">
-      {item.actorName ? (
-        <div className="row">
-          <Avatar className="inbox-avatar">
-            <AvatarFallback>{getInitials(item.actorName)}</AvatarFallback>
-          </Avatar>
-          <span>{item.actorName}</span>
-        </div>
-      ) : null}
-      <h3>{item.text}</h3>
-      {item.snippet ? <p>{item.snippet}</p> : null}
-      <time
-        dateTime={item.createdAt}
-        title={DATE_FORMATTER.format(new Date(item.createdAt))}
-      >
-        {formatRelativeTime(item.createdAt)}
-      </time>
-      {item.projectName && item.projectId ? (
-        <Link
-          className="btn btn-secondary"
-          href={`/projects/${item.projectId}?view=board` as Route}
-        >
-          Open {item.projectName}
-        </Link>
-      ) : null}
-      {item.readAt === null ? (
-        <WorkspaceButton
-          disabled={pending}
-          onClick={() => onMarkRead(item.id)}
-          type="button"
-          variant="secondary"
-        >
-          Mark as read
-        </WorkspaceButton>
-      ) : null}
-    </div>
-  ) : (
-    <div className="inbox-detail-empty">
-      <EnvelopeOpen aria-hidden="true" size={24} />
-      <h2>Select a notification</h2>
-      <p>Choose a notification to review its details.</p>
-    </div>
-  );
 
 export const InboxWorkspace = ({
   items,

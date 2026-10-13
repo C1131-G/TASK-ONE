@@ -5,16 +5,12 @@ import { revalidatePath } from "next/cache";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
-import {
-  IdempotencyKeySchema,
-  UUIDSchema,
-} from "@/src/server/core/input-schemas";
+import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
 import { runServerAction } from "@/src/server/core/server-action";
 import {
   BugApprovalDecisionInputSchema,
   BugEvidenceInputSchema,
   BugFixAttemptInputSchema,
-  BugListInputSchema,
   BugPostReleaseCheckInputSchema,
   BugRelationInputSchema,
   BugReleaseInputSchema,
@@ -25,23 +21,37 @@ import {
   BugVersionInputSchema,
 } from "@/src/server/work/bug-contracts";
 import {
-  BugHistory,
-  BugHistoryLive,
-  BugHistorySchema,
-} from "@/src/server/work/bug-history";
-import {
   BugManagement,
   BugManagementLive,
-  BugListSchema,
   BugReportItemSchema,
 } from "@/src/server/work/bug-management";
 import { BugWorkflowManagement } from "@/src/server/work/bug-workflow-management";
 
 import {
+  getBugAction as getBug,
+  getBugHistoryAction as getBugHistory,
+  listBugsAction as listBugs,
+} from "./bug-queries";
+import {
   revalidateBugViews,
   runBugWorkflowAction,
 } from "./bug-workflow-action-shared";
 import { requestHeadersOrFail } from "./tasks-shared";
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function getBugAction(input: unknown) {
+  return await getBug(input);
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function getBugHistoryAction(input: unknown) {
+  return await getBugHistory(input);
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function listBugsAction(input: unknown) {
+  return await listBugs(input);
+}
 
 const ReportBugActionInputSchema = Schema.Struct({
   ...BugReportInputSchema.fields,
@@ -83,69 +93,6 @@ export async function reportBugAction(input: unknown) {
     revalidatePath(`/projects/${result.data.projectId}`);
   }
   return result;
-}
-
-// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
-export async function getBugAction(input: unknown) {
-  return await runServerAction(
-    input,
-    Schema.Struct({ bugId: UUIDSchema }),
-    (validated) =>
-      Effect.gen(function* getBug() {
-        const sessions = yield* AuthSession;
-        const actor = yield* sessions.requireWorkspaceAccess(
-          yield* requestHeadersOrFail
-        );
-        const bugs = yield* BugManagement;
-        return yield* bugs.getBug(actor.id, validated.bugId);
-      }).pipe(
-        Effect.provide(AuthSessionLive),
-        Effect.provide(BugManagementLive)
-      ),
-    undefined,
-    BugReportItemSchema
-  );
-}
-
-// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
-export async function listBugsAction(input: unknown) {
-  return await runServerAction(
-    input,
-    BugListInputSchema,
-    (validated) =>
-      Effect.gen(function* listBugs() {
-        const sessions = yield* AuthSession;
-        const actor = yield* sessions.requireWorkspaceAccess(
-          yield* requestHeadersOrFail
-        );
-        const bugs = yield* BugManagement;
-        return yield* bugs.listBugs(actor.id, validated);
-      }).pipe(
-        Effect.provide(AuthSessionLive),
-        Effect.provide(BugManagementLive)
-      ),
-    undefined,
-    BugListSchema
-  );
-}
-
-// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
-export async function getBugHistoryAction(input: unknown) {
-  return await runServerAction(
-    input,
-    Schema.Struct({ bugId: UUIDSchema }),
-    (validated) =>
-      Effect.gen(function* getBugHistory() {
-        const sessions = yield* AuthSession;
-        const actor = yield* sessions.requireWorkspaceAccess(
-          yield* requestHeadersOrFail
-        );
-        const history = yield* BugHistory;
-        return yield* history.get(actor.id, validated.bugId);
-      }).pipe(Effect.provide(AuthSessionLive), Effect.provide(BugHistoryLive)),
-    undefined,
-    BugHistorySchema
-  );
 }
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.

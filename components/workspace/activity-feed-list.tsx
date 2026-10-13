@@ -17,6 +17,12 @@ import {
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
 
 type ActivityFilter = "all" | "status" | "comments" | "projects";
+const ACTIVITY_FILTERS: readonly ActivityFilter[] = [
+  "all",
+  "status",
+  "comments",
+  "projects",
+];
 
 const isStatusChange = (action: string) =>
   action === "task.status_changed" ||
@@ -70,7 +76,14 @@ const ActivityFeedList = ({
     <section aria-label="Workspace activity" className="stack">
       <div className="row activity-filters">
         <Tabs
-          onValueChange={(value) => setFilter(value as ActivityFilter)}
+          onValueChange={(value) => {
+            const selectedFilter = ACTIVITY_FILTERS.find(
+              (candidate) => candidate === value
+            );
+            if (selectedFilter) {
+              setFilter(selectedFilter);
+            }
+          }}
           value={filter}
         >
           <div className="activity-tabs">

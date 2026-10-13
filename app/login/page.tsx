@@ -6,8 +6,8 @@ import { LoginForm } from "@/components/login-form";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
-  description: "Sign in to your Metsys team workspace.",
-  title: "Sign in | Metsys",
+  description: "Sign in to your Metsys Task System workspace.",
+  title: "Sign in | Metsys Task System",
 };
 
 const CHANGE_PASSWORD_PATH: Route<"/change-password"> = "/change-password";
@@ -35,7 +35,7 @@ const LoginContent = async () => {
         id="login-main"
         tabIndex={-1}
       >
-        <div className="w-full max-w-sm md:max-w-4xl">
+        <div className="w-full max-w-[76rem]">
           <LoginForm />
         </div>
       </main>

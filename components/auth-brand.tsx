@@ -1,12 +1,20 @@
 const AuthBrand = () => (
-  <div className="inline-flex items-center gap-2.5 text-sm font-semibold tracking-tight">
-    <span
-      aria-hidden="true"
-      className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm"
-    >
-      M
+  <div className="auth-brand">
+    <span aria-hidden="true" className="auth-brand-mark">
+      <svg fill="none" viewBox="0 0 24 24">
+        <path
+          d="M4.5 18V6l7.5 7 7.5-7v12"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2.2"
+        />
+      </svg>
     </span>
-    <span>Metsys</span>
+    <span className="auth-brand-copy">
+      <span className="auth-brand-name">Metsys</span>
+      <span className="auth-brand-product">Task System</span>
+    </span>
   </div>
 );
 

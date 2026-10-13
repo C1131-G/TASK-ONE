@@ -9,17 +9,15 @@ import type { FormEvent } from "react";
 
 import {
   duplicateFileAction,
-  finalizeUploadAction,
   getFileDownloadUrlAction,
   getFilePreviewUrlAction,
   listProjectFilesAction,
   listTaskFilesAction,
   removeFileAction,
   renameFileAction,
-  requestProjectUploadAction,
-  requestTaskUploadAction,
   undoFileRemovalAction,
 } from "@/app/actions/uploads";
+import { filterProjectFiles } from "@/components/workspace/filter-project-files";
 import {
   ProjectFileCard,
   ProjectFileRenameDialog,
@@ -30,49 +28,10 @@ import type {
   FileSort,
   ProjectFile,
 } from "@/components/workspace/project-file-types";
+import { uploadRunner } from "@/components/workspace/project-upload-runner";
 import { UploadProgressList } from "@/components/workspace/upload-progress-list";
 import { useUploadQueue } from "@/components/workspace/use-upload-queue";
-import type { UploadRunner } from "@/components/workspace/use-upload-queue";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
-
-const uploadRunner =
-  (projectId: string | null, taskId: string | null) =>
-  (file: File): UploadRunner => {
-    const input = {
-      contentType: file.type || "application/octet-stream",
-      fileName: file.name,
-      sizeBytes: file.size,
-    };
-    let uploadIntentId = "";
-    return {
-      finalize: async () => {
-        const result = await finalizeUploadAction({
-          idempotencyKey: crypto.randomUUID(),
-          uploadIntentId,
-        });
-        return result.ok ? null : result.error.message;
-      },
-      request: async () => {
-        const ticket = taskId
-          ? await requestTaskUploadAction({ ...input, taskId })
-          : await requestProjectUploadAction({
-              ...input,
-              projectId: projectId ?? "",
-            });
-        if (!ticket.ok) {
-          return { message: ticket.error.message, ok: false };
-        }
-        ({ uploadIntentId } = ticket.data);
-        return {
-          ok: true,
-          ticket: {
-            requiredHeaders: ticket.data.requiredHeaders,
-            uploadUrl: ticket.data.uploadUrl,
-          },
-        };
-      },
-    };
-  };
 
 const ProjectFiles = ({
   projectId,
@@ -223,28 +182,12 @@ const ProjectFiles = ({
     });
   };
 
-  const fileTypes = [
-    ...new Set(files.map(({ contentType }) => contentType)),
-  ].toSorted((left, right) => left.localeCompare(right));
-  const filteredFiles = files
-    .filter((file) => {
-      const matchesQuery = `${file.originalName} ${file.contentType}`
-        .toLocaleLowerCase()
-        .includes(query.toLocaleLowerCase());
-      const matchesType =
-        typeFilter === "all" || file.contentType === typeFilter;
-      return matchesQuery && matchesType;
-    })
-    .toSorted((left, right) => {
-      if (sort === "name") {
-        return left.originalName.localeCompare(right.originalName);
-      }
-      if (sort === "size") {
-        return right.sizeBytes - left.sizeBytes;
-      }
-      const dateOrder = left.createdAt.localeCompare(right.createdAt);
-      return sort === "newest" ? -dateOrder : dateOrder;
-    });
+  const { fileTypes, filteredFiles } = filterProjectFiles(
+    files,
+    query,
+    typeFilter,
+    sort
+  );
 
   return (
     <section aria-busy={pending} className="panel project-files">
