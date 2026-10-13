@@ -130,7 +130,7 @@ const SearchForm = ({
             {results.tasks.map((task) => (
               <Link
                 className="mini"
-                href={`/projects/${task.projectId}` as Route}
+                href={`/projects/${task.projectId}?task=${task.id}` as Route}
                 key={task.id}
               >
                 <span className="trunc grow">{task.title}</span>

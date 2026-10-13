@@ -126,7 +126,9 @@ const FavoritesPage = async () => {
                   <div className="favorite-task-main">
                     <Link
                       className="favorite-task-title"
-                      href={`/projects/${task.projectId}` as Route}
+                      href={
+                        `/projects/${task.projectId}?task=${task.id}` as Route
+                      }
                     >
                       {task.title}
                     </Link>
