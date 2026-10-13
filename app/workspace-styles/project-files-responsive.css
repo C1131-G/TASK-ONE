@@ -1,0 +1,73 @@
+@media (max-width: 1024px) {
+  .workspace-app .file-toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(110px, 0.65fr) minmax(
+        130px,
+        0.8fr
+      ) auto auto;
+  }
+
+  .workspace-app .file-results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .workspace-app .file-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .workspace-app .file-search {
+    grid-column: 1 / -1;
+  }
+
+  .workspace-app .file-layout-switch {
+    justify-self: start;
+  }
+
+  .workspace-app .file-toolbar > [data-slot="button"] {
+    justify-self: end;
+  }
+
+  .workspace-app .file-dropzone {
+    min-height: 58px;
+    margin-inline: 10px;
+    padding: 8px;
+  }
+
+  .workspace-app .file-results {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .workspace-app .file-card-preview {
+    min-height: 90px;
+  }
+
+  .workspace-app .file-undo-banner {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 390px) {
+  .workspace-app .file-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workspace-app .file-search {
+    grid-column: auto;
+  }
+
+  .workspace-app .file-layout-switch,
+  .workspace-app .file-toolbar > [data-slot="button"] {
+    justify-self: stretch;
+  }
+
+  .workspace-app .file-toolbar > [data-slot="button"] {
+    justify-content: center;
+  }
+
+  .workspace-app .file-results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

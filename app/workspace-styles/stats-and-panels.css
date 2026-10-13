@@ -1,0 +1,100 @@
+.workspace-app .panel-b {
+  padding: 0 14px 14px;
+}
+.workspace-app .stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.workspace-app .stat {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  transition: background var(--dur);
+}
+.workspace-app .stat + .stat {
+  border-left: 1px solid var(--border);
+}
+.workspace-app .stat:hover {
+  background: var(--surface-2);
+}
+.workspace-app .stat .k {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.workspace-app .stat .v {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.workspace-app .stat .d {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.workspace-app .stat .d.up {
+  color: var(--green);
+}
+.workspace-app .stat .d.bad {
+  color: var(--red);
+}
+.workspace-app .grid2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.workspace-app .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* rows inside a bordered panel draw separators between themselves only, never against the panel edge */
+.workspace-app .panel > .mini:first-child {
+  border-top: 0;
+}
+.workspace-app .nrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 14px;
+  cursor: pointer;
+}
+.workspace-app .nrow + .nrow {
+  border-top: 1px solid var(--divider);
+}
+.workspace-app .nrow.unread {
+  background: color-mix(in srgb, var(--accent) 3.5%, transparent);
+}
+.workspace-app .nrow:hover {
+  background: var(--surface-2);
+}
+/* Inbox list works as a secondary sidebar: no visible scrollbar (it narrowed the rows), and the
+   tab labels start on the gutter with tighter spacing so all five categories fit without clipping. */
+.workspace-app .inbox-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: none;
+}
+.workspace-app .inbox-list::-webkit-scrollbar {
+  display: none;
+}
+.workspace-app .inbox-tabs {
+  margin-top: 8px;
+  padding: 0 var(--gutter);
+  gap: 16px;
+}
+.workspace-app .inbox-tabs .tab {
+  padding: 0;
+}
+.workspace-app .inbox-tabs .tab.on::after {
+  left: 0;
+  right: 0;
+}

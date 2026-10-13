@@ -6,40 +6,23 @@ import { useSelector } from "@tanstack/react-store";
 import { useMemo } from "react";
 
 import { ProjectTaskFilters } from "@/features/projects/components/project-task-filters";
+import { ProjectTaskList } from "@/features/projects/components/project-task-list";
 import { ProjectTaskTable } from "@/features/projects/components/project-task-table";
+import {
+  filterProjectTasks,
+  groupProjectTasks,
+} from "@/features/projects/project-task-filtering";
 import type { ProjectTaskViewItem } from "@/features/projects/types/project-task-view-types";
 import { GlobalTaskBulkDialog } from "@/features/tasks/components/global-task-bulk-dialog";
 import { TaskCreateForm } from "@/features/tasks/components/task-create-form";
-import { TaskManageControls } from "@/features/tasks/components/task-manage-controls";
-import { TaskStatusSelect } from "@/features/tasks/components/task-status-select";
 import { TaskTableColumnMenu } from "@/features/tasks/components/task-table-column-menu";
 import { serializeHiddenColumns } from "@/features/tasks/task-table-columns";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
-import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
 import { useProjectViewSearch } from "../hooks/use-project-view-search";
 import { useProjectViewStore } from "../providers/project-view-store-provider";
-
-const priorityOrder = {
-  high: 1,
-  low: 3,
-  medium: 2,
-  none: 4,
-  urgent: 0,
-} as const;
-
-const TASK_STATUS_GROUPS: readonly {
-  readonly status: ProjectTaskListItem["status"];
-  readonly label: string;
-}[] = [
-  { label: "Backlog", status: "backlog" },
-  { label: "To Do", status: "todo" },
-  { label: "In Progress", status: "progress" },
-  { label: "Review", status: "review" },
-  { label: "Done", status: "done" },
-];
 
 export const ProjectTaskListViewContent = ({
   currentUserId,
@@ -81,53 +64,20 @@ export const ProjectTaskListViewContent = ({
     [selectedTaskIdList]
   );
 
-  const normalizedQuery = query.trim().toLowerCase();
-  const visibleTasks = tasks
-    .filter((task) => {
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        task.title.toLowerCase().includes(normalizedQuery) ||
-        `${project.key}-${task.projectTaskNumber}`
-          .toLowerCase()
-          .includes(normalizedQuery);
-      return (
-        matchesQuery &&
-        (status === "all" || task.status === status) &&
-        (priority === "all" || task.priority === priority)
-      );
-    })
-    .toSorted((first, second) => {
-      if (sort === "name") {
-        return first.title.localeCompare(second.title);
-      }
-      if (sort === "due") {
-        return (first.dueDate ?? "9999-12-31").localeCompare(
-          second.dueDate ?? "9999-12-31"
-        );
-      }
-      if (sort === "priority") {
-        return priorityOrder[first.priority] - priorityOrder[second.priority];
-      }
-      return 0;
-    });
+  const visibleTasks = filterProjectTasks(tasks, {
+    priority,
+    projectKey: project.key,
+    query,
+    sort,
+    status,
+  });
   const selectedTasks = visibleTasks.filter((task) =>
     selectedTaskIds.has(task.id)
   );
   const editableVisibleTasks = visibleTasks.filter((task) =>
     editableTaskIds.has(task.id)
   );
-  const labelsById = new Map(labels.map((label) => [label.id, label]));
-  const tableGroups =
-    groupBy === "status"
-      ? TASK_STATUS_GROUPS.flatMap(({ label, status: taskStatus }) => {
-          const groupedTasks = visibleTasks.filter(
-            (task) => task.status === taskStatus
-          );
-          return groupedTasks.length
-            ? [{ id: taskStatus, label, tasks: groupedTasks }]
-            : [];
-        })
-      : [{ id: "all", label: "", tasks: visibleTasks }];
+  const tableGroups = groupProjectTasks(visibleTasks, groupBy);
 
   const clearSelection = () => projectViewStore.actions.clearSelection();
   const updateFilter = (update: () => void) => {
@@ -212,75 +162,15 @@ export const ProjectTaskListViewContent = ({
           tasks={visibleTasks}
         />
       ) : (
-        <div className="list-wrap project-task-list-wrap">
-          <div className="tlist project-task-list">
-            <div className="thead">
-              <div>Task</div>
-              <div>Status</div>
-              <div>Priority</div>
-              <div>Assignees</div>
-              <div>Due date</div>
-              <div>Labels</div>
-              <div>Actions</div>
-            </div>
-            {visibleTasks.map((task) => (
-              <div className="trow" key={task.id}>
-                <div className="ttl">
-                  <span className="mono faint">
-                    {project.key}-{task.projectTaskNumber}
-                  </span>
-                  <span className="trunc">{task.title}</span>
-                  {task.subtaskCount ? (
-                    <span className="meta-mini">
-                      {task.completedSubtaskCount}/{task.subtaskCount} subtasks
-                    </span>
-                  ) : null}
-                </div>
-                <div className="c-meta">
-                  {editableTaskIds.has(task.id) ? (
-                    <TaskStatusSelect
-                      status={task.status}
-                      taskId={task.id}
-                      version={task.version}
-                    />
-                  ) : (
-                    <span className={`pstatus ${task.status}`}>
-                      {task.status}
-                    </span>
-                  )}
-                </div>
-                <div className="c-meta">{task.priority}</div>
-                <div className="c-meta project-task-list-assignees">
-                  {task.assignees.length
-                    ? task.assignees.map((assignee) => assignee.name).join(", ")
-                    : "Unassigned"}
-                </div>
-                <div className="c-meta num">{task.dueDate ?? "—"}</div>
-                <div className="c-meta c-lbl project-task-list-labels">
-                  {task.labelIds.flatMap((id) => {
-                    const label = labelsById.get(id);
-                    return label
-                      ? [
-                          <span className="lbl" key={label.id}>
-                            {label.name}
-                          </span>,
-                        ]
-                      : [];
-                  })}
-                </div>
-                <div className="c-meta">
-                  <TaskManageControls
-                    canEdit={editableTaskIds.has(task.id)}
-                    currentUserId={currentUserId}
-                    employees={employees}
-                    isAdmin={isAdmin}
-                    task={task}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ProjectTaskList
+          currentUserId={currentUserId}
+          editableTaskIds={editableTaskIds}
+          employees={employees}
+          isAdmin={isAdmin}
+          labels={labels}
+          projectKey={project.key}
+          tasks={visibleTasks}
+        />
       )}
       {visibleTasks.length ? null : (
         <div className="panel-b muted">

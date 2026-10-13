@@ -1,0 +1,68 @@
+@media (max-width: 640px) {
+  .workspace-app .members-section-nav {
+    width: 100%;
+  }
+  .workspace-app .members-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .workspace-app .members-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .workspace-app .members-search {
+    width: 100%;
+  }
+  .workspace-app .members-role-filter {
+    width: fit-content;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 820px) {
+  .workspace-app .member-profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-app .member-profile-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .workspace-app .member-profile-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 88px;
+  }
+}
+
+@media (max-width: 560px) {
+  .workspace-app .member-profile-header {
+    gap: 12px;
+  }
+  .workspace-app .member-profile-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+  .workspace-app .member-profile-name-row h1 {
+    font-size: var(--fs-xl);
+  }
+  .workspace-app .member-profile-actions {
+    margin-left: 0;
+  }
+  .workspace-app .member-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .workspace-app .member-profile-stats .stat:nth-child(3) {
+    border-left: 0;
+  }
+  .workspace-app .member-profile-stats .stat:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+  .workspace-app .member-profile-task {
+    align-items: flex-start;
+  }
+  .workspace-app .member-profile-task-meta {
+    align-items: flex-end;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,247 @@
+/* badges / pills / chips */
+.workspace-app .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.workspace-app .badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.workspace-app .badge.green {
+  color: var(--green);
+  background: var(--green-soft);
+  border-color: transparent;
+}
+.workspace-app .badge.amber {
+  color: var(--amber);
+  background: var(--amber-soft);
+  border-color: transparent;
+}
+.workspace-app .badge.red {
+  color: var(--red);
+  background: var(--red-soft);
+  border-color: transparent;
+}
+.workspace-app .badge.accent {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.workspace-app .badge.violet {
+  color: var(--violet);
+  background: color-mix(in srgb, var(--violet) 11%, transparent);
+  border-color: transparent;
+}
+.workspace-app .badge.gray {
+  color: var(--text-2);
+}
+.workspace-app .lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 7px 0 6px;
+  border-radius: 5px;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+.workspace-app .lbl i {
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.workspace-app .lbl-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.workspace-app .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-sm);
+  padding: 0 4px 0 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  background: var(--accent-soft);
+  color: var(--text);
+  border: 1px solid var(--accent-line);
+}
+.workspace-app .chip b {
+  font-weight: 500;
+  color: var(--text-2);
+}
+.workspace-app .chip .ibtn {
+  width: 18px;
+  height: 18px;
+  color: var(--text-2);
+}
+.workspace-app .pillbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-sm);
+  padding: 0 7px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--text);
+  transition: background var(--dur);
+  white-space: nowrap;
+  max-width: 100%;
+}
+.workspace-app .pillbtn:hover {
+  background: var(--surface-2);
+}
+.workspace-app .pillbtn.empty {
+  color: var(--text-3);
+}
+.workspace-app .pillbtn.bordered {
+  border: 1px solid var(--border);
+}
+.workspace-app .pillbtn.over {
+  color: var(--red);
+}
+/* avatar */
+.workspace-app .av {
+  --sz: 22px;
+  width: var(--sz);
+  height: var(--sz);
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: calc(var(--sz) * 0.4);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: color-mix(in srgb, var(--c) 17%, var(--surface));
+  color: color-mix(in srgb, var(--c) 55%, var(--text));
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1.5px var(--surface);
+  line-height: 1;
+  user-select: none;
+}
+.workspace-app .av.sm {
+  --sz: 20px;
+}
+.workspace-app .av.md {
+  --sz: 26px;
+}
+.workspace-app .av.lg {
+  --sz: 36px;
+}
+.workspace-app .av.xl {
+  --sz: 64px;
+}
+.workspace-app .av.empty {
+  background: transparent;
+  border: 1.3px dashed var(--border-strong);
+  color: var(--text-4);
+  box-shadow: none;
+}
+.workspace-app .avs {
+  display: inline-flex;
+}
+.workspace-app .avs .av + .av {
+  margin-left: -5px;
+}
+.workspace-app .avs .more {
+  --c: var(--gray);
+}
+.workspace-app .presence {
+  position: relative;
+}
+.workspace-app .presence::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+/* progress */
+.workspace-app .prog {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+  flex: 1;
+  min-width: 40px;
+}
+.workspace-app .prog > i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+  transition: transform 0.3s var(--ease);
+}
+.workspace-app .prog.green > i {
+  background: var(--green);
+}
+.workspace-app .prog.amber > i {
+  background: var(--amber);
+}
+.workspace-app .prog.red > i {
+  background: var(--red);
+}
+.workspace-app .stackbar {
+  display: flex;
+  height: 6px;
+  border-radius: 6px;
+  overflow: hidden;
+  gap: 2px;
+  background: var(--surface-3);
+}
+.workspace-app .stackbar i {
+  display: block;
+  height: 100%;
+}
+/* design-system select (see js/ui/select.js) */
+.workspace-app .select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.workspace-app .select-btn {
+  display: inline-flex;
+  align-items: center;
+  text-align: left;
+  min-width: 0;
+  color: var(--text);
+}
+.workspace-app .select-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.workspace-app .select-menu {
+  max-width: 360px;
+}
+.workspace-app .select-menu .mi[aria-selected="true"] {
+  font-weight: 500;
+}

@@ -1,0 +1,259 @@
+/* ============================================================
+   OVERLAYS: MODAL / DRAWER / POPOVER / MENU / PALETTE / TOAST
+   ============================================================ */
+.workspace-app .scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 60;
+}
+.workspace-app .scrim.enter {
+  animation: fade 0.18s ease both;
+}
+.workspace-app .modal-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10vh 16px 16px;
+  overflow-y: auto;
+}
+.workspace-app .modal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+.workspace-app .modal.enter {
+  animation: modalIn 0.26s var(--ease) both;
+}
+.workspace-app .modal.sm {
+  max-width: 420px;
+}
+.workspace-app .modal.lg {
+  max-width: 720px;
+}
+.workspace-app .modal-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 0;
+}
+.workspace-app .modal-h h2 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  margin: 0;
+}
+.workspace-app .modal-h .ibtn {
+  margin-left: auto;
+}
+.workspace-app .modal-b {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.workspace-app .modal-f {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .modal-f .sp {
+  flex: 1;
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.workspace-app .drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(620px, 100vw);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -18px 0 40px -24px rgba(0, 0, 0, 0.25);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+.workspace-app .drawer.enter {
+  animation: drawerIn 0.34s var(--ease-drawer) both;
+}
+.workspace-app .drawer.enter .drawer-b > * {
+  animation: riseIn 0.38s var(--ease) both;
+}
+.workspace-app .drawer.enter .drawer-b > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.workspace-app .drawer.enter .drawer-b > *:nth-child(3) {
+  animation-delay: 0.07s;
+}
+.workspace-app .drawer.enter .drawer-b > *:nth-child(n + 4) {
+  animation-delay: 0.1s;
+}
+.workspace-app .drawer.full {
+  width: min(980px, calc(100vw - 48px));
+  right: 50%;
+  transform: translateX(50%);
+  top: 24px;
+  bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.workspace-app .drawer.full.enter {
+  animation: modalIn 0.26s var(--ease) both;
+}
+.workspace-app .drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: transparent;
+}
+.workspace-app .drawer-scrim.full {
+  background: var(--overlay);
+}
+.workspace-app .drawer-scrim.full.enter {
+  animation: fade 0.18s both;
+}
+@keyframes drawerIn {
+  from {
+    transform: translateX(48px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.workspace-app .drawer-h {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 46px;
+  padding: 0 10px 0 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.workspace-app .drawer-b {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+}
+.workspace-app .drawer.full .drawer-b {
+  padding: 28px 48px 40px;
+}
+.workspace-app .ttl-edit {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  resize: none;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.3;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  outline: none;
+}
+.workspace-app .ttl-edit:hover {
+  background: var(--surface-2);
+}
+.workspace-app .ttl-edit:focus {
+  background: var(--surface-2);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.workspace-app .dsec {
+  margin-top: 26px;
+}
+.workspace-app .dsec-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.workspace-app .dsec-h h3 {
+  font-size: var(--fs);
+  font-weight: 600;
+  margin: 0;
+}
+.workspace-app .dsec-h .cnt {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .dsec-h .acts {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+}
+.workspace-app .rte {
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  transition: border-color var(--dur);
+}
+.workspace-app .rte:hover {
+  border-color: var(--border);
+}
+.workspace-app .rte:focus-within {
+  border-color: var(--border-strong);
+}
+.workspace-app .rte-tb {
+  display: flex;
+  gap: 1px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity var(--dur);
+}
+.workspace-app .dsec:hover .rte-tb,
+.workspace-app .dsec:focus-within .rte-tb {
+  opacity: 1;
+}
+.workspace-app .rte-body {
+  padding: 8px 10px;
+  min-height: 64px;
+  outline: none;
+  font-size: var(--fs);
+  line-height: 1.6;
+}
+.workspace-app .rte-body:empty::before {
+  content: attr(data-ph);
+  color: var(--text-3);
+}
+.workspace-app .rte-body p {
+  margin: 0 0 6px;
+}
+.workspace-app .rte-body ul,
+.workspace-app .rte-body ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+.workspace-app .rte-body h4 {
+  font-size: var(--fs-md);
+  margin: 10px 0 4px;
+}

@@ -1,0 +1,14 @@
+/* shared panel skeleton */
+.workspace-app .skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.workspace-app .skeleton-row {
+  height: 36px;
+}
+.workspace-app .home-stats-skeleton {
+  height: 84px;
+  margin-bottom: 16px;
+  border-radius: var(--r-lg);
+}

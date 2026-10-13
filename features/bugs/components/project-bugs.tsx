@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Project bug view uses reference workspace styles in workspace-reference.css. */
+/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Project bug view uses reference workspace styles in app/workspace-styles. */
 
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 

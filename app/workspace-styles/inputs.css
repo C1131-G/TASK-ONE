@@ -1,0 +1,292 @@
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.workspace-app .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.workspace-app .label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+.workspace-app .hint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.workspace-app .err {
+  font-size: var(--fs-xs);
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.workspace-app .input,
+.workspace-app .select,
+.workspace-app .textarea {
+  width: 100%;
+  height: var(--h-md);
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: var(--fs);
+  transition:
+    border-color var(--dur),
+    box-shadow var(--dur);
+}
+.workspace-app .input-lg {
+  height: var(--h-lg);
+}
+.workspace-app .textarea {
+  height: auto;
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.workspace-app textarea.input {
+  min-height: 0;
+}
+.workspace-app .input::placeholder,
+.workspace-app .textarea::placeholder {
+  color: var(--text-3);
+}
+.workspace-app .input:hover,
+.workspace-app .select:hover,
+.workspace-app .textarea:hover {
+  border-color: color-mix(in srgb, var(--border-strong) 60%, var(--text-3));
+}
+.workspace-app .input:focus,
+.workspace-app .select:focus,
+.workspace-app .textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+.workspace-app .input.is-error {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-soft);
+}
+.workspace-app .input:disabled {
+  background: var(--surface-2);
+  color: var(--text-3);
+  cursor: not-allowed;
+}
+.workspace-app .select {
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239C988F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  cursor: pointer;
+}
+.workspace-app .inwrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.workspace-app .inwrap > .i {
+  position: absolute;
+  left: 9px;
+  color: var(--text-4);
+  pointer-events: none;
+}
+.workspace-app .inwrap > .input {
+  padding-left: 30px;
+}
+.workspace-app .inwrap > .kbd {
+  position: absolute;
+  right: 7px;
+}
+.workspace-app .search-sm {
+  height: var(--h-sm);
+  font-size: var(--fs-sm);
+  width: 200px;
+}
+.workspace-app .check {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--dur),
+    border-color var(--dur);
+  margin: 0;
+}
+.workspace-app .check:hover {
+  border-color: var(--text-4);
+}
+.workspace-app .check:checked,
+.workspace-app .check:indeterminate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.workspace-app .check:checked::after {
+  content: "";
+  width: 8px;
+  height: 5px;
+  border-left: 1.8px solid var(--on-accent);
+  border-bottom: 1.8px solid var(--on-accent);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+.workspace-app .check:indeterminate::after {
+  content: "";
+  width: 7px;
+  height: 1.8px;
+  background: var(--on-accent);
+}
+.workspace-app .check.round {
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+}
+.workspace-app .toggle {
+  appearance: none;
+  width: 30px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--border-strong);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--dur);
+  flex-shrink: 0;
+  margin: 0;
+}
+.workspace-app .toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform var(--dur) var(--ease);
+}
+.workspace-app .toggle:checked {
+  background: var(--accent);
+}
+.workspace-app .toggle:checked::after {
+  transform: translateX(12px);
+}
+.workspace-app .radio {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  margin: 0;
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  flex-shrink: 0;
+}
+.workspace-app .radio:checked {
+  border-color: var(--accent);
+}
+.workspace-app .radio:checked::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+/* segmented */
+.workspace-app .seg {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  gap: 2px;
+}
+.workspace-app .seg button {
+  height: calc(var(--h-sm) - 2px);
+  padding: 0 9px;
+  border-radius: 5px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition:
+    background var(--dur),
+    color var(--dur);
+}
+.workspace-app .seg button:hover {
+  color: var(--text);
+}
+.workspace-app .seg button.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 0 0 1px var(--border);
+}
+/* tabs */
+.workspace-app .tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.workspace-app .tabs::-webkit-scrollbar {
+  display: none;
+}
+.workspace-app .tab {
+  height: 36px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-2);
+  position: relative;
+  white-space: nowrap;
+  transition: color var(--dur);
+}
+.workspace-app .tab:hover {
+  color: var(--text);
+}
+.workspace-app .tab.on {
+  color: var(--text);
+}
+.workspace-app .tab.on::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text);
+}
+.workspace-app .fx-tabs .tab.on::after {
+  animation: tabIn 0.26s var(--ease);
+}
+.workspace-app .tab .cnt {
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  font-weight: 500;
+}
+@keyframes tabIn {
+  from {
+    transform: scaleX(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

@@ -2,7 +2,7 @@
 
 "use client";
 
-/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- These workspace classes are defined in workspace-reference.css to match the reference UI. */
+/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- These workspace classes are defined in app/workspace-styles to match the reference UI. */
 
 import { ArrowLeft } from "@phosphor-icons/react";
 import type { Route } from "next";
@@ -98,11 +98,11 @@ export const BugDetailWorkflow = ({
 
   const submit = (
     event: FormEvent<HTMLFormElement>,
-    run: (data: FormData) => Promise<BugActionResult>
+    run: (formData: FormData) => Promise<BugActionResult>
   ) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    startTransition(async () => finishAction(await run(data)));
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => finishAction(await run(formData)));
   };
 
   const runAction = (action: Promise<BugActionResult>) =>

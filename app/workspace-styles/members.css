@@ -1,0 +1,143 @@
+.workspace-app .members-panel {
+  min-width: 0;
+}
+.workspace-app .members-workspace {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+.workspace-app .members-section-nav {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.workspace-app .members-section-nav a {
+  min-height: 38px;
+  padding: 10px 12px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .members-section-nav a[aria-current="page"] {
+  border-bottom: 2px solid var(--text);
+  color: var(--text);
+}
+.workspace-app .members-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.workspace-app .members-count,
+.workspace-app .members-controls,
+.workspace-app .members-role-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workspace-app .members-count h2 {
+  margin: 0;
+}
+.workspace-app .members-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.workspace-app .members-search {
+  width: min(240px, 100%);
+}
+.workspace-app .members-role-filter {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 2px;
+}
+.workspace-app .members-role-filter [data-active="true"] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.workspace-app .members-panel [data-slot="table-container"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.workspace-app .members-table {
+  min-width: 980px;
+}
+.workspace-app .members-avatar {
+  width: 32px;
+  height: 32px;
+}
+.workspace-app .members-table [data-slot="table-head"] {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .members-table [data-slot="table-cell"] {
+  padding-block: 10px;
+}
+.workspace-app .members-permissions-table {
+  min-width: 560px;
+}
+.workspace-app .members-permissions-table [data-slot="table-container"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.workspace-app
+  .members-permissions-table
+  [data-slot="table-cell"]:not(:first-child) {
+  text-align: center;
+}
+.workspace-app .permission-allowed,
+.workspace-app .permission-denied {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+}
+.workspace-app .permission-allowed {
+  color: var(--green);
+}
+.workspace-app .permission-denied {
+  color: var(--text-3);
+}
+.workspace-app .members-person {
+  display: flex;
+  min-width: 190px;
+  align-items: center;
+  gap: 10px;
+}
+.workspace-app .members-person-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.workspace-app .members-person-copy strong,
+.workspace-app .members-person-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .members-person-copy strong {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 550;
+}
+.workspace-app .members-person-copy span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .members-empty {
+  text-align: center;
+}
+.workspace-app .members-person-link {
+  color: inherit;
+  text-decoration: none;
+}
+.workspace-app .members-person-link:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

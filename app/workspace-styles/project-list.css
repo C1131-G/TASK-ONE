@@ -1,0 +1,96 @@
+.workspace-app .project-toolbar {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.workspace-app .project-toolbar .field {
+  min-width: 138px;
+  margin: 0;
+}
+.workspace-app .project-toolbar .project-search {
+  min-width: min(260px, 100%);
+  flex: 1;
+}
+.workspace-app .project-view-tabs {
+  align-self: flex-start;
+  margin: 4px 0 0;
+}
+.workspace-app .project-list-view {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--divider);
+}
+.workspace-app .project-list-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+}
+.workspace-app .project-list-main {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  grid-template-columns: 24px minmax(120px, 1.5fr) auto minmax(
+      110px,
+      0.8fr
+    ) minmax(80px, 0.7fr) minmax(80px, 0.7fr) auto;
+  color: inherit;
+  text-decoration: none;
+}
+.workspace-app .project-list-main:hover strong,
+.workspace-app .project-table-name:hover {
+  color: var(--accent);
+}
+.workspace-app .project-list-title {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.workspace-app .project-list-title .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .project-list-progress {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+.workspace-app .project-list-progress .prog {
+  min-width: 44px;
+  width: 100%;
+}
+.workspace-app .project-table {
+  min-width: 760px;
+}
+.workspace-app .project-table-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+.workspace-app [data-project-status="active"] {
+  color: var(--blue);
+}
+.workspace-app [data-project-status="risk"] {
+  color: var(--red);
+}
+.workspace-app [data-project-status="complete"] {
+  color: var(--green);
+}
+.workspace-app [data-project-status="hold"] {
+  color: var(--text-3);
+}
+.workspace-app [data-project-status="planning"] {
+  color: var(--amber);
+}

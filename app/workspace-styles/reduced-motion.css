@@ -1,0 +1,60 @@
+@media (prefers-reduced-motion: reduce) {
+  .dark .workspace-app {
+    --reduce: 1;
+  }
+}
+.workspace-app[data-motion="reduce"] {
+  --reduce: 1;
+}
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-app .modal,
+  .workspace-app .drawer,
+  .workspace-app .pop,
+  .workspace-app .toast,
+  .workspace-app .bulkbar,
+  .workspace-app .tab.on::after {
+    animation-name: fadeOnly !important;
+    animation-duration: 0.12s !important;
+  }
+  .workspace-app .btn:active:not(:disabled) {
+    transform: none;
+  }
+  .workspace-app .prog > i,
+  .workspace-app .toggle::after,
+  .workspace-app .sitem .chev,
+  .workspace-app .skip {
+    transition: none;
+  }
+  .workspace-app .sk {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+.workspace-app[data-motion="reduce"] .modal,
+.workspace-app[data-motion="reduce"] .drawer,
+.workspace-app[data-motion="reduce"] .pop,
+.workspace-app[data-motion="reduce"] .toast,
+.workspace-app[data-motion="reduce"] .bulkbar,
+.workspace-app[data-motion="reduce"] .tab.on::after {
+  animation-name: fadeOnly !important;
+  animation-duration: 0.12s !important;
+}
+.workspace-app[data-motion="reduce"] .btn:active:not(:disabled) {
+  transform: none;
+}
+.workspace-app[data-motion="reduce"] .prog > i,
+.workspace-app[data-motion="reduce"] .toggle::after {
+  transition: none;
+}
+.workspace-app[data-motion="reduce"] .sk {
+  animation: none;
+  opacity: 0.85;
+}

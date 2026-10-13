@@ -1,0 +1,52 @@
+@media (prefers-reduced-motion: reduce) {
+  .workspace-app .fx-route > .page > *,
+  .workspace-app .fx-route > .fullstate,
+  .workspace-app .fx-route .grid2 > * > *,
+  .workspace-app .fx-route .bar,
+  .workspace-app .pbody.fx-tab > *,
+  .workspace-app .pbody.fx-tab .kcard,
+  .workspace-app .auth-card.fx-auth > *,
+  .workspace-app .onb.fx-step > *,
+  .workspace-app .drawer.enter .drawer-b > *,
+  .workspace-app .kcard.fx-moved,
+  .workspace-app .cev.fx-moved,
+  .workspace-app .wcard.fx-moved,
+  .workspace-app .fx-done .check,
+  .workspace-app .onb.fx-step .ready-row,
+  .workspace-app .onb.fx-step .ready-row .ok,
+  .workspace-app .onb.fx-step .ready-badge {
+    animation: fadeOnly 0.12s both !important;
+  }
+  .workspace-app .fx-route .prog > i,
+  .workspace-app .fx-route .stackbar i,
+  .workspace-app .onb.fx-step .steps i.cur {
+    animation: none !important;
+  }
+  .workspace-app .fx-done .tt,
+  .workspace-app .fx-done .title {
+    animation: none;
+    background: none;
+    text-decoration: line-through !important;
+  }
+  .workspace-app .pcard:hover,
+  .workspace-app .kcard:hover,
+  .workspace-app .check:active {
+    transform: none;
+  }
+}
+.workspace-app[data-motion="reduce"] .fx-route > .page > *,
+.workspace-app[data-motion="reduce"] .pbody.fx-tab > *,
+.workspace-app[data-motion="reduce"] .auth-card.fx-auth > *,
+.workspace-app[data-motion="reduce"] .onb.fx-step > *,
+.workspace-app[data-motion="reduce"] .drawer.enter .drawer-b > *,
+.workspace-app[data-motion="reduce"] .kcard.fx-moved {
+  animation: fadeOnly 0.12s both !important;
+}
+.workspace-app[data-motion="reduce"] .fx-route .prog > i,
+.workspace-app[data-motion="reduce"] .fx-route .stackbar i {
+  animation: none !important;
+}
+.workspace-app[data-motion="reduce"] .pcard:hover,
+.workspace-app[data-motion="reduce"] .kcard:hover {
+  transform: none;
+}

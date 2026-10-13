@@ -6,7 +6,7 @@ import {
   WorkspaceFrameSkeleton,
 } from "@/features/workspace/components/workspace-frame";
 
-import "../workspace-reference.css";
+import "../workspace-styles/workspace-styles";
 
 export const instant = false;
 

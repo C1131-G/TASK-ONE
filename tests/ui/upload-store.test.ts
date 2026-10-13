@@ -5,11 +5,11 @@ import {
   uploadPercent,
 } from "../../features/files/upload-store";
 
-const item = { id: "a", name: "plan.pdf", sizeBytes: 200 };
+const sampleUpload = { id: "a", name: "plan.pdf", sizeBytes: 200 };
 
 test("an added upload starts at zero and reports progress as a percent", () => {
   const store = createUploadStore();
-  store.actions.add(item);
+  store.actions.add(sampleUpload);
   expect(store.state.uploads[0]?.status).toBe("uploading");
   store.actions.progress("a", 50);
   const [first] = store.state.uploads;
@@ -18,7 +18,7 @@ test("an added upload starts at zero and reports progress as a percent", () => {
 
 test("done fills the bar and failed keeps the message for a retry", () => {
   const store = createUploadStore();
-  store.actions.add(item);
+  store.actions.add(sampleUpload);
   store.actions.failed("a", "Storage is unreachable");
   expect(store.state.uploads[0]).toMatchObject({
     error: "Storage is unreachable",
@@ -38,7 +38,7 @@ test("done fills the bar and failed keeps the message for a retry", () => {
 
 test("cancelled uploads stay listed until dismissed, and clearFinished keeps running ones", () => {
   const store = createUploadStore();
-  store.actions.add(item);
+  store.actions.add(sampleUpload);
   store.actions.add({ id: "b", name: "photo.png", sizeBytes: 10 });
   store.actions.cancelled("a");
   expect(store.state.uploads[0]?.status).toBe("cancelled");

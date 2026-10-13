@@ -1,0 +1,98 @@
+.workspace-app .board-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.workspace-app .project-task-filter {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) repeat(3, minmax(135px, 170px)) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.workspace-app .project-task-filter-grouped {
+  grid-template-columns: minmax(160px, 1fr) repeat(4, minmax(110px, 150px)) auto;
+}
+.workspace-app .project-task-filter .field {
+  min-width: 0;
+}
+.workspace-app .project-task-filter .project-task-count {
+  white-space: nowrap;
+  font-size: var(--fs-xs);
+}
+.workspace-app .project-task-list-wrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.workspace-app .project-task-list {
+  min-width: 980px;
+}
+.workspace-app .project-task-list .thead,
+.workspace-app .project-task-list .trow {
+  grid-template-columns: minmax(220px, 1fr) 126px 90px 150px 100px minmax(
+      140px,
+      200px
+    ) 44px;
+}
+.workspace-app .project-task-list-assignees {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .project-task-list-labels {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+}
+.workspace-app .project-task-data-table {
+  min-width: 1080px;
+}
+.workspace-app .project-task-bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 8px 0;
+}
+.workspace-app .project-task-data-table th,
+.workspace-app .project-task-data-table td {
+  border-bottom: 1px solid var(--border);
+}
+.workspace-app .project-task-data-table .project-task-name-cell {
+  min-width: 240px;
+  white-space: normal;
+}
+.workspace-app .project-task-name-cell > span {
+  display: block;
+}
+.workspace-app .project-task-name {
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .project-task-assignees {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workspace-app .project-task-priority {
+  text-transform: capitalize;
+}
+.workspace-app .project-task-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 240px;
+  white-space: normal;
+}
+.workspace-app .project-task-group-row td {
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}

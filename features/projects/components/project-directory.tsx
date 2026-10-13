@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle -- Workspace classes are defined in workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle -- Workspace classes are defined in app/workspace-styles. */
 
 import Link from "next/link";
 import { connection } from "next/server";

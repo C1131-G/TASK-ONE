@@ -102,9 +102,9 @@ export const useUploadQueue = (
   };
 
   const clearFinished = () => {
-    for (const item of store.state.uploads) {
-      if (item.status !== "uploading") {
-        entries.current.delete(item.id);
+    for (const upload of store.state.uploads) {
+      if (upload.status !== "uploading") {
+        entries.current.delete(upload.id);
       }
     }
     store.actions.clearFinished();

@@ -1,0 +1,70 @@
+.workspace-app {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+.workspace-app .bottomnav a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 5px 0;
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.workspace-app .bottomnav a.on {
+  color: var(--text);
+}
+
+.workspace-app progress.prog {
+  appearance: none;
+  border: 0;
+  color: var(--accent);
+}
+.workspace-app [data-workspace-progress] {
+  height: 4px;
+  background: var(--surface-3);
+}
+.workspace-app [data-workspace-progress] [data-slot="progress-indicator"] {
+  background: var(--accent);
+  transition: transform 180ms var(--ease);
+}
+.workspace-app [data-workspace-date-trigger] {
+  min-height: 30px;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text-2);
+  padding: 0 9px;
+  font-size: var(--fs-sm);
+}
+.workspace-app [data-workspace-date-trigger]:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.workspace-app progress.prog::-webkit-progress-bar {
+  border-radius: 4px;
+  background: var(--surface-3);
+}
+
+.workspace-app progress.prog::-webkit-progress-value {
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.workspace-app progress.prog::-moz-progress-bar {
+  border-radius: 4px;
+  background: var(--accent);
+}

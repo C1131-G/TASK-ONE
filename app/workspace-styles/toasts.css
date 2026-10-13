@@ -1,0 +1,117 @@
+.workspace-app #toasts {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.workspace-app .toast {
+  pointer-events: auto;
+  animation-timing-function: var(--spring) !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 8px 8px 12px;
+  border-radius: var(--r);
+  background: var(--text);
+  color: var(--text-inv);
+  font-size: var(--fs-sm);
+  box-shadow: var(--shadow-pop);
+  animation: toastIn 0.2s var(--ease) both;
+  max-width: 400px;
+}
+.workspace-app .toast.out {
+  animation: toastOut 0.16s ease both;
+}
+.workspace-app .toast .i.ok {
+  color: var(--green);
+}
+.workspace-app .toast .i.bad {
+  color: var(--red);
+}
+.workspace-app .toast .ta {
+  color: var(--text-inv);
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  opacity: 0.9;
+}
+.workspace-app .toast .ta:hover {
+  background: color-mix(in srgb, var(--text-inv) 14%, transparent);
+}
+.workspace-undo-stack {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 110;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(50dvh, 420px);
+  overflow-y: auto;
+  pointer-events: none;
+}
+.workspace-undo-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-undo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--text);
+  color: var(--text-inv);
+  box-shadow: var(--shadow-pop);
+  pointer-events: auto;
+}
+.workspace-undo-copy {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+  font-size: var(--fs-sm);
+}
+.workspace-undo-copy .faint {
+  color: color-mix(in srgb, var(--text-inv) 76%, transparent);
+}
+.workspace-undo-item .workspace-undo-button {
+  min-height: 44px;
+  color: var(--text);
+}
+.workspace-undo-item .workspace-undo-dismiss {
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--text-inv);
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-undo-item {
+    animation: none;
+    transition: none;
+  }
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}

@@ -1,0 +1,85 @@
+.workspace-app .activity-filters {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.workspace-app .activity-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.workspace-app .activity-tabs [data-slot="tabs-list"] {
+  width: max-content;
+  max-width: none;
+}
+
+.workspace-app .activity-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.workspace-app .activity-filters [data-slot="select-trigger"] {
+  min-width: 130px;
+}
+
+.workspace-app .activity-entry {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.workspace-app .activity-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.workspace-app .activity-link,
+.workspace-app .activity-project {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.workspace-app .activity-link:hover,
+.workspace-app .activity-project:hover {
+  text-decoration: underline;
+}
+.workspace-app .project-activity-feed {
+  max-width: 780px;
+  margin-inline: auto;
+  padding: 18px var(--gutter) 40px;
+}
+.workspace-app .project-activity-feed .day-h:first-child {
+  padding-top: 0;
+}
+.workspace-app .project-activity-empty {
+  max-width: 780px;
+  margin: 18px auto 0;
+}
+
+@media (max-width: 640px) {
+  .workspace-app .activity-filters {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .workspace-app .activity-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .workspace-app .activity-filters [data-slot="select-trigger"] {
+    flex: 0 0 130px;
+    width: 130px;
+  }
+
+  .workspace-app .activity-entry time {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .workspace-app .project-activity-feed {
+    padding: 12px var(--gutter) 32px;
+  }
+  .workspace-app .project-activity-feed .fitem {
+    gap: 8px;
+  }
+}

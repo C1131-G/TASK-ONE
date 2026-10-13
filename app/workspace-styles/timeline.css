@@ -1,0 +1,265 @@
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.workspace-app .tl {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+.workspace-app .timeline-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+.workspace-app .timeline-panel-header {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 14px;
+}
+.workspace-app .timeline-toolbar {
+  align-items: center;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  width: 100%;
+}
+.workspace-app .timeline-toolbar .field {
+  flex: 0 1 154px;
+  margin: 0;
+  min-width: 136px;
+}
+.workspace-app .timeline-toolbar .timeline-search {
+  flex: 1 1 200px;
+}
+.workspace-app .timeline-scale {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+}
+.workspace-app .timeline-scale button {
+  min-height: 32px;
+  padding-inline: 10px;
+}
+.workspace-app .timeline-panel .tl {
+  min-height: 360px;
+}
+.workspace-app .tl-left {
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.workspace-app .tl-right {
+  overflow: auto;
+  position: relative;
+}
+.workspace-app .tl-head {
+  height: 52px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.workspace-app .tl-left .tl-head {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 12px 8px var(--gutter);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 500;
+}
+.workspace-app .tl-rows {
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.workspace-app .tl-row {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 var(--gutter);
+  border-bottom: 1px solid var(--divider);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.workspace-app .timeline-row-link {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  text-decoration: none;
+  width: 100%;
+}
+.workspace-app .tl-row:hover {
+  background: var(--surface-2);
+}
+.workspace-app .tl-row.g {
+  font-weight: 600;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  background: var(--sunken);
+  cursor: default;
+}
+.workspace-app .tl-row.sub {
+  padding-left: 34px;
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+}
+.workspace-app .tl-months,
+.workspace-app .tl-days {
+  display: flex;
+  height: 26px;
+  position: absolute;
+  left: 0;
+}
+.workspace-app .tl-months {
+  top: 0;
+}
+.workspace-app .tl-days {
+  top: 26px;
+  border-top: 1px solid var(--divider);
+}
+.workspace-app .tl-months div {
+  border-left: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 5px 0;
+  color: var(--text);
+  white-space: nowrap;
+}
+/* month name sticks to the left edge while its month is scrolled partly out of view */
+.workspace-app .tl-months span {
+  position: sticky;
+  left: 8px;
+  padding: 0 8px;
+}
+.workspace-app .tl-days div {
+  border-left: 1px solid var(--divider);
+  font-size: 11px;
+  color: var(--text-3);
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .tl-days div.today {
+  color: var(--accent);
+  font-weight: 600;
+}
+.workspace-app .tl-grid {
+  position: relative;
+}
+.workspace-app .tl-gl {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--divider);
+}
+.workspace-app .tl-we {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sunken);
+}
+.workspace-app .tl-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.7;
+  z-index: 2;
+}
+.workspace-app .tl-rowbg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 36px;
+  border-bottom: 1px solid var(--divider);
+}
+.workspace-app .tl-rowbg.g {
+  background: color-mix(in srgb, var(--sunken) 70%, transparent);
+}
+.workspace-app .bar {
+  position: absolute;
+  height: 24px;
+  font-size: var(--fs-sm) !important;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--c) 16%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  font-size: var(--fs-xs);
+  color: var(--text);
+  cursor: grab;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 3;
+  user-select: none;
+}
+.workspace-app .cday[data-touch-over="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.workspace-app .cal-chip[data-touch-dragging="true"] {
+  opacity: 0.7;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
+.workspace-app .tl-milestone {
+  position: absolute;
+  top: 12px;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  z-index: 3;
+}
+.workspace-app .tl-milestone.done {
+  background: transparent;
+}
+.workspace-app .tl-milestone.movable {
+  cursor: grab;
+}
+/* A touch drag along the day axis moves the item; vertical swipes still scroll. */
+.workspace-app .bar.movable,
+.workspace-app .tl-milestone.movable {
+  touch-action: pan-y;
+}
+.workspace-app .bar:hover {
+  border-color: var(--c);
+}
+.workspace-app .bar .pf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--c) 26%, transparent);
+  z-index: -1;
+}
+.workspace-app .bar.done {
+  opacity: 0.6;
+}
+.workspace-app .bar.dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-drag);
+}

@@ -1,0 +1,212 @@
+.workspace-app .team-overview {
+  display: grid;
+  min-width: 0;
+  gap: 18px;
+}
+.workspace-app .team-overview-heading {
+  align-items: center;
+}
+.workspace-app .team-overview-title,
+.workspace-app .team-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.workspace-app .team-overview-title h1,
+.workspace-app .team-section-title h2 {
+  margin: 0;
+}
+.workspace-app .team-color-mark,
+.workspace-app .team-project-mark {
+  display: block;
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+}
+.workspace-app .team-overview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workspace-app .team-overview-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.workspace-app .team-overview-section-heading,
+.workspace-app .team-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workspace-app .team-overview-section-heading {
+  justify-content: space-between;
+}
+.workspace-app .team-project-list,
+.workspace-app .team-open-task-list,
+.workspace-app .team-member-list {
+  display: grid;
+}
+.workspace-app .team-project-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--divider);
+  padding: 14px 16px;
+  color: var(--text);
+  text-decoration: none;
+}
+.workspace-app .team-project-row:last-child,
+.workspace-app .team-open-task-row:last-child,
+.workspace-app .team-member-row:last-child {
+  border-bottom: 0;
+}
+.workspace-app .team-project-main,
+.workspace-app .team-project-title,
+.workspace-app .team-task-main,
+.workspace-app .team-member-main {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+.workspace-app .team-project-title {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+.workspace-app .team-project-title strong,
+.workspace-app .team-task-main strong,
+.workspace-app .team-member-main strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .team-project-status,
+.workspace-app .team-task-main span,
+.workspace-app .team-task-assignees,
+.workspace-app .team-member-main span {
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .team-project-progress {
+  height: 5px;
+  background: var(--surface-3);
+}
+.workspace-app .team-project-percent {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .team-open-task-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 84px minmax(0, 1fr) minmax(80px, auto);
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--divider);
+  padding: 11px 16px;
+  color: inherit;
+  text-decoration: none;
+}
+.workspace-app .team-task-status {
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  padding: 4px 6px;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .team-task-status[data-task-status="progress"] {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.workspace-app .team-task-status[data-task-status="review"] {
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+.workspace-app .team-task-status[data-task-status="done"] {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.workspace-app .team-task-assignees {
+  max-width: 150px;
+  text-align: right;
+}
+.workspace-app .team-member-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--divider);
+  padding: 12px 16px;
+}
+.workspace-app .team-member-main {
+  flex: 1;
+}
+.workspace-app .team-member-footer {
+  border-top: 1px solid var(--divider);
+}
+.workspace-app .team-members-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .team-members-link:hover,
+.workspace-app .team-project-row:hover,
+.workspace-app .team-open-task-row:hover,
+.workspace-app .team-card-link:hover {
+  background: var(--surface-2);
+}
+.workspace-app .team-card-link {
+  display: grid;
+  gap: 3px;
+  color: inherit;
+  text-decoration: none;
+}
+.workspace-app .team-card-link strong {
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .workspace-app .team-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .workspace-app .team-overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .workspace-app .team-overview-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .workspace-app .team-open-task-row {
+    grid-template-columns: 75px minmax(0, 1fr);
+  }
+  .workspace-app .team-task-assignees {
+    grid-column: 2;
+    max-width: 100%;
+    text-align: left;
+  }
+}

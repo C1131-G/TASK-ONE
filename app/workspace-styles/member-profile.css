@@ -1,0 +1,244 @@
+.workspace-app .member-profile-page {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.workspace-app .member-profile-back {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .member-profile-back:hover,
+.workspace-app .member-profile-email:hover {
+  color: var(--text);
+}
+.workspace-app .member-profile-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+}
+.workspace-app .member-profile-avatar {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  font-size: 24px;
+}
+.workspace-app .member-profile-identity {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+.workspace-app .member-profile-name-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.workspace-app .member-profile-name-row h1 {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.workspace-app .member-profile-job {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.workspace-app .member-profile-email {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.workspace-app .member-profile-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.workspace-app .member-profile-stats {
+  margin-bottom: 0;
+}
+.workspace-app .member-profile-stats .is-overdue {
+  color: var(--red);
+}
+.workspace-app .member-profile-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.workspace-app .member-profile-side {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+.workspace-app .member-profile-tabs {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.workspace-app .member-profile-tabs a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.workspace-app .member-profile-tabs a[aria-current="page"] {
+  border-bottom: 2px solid var(--text);
+  color: var(--text);
+}
+.workspace-app .member-profile-task-list,
+.workspace-app .member-profile-project-list,
+.workspace-app .member-profile-activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-app .member-profile-task {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-app .member-profile-task:last-child,
+.workspace-app .member-profile-project-list li:last-child,
+.workspace-app .member-profile-activity-list li:last-child {
+  border-bottom: 0;
+}
+.workspace-app .member-profile-task-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 3px;
+}
+.workspace-app .member-profile-task-copy strong,
+.workspace-app .member-profile-task-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .member-profile-task-copy strong {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.workspace-app .member-profile-task-title[data-slot="button"] {
+  width: fit-content;
+  max-width: 100%;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: 0;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .member-profile-task-title[data-slot="button"]:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.workspace-app .member-profile-task-copy span,
+.workspace-app .member-profile-task-meta {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .member-profile-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.workspace-app .member-profile-task-meta time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.workspace-app .member-profile-empty {
+  padding-top: 14px;
+}
+.workspace-app .member-profile-project-list a {
+  display: flex;
+  min-width: 0;
+  min-height: 43px;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .member-profile-project-list a:hover {
+  background: var(--surface-2);
+}
+.workspace-app .member-profile-project-list a > span:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .member-profile-project-color {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--project-color, var(--accent));
+}
+.workspace-app .member-profile-activity-list li {
+  display: flex;
+  gap: 9px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-app .member-profile-activity-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+.workspace-app .member-profile-activity-list p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.workspace-app .member-profile-activity-list strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.workspace-app .member-profile-activity-list time {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}

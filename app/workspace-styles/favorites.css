@@ -1,0 +1,116 @@
+.workspace-app .favorite-empty {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.workspace-app .favorite-empty h3,
+.workspace-app .favorite-empty p {
+  margin: 0;
+}
+
+.workspace-app .favorite-empty-link {
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-top: 4px;
+  text-decoration: none;
+}
+
+.workspace-app .favorite-task-list {
+  overflow: hidden;
+}
+
+.workspace-app .favorite-task-row {
+  align-items: center;
+  border-bottom: 1px solid var(--divider);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  min-height: 72px;
+  padding: 10px 16px;
+}
+
+.workspace-app .favorite-task-row:last-child {
+  border-bottom: 0;
+}
+
+.workspace-app .favorite-task-row > .home-task-completion {
+  justify-self: center;
+}
+
+.workspace-app .favorite-task-status-dot {
+  background: var(--text-3);
+  border-radius: 50%;
+  height: 8px;
+  justify-self: center;
+  width: 8px;
+}
+
+.workspace-app .favorite-task-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workspace-app .favorite-task-title,
+.workspace-app .favorite-task-project {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-app .favorite-task-title {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.workspace-app .favorite-task-title:hover,
+.workspace-app .favorite-task-project:hover {
+  text-decoration: underline;
+}
+
+.workspace-app .favorite-task-project,
+.workspace-app .favorite-task-metadata time {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-decoration: none;
+}
+
+.workspace-app .favorite-task-metadata {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.workspace-app .favorite-task-assignees {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.workspace-app .favorite-task-assignees .av {
+  display: grid;
+  height: 26px;
+  place-items: center;
+  width: 26px;
+}
+
+@media (max-width: 640px) {
+  .workspace-app .favorite-task-row {
+    gap: 8px;
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+    padding: 10px;
+  }
+
+  .workspace-app .favorite-task-row > .col:last-child {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}

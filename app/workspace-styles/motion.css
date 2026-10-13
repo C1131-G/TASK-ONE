@@ -1,0 +1,263 @@
+/* ============================================================
+   MOTION: one-shot flow animations (gated to the render they belong to)
+   ============================================================ */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slideInR {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes growX {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes popCheck {
+  0% {
+    transform: scale(0.55);
+  }
+  55% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes strike {
+  to {
+    background-size: 100% 1.5px;
+  }
+}
+@keyframes doneWash {
+  from {
+    background: var(--green-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+@keyframes doneRing {
+  from {
+    box-shadow:
+      0 0 0 2px var(--green),
+      var(--shadow-card);
+  }
+  to {
+    box-shadow: var(--shadow-card);
+  }
+}
+@keyframes land {
+  0% {
+    transform: scale(1.04) rotate(-1.2deg);
+    box-shadow: var(--shadow-drag);
+  }
+  100% {
+    transform: none;
+    box-shadow: var(--shadow-card);
+  }
+}
+@keyframes addWash {
+  from {
+    background: var(--accent-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+@keyframes addRing {
+  from {
+    box-shadow:
+      0 0 0 2px var(--accent-line),
+      var(--shadow-card);
+  }
+  to {
+    box-shadow: var(--shadow-card);
+  }
+}
+/* route change: content rises in, lightly staggered */
+.workspace-app .fx-route > .page > *,
+.workspace-app .fx-route > .fullstate {
+  animation: riseIn 0.36s var(--ease) both;
+}
+.workspace-app .fx-route > .page > *:nth-child(2) {
+  animation-delay: 0.035s;
+}
+.workspace-app .fx-route > .page > *:nth-child(3) {
+  animation-delay: 0.07s;
+}
+.workspace-app .fx-route > .page > *:nth-child(n + 4) {
+  animation-delay: 0.1s;
+}
+.workspace-app .fx-route .grid2 > * > *:nth-child(2),
+.workspace-app .fx-route .grid2 > *:nth-child(2) > *:first-child {
+  animation: riseIn 0.4s 0.09s var(--ease) both;
+}
+.workspace-app .fx-route .prog > i {
+  animation: growX 0.8s 0.12s var(--ease) both;
+}
+.workspace-app .fx-route .stackbar i {
+  transform-origin: left;
+  animation: growX 0.8s 0.12s var(--ease) both;
+}
+.workspace-app .fx-route .bar {
+  animation: riseIn 0.4s var(--ease) both;
+}
+.workspace-app .pbody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.workspace-app .pbody.fx-tab > * {
+  animation: riseIn 0.26s var(--ease) both;
+}
+.workspace-app .pbody.fx-tab .kcard {
+  animation: riseIn 0.32s var(--ease) both;
+}
+.workspace-app .pbody.fx-tab .bcol:nth-child(2) .kcard {
+  animation-delay: 0.03s;
+}
+.workspace-app .pbody.fx-tab .bcol:nth-child(3) .kcard {
+  animation-delay: 0.06s;
+}
+.workspace-app .pbody.fx-tab .bcol:nth-child(n + 4) .kcard {
+  animation-delay: 0.09s;
+}
+/* task completed */
+.workspace-app .trow.fx-done,
+.workspace-app .mini.fx-done {
+  animation: doneWash 1s var(--ease) both;
+}
+.workspace-app .kcard.fx-done {
+  animation: doneRing 1s var(--ease) both;
+}
+.workspace-app .fx-done .check,
+.workspace-app .fx-done .done-ic {
+  animation: popCheck 0.42s var(--spring) both;
+}
+.workspace-app .fx-done .tt,
+.workspace-app .fx-done .title {
+  text-decoration: none !important;
+  background: linear-gradient(currentColor, currentColor) 0 58%/0 1.5px
+    no-repeat;
+  animation: strike 0.38s 0.1s var(--ease) forwards;
+}
+/* dropped, created */
+.workspace-app .kcard.fx-moved {
+  animation: land 0.5s var(--spring) both;
+}
+.workspace-app .cev.fx-moved,
+.workspace-app .wcard.fx-moved {
+  animation: popCheck 0.4s var(--spring) both;
+}
+.workspace-app .trow.fx-added,
+.workspace-app .mini.fx-added {
+  animation:
+    riseIn 0.3s var(--ease) both,
+    addWash 1.4s var(--ease) both;
+}
+.workspace-app .kcard.fx-added {
+  animation:
+    riseIn 0.3s var(--ease) both,
+    addRing 1.4s var(--ease) both;
+}
+.workspace-app .subt.fx-added {
+  animation: riseIn 0.28s var(--ease) both;
+}
+/* auth + onboarding */
+.workspace-app .auth-card.fx-auth > * {
+  animation: riseIn 0.42s var(--ease) both;
+}
+.workspace-app .auth-card.fx-auth > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.workspace-app .auth-card.fx-auth > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.workspace-app .auth-card.fx-auth > *:nth-child(n + 4) {
+  animation-delay: 0.12s;
+}
+.workspace-app .onb.fx-step > *:not(.steps) {
+  animation: slideInR 0.36s var(--ease) both;
+}
+.workspace-app .onb.fx-step > *:nth-child(n + 4) {
+  animation-delay: 0.05s;
+}
+.workspace-app .steps i {
+  transform-origin: left;
+  transition: background 0.3s;
+}
+.workspace-app .onb.fx-step .steps i.cur {
+  animation: growX 0.45s var(--ease) both;
+}
+.workspace-app .onb.fx-step .ready-row {
+  animation: riseIn 0.4s var(--ease) both;
+}
+.workspace-app .onb.fx-step .ready-row:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.workspace-app .onb.fx-step .ready-row:nth-child(3) {
+  animation-delay: 0.24s;
+}
+.workspace-app .onb.fx-step .ready-row .ok {
+  animation: popCheck 0.42s var(--spring) both;
+}
+.workspace-app .onb.fx-step .ready-row:nth-child(1) .ok {
+  animation-delay: 0.18s;
+}
+.workspace-app .onb.fx-step .ready-row:nth-child(2) .ok {
+  animation-delay: 0.3s;
+}
+.workspace-app .onb.fx-step .ready-row:nth-child(3) .ok {
+  animation-delay: 0.42s;
+}
+.workspace-app .onb.fx-step .ready-badge {
+  animation: popCheck 0.5s 0.05s var(--spring) both;
+}
+/* tactile micro-feedback */
+.workspace-app .check:active {
+  transform: scale(0.88);
+}
+.workspace-app .check {
+  transition:
+    background var(--dur),
+    border-color var(--dur),
+    transform 0.12s var(--ease);
+}
+.workspace-app .toggle::after {
+  transition: transform 0.28s var(--spring);
+}
+.workspace-app .pcard {
+  transition:
+    border-color var(--dur),
+    box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.workspace-app .pcard:hover {
+  transform: translateY(-2px);
+}
+.workspace-app .kcard {
+  transition:
+    box-shadow var(--dur),
+    transform 0.18s var(--ease);
+}
+.workspace-app .kcard:hover {
+  transform: translateY(-1px);
+}
+.workspace-app .stat .v {
+  font-variant-numeric: tabular-nums;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- These workspace classes are authored in workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- These workspace classes are authored in app/workspace-styles. */
 
 import { ArrowSquareOut } from "@phosphor-icons/react";
 
@@ -61,11 +61,11 @@ export const BugEvidenceHistory = ({
   readonly history: BugHistory;
   readonly openFile: (id: string, preview: boolean) => Promise<void>;
 }) => {
-  const itemsByKind = new Map<string, BugHistory["evidence"][number][]>();
-  for (const item of history.evidence) {
-    const items = itemsByKind.get(item.kind) ?? [];
-    items.push(item);
-    itemsByKind.set(item.kind, items);
+  const evidenceByKind = new Map<string, BugHistory["evidence"][number][]>();
+  for (const evidence of history.evidence) {
+    const kindEvidence = evidenceByKind.get(evidence.kind) ?? [];
+    kindEvidence.push(evidence);
+    evidenceByKind.set(evidence.kind, kindEvidence);
   }
 
   return (
@@ -73,7 +73,7 @@ export const BugEvidenceHistory = ({
       {["before", "after", "other"].map((kind) => (
         <div className="bug-evidence-column" key={kind}>
           <h3>{kind}</h3>
-          {(itemsByKind.get(kind) ?? []).map((item) => {
+          {(evidenceByKind.get(kind) ?? []).map((item) => {
             const { file } = item;
             return (
               <article className="bug-evidence-item" key={item.id}>

@@ -1,0 +1,173 @@
+.workspace-app .pop {
+  position: fixed;
+  z-index: 80;
+  min-width: 200px;
+  max-width: 320px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+  padding: 4px;
+  transform-origin: top left;
+  max-height: min(420px, 70vh);
+  overflow-y: auto;
+  font-size: var(--fs);
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.workspace-app .pop.enter {
+  animation: popIn 0.16s var(--ease) both;
+}
+.workspace-app .pop .pin {
+  padding: 4px 4px 6px;
+  border-bottom: 1px solid var(--divider);
+  margin: -4px -4px 4px;
+  padding: 8px;
+}
+.workspace-app .pop .pin input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  width: 100%;
+  font-size: var(--fs);
+  padding: 0 4px;
+}
+.workspace-app .mi {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  color: var(--text);
+  font-size: var(--fs);
+  white-space: nowrap;
+}
+.workspace-app .mi:hover,
+.workspace-app .mi.hl,
+.workspace-app .mi:focus-visible {
+  background: var(--surface-2);
+  outline: none;
+}
+.workspace-app .mi .i {
+  color: var(--text-2);
+}
+.workspace-app .mi .r {
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.workspace-app .mi .ck {
+  margin-left: auto;
+  color: var(--accent);
+}
+.workspace-app .mi.danger {
+  color: var(--red);
+}
+.workspace-app .mi.danger .i {
+  color: var(--red);
+}
+.workspace-app .mi:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.workspace-app .msep {
+  height: 1px;
+  background: var(--divider);
+  margin: 4px -4px;
+}
+.workspace-app .mh {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--text-3);
+  padding: 8px 8px 4px;
+}
+/* Filter builder uses the same insets as every other menu: 4px popover padding + 8px item padding. */
+.workspace-app .fbuild {
+  min-width: 440px;
+}
+.workspace-app .fb-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 30px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.workspace-app .fb-h .btn {
+  text-transform: none;
+  letter-spacing: 0;
+  margin-right: -4px;
+}
+.workspace-app .fb-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 8px 6px;
+}
+.workspace-app .fb-empty {
+  margin: 0;
+  padding: 2px 8px 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+.workspace-app .fb-add {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 8px 6px;
+  font-size: var(--fs-xs);
+}
+.workspace-app .fb-add .faint {
+  margin-right: 4px;
+}
+.workspace-app .frow {
+  display: grid;
+  grid-template-columns: 44px 120px 84px minmax(0, 1fr) 26px;
+  gap: 6px;
+  align-items: center;
+}
+.workspace-app .frow .conj {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  text-align: right;
+  padding-right: 4px;
+}
+.workspace-app .frow .select,
+.workspace-app .frow .input {
+  height: var(--h-sm);
+  font-size: var(--fs-sm);
+}
+.workspace-app .valbtn {
+  height: var(--h-sm);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 0 8px;
+  font-size: var(--fs-sm);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+}
+.workspace-app .valbtn:hover {
+  background: var(--surface-2);
+}

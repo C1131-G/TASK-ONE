@@ -1,0 +1,264 @@
+/* ============================================================
+   KANBAN
+   ============================================================ */
+.workspace-app .board {
+  display: flex;
+  gap: 12px;
+  padding: 14px var(--gutter) 24px;
+  overflow-x: auto;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+}
+.workspace-app .board::after {
+  content: "";
+  flex: 0 0 8px;
+}
+.workspace-app .bcol {
+  width: 284px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  border-radius: var(--r-lg);
+  background: var(--sunken);
+  border: 1px solid var(--divider);
+}
+.workspace-app .bcol.collapsed {
+  width: 44px;
+  align-items: center;
+  padding-top: 8px;
+  cursor: pointer;
+}
+.workspace-app .bcol.collapsed .vname {
+  writing-mode: vertical-rl;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  margin-top: 8px;
+  color: var(--text-2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.workspace-app .bcol-h {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 8px 6px 12px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.workspace-app .bcol-h .cnt {
+  color: var(--text-3);
+  font-weight: 500;
+}
+.workspace-app .bcol-h .acts {
+  margin-left: auto;
+  display: flex;
+  gap: 0;
+  opacity: 0.55;
+  transition: opacity var(--dur);
+}
+.workspace-app .bcol:hover .bcol-h .acts {
+  opacity: 1;
+}
+.workspace-app .bcol-b {
+  padding: 4px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 60px;
+  flex: 1;
+}
+.workspace-app .bcol.over {
+  background: color-mix(in srgb, var(--accent) 6%, var(--sunken));
+  border-color: var(--accent-line);
+}
+.workspace-app .kcard {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-card);
+  padding: var(--card-pad) calc(var(--card-pad) + 2px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition:
+    box-shadow var(--dur),
+    transform var(--dur);
+}
+.workspace-app .kcard:hover {
+  box-shadow:
+    0 2px 6px -2px rgba(0, 0, 0, 0.08),
+    0 0 0 1px var(--border-strong);
+}
+.workspace-app .kcard.dragging {
+  opacity: 0.35;
+}
+.workspace-app .kcard.ghost {
+  box-shadow: var(--shadow-drag);
+  transform: rotate(1.5deg);
+}
+.workspace-app .kcard .top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+.workspace-app .kcard .done-ic {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin: 2px 7px 0 0;
+  color: var(--green, #5f9e78);
+}
+.workspace-app .kcard .title {
+  margin: 0;
+  font-size: var(--fs);
+  line-height: 1.4;
+  font-weight: 450;
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+}
+.workspace-app .kcard.done .title {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+.workspace-app .kcard .hacts {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  gap: 1px;
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  box-shadow: 0 0 0 1px var(--border);
+  padding: 1px;
+}
+.workspace-app .kcard:hover .hacts {
+  display: flex;
+}
+.workspace-app .kcard .labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.workspace-app .kcard .meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .kcard .meta .m {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.workspace-app .kcard .meta .av {
+  margin-left: auto;
+}
+.workspace-app .kcard .subp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}
+.workspace-app .board-subtask-progress {
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--border);
+}
+.workspace-app .board-subtask-progress::-webkit-progress-bar {
+  border-radius: inherit;
+  background: var(--border);
+}
+.workspace-app .board-subtask-progress::-webkit-progress-value,
+.workspace-app .board-subtask-progress::-moz-progress-bar {
+  background: var(--green, #5f9e78);
+}
+.workspace-app .kcard .key {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-3);
+}
+.workspace-app .drop-line {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  margin: -4px 2px;
+  flex-shrink: 0;
+}
+.workspace-app .addcard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  border-radius: var(--r-sm);
+  width: 100%;
+  text-align: left;
+  flex-shrink: 0;
+}
+.workspace-app .addcard:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.workspace-app .composer {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow:
+    0 0 0 1px var(--accent-line),
+    0 0 0 3px var(--accent-soft);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.workspace-app .composer textarea {
+  border: 0;
+  resize: none;
+  background: transparent;
+  outline: none;
+  font-size: var(--fs);
+  min-height: 38px;
+  padding: 0;
+}
+.workspace-app .toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px var(--gutter);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+.workspace-app .toolbar .btn-ghost {
+  height: var(--h-sm);
+  font-size: var(--fs-xs);
+  padding: 0 8px;
+}
+.workspace-app .chipsbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px var(--gutter);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+/* columns scroll on wheel/touch without a visible bar, so every column keeps the same inner width */
+.workspace-app .bcol-b {
+  scrollbar-width: none;
+}
+.workspace-app .bcol-b::-webkit-scrollbar {
+  display: none;
+}

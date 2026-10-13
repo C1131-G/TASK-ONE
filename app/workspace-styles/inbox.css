@@ -1,0 +1,225 @@
+.workspace-app .inbox-workspace {
+  align-items: stretch;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  min-height: min(720px, calc(100dvh - 190px));
+}
+.workspace-app .inbox-list-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.workspace-app .inbox-heading {
+  align-items: center;
+}
+.workspace-app .inbox-heading > div p {
+  margin: 4px 0 0;
+}
+.workspace-app .inbox-filters {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 16px 0;
+}
+.workspace-app .inbox-filter-actions {
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+}
+.workspace-app .inbox-unread-toggle {
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.workspace-app .inbox-tabs {
+  align-items: center;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0;
+}
+.workspace-app .inbox-tabs [role="tab"] {
+  border-radius: 0;
+  flex: 0 0 auto;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 10px;
+}
+.workspace-app .inbox-tabs [role="tab"] span {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .inbox-items {
+  list-style: none;
+  margin: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+}
+.workspace-app .inbox-item {
+  align-items: center;
+  border-bottom: 1px solid var(--divider);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  min-height: 86px;
+  padding: 8px 10px 8px 14px;
+}
+.workspace-app .inbox-item.selected {
+  background: var(--surface-2);
+}
+.workspace-app [data-inbox-item-select] {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 8px 32px minmax(0, 1fr);
+  min-height: 64px;
+  min-width: 0;
+  padding: 4px;
+  width: 100%;
+  text-align: left;
+}
+.workspace-app [data-inbox-item-select]:focus-visible {
+  border-radius: var(--r-sm);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.workspace-app .inbox-item .ndot {
+  background: var(--accent);
+  border-radius: 999px;
+  height: 7px;
+  width: 7px;
+}
+.workspace-app .inbox-item.read .ndot {
+  background: transparent;
+}
+.workspace-app .inbox-avatar,
+.workspace-app .inbox-system-icon {
+  flex: 0 0 auto;
+  height: 32px;
+  width: 32px;
+}
+.workspace-app .inbox-system-icon {
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: 999px;
+  color: var(--text-2);
+  display: flex;
+  justify-content: center;
+}
+.workspace-app .inbox-system-icon svg {
+  height: 16px;
+  width: 16px;
+}
+.workspace-app .inbox-item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.workspace-app .inbox-item-title,
+.workspace-app .inbox-item-snippet {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .inbox-item-title {
+  font-size: var(--fs-sm);
+  font-weight: 550;
+}
+.workspace-app .inbox-item-snippet,
+.workspace-app .inbox-item-time {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .inbox-item-meta {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+.workspace-app .inbox-item-project + .inbox-item-time::before {
+  content: "·";
+  margin-right: 6px;
+}
+.workspace-app .inbox-item-read {
+  justify-self: center;
+}
+.workspace-app .inbox-detail {
+  min-width: 0;
+  position: relative;
+}
+.workspace-app .inbox-detail-body {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-wrap: anywhere;
+}
+.workspace-app .inbox-detail-body h3,
+.workspace-app .inbox-detail-body p {
+  margin: 0;
+}
+.workspace-app .inbox-detail-body time {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .inbox-detail-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  inset: 0;
+  justify-content: center;
+  min-height: 300px;
+  padding: 24px;
+  position: absolute;
+  text-align: center;
+}
+.workspace-app .inbox-detail-empty h2,
+.workspace-app .inbox-detail-empty p {
+  margin: 0;
+}
+.workspace-app .inbox-detail-empty p {
+  color: var(--text-3);
+}
+.workspace-app.inbox-mobile-detail-sheet {
+  width: 100%;
+  height: auto;
+  max-height: 82dvh;
+  min-height: 0;
+  overflow-y: auto;
+  border-radius: 12px 12px 0 0;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+}
+.workspace-app .inbox-mobile-detail-header {
+  padding: 16px 16px 10px;
+}
+.workspace-app.inbox-mobile-detail-sheet .inbox-detail-body {
+  padding: 0 16px 12px;
+}
+.workspace-app.inbox-mobile-detail-sheet .inbox-detail-body h3,
+.workspace-app.inbox-mobile-detail-sheet .inbox-detail-body p {
+  margin: 0;
+}
+.workspace-app .inbox-item-project {
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .inbox-empty {
+  margin: auto 0;
+  padding: 24px;
+}

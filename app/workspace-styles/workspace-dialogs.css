@@ -1,0 +1,107 @@
+[data-slot="dialog-content"][data-workspace] {
+  --background: #fbfaf8;
+  --foreground: #1d1c1a;
+  --popover: #ffffff;
+  --popover-foreground: #1d1c1a;
+  --accent: #eeede9;
+  --accent-foreground: #1d1c1a;
+  --muted: #f6f5f2;
+  --muted-foreground: #6b6760;
+  --border: #e9e7e2;
+  gap: 18px;
+  border: 1px solid #e9e7e2;
+  border-radius: 10px;
+  background: #fbfaf8;
+  color: #1d1c1a;
+}
+[data-slot="dialog-content"][data-workspace] .field {
+  display: grid;
+  gap: 6px;
+  color: #57544e;
+  font-size: 12.5px;
+}
+[data-slot="dialog-content"][data-workspace] input {
+  height: 30px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+[data-slot="dialog-content"][data-workspace] textarea {
+  min-height: 62px;
+  border: 1px solid #dad7d0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1d1c1a;
+  padding: 7px 10px;
+  font-size: 12.5px;
+}
+[data-slot="dialog-content"][data-workspace] [data-slot="select-trigger"] {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #dad7d0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1d1c1a;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+[data-slot="dialog-content"][data-workspace] [data-slot="button"] {
+  min-height: 30px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+[data-slot="dialog-content"][data-workspace]
+  [data-slot="button"][data-variant="default"] {
+  border-color: #4b5bd6;
+  background: #4b5bd6;
+  color: #ffffff;
+  box-shadow: none;
+}
+[data-slot="dialog-content"][data-workspace]
+  [data-slot="button"][data-variant="ghost"] {
+  color: #57544e;
+}
+[data-slot="dialog-content"][data-workspace] [role="alert"] {
+  margin: 0;
+  color: #b23c30;
+  font-size: 12.5px;
+}
+.dark [data-slot="dialog-content"][data-workspace] {
+  --background: #1a1a19;
+  --foreground: #eceae5;
+  --popover: #1d1d1c;
+  --popover-foreground: #eceae5;
+  --accent: #2d2d2b;
+  --accent-foreground: #eceae5;
+  --muted: #252524;
+  --muted-foreground: #9a968f;
+  --border: #2c2b29;
+  border-color: #2c2b29;
+  background: #1a1a19;
+  color: #eceae5;
+}
+.dark [data-slot="dialog-content"][data-workspace] .field {
+  color: #b5b2ab;
+}
+.dark [data-slot="dialog-content"][data-workspace] [role="alert"] {
+  color: #e57d70;
+}
+.dark [data-slot="dialog-content"][data-workspace] textarea,
+.dark
+  [data-slot="dialog-content"][data-workspace]
+  [data-slot="select-trigger"] {
+  border-color: #3a3936;
+  background: #1d1d1c;
+  color: #eceae5;
+}
+.dark
+  [data-slot="dialog-content"][data-workspace]
+  [data-slot="button"][data-variant="default"] {
+  border-color: #8e9af3;
+  background: #8e9af3;
+  color: #12131c;
+}
+.dark
+  [data-slot="dialog-content"][data-workspace]
+  [data-slot="button"][data-variant="ghost"] {
+  color: #b5b2ab;
+}

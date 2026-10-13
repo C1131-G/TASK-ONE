@@ -1,0 +1,147 @@
+.workspace-app .project-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.workspace-app .project-overview-main,
+.workspace-app .project-overview-aside {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+.workspace-app .project-overview-about {
+  margin: 0;
+  padding: 0 16px 16px;
+  color: var(--text-2);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.workspace-app .project-overview-progress-heading {
+  align-items: center;
+}
+.workspace-app .project-overview-progress-heading h2 {
+  margin: 0 0 4px;
+}
+.workspace-app .project-overview-progress-heading .muted {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+.workspace-app .project-overview-percent {
+  color: var(--text);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .project-overview-progress-track,
+.workspace-app .project-status-track {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  height: 7px;
+  border: 0;
+  border-radius: 99px;
+  appearance: none;
+  background: var(--surface-2);
+}
+.workspace-app .project-overview-progress-track {
+  margin: 0 16px;
+  width: calc(100% - 32px);
+}
+.workspace-app .project-overview-progress-track::-webkit-progress-bar,
+.workspace-app .project-status-track::-webkit-meter-bar {
+  border-radius: 99px;
+  background: var(--surface-2);
+}
+.workspace-app .project-overview-progress-track::-webkit-progress-value,
+.workspace-app .project-overview-progress-track::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: 99px;
+}
+.workspace-app .project-overview-progress-meta {
+  margin: 8px 16px 12px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .project-status-breakdown,
+.workspace-app .project-upcoming-list,
+.workspace-app .project-overview-activity,
+.workspace-app .project-overview-members {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-app .project-status-breakdown {
+  padding: 0 16px 14px;
+}
+.workspace-app .project-status-breakdown li {
+  display: grid;
+  grid-template-columns: 8px minmax(70px, 1fr) 24px minmax(48px, 0.8fr);
+  align-items: center;
+  gap: 9px;
+  min-height: 29px;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.workspace-app .project-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+.workspace-app .project-status-dot.backlog,
+.workspace-app .project-status-track > span.backlog {
+  background: var(--text-3);
+}
+.workspace-app .project-status-dot.todo,
+.workspace-app .project-status-track > span.todo {
+  background: var(--blue);
+}
+.workspace-app .project-status-dot.progress,
+.workspace-app .project-status-track > span.progress {
+  background: var(--accent);
+}
+.workspace-app .project-status-dot.review,
+.workspace-app .project-status-track > span.review {
+  background: var(--amber);
+}
+.workspace-app .project-status-dot.done,
+.workspace-app .project-status-track > span.done {
+  background: var(--green);
+}
+.workspace-app .project-status-count {
+  color: var(--text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .project-status-track {
+  height: 5px;
+}
+.workspace-app .project-status-track::-webkit-meter-optimum-value,
+.workspace-app .project-status-track::-moz-meter-bar {
+  border-radius: 99px;
+  background: var(--text-3);
+}
+.workspace-app .project-status-track.backlog::-webkit-meter-optimum-value {
+  background: var(--text-3);
+}
+.workspace-app .project-status-track.todo::-webkit-meter-optimum-value {
+  background: var(--blue);
+}
+.workspace-app .project-status-track.progress::-webkit-meter-optimum-value {
+  background: var(--accent);
+}
+.workspace-app .project-status-track.review::-webkit-meter-optimum-value {
+  background: var(--amber);
+}
+.workspace-app .project-status-track.done::-webkit-meter-optimum-value {
+  background: var(--green);
+}
+.workspace-app .project-overview-text-link {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .project-overview-text-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}

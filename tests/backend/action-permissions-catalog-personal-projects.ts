@@ -24,7 +24,7 @@ const projectsQueries =
 const userQueries = await import("../../features/user/user-queries");
 const tasksQueries = await import("../../features/tasks/tasks-queries");
 
-export const actionCatalog2: readonly ActionEntry[] = [
+export const personalProjectActionCatalog: readonly ActionEntry[] = [
   entry(
     "markAllNotificationsReadAction",
     notifications.markAllNotificationsReadAction,

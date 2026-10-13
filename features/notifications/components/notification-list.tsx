@@ -44,8 +44,8 @@ const NotificationList = ({
   const groupedItems = new Map<DateBucket, NotificationItem[]>(
     DATE_BUCKETS.map((bucket) => [bucket, []])
   );
-  for (const item of visibleItems) {
-    groupedItems.get(getDateBucket(item.createdAt))?.push(item);
+  for (const notification of visibleItems) {
+    groupedItems.get(getDateBucket(notification.createdAt))?.push(notification);
   }
 
   const markAllRead = () =>

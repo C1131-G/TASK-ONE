@@ -1,0 +1,179 @@
+.workspace-app .settings-workspace {
+  align-items: stretch;
+  gap: 14px;
+}
+.workspace-app .settings-workspace > [data-slot="tabs-list"].settings-nav {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  height: 40px;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+.workspace-app .settings-nav [data-slot="tabs-trigger"] {
+  min-height: 40px;
+  flex: 0 0 auto;
+  justify-content: center;
+  border-radius: 0;
+  padding-inline: 12px;
+  color: var(--text-2);
+  text-align: center;
+}
+.workspace-app .settings-nav [data-slot="tabs-trigger"][aria-selected="true"] {
+  border-bottom: 2px solid var(--text);
+  background: transparent;
+  color: var(--text);
+}
+.workspace-app .settings-content {
+  min-width: 0;
+  flex: 1;
+}
+.workspace-app .settings-content [data-slot="tabs-content"] {
+  margin: 0;
+}
+.workspace-app .settings-section-title {
+  margin: 0 0 5px;
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
+.workspace-app .settings-theme-options {
+  max-width: 560px;
+}
+.workspace-app .settings-theme-choice {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.workspace-app .settings-theme-preview {
+  display: grid;
+  height: 84px;
+  grid-template-columns: 30% minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e3df;
+  border-radius: var(--r-sm);
+  background: #fff;
+  padding: 8px;
+}
+.workspace-app .settings-preview-sidebar {
+  border-radius: 3px;
+  background: #f0efeb;
+}
+.workspace-app .settings-preview-main {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 4px 2px;
+}
+.workspace-app .settings-preview-main i,
+.workspace-app .settings-preview-main b {
+  display: block;
+  height: 6px;
+  border-radius: 99px;
+  background: #e6e4df;
+}
+.workspace-app .settings-preview-main i:first-child {
+  width: 42%;
+  height: 8px;
+  background: #343331;
+}
+.workspace-app .settings-preview-main i:nth-child(2) {
+  width: 86%;
+}
+.workspace-app .settings-preview-main i:nth-child(3) {
+  width: 68%;
+}
+.workspace-app .settings-preview-main b {
+  width: 22%;
+  height: 9px;
+  background: var(--accent);
+}
+.workspace-app .settings-theme-preview[data-theme-preview="dark"] {
+  border-color: #353535;
+  background: #1c1c1b;
+}
+.workspace-app
+  .settings-theme-preview[data-theme-preview="dark"]
+  .settings-preview-sidebar {
+  background: #101010;
+}
+.workspace-app
+  .settings-theme-preview[data-theme-preview="dark"]
+  .settings-preview-main
+  i,
+.workspace-app
+  .settings-theme-preview[data-theme-preview="dark"]
+  .settings-preview-main
+  b {
+  background: #454442;
+}
+.workspace-app
+  .settings-theme-preview[data-theme-preview="dark"]
+  .settings-preview-main
+  i:first-child {
+  background: #f4f3ef;
+}
+.workspace-app
+  .settings-theme-preview[data-theme-preview="dark"]
+  .settings-preview-main
+  b {
+  background: #979cf1;
+}
+.workspace-app .settings-theme-preview[data-theme-preview="system"] {
+  background: linear-gradient(90deg, #1c1c1b 0 50%, #fff 50%);
+}
+.workspace-app
+  .settings-theme-preview[data-theme-preview="system"]
+  .settings-preview-sidebar {
+  background: linear-gradient(90deg, #101010 0 50%, #f0efeb 50%);
+}
+.workspace-app .settings-theme-choice-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.workspace-app .settings-theme-choice-caption > span {
+  display: grid;
+  gap: 3px;
+}
+.workspace-app .settings-theme-choice strong {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 550;
+}
+.workspace-app .settings-theme-choice-caption > span > span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .settings-password-link {
+  border-top: 1px solid var(--divider);
+}
+
+@media (max-width: 700px) {
+  .workspace-app .settings-workspace {
+    gap: 14px;
+  }
+  .workspace-app .settings-workspace > [data-slot="tabs-list"].settings-nav {
+    width: 100%;
+    max-width: 100%;
+  }
+  .workspace-app .settings-content,
+  .workspace-app .settings-content > [data-slot="tabs-content"],
+  .workspace-app .settings-content .panel {
+    width: 100%;
+    max-width: 100%;
+  }
+}

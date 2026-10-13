@@ -28,7 +28,7 @@ const peopleQueries = await import("../../features/people/people-queries");
 const tasks = await import("../../features/tasks/tasks-actions");
 const tasksQueries = await import("../../features/tasks/tasks-queries");
 
-export const actionCatalog1: readonly ActionEntry[] = [
+export const workspaceActionCatalog: readonly ActionEntry[] = [
   entry("listTaskCalendar", calendarQueries.listTaskCalendar, () => ({
     from: "2026-10-01",
     groupBy: "status",

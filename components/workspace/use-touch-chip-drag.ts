@@ -55,8 +55,8 @@ export const useTouchChipDrag = ({
   };
 
   useEffect(() => {
-    const handler = blockScroll.current;
-    return () => window.removeEventListener("touchmove", handler);
+    const touchMoveListener = blockScroll.current;
+    return () => window.removeEventListener("touchmove", touchMoveListener);
   }, []);
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {

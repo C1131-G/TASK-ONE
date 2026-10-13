@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace page classes are authored in workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace page classes are authored in app/workspace-styles. */
 
 import type { Metadata } from "next";
 import { Suspense } from "react";

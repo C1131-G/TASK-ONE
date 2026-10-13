@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
 // Stable keys for placeholder rows; rows never reorder.
 const ROW_KEYS = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"] as const;

@@ -120,16 +120,16 @@ const WorkspaceUndoProvider = ({
   };
 
   const runUndo = async (id: string) => {
-    const item = items.find((notice) => notice.id === id);
-    if (!item || pendingId !== null) {
+    const undoNotice = items.find((notice) => notice.id === id);
+    if (!undoNotice || pendingId !== null) {
       return;
     }
     setPendingId(id);
-    const error = await item
+    const error = await undoNotice
       .run()
       .catch(() => "Undo failed. Refresh and try again.");
     if (error) {
-      setAnnouncement(`${item.label}. ${error}`);
+      setAnnouncement(`${undoNotice.label}. ${error}`);
       setItems((current) =>
         current.map((notice) =>
           notice.id === id ? { ...notice, error } : notice
@@ -137,7 +137,7 @@ const WorkspaceUndoProvider = ({
       );
     } else {
       dismiss(id);
-      setAnnouncement(`Undid ${item.label}.`);
+      setAnnouncement(`Undid ${undoNotice.label}.`);
     }
     setPendingId(null);
   };

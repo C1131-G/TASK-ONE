@@ -18,10 +18,10 @@ export const useBugSimilarSearch = (
     if (!form) {
       return;
     }
-    const data = new FormData(form);
+    const formData = new FormData(form);
     const query =
-      String(data.get("title") ?? "").trim() ||
-      String(data.get("component") ?? "").trim();
+      String(formData.get("title") ?? "").trim() ||
+      String(formData.get("component") ?? "").trim();
     if (!query) {
       setMessage("Enter a title or component before searching previous bugs.");
       return;

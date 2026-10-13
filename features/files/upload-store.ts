@@ -54,10 +54,10 @@ export const uploadActions = ({
     })),
   done: (id: string) =>
     setState((previous) => {
-      const item = previous.uploads.find((entry) => entry.id === id);
+      const finishedUpload = previous.uploads.find((entry) => entry.id === id);
       return patchItem(previous, id, {
         error: null,
-        loadedBytes: item?.sizeBytes ?? 0,
+        loadedBytes: finishedUpload?.sizeBytes ?? 0,
         status: "done",
       });
     }),

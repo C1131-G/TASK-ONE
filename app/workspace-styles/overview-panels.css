@@ -1,0 +1,100 @@
+.workspace-app .board-search {
+  flex: 1 1 220px;
+  min-width: min(100%, 180px);
+  max-width: 360px;
+}
+.workspace-app .board-search .input,
+.workspace-app .board-control [data-slot="select-trigger"] {
+  min-height: 34px;
+  height: 34px;
+}
+.workspace-app .board-control {
+  flex: 0 1 170px;
+  min-width: 150px;
+}
+.workspace-app .board-control [data-slot="select-trigger"] {
+  width: 100%;
+}
+.workspace-app .overview-project-table {
+  min-width: 780px;
+}
+.workspace-app .overview-grid > .panel {
+  min-width: 0;
+}
+.workspace-app .overview-status-list {
+  display: grid;
+  gap: 10px;
+}
+.workspace-app .overview-status-row {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(78px, 1fr) minmax(70px, 1.3fr) 26px 34px;
+  min-height: 30px;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.workspace-app .overview-status-row:hover,
+.workspace-app .overview-workload-row:hover,
+.workspace-app .overview-milestone-row:hover {
+  color: var(--accent);
+}
+.workspace-app .overview-status-row [data-slot="progress"] {
+  height: 5px;
+}
+.workspace-app
+  .overview-status-row
+  [data-slot="progress"][data-task-status="todo"]
+  [data-slot="progress-indicator"] {
+  background: var(--blue);
+}
+.workspace-app
+  .overview-status-row
+  [data-slot="progress"][data-task-status="progress"]
+  [data-slot="progress-indicator"] {
+  background: var(--accent);
+}
+.workspace-app
+  .overview-status-row
+  [data-slot="progress"][data-task-status="review"]
+  [data-slot="progress-indicator"] {
+  background: var(--amber);
+}
+.workspace-app
+  .overview-status-row
+  [data-slot="progress"][data-task-status="done"]
+  [data-slot="progress-indicator"] {
+  background: var(--green);
+}
+.workspace-app .overview-status-row > :last-child {
+  font-size: var(--fs-xs);
+  text-align: right;
+}
+.workspace-app .overview-panel-caption {
+  margin: 0 0 8px;
+  font-size: var(--fs-xs);
+}
+.workspace-app .overview-workload-row,
+.workspace-app .overview-milestone-row {
+  min-height: 42px;
+  color: var(--text);
+  text-decoration: none;
+}
+.workspace-app .overview-milestone-row time {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+.workspace-app .overview-actions {
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+  .workspace-app .overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-app .overview-actions {
+    justify-content: flex-start;
+  }
+}

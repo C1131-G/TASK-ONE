@@ -1,0 +1,145 @@
+.workspace-app .home-task-completion {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+.workspace-app .task-completion-error {
+  max-width: 220px;
+  color: var(--red);
+  font-size: var(--fs-xs);
+}
+.workspace-app .bcol-b {
+  min-height: 90px;
+}
+@media (max-width: 640px) {
+  .workspace-app .project-task-filter {
+    grid-template-columns: 1fr 1fr;
+  }
+  .workspace-app .project-task-filter .field:first-child,
+  .workspace-app .project-task-filter .project-task-count {
+    grid-column: 1 / -1;
+  }
+  .workspace-app .board-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .workspace-app .board-search {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .workspace-app .board-control {
+    min-width: 0;
+  }
+}
+
+.workspace-app .section-heading {
+  margin: 8px 0 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .workspace-app .project-task-data-table {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .workspace-app .project-task-data-table thead {
+    display: none;
+  }
+  .workspace-app .project-task-data-table tbody {
+    display: grid;
+    gap: 8px;
+  }
+  .workspace-app
+    .project-task-data-table
+    tbody
+    > tr:not(.project-task-group-row) {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  .workspace-app
+    .project-task-data-table
+    tbody
+    > tr:not(.project-task-group-row)
+    > td {
+    display: block;
+    min-width: 0;
+    padding: 6px;
+    white-space: normal;
+  }
+  .workspace-app
+    .project-task-data-table
+    tbody
+    > tr:not(.project-task-group-row)
+    > td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text-3);
+    font-size: var(--fs-2xs);
+    font-weight: 500;
+  }
+  .workspace-app
+    .project-task-data-table
+    tbody
+    > tr:not(.project-task-group-row)
+    > td:first-child {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    padding: 0;
+  }
+  .workspace-app .project-task-data-table .project-task-name-cell,
+  .workspace-app .project-task-data-table .project-task-assignees,
+  .workspace-app .project-task-data-table td[data-label="Labels"],
+  .workspace-app .project-task-data-table td[data-label="Actions"] {
+    grid-column: 1 / -1;
+  }
+  .workspace-app .project-task-data-table .project-task-name {
+    max-width: none;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .workspace-app .project-task-data-table .project-task-assignees {
+    max-width: none;
+    overflow: visible;
+  }
+  .workspace-app .project-task-data-table .project-task-labels {
+    max-width: none;
+  }
+  .workspace-app .project-task-data-table .project-task-group-row {
+    display: block;
+  }
+  .workspace-app .project-task-data-table .project-task-group-row td {
+    display: block;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+  }
+  .workspace-app .project-task-list {
+    min-width: 0;
+  }
+  .workspace-app .project-task-list .thead,
+  .workspace-app .project-task-list .trow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-app .project-task-list-assignees,
+  .workspace-app .project-task-list-labels {
+    overflow: visible;
+    white-space: normal;
+  }
+}
+
+.workspace-app .section-heading .muted {
+  margin-left: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}

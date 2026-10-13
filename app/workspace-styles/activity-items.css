@@ -1,0 +1,75 @@
+.workspace-app .feed {
+  display: flex;
+  flex-direction: column;
+}
+.workspace-app .fitem {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  position: relative;
+}
+.workspace-app .fitem .av {
+  margin-top: 1px;
+}
+.workspace-app .fitem b {
+  font-weight: 500;
+}
+.workspace-app .fitem .obj {
+  font-weight: 500;
+  cursor: pointer;
+}
+.workspace-app .fitem .obj:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.workspace-app .fitem time {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+.workspace-app .feed.lined .fitem:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 32px;
+  bottom: -4px;
+  width: 1px;
+  background: var(--border);
+}
+.workspace-app .day-h {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-3);
+  padding: 14px 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.workspace-app .kv {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  row-gap: 2px;
+  align-items: center;
+  font-size: var(--fs-sm);
+}
+.workspace-app .kv > dt {
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  margin: 0;
+}
+.workspace-app .kv > dd {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-height: 30px;
+}
+.workspace-app .kv > dt .i {
+  color: var(--text-4);
+}

@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from workspace-reference.css. */
+/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from app/workspace-styles. */
 
 import type { Route } from "next";
 import Link from "next/link";

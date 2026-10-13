@@ -1,0 +1,210 @@
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.workspace-app .btn {
+  --h: var(--h-md);
+  height: var(--h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 11px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background var(--dur),
+    border-color var(--dur),
+    color var(--dur),
+    box-shadow var(--dur);
+  border: 1px solid transparent;
+  user-select: none;
+  position: relative;
+}
+.workspace-app .btn .i {
+  opacity: 0.9;
+}
+.workspace-app .btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.workspace-app .btn {
+  transition-property: background, border-color, color, box-shadow, transform;
+}
+.workspace-app .btn-sm {
+  --h: var(--h-sm);
+  padding: 0 8px;
+  font-size: var(--fs-xs);
+}
+.workspace-app .btn-lg {
+  --h: var(--h-lg);
+  padding: 0 14px;
+  font-size: var(--fs);
+}
+.workspace-app .btn-block {
+  width: 100%;
+}
+.workspace-app .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+.workspace-app .btn-primary:hover {
+  background: color-mix(in srgb, var(--accent) 88%, var(--text));
+}
+.workspace-app .btn-primary:active {
+  background: color-mix(in srgb, var(--accent) 78%, var(--text));
+}
+.workspace-app .btn-secondary {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.workspace-app .btn-secondary:hover {
+  background: var(--surface-2);
+}
+.workspace-app .btn-secondary:active {
+  background: var(--surface-3);
+}
+.workspace-app .btn-ghost {
+  color: var(--text-2);
+}
+.workspace-app .btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.workspace-app .btn-ghost:active,
+.workspace-app .btn-ghost.on {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.workspace-app .btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+.workspace-app .btn-danger:hover {
+  background: color-mix(in srgb, var(--red) 88%, #000);
+}
+.workspace-app .btn-danger-ghost {
+  color: var(--red);
+}
+.workspace-app .btn-danger-ghost:hover {
+  background: var(--red-soft);
+}
+.workspace-app .btn:disabled,
+.workspace-app .btn[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+  box-shadow: none;
+}
+.workspace-app .btn.is-loading {
+  color: transparent !important;
+  pointer-events: none;
+}
+.workspace-app .btn.is-loading::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-color: var(--on-accent) transparent var(--on-accent) var(--on-accent);
+  animation: spin 0.7s linear infinite;
+}
+.workspace-app .btn-secondary.is-loading::after,
+.workspace-app .btn-ghost.is-loading::after {
+  border-color: var(--text-2) transparent var(--text-2) var(--text-2);
+}
+.workspace-app .ibtn {
+  width: var(--h-md);
+  height: var(--h-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  transition:
+    background var(--dur),
+    color var(--dur);
+  position: relative;
+  flex-shrink: 0;
+}
+.workspace-app .topbar-notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.workspace-app .ibtn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.workspace-app .ibtn.on,
+.workspace-app .ibtn:active {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.workspace-app .ibtn-sm {
+  width: var(--h-sm);
+  height: var(--h-sm);
+}
+.workspace-app .ibtn-xs {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-xs);
+}
+.workspace-app .ibtn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* tooltip */
+.workspace-app [data-tip] {
+  position: relative;
+}
+.workspace-app [data-tip]:hover::after,
+.workspace-app [data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--text-inv);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 5px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 200;
+  pointer-events: none;
+  animation: tipIn 0.12s 0.35s both;
+}
+.workspace-app [data-tip-pos="right"]:hover::after,
+.workspace-app [data-tip-pos="right"]:focus-visible::after {
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.workspace-app [data-tip-pos="top"]:hover::after {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+@keyframes tipIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,54 @@
+.workspace-app.workspace-loading {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  background: var(--surface);
+}
+.workspace-app .workspace-loading-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-side);
+  padding: 14px;
+}
+.workspace-app .workspace-loading-brand,
+.workspace-app .workspace-loading-nav,
+.workspace-app .workspace-loading-topbar,
+.workspace-app .workspace-loading-heading,
+.workspace-app .workspace-loading-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+.workspace-app .workspace-loading-brand {
+  width: 60%;
+  height: 32px;
+  margin-bottom: 12px;
+}
+.workspace-app .workspace-loading-nav {
+  height: 30px;
+}
+.workspace-app .workspace-loading-main {
+  min-width: 0;
+}
+.workspace-app .workspace-loading-topbar {
+  height: var(--topbar-h);
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: var(--surface);
+}
+.workspace-app .workspace-loading-page {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 28px var(--gutter);
+}
+.workspace-app .workspace-loading-heading {
+  width: min(280px, 55%);
+  height: 38px;
+}
+.workspace-app .workspace-loading-panel {
+  min-height: 210px;
+  background: var(--surface);
+}

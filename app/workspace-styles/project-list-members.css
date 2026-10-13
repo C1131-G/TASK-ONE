@@ -1,0 +1,74 @@
+.workspace-app .project-list-actions {
+  position: relative;
+  flex: 0 0 auto;
+}
+.workspace-app .pcard > .project-list-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+}
+.workspace-app .project-options-trigger {
+  width: 30px;
+  height: 30px;
+  opacity: 0.65;
+}
+.workspace-app .pcard:hover .project-options-trigger,
+.workspace-app .project-options-trigger:focus-visible {
+  opacity: 1;
+}
+.workspace-app .project-list-row .project-options-trigger {
+  flex: 0 0 auto;
+}
+.workspace-app .project-members {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-app .project-members li {
+  display: flex;
+  min-width: 0;
+}
+.workspace-app .project-member-avatar {
+  width: 24px;
+  height: 24px;
+  margin-left: -5px;
+  border: 2px solid var(--surface);
+}
+.workspace-app .project-members li:first-child .project-member-avatar {
+  margin-left: 0;
+}
+.workspace-app .project-member-avatar [data-slot="avatar-fallback"] {
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: 9px;
+}
+.workspace-app .project-member-overflow {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  margin-left: -5px;
+  place-items: center;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: 9px;
+}
+.workspace-app .project-action-error {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 4px);
+  right: 8px;
+  max-width: min(300px, calc(100vw - 32px));
+  border: 1px solid var(--red);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  padding: 6px 8px;
+  box-shadow: var(--shadow-card);
+  font-size: var(--fs-xs);
+}

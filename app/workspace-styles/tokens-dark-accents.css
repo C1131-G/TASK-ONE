@@ -1,0 +1,112 @@
+@media (prefers-color-scheme: dark) {
+  .dark .workspace-app {
+    --bg: #1a1a19;
+    --bg-side: #151514;
+    --surface: #1d1d1c;
+    --surface-2: #252524;
+    --surface-3: #2d2d2b;
+    --sunken: #181817;
+    --overlay: rgba(0, 0, 0, 0.55);
+    --border: #2c2b29;
+    --border-strong: #3a3936;
+    --divider: #252523;
+    --text: #eceae5;
+    --text-2: #b5b2ab;
+    --text-3: #9a968f;
+    --text-4: #6f6c66;
+    --text-inv: #151514;
+    --accent: var(--acc-d);
+    --on-accent: #12131c;
+    --green: #5cba86;
+    --amber: #d8a443;
+    --red: #e57d70;
+    --blue: #72a5ea;
+    --violet: #a98deb;
+    --teal: #58c0b6;
+    --rose: #e68aab;
+    --orange: #e3925f;
+    --gray: #8f8b84;
+    --pc-mix: 72%;
+    --st-backlog: #6f6c66;
+    --st-todo: #a6a39c;
+    --st-progress: #d8a443;
+    --st-review: #a98deb;
+    --st-done: #5cba86;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 0 0 1px var(--border);
+    --shadow-pop:
+      0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-strong);
+    --shadow-drag:
+      0 18px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-strong);
+    color-scheme: dark;
+  }
+}
+.dark .workspace-app {
+  --bg: #1a1a19;
+  --bg-side: #151514;
+  --surface: #1d1d1c;
+  --surface-2: #252524;
+  --surface-3: #2d2d2b;
+  --sunken: #181817;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --border: #2c2b29;
+  --border-strong: #3a3936;
+  --divider: #252523;
+  --text: #eceae5;
+  --text-2: #b5b2ab;
+  --text-3: #9a968f;
+  --text-4: #6f6c66;
+  --text-inv: #151514;
+  --accent: var(--acc-d);
+  --on-accent: #12131c;
+  --green: #5cba86;
+  --amber: #d8a443;
+  --red: #e57d70;
+  --blue: #72a5ea;
+  --violet: #a98deb;
+  --teal: #58c0b6;
+  --rose: #e68aab;
+  --orange: #e3925f;
+  --gray: #8f8b84;
+  --pc-mix: 72%;
+  --st-backlog: #6f6c66;
+  --st-todo: #a6a39c;
+  --st-progress: #d8a443;
+  --st-review: #a98deb;
+  --st-done: #5cba86;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 0 0 1px var(--border);
+  --shadow-pop:
+    0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-strong);
+  --shadow-drag:
+    0 18px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-strong);
+  color-scheme: dark;
+}
+/* accent variants */
+.workspace-app[data-accent="blue"] {
+  --acc-l: #2f6cd4;
+  --acc-d: #74a7f0;
+}
+.workspace-app[data-accent="violet"] {
+  --acc-l: #7348cc;
+  --acc-d: #ae93f0;
+}
+.workspace-app[data-accent="teal"] {
+  --acc-l: #1a7f7a;
+  --acc-d: #5cc4ba;
+}
+.workspace-app[data-accent="rose"] {
+  --acc-l: #b93d68;
+  --acc-d: #ec8dae;
+}
+.workspace-app[data-accent="graphite"] {
+  --acc-l: #34332f;
+  --acc-d: #d9d6cf;
+}
+.workspace-app[data-side="compact"] {
+  --side-row: 26px;
+}
+.workspace-app[data-density="compact"] {
+  --row-h: 34px;
+  --card-pad: 8px;
+}

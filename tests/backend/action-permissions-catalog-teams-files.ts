@@ -10,7 +10,7 @@ const uploads = await import("../../features/files/files-actions");
 const peopleQueries = await import("../../features/people/people-queries");
 const filesQueries = await import("../../features/files/files-queries");
 
-export const actionCatalog3: readonly ActionEntry[] = [
+export const teamFileActionCatalog: readonly ActionEntry[] = [
   entry("changeTaskColumnAction", tasks.changeTaskColumnAction, () => ({
     expectedVersion: 1,
     idempotencyKey: nextKey(),

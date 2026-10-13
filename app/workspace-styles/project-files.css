@@ -1,0 +1,200 @@
+/* ============================================================
+   CARDS / PANELS
+   ============================================================ */
+.workspace-app .panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.workspace-app .panel-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 10px;
+}
+.workspace-app .panel-h h2 {
+  font-size: var(--fs);
+  font-weight: 600;
+  margin: 0;
+}
+.workspace-app .panel-h .acts {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.workspace-app .project-files {
+  min-width: 0;
+  overflow: hidden;
+}
+.workspace-app .file-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(120px, 0.55fr) minmax(
+      140px,
+      0.65fr
+    ) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+.workspace-app .file-search,
+.workspace-app .file-filter,
+.workspace-app .file-sort {
+  min-width: 0;
+}
+.workspace-app .file-search input {
+  height: var(--h-sm);
+  width: 100%;
+  border-radius: var(--r-sm);
+  padding-inline: 10px;
+  font-size: var(--fs-sm);
+}
+.workspace-app .file-filter [data-slot="select-trigger"],
+.workspace-app .file-sort [data-slot="select-trigger"] {
+  height: var(--h-sm);
+  min-width: 0;
+  width: 100%;
+  border-radius: var(--r-sm);
+  padding-inline: 10px;
+  font-size: var(--fs-sm);
+}
+.workspace-app .file-layout-switch {
+  display: flex;
+  min-inline-size: 0;
+  min-width: 0;
+  gap: 2px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 2px;
+}
+.workspace-app [data-workspace][data-slot="button"] {
+  min-height: var(--h-sm);
+  border-radius: var(--r-sm);
+  transition:
+    background var(--dur),
+    color var(--dur),
+    border-color var(--dur);
+}
+.workspace-app [data-workspace][data-slot="button"][data-variant="ghost"] {
+  color: var(--text-2);
+}
+.workspace-app [data-workspace][data-slot="button"][data-variant="ghost"]:hover,
+.workspace-app [data-workspace][data-slot="button"][data-active="true"] {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.workspace-app [data-workspace][data-slot="button"][data-variant="default"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.workspace-app
+  [data-workspace][data-slot="button"][data-variant="default"]:hover {
+  filter: brightness(0.96);
+}
+.workspace-app [data-workspace][data-slot="button"][data-variant="secondary"] {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  box-shadow: none;
+}
+.workspace-app .file-dropzone {
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 0 14px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+.workspace-app .file-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 14px 14px;
+}
+.workspace-app .file-results[data-layout="list"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.workspace-app .file-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: 10px;
+}
+.workspace-app .file-card-preview {
+  display: grid;
+  min-height: 120px;
+  grid-column: 1 / -1;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.workspace-app .file-card-main {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 4px;
+}
+.workspace-app .file-card-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .file-card-details,
+.workspace-app .file-copy-state {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.workspace-app .file-copy-state.failed {
+  color: var(--red);
+}
+.workspace-app .file-copy-state.pending {
+  color: var(--warning, var(--text-2));
+}
+.workspace-app .file-empty-state {
+  padding-block: 28px;
+  text-align: center;
+}
+.workspace-app .file-empty-state h3 {
+  margin: 0 0 5px;
+  font-size: var(--fs);
+}
+.workspace-app .file-empty-state p {
+  margin: 0;
+}
+.workspace-app .file-loading-state {
+  display: block;
+}
+.workspace-app .file-undo-banner {
+  align-items: center;
+  justify-content: space-between;
+}
+.workspace-app .file-rename-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

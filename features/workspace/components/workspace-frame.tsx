@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
 import type { Route } from "next";
 import { redirect } from "next/navigation";

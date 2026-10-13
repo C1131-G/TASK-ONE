@@ -1,0 +1,270 @@
+/* ============================================================
+   TASK ROWS (list)
+   ============================================================ */
+/* no top border: the toolbar above already draws that line (it doubled up before) */
+.workspace-app .tlist {
+  border-top: 0;
+}
+.workspace-app .thead,
+.workspace-app .trow {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  min-height: var(--row-h);
+  gap: 0;
+}
+.workspace-app .thead {
+  min-height: 32px;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 2;
+}
+.workspace-app .thead > div {
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.workspace-app .trow {
+  border-bottom: 1px solid var(--divider);
+  position: relative;
+  transition: background var(--dur);
+}
+.workspace-app .trow:hover {
+  background: var(--surface-2);
+}
+.workspace-app .trow.sel {
+  background: var(--accent-soft);
+}
+.workspace-app .trow.drop-before {
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+.workspace-app .trow.drop-after {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.workspace-app .trow.dragging {
+  opacity: 0.4;
+}
+.workspace-app .trow > div {
+  padding: 0 8px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.workspace-app .trow .handle {
+  opacity: 0;
+  cursor: grab;
+  color: var(--text-4);
+  width: 16px;
+  justify-content: center;
+  padding: 0;
+}
+.workspace-app .trow:hover .handle {
+  opacity: 1;
+}
+.workspace-app .trow .ttl {
+  font-size: var(--fs);
+  cursor: pointer;
+  gap: 8px;
+}
+.workspace-app .trow .ttl .tt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .trow .ttl:hover .tt {
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+.workspace-app .trow.done .tt {
+  color: var(--text-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-3);
+}
+.workspace-app .trow .key {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.workspace-app .trow .meta-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+}
+.workspace-app .grp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 8px 0 22px;
+  margin-top: 10px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.workspace-app .grp .cnt {
+  color: var(--text-3);
+  font-weight: 500;
+}
+.workspace-app .grp .ibtn {
+  opacity: 0.6;
+}
+.workspace-app .grp:hover .ibtn {
+  opacity: 1;
+}
+.workspace-app .subrows {
+  background: var(--sunken);
+}
+.workspace-app .subrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding-left: 64px;
+  border-bottom: 1px solid var(--divider);
+  font-size: var(--fs-sm);
+}
+.workspace-app .subrow.done span {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+.workspace-app .addrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px 0 26px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--divider);
+}
+.workspace-app .addrow:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.workspace-app .inline-in {
+  border: 0;
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  font-size: var(--fs);
+  padding: 0;
+  outline: none;
+}
+.workspace-app .bulkbar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 6px 6px 14px;
+  border-radius: var(--r-lg);
+  background: var(--text);
+  color: var(--text-inv);
+  box-shadow: var(--shadow-pop);
+  z-index: 40;
+  font-size: var(--fs-sm);
+}
+.workspace-app .bulkbar.enter {
+  animation: popUp 0.28s var(--spring);
+}
+.workspace-app .bulkbar .btn {
+  color: var(--text-inv);
+  opacity: 0.85;
+}
+.workspace-app .bulkbar .btn:hover {
+  background: color-mix(in srgb, var(--text-inv) 14%, transparent);
+  opacity: 1;
+}
+.workspace-app .bulkbar .sep {
+  width: 1px;
+  height: 18px;
+  background: color-mix(in srgb, var(--text-inv) 20%, transparent);
+  margin: 0 4px;
+}
+@keyframes popUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+/* compact task row (dashboard) */
+.workspace-app .mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-top: 1px solid var(--divider);
+  cursor: pointer;
+  transition: background var(--dur);
+}
+.workspace-app .mini:hover {
+  background: var(--surface-2);
+}
+.workspace-app .mini .tt {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .mini.done .tt {
+  text-decoration: line-through;
+  color: var(--text-3);
+}
+.workspace-app .mini .pj {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  max-width: 140px;
+}
+.workspace-app .pdot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--c);
+  flex-shrink: 0;
+}
+.workspace-app .due {
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .due.over {
+  color: var(--red);
+}
+.workspace-app .due.soon {
+  color: var(--amber);
+}
+/* List rows start with an 18px drag handle + 30px checkbox column; pulling the wrapper left by
+   the handle+cell inset puts the checkbox (and group chevrons) exactly on the shared gutter. */
+.workspace-app .list-wrap {
+  padding: 0 var(--gutter) 90px calc(var(--gutter) - 26px);
+}

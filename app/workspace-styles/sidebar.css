@@ -1,0 +1,270 @@
+/* ============================================================
+   SHELL: SIDEBAR / TOPBAR
+   ============================================================ */
+.workspace-app #app {
+  height: 100%;
+}
+.workspace-app .shell {
+  display: grid;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  height: 100%;
+}
+.workspace-app .shell.collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+.workspace-app .side-scrim {
+  display: none;
+}
+.workspace-app .side {
+  background: var(--bg-side);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  user-select: none;
+}
+.workspace-app .side-top {
+  padding: 8px 8px 4px;
+}
+.workspace-app .ws {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 6px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  transition: background var(--dur);
+}
+.workspace-app .ws:hover {
+  background: var(--surface-3);
+}
+.workspace-app .ws-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--c, #3a3934);
+  flex-shrink: 0;
+}
+.workspace-app .ws-logo.brand {
+  background: #000;
+  overflow: hidden;
+  border-radius: 28%;
+}
+.workspace-app .ws-logo.brand svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.workspace-app .brand .logo,
+.workspace-app .auth-card .logo {
+  color: var(--text);
+}
+.workspace-app svg.logo {
+  display: block;
+  flex-shrink: 0;
+}
+.workspace-app .ws-name {
+  font-weight: 600;
+  font-size: var(--fs);
+}
+/* Scrolls without a visible bar: a scrollbar would eat width and push the nav off the logo's centre line when collapsed. */
+.workspace-app .side-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 8px 12px;
+  scrollbar-width: none;
+}
+.workspace-app .side-scroll::-webkit-scrollbar {
+  display: none;
+}
+.workspace-app .sgroup {
+  margin-top: 14px;
+}
+.workspace-app .sgroup-h {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.workspace-app .sgroup-h .ibtn {
+  opacity: 0;
+  transition: opacity var(--dur);
+}
+.workspace-app .sgroup:hover .sgroup-h .ibtn,
+.workspace-app .sgroup-h .ibtn:focus-visible {
+  opacity: 1;
+}
+.workspace-app .sitem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  height: var(--side-row);
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: var(--fs);
+  font-weight: 450;
+  text-align: left;
+  transition:
+    background var(--dur),
+    color var(--dur);
+  position: relative;
+  white-space: nowrap;
+}
+.workspace-app .sitem:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.workspace-app .sitem.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px var(--border);
+  font-weight: 500;
+}
+.dark .workspace-app {
+  background: var(--surface-3);
+  box-shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  .dark .workspace-app {
+    background: var(--surface-3);
+    box-shadow: none;
+  }
+}
+.workspace-app .sitem .i {
+  color: var(--text-4);
+}
+.workspace-app .sitem.on .i,
+.workspace-app .sitem:hover .i {
+  color: var(--text-2);
+}
+.workspace-app .sitem .ct {
+  margin-left: auto;
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .sitem .ct.dotc {
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  font-weight: 600;
+}
+.workspace-app .sitem .pico {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--pc, var(--c));
+  flex-shrink: 0;
+}
+.workspace-app .sitem .pico .i {
+  color: var(--pc, var(--c)) !important;
+}
+.workspace-app .sitem .pico,
+.workspace-app .picon {
+  --pc: color-mix(in srgb, var(--c) var(--pc-mix, 100%), var(--text));
+}
+.workspace-app .sitem .sdot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.workspace-app .sitem .fav {
+  color: var(--amber);
+  margin-left: 4px;
+}
+.workspace-app .sitem .hov {
+  margin-left: auto;
+  display: none;
+}
+.workspace-app .sitem:hover .hov {
+  display: flex;
+}
+.workspace-app .sitem:hover .sdot {
+  display: none;
+}
+.workspace-app .sitem.drop-before::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.workspace-app .sitem.dragging {
+  opacity: 0.4;
+}
+.workspace-app .sub {
+  padding-left: 14px;
+  margin-left: 8px;
+  border-left: 1px solid var(--border);
+  display: none;
+}
+.workspace-app .sub.open {
+  display: block;
+}
+.workspace-app .sitem .chev {
+  transition: transform var(--dur);
+  color: var(--text-4);
+}
+.workspace-app .sitem .chev.open {
+  transform: rotate(90deg);
+}
+.workspace-app .side-bot {
+  padding: 6px 8px 8px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .collapsed .sitem {
+  justify-content: center;
+  padding: 0;
+}
+.workspace-app .collapsed .sitem > span:not(.pico),
+.workspace-app .collapsed .sitem .ct,
+.workspace-app .collapsed .sgroup-h,
+.workspace-app .collapsed .ws-name,
+.workspace-app .collapsed .ws .chev-d,
+.workspace-app .collapsed .sitem .sdot,
+.workspace-app .collapsed .sitem .fav,
+.workspace-app .collapsed .sitem .hov,
+.workspace-app .collapsed .sub,
+.workspace-app .collapsed .side-search,
+.workspace-app .collapsed .sitem .chev {
+  display: none !important;
+}
+.workspace-app .collapsed .sgroup {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .collapsed .ws {
+  justify-content: center;
+  padding: 5px 0;
+}

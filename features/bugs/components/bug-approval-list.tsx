@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Bug screens use workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Bug screens use app/workspace-styles. */
 
 import type { Route } from "next";
 import { redirect } from "next/navigation";

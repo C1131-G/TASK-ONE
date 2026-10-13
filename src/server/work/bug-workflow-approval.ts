@@ -81,14 +81,14 @@ export const submitApproval = async (
       : [];
   const fileById = new Map(files.map((file) => [file.id, file]));
   const usableEvidence = [];
-  for (const item of evidence) {
-    if (item.fileAssetId) {
-      const asset = fileById.get(item.fileAssetId);
+  for (const evidenceEntry of evidence) {
+    if (evidenceEntry.fileAssetId) {
+      const asset = fileById.get(evidenceEntry.fileAssetId);
       if (asset && !asset.deletedAt && asset.copyState === "ready") {
-        usableEvidence.push(item);
+        usableEvidence.push(evidenceEntry);
       }
-    } else if (item.externalUrl?.startsWith("https://")) {
-      usableEvidence.push(item);
+    } else if (evidenceEntry.externalUrl?.startsWith("https://")) {
+      usableEvidence.push(evidenceEntry);
     }
   }
   if (!hasRequiredBugEvidence(usableEvidence, attempt.id)) {
@@ -99,12 +99,12 @@ export const submitApproval = async (
   const now = new Date();
   const beforeEvidenceIds: string[] = [];
   const afterEvidenceIds: string[] = [];
-  for (const item of usableEvidence) {
-    if (item.kind === "before") {
-      beforeEvidenceIds.push(item.id);
+  for (const evidenceEntry of usableEvidence) {
+    if (evidenceEntry.kind === "before") {
+      beforeEvidenceIds.push(evidenceEntry.id);
     }
-    if (item.kind === "after") {
-      afterEvidenceIds.push(item.id);
+    if (evidenceEntry.kind === "after") {
+      afterEvidenceIds.push(evidenceEntry.id);
     }
   }
   await transaction.orm.public.BugApproval.create({

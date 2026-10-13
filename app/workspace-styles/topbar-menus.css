@@ -1,0 +1,277 @@
+.workspace-app .main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface);
+}
+.workspace-app .topbar {
+  height: var(--topbar-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 var(--gutter);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+  z-index: 5;
+}
+.workspace-app .topbar [data-workspace-account-name] {
+  display: none;
+}
+.workspace-app [data-workspace-avatar] {
+  --sz: 22px;
+  display: inline-grid;
+  width: var(--sz);
+  height: var(--sz);
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  color: var(--text);
+  font-size: calc(var(--sz) * 0.4);
+  font-weight: 600;
+  line-height: 1;
+}
+.workspace-app [data-workspace-account] {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 8px;
+  border-radius: var(--r);
+  padding: 0 8px;
+  color: var(--text);
+}
+.workspace-app [data-workspace-account-name] {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .topbar [data-workspace-account] {
+  width: auto;
+  justify-content: center;
+  padding: 0 6px;
+}
+.workspace-app [data-workspace-create] {
+  border-radius: var(--r);
+  background: #4b5bd6;
+  color: #fff;
+}
+.workspace-app [data-workspace-create]:hover {
+  background: #404fc4;
+}
+[data-workspace-menu] {
+  --popover: #fff;
+  --popover-foreground: #1d1c1a;
+  --accent: #eeede9;
+  --accent-foreground: #1d1c1a;
+  --border: #e9e7e2;
+  min-width: 184px;
+  border: 1px solid #e9e7e2;
+  background: #fff;
+  color: #1d1c1a;
+}
+[data-workspace-sheet][data-side="right"] {
+  width: min(520px, 100vw);
+  max-width: min(520px, 100vw);
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+[data-workspace-sheet][data-side="left"] {
+  max-width: min(320px, 88vw);
+  border-color: var(--border);
+  background: var(--bg-side);
+  color: var(--text);
+}
+[data-workspace-menu] [data-slot="dropdown-menu-item"],
+[data-workspace-menu] [data-slot="dropdown-menu-checkbox-item"],
+[data-workspace-menu] [data-slot="dropdown-menu-radio-item"] {
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-weight: 450;
+}
+[data-workspace-menu] [data-slot="command"] {
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+[data-workspace-combobox] {
+  gap: 0;
+  padding: 4px;
+}
+[data-workspace-menu] [data-slot="command-item"] {
+  border-radius: 4px;
+  padding: 6px 9px;
+  font-size: 12.5px;
+  font-weight: 450;
+}
+[data-workspace-confirm] {
+  --background: #fbfaf8;
+  --foreground: #1d1c1a;
+  --popover: #fbfaf8;
+  --popover-foreground: #1d1c1a;
+  --border: #e9e7e2;
+  border: 1px solid #e9e7e2;
+  border-radius: 10px;
+  background: #fbfaf8;
+  color: #1d1c1a;
+}
+[data-workspace-select] {
+  --popover: #ffffff;
+  --popover-foreground: #1d1c1a;
+  --accent: #eeede9;
+  --accent-foreground: #1d1c1a;
+  --border: #e9e7e2;
+  border: 1px solid #e9e7e2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1d1c1a;
+  box-shadow:
+    0 12px 32px -8px rgb(28 25 20 / 16%),
+    0 2px 6px -2px rgb(28 25 20 / 6%);
+}
+[data-workspace-select] [data-slot="select-item"] {
+  border-radius: 4px;
+  padding-block: 6px;
+  font-size: 12.5px;
+  font-weight: 450;
+}
+.dark [data-workspace-confirm] {
+  --background: #1a1a19;
+  --foreground: #eceae5;
+  --popover: #1d1d1c;
+  --popover-foreground: #eceae5;
+  --border: #2c2b29;
+  border-color: #2c2b29;
+  background: #1a1a19;
+  color: #eceae5;
+}
+.dark [data-workspace-menu] {
+  --popover: #1d1d1c;
+  --popover-foreground: #eceae5;
+  --accent: #2d2d2b;
+  --accent-foreground: #eceae5;
+  --border: #2c2b29;
+  border-color: #2c2b29;
+  background: #1d1d1c;
+  color: #eceae5;
+}
+.dark [data-workspace-select] {
+  --popover: #1d1d1c;
+  --popover-foreground: #eceae5;
+  --accent: #2d2d2b;
+  --accent-foreground: #eceae5;
+  --border: #2c2b29;
+  border-color: #2c2b29;
+  background: #1d1d1c;
+  color: #eceae5;
+  box-shadow: 0 16px 40px -10px rgb(0 0 0 / 60%);
+}
+[data-workspace-menu][data-workspace-account-menu] {
+  width: 224px;
+}
+[data-workspace-account-label],
+[data-workspace-account-role] {
+  display: block;
+}
+[data-workspace-account-label] {
+  overflow: hidden;
+  color: var(--popover-foreground);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-workspace-account-role] {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--popover-foreground) 65%, transparent);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+[data-workspace-account-signout] > div > button {
+  width: 100%;
+  min-width: 0;
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+[data-workspace-account-signout] > div > button:hover {
+  background: var(--accent);
+}
+[data-workspace-account-signout] > div > p {
+  padding: 0 12px 8px;
+}
+.workspace-app .crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+/* No padding or hover fill: the first crumb starts exactly on the content gutter; hover is shown with colour only. */
+.workspace-app .crumbs button {
+  padding: 3px 0;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--dur);
+}
+.workspace-app .crumbs button:hover {
+  color: var(--text);
+}
+.workspace-app .crumbs .cur {
+  color: var(--text);
+  font-weight: 500;
+}
+.workspace-app .crumbs .sep {
+  color: var(--text-4);
+  font-size: 12px;
+}
+.workspace-app .topsearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--h-sm);
+  padding: 0 6px 0 9px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  width: 220px;
+  background: var(--sunken);
+  transition: border-color var(--dur);
+}
+.workspace-app .topbar [data-workspace-search-trigger] {
+  justify-content: flex-start;
+  border-color: var(--border);
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  box-shadow: none;
+}
+.workspace-app .topbar [data-workspace-search-trigger]:hover {
+  border-color: var(--border-strong);
+  background: var(--sunken);
+  color: var(--text-2);
+}
+.workspace-app .topsearch:hover {
+  border-color: var(--border-strong);
+  color: var(--text-2);
+}
+.workspace-app .topsearch .kbd {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.workspace-app .topsearch .lbltxt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}

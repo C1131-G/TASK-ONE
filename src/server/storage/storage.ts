@@ -130,11 +130,11 @@ export const StorageLive = Layer.succeed(
             { client: s3, pageSize: 1000 },
             { Bucket: bucket, Prefix: prefix }
           )) {
-            for (const item of page.Contents ?? []) {
-              if (item.Key) {
+            for (const listedObject of page.Contents ?? []) {
+              if (listedObject.Key) {
                 objects.push({
-                  key: item.Key,
-                  lastModified: item.LastModified ?? null,
+                  key: listedObject.Key,
+                  lastModified: listedObject.LastModified ?? null,
                 });
               }
             }

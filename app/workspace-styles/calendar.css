@@ -1,0 +1,255 @@
+/* ============================================================
+   CALENDAR
+   ============================================================ */
+.workspace-app .cal {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.workspace-app .cal-h {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+}
+.workspace-app .cal-h div {
+  padding: 8px 10px;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 500;
+}
+.workspace-app .cal-g {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(112px, 1fr);
+  flex: 1;
+}
+.workspace-app .calendar-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 200px) auto auto;
+  justify-content: start;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.workspace-app .calendar-navigation-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 10px;
+}
+.workspace-app .calendar-month-label {
+  flex: 0 0 auto;
+  margin: 0;
+  text-align: left;
+}
+.workspace-app .calendar-project-legend {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-app .calendar-project-legend-item {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+}
+.workspace-app .calendar-project-legend-item .pdot {
+  background: var(--c);
+}
+.workspace-app .calendar-search {
+  min-width: 0;
+}
+.workspace-app .calendar-view-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+.workspace-app .cday {
+  border-right: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  transition: background var(--dur);
+  position: relative;
+}
+.workspace-app .cday:nth-child(7n) {
+  border-right: 0;
+}
+.workspace-app .cday.out {
+  background: var(--sunken);
+}
+.workspace-app .cday.out .dn {
+  color: var(--text-3);
+}
+.workspace-app .cday.over {
+  background: var(--accent-soft);
+}
+.workspace-app .cday .dn {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-2);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .cday.today .dn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.workspace-app .cday .add {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  opacity: 0;
+}
+.workspace-app .cday:hover .add,
+.workspace-app .cday:focus-within .add {
+  opacity: 1;
+}
+.workspace-app .cev {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 5px;
+  font-size: var(--fs-xs);
+  background: color-mix(in srgb, var(--c) 11%, var(--surface));
+  color: var(--text);
+  cursor: pointer;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--c) 22%, transparent);
+  text-align: left;
+  width: 100%;
+}
+.workspace-app .cev:hover {
+  background: color-mix(in srgb, var(--c) 18%, var(--surface));
+}
+.workspace-app .cev .trunc {
+  flex: 1;
+}
+.workspace-app .cev.done {
+  opacity: 0.55;
+}
+.workspace-app .cev[data-done="true"] {
+  opacity: 0.55;
+}
+.workspace-app .cev[data-done="true"] .trunc {
+  text-decoration: line-through;
+}
+.workspace-app .cev.done .trunc {
+  text-decoration: line-through;
+}
+.workspace-app .cev.event {
+  background: transparent;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--c) 45%, transparent);
+}
+.workspace-app .cev .av {
+  --sz: 16px;
+  font-size: 7.5px;
+}
+.workspace-app .cmore {
+  font-size: var(--fs-2xs);
+  color: var(--text-2);
+  padding: 0 6px;
+  text-align: left;
+}
+.workspace-app .cmore:hover {
+  color: var(--text);
+}
+.workspace-app .week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  flex: 1;
+  min-height: 0;
+}
+.workspace-app .wcol {
+  border-right: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.workspace-app .wcol:last-child {
+  border-right: 0;
+}
+.workspace-app .wcol-h {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.workspace-app .wcol-h .n {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.workspace-app .wcol-h.today .n {
+  color: var(--accent);
+}
+.workspace-app .wcol-b {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+.workspace-app .wcol-b.over {
+  background: var(--accent-soft);
+}
+.workspace-app .wcard {
+  border-radius: var(--r-sm);
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+.workspace-app .wcard:hover {
+  border-color: var(--border-strong);
+}
+.workspace-app .wcard .t {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+}
+.workspace-app .wcard .t .pdot {
+  transform: translateY(-1px);
+}
+.workspace-app .wcard.event {
+  background: color-mix(in srgb, var(--c) 8%, var(--surface));
+}
+.workspace-app .wcard .t {
+  font-weight: 500;
+  line-height: 1.3;
+}
+.workspace-app .wcard .m {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}

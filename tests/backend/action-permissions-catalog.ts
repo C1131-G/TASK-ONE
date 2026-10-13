@@ -1,11 +1,11 @@
-import { actionCatalog1 } from "./action-permissions-catalog-1";
-import { actionCatalog2 } from "./action-permissions-catalog-2";
-import { actionCatalog3 } from "./action-permissions-catalog-3";
+import { personalProjectActionCatalog } from "./action-permissions-catalog-personal-projects";
+import { teamFileActionCatalog } from "./action-permissions-catalog-teams-files";
+import { workspaceActionCatalog } from "./action-permissions-catalog-workspace";
 
 export const allActions = [
-  ...actionCatalog1,
-  ...actionCatalog2,
-  ...actionCatalog3,
+  ...workspaceActionCatalog,
+  ...personalProjectActionCatalog,
+  ...teamFileActionCatalog,
 ] as const;
 
 export const adminOnlyNames: readonly string[] = [

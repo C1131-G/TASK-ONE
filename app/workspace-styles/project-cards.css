@@ -1,0 +1,133 @@
+/* ============================================================
+   PROJECT CARDS / MISC
+   ============================================================ */
+.workspace-app .pgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+}
+.workspace-app .pcard {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  background: var(--surface);
+  transition:
+    border-color var(--dur),
+    box-shadow var(--dur);
+  text-align: left;
+  position: relative;
+}
+.workspace-app .pcard:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.1);
+}
+.workspace-app .pcard .desc {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.9em;
+  line-height: 1.45;
+}
+.workspace-app .pcard .foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  padding-top: 10px;
+  border-top: 1px solid var(--divider);
+}
+.workspace-app .picon {
+  --sz: 28px;
+  width: var(--sz);
+  height: var(--sz);
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  color: var(--pc, var(--c));
+  flex-shrink: 0;
+}
+.workspace-app .picon.lg {
+  --sz: 36px;
+  border-radius: 9px;
+}
+.workspace-app .pcard .more {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+}
+.workspace-app .pcard:hover .more {
+  opacity: 1;
+}
+.workspace-app .pstatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.workspace-app .pstatus i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c);
+}
+.workspace-app .proj-h {
+  padding: 20px var(--gutter) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.workspace-app .proj-h .t {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.workspace-app .proj-h h1 {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.018em;
+}
+/* tabs bleed to the edges; the first label still starts on the gutter (tab has 10px side padding) */
+.workspace-app .proj-h .tabs {
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0 calc(var(--gutter) - 10px);
+}
+.workspace-app .proj-h .project-meta {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.workspace-app .proj-h .project-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+.workspace-app .proj-h .project-controls > [role="alert"] {
+  flex-basis: 100%;
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .workspace-app .proj-h .project-controls {
+    margin-left: 0;
+    width: 100%;
+  }
+}

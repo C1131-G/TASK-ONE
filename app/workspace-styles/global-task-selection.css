@@ -1,0 +1,33 @@
+.workspace-app .pcard-link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
+.workspace-app .task-table-global .thead,
+.workspace-app .task-table-global .trow {
+  grid-template-columns: 36px minmax(220px, 2fr) 110px minmax(
+      150px,
+      1fr
+    ) 100px 105px minmax(120px, 1fr) minmax(150px, auto);
+}
+.workspace-app .global-task-selection-bar {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0;
+}
+.workspace-app .global-task-selection-bar label {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+.workspace-app .global-task-bulk-form {
+  max-height: min(72dvh, 680px);
+  overflow-y: auto;
+}
+.workspace-app .global-task-bulk-assignees {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px 2px;
+}

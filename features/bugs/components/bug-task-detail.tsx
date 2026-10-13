@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Error and muted styles come from workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Error and muted styles come from app/workspace-styles. */
 
 "use client";
 

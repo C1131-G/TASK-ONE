@@ -1,0 +1,284 @@
+.workspace-app .project-bugs-view {
+  display: grid;
+  gap: 16px;
+}
+.workspace-app .bug-detail-page {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.workspace-app .bug-back-link {
+  align-items: center;
+  color: var(--text-3);
+  display: inline-flex;
+  font-size: var(--fs-sm);
+  gap: 6px;
+  text-decoration: none;
+  width: fit-content;
+}
+.workspace-app .bug-back-link:hover {
+  color: var(--text);
+}
+.workspace-app .bug-detail-header,
+.workspace-app .bug-detail-header-actions,
+.workspace-app .bug-detail-section > header,
+.workspace-app .bug-history-card > header,
+.workspace-app .bug-inline-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.workspace-app .bug-detail-header,
+.workspace-app .bug-detail-section > header,
+.workspace-app .bug-history-card > header {
+  justify-content: space-between;
+}
+.workspace-app .bug-detail-heading {
+  min-width: 0;
+}
+.workspace-app .bug-detail-heading h1 {
+  color: var(--text);
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.workspace-app .bug-detail-heading p {
+  margin: 5px 0 0;
+}
+.workspace-app .bug-detail-heading .eyebrow {
+  color: var(--text-4);
+  font-size: var(--fs-xs);
+  margin-bottom: 6px;
+}
+.workspace-app .bug-workflow-status,
+.workspace-app .bug-severity-label {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  color: var(--text-2);
+  display: inline-flex;
+  font-size: var(--fs-xs);
+  padding: 5px 9px;
+  text-transform: capitalize;
+}
+.workspace-app .bug-status-awaiting_admin_approval,
+.workspace-app .bug-status-approved_for_release {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.workspace-app .bug-status-closed,
+.workspace-app .bug-status-released {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.workspace-app .bug-status-rejected,
+.workspace-app .bug-status-duplicate {
+  background: var(--red-soft);
+  color: var(--red);
+}
+.workspace-app .bug-detail-section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+}
+.workspace-app .bug-detail-section h2 {
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 620;
+  margin: 0;
+}
+.workspace-app .bug-detail-section h3 {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: 620;
+  margin: 0 0 6px;
+}
+.workspace-app .bug-detail-facts {
+  display: grid;
+  gap: 10px 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.workspace-app .bug-detail-facts > p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  min-width: 0;
+}
+.workspace-app .bug-detail-facts strong {
+  color: var(--text-4);
+  font-size: var(--fs-xs);
+  font-weight: 550;
+}
+.workspace-app .bug-detail-facts span {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+  text-transform: capitalize;
+}
+.workspace-app .bug-report-detail-grid,
+.workspace-app .bug-evidence-columns {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.workspace-app .bug-report-detail-grid > div,
+.workspace-app .bug-evidence-column {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  min-width: 0;
+  padding: 12px;
+}
+.workspace-app .bug-report-detail-grid ol {
+  color: var(--text-2);
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+}
+.workspace-app .bug-report-detail-grid p,
+.workspace-app .bug-long-description {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.workspace-app .bug-long-description {
+  margin: 0;
+}
+.workspace-app .bug-detail-form-grid,
+.workspace-app .bug-inline-form {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.workspace-app .bug-inline-form {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.workspace-app .bug-employee-picker {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  grid-column: 1 / -1;
+  margin: 0;
+  min-width: 0;
+  padding: 12px;
+}
+.workspace-app .bug-employee-picker legend {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  padding: 0 4px;
+}
+.workspace-app .bug-employee-option {
+  align-items: center;
+  color: var(--text-2);
+  display: inline-flex;
+  font-size: var(--fs-sm);
+  gap: 7px;
+  min-height: 34px;
+}
+.workspace-app .bug-detail-form-grid > button,
+.workspace-app .bug-inline-form > button {
+  justify-self: start;
+}
+.workspace-app .bug-attempt-history,
+.workspace-app .bug-decision-history,
+.workspace-app .bug-related-list {
+  display: grid;
+  gap: 8px;
+}
+.workspace-app .bug-history-card,
+.workspace-app .bug-evidence-item {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  min-width: 0;
+  padding: 12px;
+}
+.workspace-app .bug-history-card h3 {
+  margin: 0;
+}
+.workspace-app .bug-history-card > p,
+.workspace-app .bug-evidence-item > p {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.workspace-app .bug-evidence-column {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.workspace-app .bug-evidence-item small {
+  color: var(--text-4);
+  display: block;
+  font-size: var(--fs-2xs);
+  margin-top: 5px;
+}
+.workspace-app .bug-evidence-item a {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  font-size: var(--fs-sm);
+  gap: 4px;
+  margin-top: 8px;
+  width: fit-content;
+}
+.workspace-app .bug-evidence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.workspace-app .bug-evidence-upload {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.workspace-app .bug-evidence-upload input {
+  flex: 1 1 240px;
+}
+.workspace-app .bug-evidence-upload .bug-field-help {
+  flex: 1 0 100%;
+}
+.workspace-app .bug-related-list a {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+  padding: 9px 11px;
+  text-decoration: none;
+}
+.workspace-app .bug-related-list a:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.workspace-app .bug-reject-form {
+  align-items: center;
+  display: flex;
+  flex: 1 1 360px;
+  gap: 8px;
+}
+.workspace-app .bug-reject-form input {
+  min-width: 160px;
+}
+.workspace-app .bug-read-only-note {
+  background: var(--amber-soft);
+  border-radius: var(--r);
+  color: var(--amber);
+  font-size: var(--fs-sm);
+  padding: 10px 12px;
+}
