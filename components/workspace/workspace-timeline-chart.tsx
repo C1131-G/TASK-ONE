@@ -4,10 +4,13 @@ import type { Route } from "next";
 import Link from "next/link";
 import type { RefObject } from "react";
 
+import type { MilestoneRecord } from "@/components/workspace/milestone-dates";
 import type { TaskSpan } from "@/components/workspace/task-dates";
 import { dayDiff } from "@/components/workspace/task-dates";
 import { TimelineBar } from "@/components/workspace/workspace-timeline-bar";
+import { TimelineMilestoneMarker } from "@/components/workspace/workspace-timeline-milestone";
 import type {
+  TimelineMilestoneLane,
   TimelineRow,
   TimelineScale,
   TimelineTask,
@@ -36,6 +39,7 @@ export const WorkspaceTimelineChart = ({
   editableIds,
   from,
   onMove,
+  onMoveMilestone,
   rows,
   scale,
   today,
@@ -46,6 +50,11 @@ export const WorkspaceTimelineChart = ({
   readonly editableIds: ReadonlySet<string>;
   readonly from: string;
   readonly onMove: (task: TimelineTask, dates: TaskSpan) => void;
+  readonly onMoveMilestone: (
+    lane: TimelineMilestoneLane,
+    milestone: MilestoneRecord,
+    dueDate: string
+  ) => void;
   readonly rows: readonly TimelineRow[];
   readonly scale: TimelineScale;
   readonly today: number;
@@ -160,25 +169,17 @@ export const WorkspaceTimelineChart = ({
             if (row.type === "milestones") {
               return (
                 <div className="tl-rowbg g" key={row.key} style={{ top }}>
-                  {row.lane.milestones.flatMap((milestone) => {
-                    const offset = dayDiff(from, milestone.dueDate);
-                    if (offset < 0 || offset >= dayCount) {
-                      return [];
-                    }
-                    return [
-                      <span
-                        className={`tl-milestone${milestone.completed ? " done" : ""}`}
-                        key={milestone.id}
-                        style={{ left: offset * dayWidth + dayWidth / 2 - 6 }}
-                        title={`${milestone.name} · ${milestone.dueDate}`}
-                      >
-                        <span className="sr-only">
-                          {milestone.name}, due {milestone.dueDate}
-                          {milestone.completed ? ", completed" : ""}
-                        </span>
-                      </span>,
-                    ];
-                  })}
+                  {row.lane.allMilestones.map((milestone) => (
+                    <TimelineMilestoneMarker
+                      dayCount={dayCount}
+                      dayWidth={dayWidth}
+                      from={from}
+                      key={milestone.id}
+                      lane={row.lane}
+                      milestone={milestone}
+                      onMove={onMoveMilestone}
+                    />
+                  ))}
                 </div>
               );
             }

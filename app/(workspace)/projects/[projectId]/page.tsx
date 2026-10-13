@@ -198,6 +198,7 @@ interface ProjectViewContentProps {
   readonly isAdmin: boolean;
   readonly milestonePanel: ReactNode;
   readonly milestones: readonly ProjectMilestone[];
+  readonly milestonesVersion: number;
   readonly monthOffset: number;
   readonly project: NonNullable<
     Extract<
@@ -321,6 +322,7 @@ const renderProjectTasks = ({
   isAdmin,
   labelResult,
   milestones,
+  milestonesVersion,
   monthOffset,
   project,
   taskResult,
@@ -346,6 +348,7 @@ const renderProjectTasks = ({
       isAdmin={isAdmin}
       labels={labelResult.ok ? labelResult.data : []}
       milestones={milestones}
+      milestonesVersion={milestonesVersion}
       monthOffset={monthOffset}
       project={project}
       tasks={tasks}
@@ -553,6 +556,7 @@ const getProjectPageData = async (
     labelResult,
     milestonePanel,
     milestones: milestoneResult.ok ? milestoneResult.data.milestones : [],
+    milestonesVersion: milestoneResult.ok ? milestoneResult.data.version : 0,
     monthOffset,
     project,
     savedViewState,
@@ -599,6 +603,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
     tasks,
     teamResult,
     milestones,
+    milestonesVersion,
     timelineRange,
     today,
     view,
@@ -675,6 +680,7 @@ const ProjectPage = async ({ params, searchParams }: ProjectPageProps) => {
             labelResult={labelResult}
             milestonePanel={milestonePanel}
             milestones={milestones}
+            milestonesVersion={milestonesVersion}
             monthOffset={monthOffset}
             project={project}
             taskResult={taskResult}

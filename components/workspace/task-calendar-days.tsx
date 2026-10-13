@@ -75,6 +75,7 @@ export const TaskCalendarDays = ({
         return (
           <div
             className={`cday${isCurrentMonth ? "" : " out"}${key === today ? " today" : ""}${overKey === key ? " over" : ""}`}
+            data-day={key}
             key={key}
             onDragEnter={onMoveTask ? () => setOverKey(key) : undefined}
             onDragLeave={onMoveTask ? () => setOverKey(null) : undefined}

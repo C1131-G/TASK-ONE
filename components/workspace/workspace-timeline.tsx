@@ -4,6 +4,7 @@
 
 import { useId, useRef, useState } from "react";
 
+import { useMilestoneReschedule } from "@/components/workspace/use-milestone-reschedule";
 import { useTaskReschedule } from "@/components/workspace/use-task-reschedule";
 import { WorkspaceTimelineChart } from "@/components/workspace/workspace-timeline-chart";
 import { WorkspaceTimelineControls } from "@/components/workspace/workspace-timeline-controls";
@@ -109,6 +110,8 @@ export const WorkspaceTimeline = ({
   // Drags and arrow-key moves show at once and roll back if the server refuses them.
   const reschedule = useTaskReschedule(tasks);
   const handleMove = reschedule.move;
+  const milestoneReschedule = useMilestoneReschedule(milestoneLanes);
+  const handleMoveMilestone = milestoneReschedule.move;
   const visibleTasks = reschedule.tasks
     .filter((task) => {
       const assigneeIds = task.assigneeIds ?? [];
@@ -149,7 +152,7 @@ export const WorkspaceTimeline = ({
       : groupTasks(visibleTasks, groupBy, employeesById);
   const rows: TimelineRow[] = [];
   const projectsWithTasks = new Set(tasks.map((task) => task.projectId));
-  for (const lane of milestoneLanes) {
+  for (const lane of milestoneReschedule.lanes) {
     if (projectsWithTasks.has(lane.projectId)) {
       rows.push({
         key: `milestones:${lane.projectId}`,
@@ -211,10 +214,11 @@ export const WorkspaceTimeline = ({
       />
       <output aria-live="polite" className="sr-only">
         {reschedule.announcement}
+        {milestoneReschedule.announcement}
       </output>
-      {reschedule.error ? (
+      {(reschedule.error ?? milestoneReschedule.error) ? (
         <p className="error panel-b" role="alert">
-          {reschedule.error}
+          {reschedule.error ?? milestoneReschedule.error}
         </p>
       ) : null}
       {rows.length ? (
@@ -224,6 +228,7 @@ export const WorkspaceTimeline = ({
           editableIds={new Set(editableTaskIds)}
           from={from}
           onMove={handleMove}
+          onMoveMilestone={handleMoveMilestone}
           rows={rows}
           scale={scale}
           today={today}

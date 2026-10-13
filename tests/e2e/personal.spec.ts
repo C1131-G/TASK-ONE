@@ -38,6 +38,7 @@ test.describe("inbox and notifications as employee", () => {
     await expect(page.getByText("commented on a task")).toHaveCount(0);
 
     await page.getByRole("tab", { name: /^Mentions/u }).click();
+    await expect(page.getByText("mentioned you").first()).toBeVisible();
     await expect(page.getByText("assigned you a task")).toHaveCount(0);
   });
 
@@ -106,9 +107,24 @@ test.describe("activity and archive as admin", () => {
     await page.keyboard.press("Escape");
   });
 
-  test("an archived task appears in the archive and can be restored", async ({
+  test("the archive lists the seeded items; an archived task joins it and can be restored", async ({
     page,
   }) => {
+    const row = (title: string) =>
+      page.locator("article.archive-row", { hasText: title });
+    const tasksTab = page.getByRole("tab", { name: /^Tasks \d+/u });
+    const countOf = async () =>
+      Number(((await tasksTab.textContent()) ?? "").replaceAll(/\D/gu, ""));
+
+    await page.goto("/archive");
+    await page.waitForLoadState("networkidle");
+    const baseline = await countOf();
+    // The fixtures archive one task and one project.
+    expect(baseline).toBeGreaterThanOrEqual(1);
+    await expect(row("Archived fixture task")).toBeVisible();
+    await page.getByRole("tab", { name: /^Projects/u }).click();
+    await expect(row("UI Fixture Archived")).toBeVisible();
+
     await page.goto("/tasks");
     await page.waitForLoadState("networkidle");
     const more = page
@@ -124,21 +140,20 @@ test.describe("activity and archive as admin", () => {
       await expect(async () => {
         await page.goto("/archive");
         await page.waitForLoadState("networkidle");
-        await expect(page.getByText(title, { exact: true })).toBeVisible({
-          timeout: 2000,
-        });
+        await expect(row(title)).toBeVisible({ timeout: 2000 });
       }).toPass({ timeout: 30_000 });
-      await expect(page.getByRole("tab", { name: /^Tasks 1/u })).toBeVisible();
+      expect(await countOf()).toBe(baseline + 1);
     } finally {
       await page.goto("/archive");
       await page.waitForLoadState("networkidle");
-      const restore = page.getByRole("button", { name: /Restore/u }).first();
+      const restore = row(title).getByRole("button", { name: "Restore" });
       if ((await restore.count()) > 0) {
         await restore.click();
-        await expect(page.getByText("No archived tasks")).toBeVisible({
-          timeout: 20_000,
-        });
+        await expect(row(title)).toHaveCount(0, { timeout: 20_000 });
       }
     }
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    expect(await countOf()).toBe(baseline);
   });
 });
