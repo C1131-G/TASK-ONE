@@ -20,6 +20,89 @@ enum TaskPriority {
   None   = "none"
 }
 
+enum TaskType {
+  @@type("pg/text@1")
+
+  Task = "task"
+  Bug  = "bug"
+}
+
+enum BugWorkflowStatus {
+  @@type("pg/text@1")
+
+  Reported            = "reported"
+  Triaged             = "triaged"
+  InProgress          = "in_progress"
+  InVerification      = "in_verification"
+  AwaitingAdminApproval = "awaiting_admin_approval"
+  ApprovedForRelease  = "approved_for_release"
+  Released            = "released"
+  Closed              = "closed"
+  Duplicate           = "duplicate"
+  Rejected            = "rejected"
+}
+
+enum BugSeverity {
+  @@type("pg/text@1")
+
+  Blocker  = "blocker"
+  Critical = "critical"
+  Major    = "major"
+  Minor    = "minor"
+  Trivial  = "trivial"
+}
+
+enum BugDiscoverySource {
+  @@type("pg/text@1")
+
+  InternalQa      = "internal_qa"
+  CustomerReport  = "customer_report"
+  Support         = "support"
+  AutomatedTest   = "automated_test"
+  Monitoring      = "monitoring"
+  EmployeeReport  = "employee_report"
+}
+
+enum BugEnvironment {
+  @@type("pg/text@1")
+
+  Production  = "production"
+  Staging     = "staging"
+  Development = "development"
+  Test        = "test"
+  Other       = "other"
+}
+
+enum BugEvidenceKind {
+  @@type("pg/text@1")
+
+  Other  = "other"
+  Before = "before"
+  After  = "after"
+}
+
+enum BugRelationType {
+  @@type("pg/text@1")
+
+  Recurrence = "recurrence"
+  Duplicate  = "duplicate"
+}
+
+enum BugVerificationOutcome {
+  @@type("pg/text@1")
+
+  Passed = "passed"
+  Failed = "failed"
+}
+
+enum BugApprovalStatus {
+  @@type("pg/text@1")
+
+  Pending  = "pending"
+  Approved = "approved"
+  Rejected = "rejected"
+}
+
 enum ProjectStatus {
   @@type("pg/text@1")
 

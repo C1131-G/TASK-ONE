@@ -1,0 +1,26 @@
+// use prisma-8
+
+model BugEvidence {
+  id             Uuid @id @default(uuid())
+  bugReportId    Uuid
+  fixAttemptId   Uuid?
+  fileAssetId    Uuid?
+  uploadedById   String
+  kind           BugEvidenceKind
+  externalUrl    String?
+  caption        String
+  createdAt      TimestamptzJsDate @default(now())
+
+  bugReport BugReport @relation(fields: [bugReportId], references: [id], onDelete: Restrict)
+  fixAttempt BugFixAttempt? @relation(fields: [fixAttemptId], references: [id], onDelete: Restrict)
+  fileAsset FileAsset? @relation(fields: [fileAssetId], references: [id], onDelete: Restrict)
+  uploadedBy User @relation("BugEvidenceUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([bugReportId, kind, createdAt])
+  @@index([fixAttemptId, kind])
+  @@index([fileAssetId])
+  @@index([uploadedById, createdAt])
+  @@check(expression: "(\"fileAssetId\" IS NOT NULL AND \"externalUrl\" IS NULL) OR (\"fileAssetId\" IS NULL AND \"externalUrl\" IS NOT NULL)", name: "bug_evidence_source_xor")
+  @@check(expression: "\"externalUrl\" IS NULL OR \"externalUrl\" ~ '^https://[^[:space:]]+$'", name: "bug_evidence_url_https")
+  @@map("bug_evidence")
+}

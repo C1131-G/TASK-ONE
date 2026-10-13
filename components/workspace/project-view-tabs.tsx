@@ -4,6 +4,7 @@
 
 import {
   CalendarBlank,
+  Bug,
   ChartLineUp,
   Files,
   List,
@@ -19,6 +20,7 @@ const views = [
   { Icon: SquaresFour, id: "board", label: "Board" },
   { Icon: List, id: "list", label: "List" },
   { Icon: Table, id: "table", label: "Table" },
+  { Icon: Bug, id: "bugs", label: "Bugs" },
   { Icon: CalendarBlank, id: "calendar", label: "Calendar" },
   { Icon: ChartLineUp, id: "timeline", label: "Timeline" },
   { Icon: Files, id: "files", label: "Files" },

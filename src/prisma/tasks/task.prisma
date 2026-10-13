@@ -5,6 +5,7 @@ model Task {
   projectId         Uuid
   projectTaskNumber Int
   title             String
+  type              TaskType @default(Task)
   description       String?
   status            TaskStatus @default(Todo)
   priority          TaskPriority @default(None)
@@ -23,6 +24,8 @@ model Task {
   recurrenceSources RecurrenceGeneration[] @relation("RecurrenceSource")
   recurrenceSuccessor RecurrenceGeneration? @relation("RecurrenceSuccessor")
   uploadIntents UploadIntent[]
+  bugReport BugReport?
+  files FileAsset[]
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
   createdBy User    @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Restrict)

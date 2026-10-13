@@ -92,6 +92,16 @@ export const removeFile = (
             message: "The file was already removed.",
           });
         }
+        const bugEvidence = await transaction.orm.public.BugEvidence.where({
+          fileAssetId: fileId,
+        }).first();
+        if (bugEvidence) {
+          throw new AppError({
+            code: "CONFLICT",
+            message:
+              "Bug evidence is retained as part of the investigation history.",
+          });
+        }
         if (actor.role !== "admin" && file.uploadedById !== actorId) {
           throw new AppError({
             code: "FORBIDDEN",

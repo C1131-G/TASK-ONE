@@ -89,11 +89,11 @@ export const nextKey = (): string => {
 export const personaId = (persona: Persona): string =>
   personas.get(persona)?.id ?? "";
 
-export const callAs = async (
+export const callAs = async <Result extends ActionResultLike>(
   persona: Persona,
-  action: ActionFunction,
+  action: (input: unknown) => Promise<Result>,
   input: unknown
-): Promise<ActionResultLike> => {
+): Promise<Result> => {
   currentHeaders = personas.get(persona)?.headers ?? new Headers();
   return await action(input);
 };

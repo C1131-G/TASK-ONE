@@ -1,0 +1,28 @@
+// use prisma-8
+
+model BugApproval {
+  id           Uuid @id @default(uuid())
+  bugReportId  Uuid
+  fixAttemptId Uuid
+  submittedById String
+  decidedById  String?
+  status       BugApprovalStatus @default(Pending)
+  snapshot     Jsonb
+  comment      String?
+  rejectionReason String?
+  submittedAt  TimestamptzJsDate @default(now())
+  decidedAt    TimestamptzJsDate?
+
+  bugReport BugReport @relation(fields: [bugReportId], references: [id], onDelete: Restrict)
+  fixAttempt BugFixAttempt @relation(fields: [fixAttemptId], references: [id], onDelete: Restrict)
+  submittedBy User @relation("BugApprovalSubmitter", fields: [submittedById], references: [id], onDelete: Restrict)
+  decidedBy User? @relation("BugApprovalActor", fields: [decidedById], references: [id], onDelete: Restrict)
+  releases BugRelease[]
+
+  @@unique([bugReportId, fixAttemptId])
+  @@index([status, submittedAt])
+  @@index([submittedById, submittedAt])
+  @@index([decidedById, decidedAt])
+  @@check(expression: "(\"status\" = 'pending' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"rejectionReason\" IS NULL) OR (\"status\" = 'approved' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND \"rejectionReason\" IS NULL) OR (\"status\" = 'rejected' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND length(trim(\"rejectionReason\")) > 0)", name: "bug_approval_decision_valid")
+  @@map("bug_approval")
+}

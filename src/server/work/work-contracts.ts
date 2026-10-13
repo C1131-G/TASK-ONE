@@ -18,6 +18,7 @@ export const TaskPrioritySchema = Schema.Literals([
   "low",
   "none",
 ]);
+export const TaskTypeSchema = Schema.Literals(["task", "bug"]);
 
 export const decodeTaskStatus = (status: string): UpdateTaskInput["status"] =>
   Schema.decodeUnknownSync(TaskStatusSchema)(status);
@@ -152,6 +153,7 @@ export interface ProjectTaskListItem extends CreatedTask {
   readonly estimate: string | null;
   readonly position: number;
   readonly startDate: string | null;
+  readonly type: typeof TaskTypeSchema.Type;
   readonly assignees: readonly { readonly id: string; readonly name: string }[];
   readonly labelIds: readonly string[];
   readonly dependencyIds: readonly string[];
@@ -175,6 +177,7 @@ export const ProjectTaskListItemSchema = Schema.Struct({
   recurrence: Schema.NullOr(TaskRecurrenceInputSchema),
   startDate: Schema.NullOr(Schema.String),
   subtaskCount: Schema.Number,
+  type: TaskTypeSchema,
 });
 
 export class WorkManagement extends Context.Service<
@@ -185,6 +188,7 @@ export class WorkManagement extends Context.Service<
       projectId: string,
       pagination: {
         readonly includeArchived?: boolean;
+        readonly includeBugs?: boolean;
         readonly limit: number;
         readonly offset: number;
         readonly taskId?: string;

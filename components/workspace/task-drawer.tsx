@@ -6,9 +6,11 @@ import type { ReactNode } from "react";
 import { TaskDetailsPanel } from "@/components/workspace/task-details-panel";
 
 interface DrawerTask {
+  readonly bugId?: string;
   readonly id: string;
   readonly projectId: string;
   readonly title: string;
+  readonly type?: "task" | "bug";
   readonly version: number;
 }
 
@@ -132,6 +134,8 @@ export const TaskDrawerProvider = ({
           open
           projectId={selected.projectId}
           taskId={selected.id}
+          {...(selected.bugId ? { bugId: selected.bugId } : {})}
+          taskType={selected.type ?? "task"}
           taskTitle={selected.title}
           version={version}
         />

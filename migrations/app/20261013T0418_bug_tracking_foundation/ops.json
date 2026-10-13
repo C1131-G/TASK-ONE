@@ -1,0 +1,488 @@
+[
+  {
+    "id": "table.bug_report",
+    "label": "Create table \"bug_report\"",
+    "summary": "Creates table \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"bug_report\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"bug_report\"",
+        "sql": "CREATE TABLE \"public\".\"bug_report\" (\n  \"actualBehavior\" text NOT NULL,\n  \"appVersion\" text,\n  \"browser\" text,\n  \"component\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"description\" text,\n  \"device\" text,\n  \"discoveredAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"discoverySource\" text NOT NULL,\n  \"environment\" text NOT NULL,\n  \"expectedBehavior\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"os\" text,\n  \"projectId\" uuid NOT NULL,\n  \"reporterId\" text NOT NULL,\n  \"reproductionSteps\" text[] NOT NULL,\n  \"route\" text NOT NULL,\n  \"severity\" text NOT NULL,\n  \"status\" text DEFAULT 'reported' NOT NULL,\n  \"taskId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"version\" int4 DEFAULT 1 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"bug_report_discoverySource_check_3697728e\" CHECK (\"discoverySource\" IN ('internal_qa', 'customer_report', 'support', 'automated_test', 'monitoring', 'employee_report')),\n  CONSTRAINT \"bug_report_environment_check_d2a5394b\" CHECK (\"environment\" IN ('production', 'staging', 'development', 'test', 'other')),\n  CONSTRAINT \"bug_report_reproductionSteps_elem_not_null_5718606e\" CHECK (array_position(\"reproductionSteps\", NULL) IS NULL),\n  CONSTRAINT \"bug_report_severity_check_be538c8d\" CHECK (\"severity\" IN ('blocker', 'critical', 'major', 'minor', 'trivial')),\n  CONSTRAINT \"bug_report_status_check_c394d412\" CHECK (\"status\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"bug_report\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task.type",
+    "label": "Add column \"type\" to \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "type",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"type\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "task",
+          "type"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"type\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD COLUMN \"type\" text DEFAULT 'task' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"type\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "task",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.bug_report.bug_report_taskId_key",
+    "label": "Add unique constraint on \"bug_report\" (taskId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "bug_report_taskId_key",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_taskId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_taskId_key",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"bug_report_taskId_key\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_taskId_key\" UNIQUE (\"taskId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_taskId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_taskId_key",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task.task_type_check_8ce82576",
+    "label": "Add check constraint \"task_type_check_8ce82576\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_type_check_8ce82576",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_type_check_8ce82576\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_type_check_8ce82576",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_type_check_8ce82576\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD CONSTRAINT \"task_type_check_8ce82576\" CHECK (\"type\" IN ('task', 'bug'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_type_check_8ce82576\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_type_check_8ce82576",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_projectId_idx_a96e4d92",
+    "label": "Create index \"bug_report_projectId_idx_a96e4d92\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_projectId_idx_a96e4d92",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"bug_report_projectId_idx_a96e4d92\" ON \"public\".\"bug_report\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_projectId_status_severity_discoveredAt_idx_97501c36",
+    "label": "Create index \"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_projectId_status_severity_discoveredAt_idx_97501c36",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\"",
+        "sql": "CREATE INDEX \"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\" ON \"public\".\"bug_report\" (\"projectId\", \"status\", \"severity\", \"discoveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_projectId_status_severity_discoveredAt_idx_97501c36\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_reporterId_discoveredAt_idx_f784a7c3",
+    "label": "Create index \"bug_report_reporterId_discoveredAt_idx_f784a7c3\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_reporterId_discoveredAt_idx_f784a7c3",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_reporterId_discoveredAt_idx_f784a7c3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_reporterId_discoveredAt_idx_f784a7c3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_reporterId_discoveredAt_idx_f784a7c3\"",
+        "sql": "CREATE INDEX \"bug_report_reporterId_discoveredAt_idx_f784a7c3\" ON \"public\".\"bug_report\" (\"reporterId\", \"discoveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_reporterId_discoveredAt_idx_f784a7c3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_reporterId_discoveredAt_idx_f784a7c3\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_reporterId_idx_aa245831",
+    "label": "Create index \"bug_report_reporterId_idx_aa245831\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_reporterId_idx_aa245831",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_reporterId_idx_aa245831\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_reporterId_idx_aa245831\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_reporterId_idx_aa245831\"",
+        "sql": "CREATE INDEX \"bug_report_reporterId_idx_aa245831\" ON \"public\".\"bug_report\" (\"reporterId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_reporterId_idx_aa245831\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_reporterId_idx_aa245831\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_status_discoveredAt_idx_e380dead",
+    "label": "Create index \"bug_report_status_discoveredAt_idx_e380dead\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_status_discoveredAt_idx_e380dead",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_status_discoveredAt_idx_e380dead\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_status_discoveredAt_idx_e380dead\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_status_discoveredAt_idx_e380dead\"",
+        "sql": "CREATE INDEX \"bug_report_status_discoveredAt_idx_e380dead\" ON \"public\".\"bug_report\" (\"status\", \"discoveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_status_discoveredAt_idx_e380dead\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_status_discoveredAt_idx_e380dead\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_report.bug_report_taskId_fkey",
+    "label": "Add foreign key \"bug_report_taskId_fkey\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_report_taskId_fkey",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_report_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_taskId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_report_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\"\nADD CONSTRAINT \"bug_report_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_report_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_taskId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_report.bug_report_projectId_fkey",
+    "label": "Add foreign key \"bug_report_projectId_fkey\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_report_projectId_fkey",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_report_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_projectId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_report_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\"\nADD CONSTRAINT \"bug_report_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_report_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_projectId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_report.bug_report_reporterId_fkey",
+    "label": "Add foreign key \"bug_report_reporterId_fkey\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_report_reporterId_fkey",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_report_reporterId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_reporterId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_report_reporterId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\"\nADD CONSTRAINT \"bug_report_reporterId_fkey\"\nFOREIGN KEY (\"reporterId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_report_reporterId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_reporterId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  }
+]

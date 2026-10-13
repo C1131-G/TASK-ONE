@@ -11,7 +11,11 @@ import type {
   UpdateTaskInput,
 } from "./work-contracts";
 import { decodeTaskStatus } from "./work-contracts";
-import { assertStartNotAfterDue, databaseError } from "./work-internal";
+import {
+  assertOrdinaryTask,
+  assertStartNotAfterDue,
+  databaseError,
+} from "./work-internal";
 import { notifyTaskAssignees } from "./work-notifications";
 import {
   assertActiveTaskAssignees,
@@ -48,6 +52,7 @@ export const updateTask = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt || task.project.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

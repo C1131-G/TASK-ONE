@@ -1,0 +1,25 @@
+// use prisma-8
+
+model BugRelease {
+  id                    Uuid @id @default(uuid())
+  bugReportId           Uuid
+  approvalId            Uuid
+  releasedById          String
+  version               String
+  environment           BugEnvironment
+  releasedAt            TimestamptzJsDate
+  postReleaseCheckPassed Boolean @default(false)
+  postReleaseCheckNotes String?
+  checkedAt             TimestamptzJsDate?
+  createdAt             TimestamptzJsDate @default(now())
+
+  bugReport BugReport @relation(fields: [bugReportId], references: [id], onDelete: Restrict)
+  approval BugApproval @relation(fields: [approvalId], references: [id], onDelete: Restrict)
+  releasedBy User @relation("BugReleaseActor", fields: [releasedById], references: [id], onDelete: Restrict)
+
+  @@unique([bugReportId, approvalId])
+  @@index([environment, releasedAt])
+  @@index([releasedById, releasedAt])
+  @@check(expression: "(\"postReleaseCheckPassed\" = false AND \"checkedAt\" IS NULL) OR (\"postReleaseCheckPassed\" = true AND \"checkedAt\" IS NOT NULL)", name: "bug_release_check_valid")
+  @@map("bug_release")
+}

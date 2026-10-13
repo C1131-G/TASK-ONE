@@ -64,13 +64,51 @@ it("finalizes an upload after storage metadata verification", async () => {
           taskId,
         })
       );
+      const evidenceBugId = randomUUID();
+      yield* Effect.promise(() =>
+        authPool.query("UPDATE task SET type = 'bug' WHERE id = $1", [taskId])
+      );
+      yield* Effect.promise(() =>
+        authPool.query(
+          "INSERT INTO bug_report (id, \"taskId\", \"projectId\", \"reporterId\", severity, \"discoverySource\", environment, component, route, \"reproductionSteps\", \"expectedBehavior\", \"actualBehavior\") VALUES ($1, $2, $3, $4, 'major', 'employee_report', 'test', 'UploadEvidence', '/test', ARRAY['Open the page'], 'The page works', 'The page fails')",
+          [evidenceBugId, taskId, projectId, actorId]
+        )
+      );
+      yield* Effect.promise(() =>
+        authPool.query(
+          'INSERT INTO bug_evidence (id, "bugReportId", "uploadedById", "fileAssetId", kind, caption) VALUES ($1, $2, $3, $4, \'before\', \'Before fix\')',
+          [randomUUID(), evidenceBugId, actorId, file.id]
+        )
+      );
+      const blockedEvidenceRemoval = yield* Effect.exit(
+        uploads.removeFile(actorId, file.id)
+      );
+      yield* Effect.promise(() =>
+        authPool.query('DELETE FROM bug_evidence WHERE "bugReportId" = $1', [
+          evidenceBugId,
+        ])
+      );
+      yield* Effect.promise(() =>
+        authPool.query("DELETE FROM bug_report WHERE id = $1", [evidenceBugId])
+      );
+      yield* Effect.promise(() =>
+        authPool.query("UPDATE task SET type = 'task' WHERE id = $1", [taskId])
+      );
       const undo = yield* uploads.removeFile(actorId, file.id);
       yield* uploads.undoFileRemoval(actorId, undo.undoId);
       const secondUndo = yield* Effect.exit(
         uploads.undoFileRemoval(actorId, undo.undoId)
       );
       const downloadUrl = yield* uploads.signedDownload(actorId, file.id);
-      return { downloadUrl, file, listedFiles, oversized, secondUndo, undo };
+      return {
+        blockedEvidenceRemoval,
+        downloadUrl,
+        file,
+        listedFiles,
+        oversized,
+        secondUndo,
+        undo,
+      };
     });
     const file = await Effect.runPromise(
       Effect.provide(program, Layer.provide(UploadsLive, storageLayer))
@@ -83,9 +121,17 @@ it("finalizes an upload after storage metadata verification", async () => {
     expect(file.listedFiles.map(({ id }) => id)).toContain(file.file.id);
     expect(file.undo.undoId).toBeTruthy();
     expect(file.oversized._tag).toBe("Failure");
+    expect(file.blockedEvidenceRemoval._tag).toBe("Failure");
     expect(file.downloadUrl).toBe("https://private.example/download");
     expect(file.secondUndo._tag).toBe("Failure");
   } finally {
+    await authPool.query(
+      'DELETE FROM bug_evidence WHERE "fileAssetId" IN (SELECT id FROM file_asset WHERE "projectId" = $1)',
+      [projectId]
+    );
+    await authPool.query('DELETE FROM bug_report WHERE "projectId" = $1', [
+      projectId,
+    ]);
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       actorId,
     ]);

@@ -1,0 +1,20 @@
+// use prisma-8
+
+model BugRelation {
+  id             Uuid @id @default(uuid())
+  fromBugReportId Uuid
+  toBugReportId   Uuid
+  type           BugRelationType
+  createdById    String
+  createdAt      TimestamptzJsDate @default(now())
+
+  fromBug BugReport @relation("BugRelationFrom", fields: [fromBugReportId], references: [id], onDelete: Restrict)
+  toBug   BugReport @relation("BugRelationTo", fields: [toBugReportId], references: [id], onDelete: Restrict)
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@unique([fromBugReportId, toBugReportId, type])
+  @@index([toBugReportId, type, createdAt])
+  @@index([createdById, createdAt])
+  @@check(expression: "\"fromBugReportId\" <> \"toBugReportId\"", name: "bug_relation_not_self")
+  @@map("bug_relation")
+}

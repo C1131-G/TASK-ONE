@@ -7,7 +7,7 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import type { CreatedTask } from "./work-contracts";
 import { decodeTaskPriority, decodeTaskStatus } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 import { allocateTaskNumber } from "./work-task-creation";
 
 export const moveTask = (
@@ -58,6 +58,7 @@ export const moveTask = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

@@ -181,8 +181,10 @@ it("enforces ownership on comments and subtasks created by someone else", async 
     idempotencyKey: nextKey(),
     taskId: ids.taskId,
   });
-  expect(comment.ok).toBe(true);
-  const commentId = (comment as unknown as { data: { id: string } }).data.id;
+  if (!comment.ok) {
+    throw new Error("The task owner could not create a comment.");
+  }
+  const commentId = comment.data.id;
   const removeByOutsider = await callAs(
     "outsider",
     comments.removeCommentAction,
@@ -201,12 +203,10 @@ it("enforces ownership on comments and subtasks created by someone else", async 
     expectedTaskVersion: 2,
     taskId: ids.taskId,
   });
-  expect(subtask.ok).toBe(true);
-  const created = (
-    subtask as unknown as {
-      data: { parentVersion: number; subtask: { id: string } };
-    }
-  ).data;
+  if (!subtask.ok) {
+    throw new Error("The task owner could not create a subtask.");
+  }
+  const created = subtask.data;
   for (const [action, extra] of [
     [subtasks.updateSubtaskAction, { completed: false, title: "Hijacked" }],
     [subtasks.removeSubtaskAction, {}],

@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7e3ecb92acdb436c18b9f4a11e952c59156c5c16fa8f6dba04cab511c5ffc61a'>;
+  StorageHashBase<'355cc70312fab7ba7944feadfb00a98a58e6f0fce3cc7aeb0bbd4910b49f0058'>;
 export type ExecutionHash =
-  ExecutionHashBase<'6626bacd52f04de1b6c569d8495e1eac45312ec18056cdb283b536b26ad02845'>;
+  ExecutionHashBase<'ab4815de7fa8d8bd30cbb0d59ef5d5e3ca04050cd5239406ba5593672109b2f2'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -258,6 +258,113 @@ export type FieldOutputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
     };
+    readonly BugApproval: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly comment: CodecTypes['pg/text@1']['output'] | null;
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['output'] | null;
+      readonly snapshot: CodecTypes['pg/jsonb@1']['output'];
+      readonly status: 'pending' | 'approved' | 'rejected';
+      readonly submittedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly submittedById: CodecTypes['pg/text@1']['output'];
+    };
+    readonly BugEvidence: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly caption: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly externalUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly fileAssetId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly kind: 'other' | 'before' | 'after';
+      readonly uploadedById: CodecTypes['pg/text@1']['output'];
+    };
+    readonly BugFixAttempt: {
+      readonly affectedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly authorId: CodecTypes['pg/text@1']['output'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly commitUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly fixSummary: CodecTypes['pg/text@1']['output'];
+      readonly fixedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly pullRequestUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly rootCause: CodecTypes['pg/text@1']['output'];
+      readonly testedEnvironment:
+        'production' | 'staging' | 'development' | 'test' | 'other' | null;
+      readonly testedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly verificationNotes: CodecTypes['pg/text@1']['output'] | null;
+      readonly verificationOutcome: 'passed' | 'failed' | null;
+      readonly verificationSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly verifiedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly verifiedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly version: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly BugRelation: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly createdById: CodecTypes['pg/text@1']['output'];
+      readonly fromBugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly toBugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly type: 'recurrence' | 'duplicate';
+    };
+    readonly BugRelease: {
+      readonly approvalId: CodecTypes['pg/uuid@1']['output'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly checkedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly postReleaseCheckNotes: CodecTypes['pg/text@1']['output'] | null;
+      readonly postReleaseCheckPassed: CodecTypes['pg/bool@1']['output'];
+      readonly releasedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly releasedById: CodecTypes['pg/text@1']['output'];
+      readonly version: CodecTypes['pg/text@1']['output'];
+    };
+    readonly BugReport: {
+      readonly actualBehavior: CodecTypes['pg/text@1']['output'];
+      readonly appVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly browser: CodecTypes['pg/text@1']['output'] | null;
+      readonly component: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly description: CodecTypes['pg/text@1']['output'] | null;
+      readonly device: CodecTypes['pg/text@1']['output'] | null;
+      readonly discoveredAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly discoverySource:
+        | 'internal_qa'
+        | 'customer_report'
+        | 'support'
+        | 'automated_test'
+        | 'monitoring'
+        | 'employee_report';
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly expectedBehavior: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly os: CodecTypes['pg/text@1']['output'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly reporterId: CodecTypes['pg/text@1']['output'];
+      readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly route: CodecTypes['pg/text@1']['output'];
+      readonly severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+      readonly status:
+        | 'reported'
+        | 'triaged'
+        | 'in_progress'
+        | 'in_verification'
+        | 'awaiting_admin_approval'
+        | 'approved_for_release'
+        | 'released'
+        | 'closed'
+        | 'duplicate'
+        | 'rejected';
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly version: CodecTypes['pg/int4@1']['output'];
+    };
     readonly CalendarEvent: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly createdById: CodecTypes['pg/text@1']['output'];
@@ -494,6 +601,7 @@ export type FieldOutputTypes = {
       readonly startDate: CodecTypes['pg/date-string@1']['output'] | null;
       readonly status: 'backlog' | 'todo' | 'progress' | 'review' | 'done';
       readonly title: CodecTypes['pg/text@1']['output'];
+      readonly type: 'task' | 'bug';
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
@@ -635,6 +743,113 @@ export type FieldInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
     };
+    readonly BugApproval: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly comment: CodecTypes['pg/text@1']['input'] | null;
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['input'] | null;
+      readonly snapshot: CodecTypes['pg/jsonb@1']['input'];
+      readonly status: 'pending' | 'approved' | 'rejected';
+      readonly submittedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly submittedById: CodecTypes['pg/text@1']['input'];
+    };
+    readonly BugEvidence: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly caption: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly externalUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly fileAssetId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly kind: 'other' | 'before' | 'after';
+      readonly uploadedById: CodecTypes['pg/text@1']['input'];
+    };
+    readonly BugFixAttempt: {
+      readonly affectedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly authorId: CodecTypes['pg/text@1']['input'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly commitUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly fixSummary: CodecTypes['pg/text@1']['input'];
+      readonly fixedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly pullRequestUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly rootCause: CodecTypes['pg/text@1']['input'];
+      readonly testedEnvironment:
+        'production' | 'staging' | 'development' | 'test' | 'other' | null;
+      readonly testedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly verificationNotes: CodecTypes['pg/text@1']['input'] | null;
+      readonly verificationOutcome: 'passed' | 'failed' | null;
+      readonly verificationSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly verifiedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly verifiedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly version: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly BugRelation: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly createdById: CodecTypes['pg/text@1']['input'];
+      readonly fromBugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly toBugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly type: 'recurrence' | 'duplicate';
+    };
+    readonly BugRelease: {
+      readonly approvalId: CodecTypes['pg/uuid@1']['input'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly checkedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly postReleaseCheckNotes: CodecTypes['pg/text@1']['input'] | null;
+      readonly postReleaseCheckPassed: CodecTypes['pg/bool@1']['input'];
+      readonly releasedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly releasedById: CodecTypes['pg/text@1']['input'];
+      readonly version: CodecTypes['pg/text@1']['input'];
+    };
+    readonly BugReport: {
+      readonly actualBehavior: CodecTypes['pg/text@1']['input'];
+      readonly appVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly browser: CodecTypes['pg/text@1']['input'] | null;
+      readonly component: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly description: CodecTypes['pg/text@1']['input'] | null;
+      readonly device: CodecTypes['pg/text@1']['input'] | null;
+      readonly discoveredAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly discoverySource:
+        | 'internal_qa'
+        | 'customer_report'
+        | 'support'
+        | 'automated_test'
+        | 'monitoring'
+        | 'employee_report';
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly expectedBehavior: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly os: CodecTypes['pg/text@1']['input'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly reporterId: CodecTypes['pg/text@1']['input'];
+      readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly route: CodecTypes['pg/text@1']['input'];
+      readonly severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+      readonly status:
+        | 'reported'
+        | 'triaged'
+        | 'in_progress'
+        | 'in_verification'
+        | 'awaiting_admin_approval'
+        | 'approved_for_release'
+        | 'released'
+        | 'closed'
+        | 'duplicate'
+        | 'rejected';
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly version: CodecTypes['pg/int4@1']['input'];
+    };
     readonly CalendarEvent: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly createdById: CodecTypes['pg/text@1']['input'];
@@ -871,6 +1086,7 @@ export type FieldInputTypes = {
       readonly startDate: CodecTypes['pg/date-string@1']['input'] | null;
       readonly status: 'backlog' | 'todo' | 'progress' | 'review' | 'done';
       readonly title: CodecTypes['pg/text@1']['input'];
+      readonly type: 'task' | 'bug';
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
@@ -1011,6 +1227,113 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
+    };
+    readonly bug_approval: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly comment: CodecTypes['pg/text@1']['output'] | null;
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['output'] | null;
+      readonly snapshot: CodecTypes['pg/jsonb@1']['output'];
+      readonly status: 'pending' | 'approved' | 'rejected';
+      readonly submittedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly submittedById: CodecTypes['pg/text@1']['output'];
+    };
+    readonly bug_evidence: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly caption: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly externalUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly fileAssetId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly kind: 'other' | 'before' | 'after';
+      readonly uploadedById: CodecTypes['pg/text@1']['output'];
+    };
+    readonly bug_fix_attempt: {
+      readonly affectedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly authorId: CodecTypes['pg/text@1']['output'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly commitUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly fixedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly fixSummary: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly pullRequestUrl: CodecTypes['pg/text@1']['output'] | null;
+      readonly rootCause: CodecTypes['pg/text@1']['output'];
+      readonly testedEnvironment:
+        'production' | 'staging' | 'development' | 'test' | 'other' | null;
+      readonly testedVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly verificationNotes: CodecTypes['pg/text@1']['output'] | null;
+      readonly verificationOutcome: 'passed' | 'failed' | null;
+      readonly verificationSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly verifiedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly verifiedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly version: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly bug_relation: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly createdById: CodecTypes['pg/text@1']['output'];
+      readonly fromBugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly toBugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly type: 'recurrence' | 'duplicate';
+    };
+    readonly bug_release: {
+      readonly approvalId: CodecTypes['pg/uuid@1']['output'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['output'];
+      readonly checkedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly postReleaseCheckNotes: CodecTypes['pg/text@1']['output'] | null;
+      readonly postReleaseCheckPassed: CodecTypes['pg/bool@1']['output'];
+      readonly releasedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly releasedById: CodecTypes['pg/text@1']['output'];
+      readonly version: CodecTypes['pg/text@1']['output'];
+    };
+    readonly bug_report: {
+      readonly actualBehavior: CodecTypes['pg/text@1']['output'];
+      readonly appVersion: CodecTypes['pg/text@1']['output'] | null;
+      readonly browser: CodecTypes['pg/text@1']['output'] | null;
+      readonly component: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly description: CodecTypes['pg/text@1']['output'] | null;
+      readonly device: CodecTypes['pg/text@1']['output'] | null;
+      readonly discoveredAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly discoverySource:
+        | 'internal_qa'
+        | 'customer_report'
+        | 'support'
+        | 'automated_test'
+        | 'monitoring'
+        | 'employee_report';
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly expectedBehavior: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly os: CodecTypes['pg/text@1']['output'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly reporterId: CodecTypes['pg/text@1']['output'];
+      readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly route: CodecTypes['pg/text@1']['output'];
+      readonly severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+      readonly status:
+        | 'reported'
+        | 'triaged'
+        | 'in_progress'
+        | 'in_verification'
+        | 'awaiting_admin_approval'
+        | 'approved_for_release'
+        | 'released'
+        | 'closed'
+        | 'duplicate'
+        | 'rejected';
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly version: CodecTypes['pg/int4@1']['output'];
     };
     readonly calendar_event: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -1248,6 +1571,7 @@ export type StorageColumnTypes = {
       readonly startDate: CodecTypes['pg/date-string@1']['output'] | null;
       readonly status: 'backlog' | 'todo' | 'progress' | 'review' | 'done';
       readonly title: CodecTypes['pg/text@1']['output'];
+      readonly type: 'task' | 'bug';
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
@@ -1388,6 +1712,113 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
+    };
+    readonly bug_approval: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly comment: CodecTypes['pg/text@1']['input'] | null;
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['input'] | null;
+      readonly snapshot: CodecTypes['pg/jsonb@1']['input'];
+      readonly status: 'pending' | 'approved' | 'rejected';
+      readonly submittedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly submittedById: CodecTypes['pg/text@1']['input'];
+    };
+    readonly bug_evidence: {
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly caption: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly externalUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly fileAssetId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly fixAttemptId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly kind: 'other' | 'before' | 'after';
+      readonly uploadedById: CodecTypes['pg/text@1']['input'];
+    };
+    readonly bug_fix_attempt: {
+      readonly affectedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly authorId: CodecTypes['pg/text@1']['input'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly commitUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly fixedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly fixSummary: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly pullRequestUrl: CodecTypes['pg/text@1']['input'] | null;
+      readonly rootCause: CodecTypes['pg/text@1']['input'];
+      readonly testedEnvironment:
+        'production' | 'staging' | 'development' | 'test' | 'other' | null;
+      readonly testedVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly verificationNotes: CodecTypes['pg/text@1']['input'] | null;
+      readonly verificationOutcome: 'passed' | 'failed' | null;
+      readonly verificationSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly verifiedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly verifiedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly version: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly bug_relation: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly createdById: CodecTypes['pg/text@1']['input'];
+      readonly fromBugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly toBugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly type: 'recurrence' | 'duplicate';
+    };
+    readonly bug_release: {
+      readonly approvalId: CodecTypes['pg/uuid@1']['input'];
+      readonly bugReportId: CodecTypes['pg/uuid@1']['input'];
+      readonly checkedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly postReleaseCheckNotes: CodecTypes['pg/text@1']['input'] | null;
+      readonly postReleaseCheckPassed: CodecTypes['pg/bool@1']['input'];
+      readonly releasedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly releasedById: CodecTypes['pg/text@1']['input'];
+      readonly version: CodecTypes['pg/text@1']['input'];
+    };
+    readonly bug_report: {
+      readonly actualBehavior: CodecTypes['pg/text@1']['input'];
+      readonly appVersion: CodecTypes['pg/text@1']['input'] | null;
+      readonly browser: CodecTypes['pg/text@1']['input'] | null;
+      readonly component: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly description: CodecTypes['pg/text@1']['input'] | null;
+      readonly device: CodecTypes['pg/text@1']['input'] | null;
+      readonly discoveredAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly discoverySource:
+        | 'internal_qa'
+        | 'customer_report'
+        | 'support'
+        | 'automated_test'
+        | 'monitoring'
+        | 'employee_report';
+      readonly environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+      readonly expectedBehavior: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly os: CodecTypes['pg/text@1']['input'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly reporterId: CodecTypes['pg/text@1']['input'];
+      readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly route: CodecTypes['pg/text@1']['input'];
+      readonly severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+      readonly status:
+        | 'reported'
+        | 'triaged'
+        | 'in_progress'
+        | 'in_verification'
+        | 'awaiting_admin_approval'
+        | 'approved_for_release'
+        | 'released'
+        | 'closed'
+        | 'duplicate'
+        | 'rejected';
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly version: CodecTypes['pg/int4@1']['input'];
     };
     readonly calendar_event: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
@@ -1625,6 +2056,7 @@ export type StorageColumnInputTypes = {
       readonly startDate: CodecTypes['pg/date-string@1']['input'] | null;
       readonly status: 'backlog' | 'todo' | 'progress' | 'review' | 'done';
       readonly title: CodecTypes['pg/text@1']['input'];
+      readonly type: 'task' | 'bug';
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
@@ -1772,6 +2204,155 @@ export namespace Models {
     task: public_Task | null;
     readonly [RelationKeys]?: 'actor' | 'project' | 'task';
   };
+  export type public_BugApproval = {
+    bugReportId: CodecTypes['pg/uuid@1']['output'];
+    comment: CodecTypes['pg/text@1']['output'] | null;
+    decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    decidedById: CodecTypes['pg/text@1']['output'] | null;
+    fixAttemptId: CodecTypes['pg/uuid@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    rejectionReason: CodecTypes['pg/text@1']['output'] | null;
+    snapshot: CodecTypes['pg/jsonb@1']['output'];
+    status: 'pending' | 'approved' | 'rejected';
+    submittedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    submittedById: CodecTypes['pg/text@1']['output'];
+    bugReport: public_BugReport;
+    decidedBy: public_User | null;
+    fixAttempt: public_BugFixAttempt;
+    releases: public_BugRelease[];
+    submittedBy: public_User;
+    readonly [RelationKeys]?: 'bugReport' | 'decidedBy' | 'fixAttempt' | 'releases' | 'submittedBy';
+  };
+  export type public_BugEvidence = {
+    bugReportId: CodecTypes['pg/uuid@1']['output'];
+    caption: CodecTypes['pg/text@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    externalUrl: CodecTypes['pg/text@1']['output'] | null;
+    fileAssetId: CodecTypes['pg/uuid@1']['output'] | null;
+    fixAttemptId: CodecTypes['pg/uuid@1']['output'] | null;
+    id: CodecTypes['pg/uuid@1']['output'];
+    kind: 'other' | 'before' | 'after';
+    uploadedById: CodecTypes['pg/text@1']['output'];
+    bugReport: public_BugReport;
+    fileAsset: public_FileAsset | null;
+    fixAttempt: public_BugFixAttempt | null;
+    uploadedBy: public_User;
+    readonly [RelationKeys]?: 'bugReport' | 'fileAsset' | 'fixAttempt' | 'uploadedBy';
+  };
+  export type public_BugFixAttempt = {
+    affectedVersion: CodecTypes['pg/text@1']['output'] | null;
+    authorId: CodecTypes['pg/text@1']['output'];
+    bugReportId: CodecTypes['pg/uuid@1']['output'];
+    commitUrl: CodecTypes['pg/text@1']['output'] | null;
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    fixSummary: CodecTypes['pg/text@1']['output'];
+    fixedVersion: CodecTypes['pg/text@1']['output'] | null;
+    id: CodecTypes['pg/uuid@1']['output'];
+    pullRequestUrl: CodecTypes['pg/text@1']['output'] | null;
+    rootCause: CodecTypes['pg/text@1']['output'];
+    testedEnvironment: 'production' | 'staging' | 'development' | 'test' | 'other' | null;
+    testedVersion: CodecTypes['pg/text@1']['output'] | null;
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    verificationNotes: CodecTypes['pg/text@1']['output'] | null;
+    verificationOutcome: 'passed' | 'failed' | null;
+    verificationSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+    verifiedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    verifiedById: CodecTypes['pg/text@1']['output'] | null;
+    version: CodecTypes['pg/int4@1']['output'];
+    author: public_User;
+    bugReport: public_BugReport;
+    evidence: public_BugEvidence[];
+    verifiedBy: public_User | null;
+    readonly [RelationKeys]?: 'author' | 'bugReport' | 'evidence' | 'verifiedBy';
+  };
+  export type public_BugRelation = {
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    createdById: CodecTypes['pg/text@1']['output'];
+    fromBugReportId: CodecTypes['pg/uuid@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    toBugReportId: CodecTypes['pg/uuid@1']['output'];
+    type: 'recurrence' | 'duplicate';
+    createdBy: public_User;
+    fromBug: public_BugReport;
+    toBug: public_BugReport;
+    readonly [RelationKeys]?: 'createdBy' | 'fromBug' | 'toBug';
+  };
+  export type public_BugRelease = {
+    approvalId: CodecTypes['pg/uuid@1']['output'];
+    bugReportId: CodecTypes['pg/uuid@1']['output'];
+    checkedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+    id: CodecTypes['pg/uuid@1']['output'];
+    postReleaseCheckNotes: CodecTypes['pg/text@1']['output'] | null;
+    postReleaseCheckPassed: CodecTypes['pg/bool@1']['output'];
+    releasedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    releasedById: CodecTypes['pg/text@1']['output'];
+    version: CodecTypes['pg/text@1']['output'];
+    approval: public_BugApproval;
+    bugReport: public_BugReport;
+    releasedBy: public_User;
+    readonly [RelationKeys]?: 'approval' | 'bugReport' | 'releasedBy';
+  };
+  export type public_BugReport = {
+    actualBehavior: CodecTypes['pg/text@1']['output'];
+    appVersion: CodecTypes['pg/text@1']['output'] | null;
+    browser: CodecTypes['pg/text@1']['output'] | null;
+    component: CodecTypes['pg/text@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    description: CodecTypes['pg/text@1']['output'] | null;
+    device: CodecTypes['pg/text@1']['output'] | null;
+    discoveredAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    discoverySource:
+      | 'internal_qa'
+      | 'customer_report'
+      | 'support'
+      | 'automated_test'
+      | 'monitoring'
+      | 'employee_report';
+    environment: 'production' | 'staging' | 'development' | 'test' | 'other';
+    expectedBehavior: CodecTypes['pg/text@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    os: CodecTypes['pg/text@1']['output'] | null;
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    reporterId: CodecTypes['pg/text@1']['output'];
+    reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+    route: CodecTypes['pg/text@1']['output'];
+    severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+    status:
+      | 'reported'
+      | 'triaged'
+      | 'in_progress'
+      | 'in_verification'
+      | 'awaiting_admin_approval'
+      | 'approved_for_release'
+      | 'released'
+      | 'closed'
+      | 'duplicate'
+      | 'rejected';
+    taskId: CodecTypes['pg/uuid@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    version: CodecTypes['pg/int4@1']['output'];
+    approvals: public_BugApproval[];
+    evidence: public_BugEvidence[];
+    fixAttempts: public_BugFixAttempt[];
+    project: public_Project;
+    relationsFrom: public_BugRelation[];
+    relationsTo: public_BugRelation[];
+    releases: public_BugRelease[];
+    reporter: public_User;
+    task: public_Task;
+    readonly [RelationKeys]?:
+      | 'approvals'
+      | 'evidence'
+      | 'fixAttempts'
+      | 'project'
+      | 'relationsFrom'
+      | 'relationsTo'
+      | 'releases'
+      | 'reporter'
+      | 'task';
+  };
   export type public_CalendarEvent = {
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
     createdById: CodecTypes['pg/text@1']['output'];
@@ -1859,11 +2440,12 @@ export namespace Models {
     storageKey: CodecTypes['pg/text@1']['output'];
     taskId: CodecTypes['pg/uuid@1']['output'] | null;
     uploadedById: CodecTypes['pg/text@1']['output'];
+    bugEvidence: public_BugEvidence[];
     deletedBy: public_User | null;
     project: public_Project;
     task: public_Task | null;
     uploadedBy: public_User;
-    readonly [RelationKeys]?: 'deletedBy' | 'project' | 'task' | 'uploadedBy';
+    readonly [RelationKeys]?: 'bugEvidence' | 'deletedBy' | 'project' | 'task' | 'uploadedBy';
   };
   export type public_IdempotencyKey = {
     actorId: CodecTypes['pg/text@1']['output'];
@@ -1947,11 +2529,14 @@ export namespace Models {
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
     archivedBy: public_User | null;
+    bugReports: public_BugReport[];
+    files: public_FileAsset[];
     lead: public_User | null;
     taskCounter: public_ProjectTaskCounter | null;
     team: public_Team | null;
     uploadIntents: public_UploadIntent[];
-    readonly [RelationKeys]?: 'archivedBy' | 'lead' | 'taskCounter' | 'team' | 'uploadIntents';
+    readonly [RelationKeys]?:
+      'archivedBy' | 'bugReports' | 'files' | 'lead' | 'taskCounter' | 'team' | 'uploadIntents';
   };
   export type public_ProjectMember = {
     joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -2072,17 +2657,22 @@ export namespace Models {
     startDate: CodecTypes['pg/date-string@1']['output'] | null;
     status: 'backlog' | 'todo' | 'progress' | 'review' | 'done';
     title: CodecTypes['pg/text@1']['output'];
+    type: 'task' | 'bug';
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
     archivedBy: public_User | null;
+    bugReport: public_BugReport | null;
     createdBy: public_User;
+    files: public_FileAsset[];
     project: public_Project;
     recurrenceSources: public_RecurrenceGeneration[];
     recurrenceSuccessor: public_RecurrenceGeneration | null;
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
       | 'archivedBy'
+      | 'bugReport'
       | 'createdBy'
+      | 'files'
       | 'project'
       | 'recurrenceSources'
       | 'recurrenceSuccessor'
@@ -2205,21 +2795,37 @@ export namespace Models {
     timeZone: CodecTypes['pg/text@1']['output'] | null;
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     assignedSubtasks: public_TaskSubtask[];
+    bugApprovalSubmissions: public_BugApproval[];
+    bugApprovals: public_BugApproval[];
+    bugEvidenceUploads: public_BugEvidence[];
+    bugFixAttempts: public_BugFixAttempt[];
+    bugReleases: public_BugRelease[];
+    bugVerifications: public_BugFixAttempt[];
+    createdBugRelations: public_BugRelation[];
     deactivatedBy: public_User | null;
     deactivatedUsers: public_User[];
     idempotencyKeys: public_IdempotencyKey[];
     pushDeliveries: public_PushDelivery[];
     pushSubscriptions: public_PushSubscription[];
+    reportedBugs: public_BugReport[];
     team: public_Team | null;
     undoRecords: public_UndoRecord[];
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
       | 'assignedSubtasks'
+      | 'bugApprovalSubmissions'
+      | 'bugApprovals'
+      | 'bugEvidenceUploads'
+      | 'bugFixAttempts'
+      | 'bugReleases'
+      | 'bugVerifications'
+      | 'createdBugRelations'
       | 'deactivatedBy'
       | 'deactivatedUsers'
       | 'idempotencyKeys'
       | 'pushDeliveries'
       | 'pushSubscriptions'
+      | 'reportedBugs'
       | 'team'
       | 'undoRecords'
       | 'uploadIntents';
@@ -2248,6 +2854,12 @@ export declare const models: {
   public: {
     Account: Models.public_Account;
     Activity: Models.public_Activity;
+    BugApproval: Models.public_BugApproval;
+    BugEvidence: Models.public_BugEvidence;
+    BugFixAttempt: Models.public_BugFixAttempt;
+    BugRelation: Models.public_BugRelation;
+    BugRelease: Models.public_BugRelease;
+    BugReport: Models.public_BugReport;
     CalendarEvent: Models.public_CalendarEvent;
     CalendarEventAttendee: Models.public_CalendarEventAttendee;
     Comment: Models.public_Comment;
@@ -2539,6 +3151,1015 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_approval: {
+              columns: {
+                readonly bugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly comment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly decidedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly decidedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly fixAttemptId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly rejectionReason: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly snapshot: {
+                  readonly dataType: 'pg/jsonb';
+                  readonly codecId: 'pg/jsonb@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'pending'>;
+                  };
+                  readonly many: false;
+                };
+                readonly submittedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly submittedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['bugReportId', 'fixAttemptId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_approval_bugReportId_idx_4618d902';
+                  readonly prefix: 'bug_approval_bugReportId_idx';
+                  readonly columns: readonly ['bugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_decidedById_decidedAt_idx_3d834c72';
+                  readonly prefix: 'bug_approval_decidedById_decidedAt_idx';
+                  readonly columns: readonly ['decidedById', 'decidedAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_decidedById_idx_8194d55f';
+                  readonly prefix: 'bug_approval_decidedById_idx';
+                  readonly columns: readonly ['decidedById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_fixAttemptId_idx_5b228f52';
+                  readonly prefix: 'bug_approval_fixAttemptId_idx';
+                  readonly columns: readonly ['fixAttemptId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_status_submittedAt_idx_0938dd64';
+                  readonly prefix: 'bug_approval_status_submittedAt_idx';
+                  readonly columns: readonly ['status', 'submittedAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_submittedById_idx_89341c73';
+                  readonly prefix: 'bug_approval_submittedById_idx';
+                  readonly columns: readonly ['submittedById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_approval_submittedById_submittedAt_idx_b877594d';
+                  readonly prefix: 'bug_approval_submittedById_submittedAt_idx';
+                  readonly columns: readonly ['submittedById', 'submittedAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_approval';
+                    readonly columns: readonly ['bugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_approval';
+                    readonly columns: readonly ['fixAttemptId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_fix_attempt';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_approval';
+                    readonly columns: readonly ['submittedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_approval';
+                    readonly columns: readonly ['decidedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_evidence: {
+              columns: {
+                readonly bugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly caption: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly externalUrl: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly fileAssetId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly fixAttemptId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly kind: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly uploadedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_evidence_bugReportId_idx_4618d902';
+                  readonly prefix: 'bug_evidence_bugReportId_idx';
+                  readonly columns: readonly ['bugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_bugReportId_kind_createdAt_idx_a038a98e';
+                  readonly prefix: 'bug_evidence_bugReportId_kind_createdAt_idx';
+                  readonly columns: readonly ['bugReportId', 'kind', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_fileAssetId_idx_84361fdc';
+                  readonly prefix: 'bug_evidence_fileAssetId_idx';
+                  readonly columns: readonly ['fileAssetId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_fixAttemptId_idx_5b228f52';
+                  readonly prefix: 'bug_evidence_fixAttemptId_idx';
+                  readonly columns: readonly ['fixAttemptId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_fixAttemptId_kind_idx_33642ef0';
+                  readonly prefix: 'bug_evidence_fixAttemptId_kind_idx';
+                  readonly columns: readonly ['fixAttemptId', 'kind'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_uploadedById_createdAt_idx_7e8cc7c7';
+                  readonly prefix: 'bug_evidence_uploadedById_createdAt_idx';
+                  readonly columns: readonly ['uploadedById', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_evidence_uploadedById_idx_b92fad21';
+                  readonly prefix: 'bug_evidence_uploadedById_idx';
+                  readonly columns: readonly ['uploadedById'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_evidence';
+                    readonly columns: readonly ['bugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_evidence';
+                    readonly columns: readonly ['fixAttemptId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_fix_attempt';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_evidence';
+                    readonly columns: readonly ['fileAssetId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'file_asset';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_evidence';
+                    readonly columns: readonly ['uploadedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_fix_attempt: {
+              columns: {
+                readonly affectedVersion: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly authorId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly bugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly commitUrl: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly fixSummary: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly fixedVersion: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly pullRequestUrl: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly rootCause: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly testedEnvironment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly testedVersion: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly verificationNotes: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly verificationOutcome: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly verificationSteps: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: { readonly elementNullable: false };
+                };
+                readonly verifiedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly verifiedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 1>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_fix_attempt_authorId_createdAt_idx_854b4c86';
+                  readonly prefix: 'bug_fix_attempt_authorId_createdAt_idx';
+                  readonly columns: readonly ['authorId', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_fix_attempt_authorId_idx_e47547ed';
+                  readonly prefix: 'bug_fix_attempt_authorId_idx';
+                  readonly columns: readonly ['authorId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_fix_attempt_bugReportId_createdAt_idx_010ffdcd';
+                  readonly prefix: 'bug_fix_attempt_bugReportId_createdAt_idx';
+                  readonly columns: readonly ['bugReportId', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_fix_attempt_bugReportId_idx_4618d902';
+                  readonly prefix: 'bug_fix_attempt_bugReportId_idx';
+                  readonly columns: readonly ['bugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_fix_attempt_verificationOutcome_verifiedAt_idx_92ddf49a';
+                  readonly prefix: 'bug_fix_attempt_verificationOutcome_verifiedAt_idx';
+                  readonly columns: readonly ['verificationOutcome', 'verifiedAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_fix_attempt_verifiedById_idx_dfd74b37';
+                  readonly prefix: 'bug_fix_attempt_verifiedById_idx';
+                  readonly columns: readonly ['verifiedById'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_fix_attempt';
+                    readonly columns: readonly ['bugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_fix_attempt';
+                    readonly columns: readonly ['authorId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_fix_attempt';
+                    readonly columns: readonly ['verifiedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_relation: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly createdById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly fromBugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly toBugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly type: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['fromBugReportId', 'toBugReportId', 'type'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_relation_createdById_createdAt_idx_bbcfd794';
+                  readonly prefix: 'bug_relation_createdById_createdAt_idx';
+                  readonly columns: readonly ['createdById', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_relation_createdById_idx_8bf640ed';
+                  readonly prefix: 'bug_relation_createdById_idx';
+                  readonly columns: readonly ['createdById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_relation_fromBugReportId_idx_8cf8c85f';
+                  readonly prefix: 'bug_relation_fromBugReportId_idx';
+                  readonly columns: readonly ['fromBugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_relation_toBugReportId_idx_0886872a';
+                  readonly prefix: 'bug_relation_toBugReportId_idx';
+                  readonly columns: readonly ['toBugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_relation_toBugReportId_type_createdAt_idx_30839378';
+                  readonly prefix: 'bug_relation_toBugReportId_type_createdAt_idx';
+                  readonly columns: readonly ['toBugReportId', 'type', 'createdAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_relation';
+                    readonly columns: readonly ['fromBugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_relation';
+                    readonly columns: readonly ['toBugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_relation';
+                    readonly columns: readonly ['createdById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_release: {
+              columns: {
+                readonly approvalId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly bugReportId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly checkedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly environment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly postReleaseCheckNotes: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly postReleaseCheckPassed: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly releasedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly releasedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['bugReportId', 'approvalId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_release_approvalId_idx_23d09a03';
+                  readonly prefix: 'bug_release_approvalId_idx';
+                  readonly columns: readonly ['approvalId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_release_bugReportId_idx_4618d902';
+                  readonly prefix: 'bug_release_bugReportId_idx';
+                  readonly columns: readonly ['bugReportId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_release_environment_releasedAt_idx_a0a953ca';
+                  readonly prefix: 'bug_release_environment_releasedAt_idx';
+                  readonly columns: readonly ['environment', 'releasedAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_release_releasedById_idx_f27c26c4';
+                  readonly prefix: 'bug_release_releasedById_idx';
+                  readonly columns: readonly ['releasedById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_release_releasedById_releasedAt_idx_6f231d18';
+                  readonly prefix: 'bug_release_releasedById_releasedAt_idx';
+                  readonly columns: readonly ['releasedById', 'releasedAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_release';
+                    readonly columns: readonly ['bugReportId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_release';
+                    readonly columns: readonly ['approvalId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_approval';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_release';
+                    readonly columns: readonly ['releasedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly bug_report: {
+              columns: {
+                readonly actualBehavior: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly appVersion: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly browser: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly component: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly description: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly device: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly discoveredAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly discoverySource: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly environment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly expectedBehavior: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly os: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly reporterId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly reproductionSteps: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: { readonly elementNullable: false };
+                };
+                readonly route: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly severity: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'reported'>;
+                  };
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 1>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['taskId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'bug_report_projectId_idx_a96e4d92';
+                  readonly prefix: 'bug_report_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_report_projectId_status_severity_discoveredAt_idx_97501c36';
+                  readonly prefix: 'bug_report_projectId_status_severity_discoveredAt_idx';
+                  readonly columns: readonly ['projectId', 'status', 'severity', 'discoveredAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_report_reporterId_discoveredAt_idx_f784a7c3';
+                  readonly prefix: 'bug_report_reporterId_discoveredAt_idx';
+                  readonly columns: readonly ['reporterId', 'discoveredAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_report_reporterId_idx_aa245831';
+                  readonly prefix: 'bug_report_reporterId_idx';
+                  readonly columns: readonly ['reporterId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'bug_report_status_discoveredAt_idx_e380dead';
+                  readonly prefix: 'bug_report_status_discoveredAt_idx';
+                  readonly columns: readonly ['status', 'discoveredAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bug_report';
+                    readonly columns: readonly ['reporterId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -4806,6 +6427,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly type: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'task'>;
+                  };
+                  readonly many: false;
+                };
                 readonly updatedAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
@@ -5968,6 +7599,56 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly BugApprovalStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['pending', 'approved', 'rejected'];
+            };
+            readonly BugDiscoverySource: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'internal_qa',
+                'customer_report',
+                'support',
+                'automated_test',
+                'monitoring',
+                'employee_report',
+              ];
+            };
+            readonly BugEnvironment: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['production', 'staging', 'development', 'test', 'other'];
+            };
+            readonly BugEvidenceKind: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['other', 'before', 'after'];
+            };
+            readonly BugRelationType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['recurrence', 'duplicate'];
+            };
+            readonly BugSeverity: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['blocker', 'critical', 'major', 'minor', 'trivial'];
+            };
+            readonly BugVerificationOutcome: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['passed', 'failed'];
+            };
+            readonly BugWorkflowStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'reported',
+                'triaged',
+                'in_progress',
+                'in_verification',
+                'awaiting_admin_approval',
+                'approved_for_release',
+                'released',
+                'closed',
+                'duplicate',
+                'rejected',
+              ];
+            };
             readonly NotificationType: {
               readonly kind: 'valueSet';
               readonly values: readonly ['mention', 'assignment', 'comment', 'update', 'due'];
@@ -5992,6 +7673,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['backlog', 'todo', 'progress', 'review', 'done'];
             };
+            readonly TaskType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['task', 'bug'];
+            };
           };
         };
       };
@@ -6005,6 +7690,30 @@ type ContractBase = Omit<
   readonly roots: {
     readonly account: { readonly namespace: 'public' & NamespaceId; readonly model: 'Account' };
     readonly activity: { readonly namespace: 'public' & NamespaceId; readonly model: 'Activity' };
+    readonly bug_approval: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugApproval';
+    };
+    readonly bug_evidence: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugEvidence';
+    };
+    readonly bug_fix_attempt: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugFixAttempt';
+    };
+    readonly bug_relation: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugRelation';
+    };
+    readonly bug_release: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugRelease';
+    };
+    readonly bug_report: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BugReport';
+    };
     readonly calendar_event: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'CalendarEvent';
@@ -6302,6 +8011,810 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly projectId: { readonly column: 'projectId' };
                 readonly taskId: { readonly column: 'taskId' };
+              };
+            };
+          };
+          readonly BugApproval: {
+            readonly fields: {
+              readonly bugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly comment: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly decidedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly decidedById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly fixAttemptId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly rejectionReason: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly snapshot: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/jsonb@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly submittedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly submittedById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly bugReport: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['bugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly decidedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['decidedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly fixAttempt: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugFixAttempt';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['fixAttemptId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly releases: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelease';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['approvalId'];
+                };
+              };
+              readonly submittedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['submittedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_approval';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly bugReportId: { readonly column: 'bugReportId' };
+                readonly comment: { readonly column: 'comment' };
+                readonly decidedAt: { readonly column: 'decidedAt' };
+                readonly decidedById: { readonly column: 'decidedById' };
+                readonly fixAttemptId: { readonly column: 'fixAttemptId' };
+                readonly id: { readonly column: 'id' };
+                readonly rejectionReason: { readonly column: 'rejectionReason' };
+                readonly snapshot: { readonly column: 'snapshot' };
+                readonly status: { readonly column: 'status' };
+                readonly submittedAt: { readonly column: 'submittedAt' };
+                readonly submittedById: { readonly column: 'submittedById' };
+              };
+            };
+          };
+          readonly BugEvidence: {
+            readonly fields: {
+              readonly bugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly caption: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly externalUrl: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly fileAssetId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly fixAttemptId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly uploadedById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly bugReport: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['bugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly fileAsset: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'FileAsset';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['fileAssetId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly fixAttempt: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugFixAttempt';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['fixAttemptId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly uploadedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['uploadedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_evidence';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly bugReportId: { readonly column: 'bugReportId' };
+                readonly caption: { readonly column: 'caption' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly externalUrl: { readonly column: 'externalUrl' };
+                readonly fileAssetId: { readonly column: 'fileAssetId' };
+                readonly fixAttemptId: { readonly column: 'fixAttemptId' };
+                readonly id: { readonly column: 'id' };
+                readonly kind: { readonly column: 'kind' };
+                readonly uploadedById: { readonly column: 'uploadedById' };
+              };
+            };
+          };
+          readonly BugFixAttempt: {
+            readonly fields: {
+              readonly affectedVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly authorId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly bugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly commitUrl: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly fixSummary: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly fixedVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly pullRequestUrl: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly rootCause: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly testedEnvironment: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly testedVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly verificationNotes: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly verificationOutcome: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly verificationSteps: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+                readonly many: { readonly elementNullable: false };
+              };
+              readonly verifiedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly verifiedById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly author: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['authorId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly bugReport: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['bugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly evidence: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugEvidence';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fixAttemptId'];
+                };
+              };
+              readonly verifiedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['verifiedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_fix_attempt';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly affectedVersion: { readonly column: 'affectedVersion' };
+                readonly authorId: { readonly column: 'authorId' };
+                readonly bugReportId: { readonly column: 'bugReportId' };
+                readonly commitUrl: { readonly column: 'commitUrl' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly fixSummary: { readonly column: 'fixSummary' };
+                readonly fixedVersion: { readonly column: 'fixedVersion' };
+                readonly id: { readonly column: 'id' };
+                readonly pullRequestUrl: { readonly column: 'pullRequestUrl' };
+                readonly rootCause: { readonly column: 'rootCause' };
+                readonly testedEnvironment: { readonly column: 'testedEnvironment' };
+                readonly testedVersion: { readonly column: 'testedVersion' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly verificationNotes: { readonly column: 'verificationNotes' };
+                readonly verificationOutcome: { readonly column: 'verificationOutcome' };
+                readonly verificationSteps: { readonly column: 'verificationSteps' };
+                readonly verifiedAt: { readonly column: 'verifiedAt' };
+                readonly verifiedById: { readonly column: 'verifiedById' };
+                readonly version: { readonly column: 'version' };
+              };
+            };
+          };
+          readonly BugRelation: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly createdById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly fromBugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly toBugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly createdBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['createdById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly fromBug: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['fromBugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly toBug: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['toBugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_relation';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly createdById: { readonly column: 'createdById' };
+                readonly fromBugReportId: { readonly column: 'fromBugReportId' };
+                readonly id: { readonly column: 'id' };
+                readonly toBugReportId: { readonly column: 'toBugReportId' };
+                readonly type: { readonly column: 'type' };
+              };
+            };
+          };
+          readonly BugRelease: {
+            readonly fields: {
+              readonly approvalId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly bugReportId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly checkedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly environment: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly postReleaseCheckNotes: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly postReleaseCheckPassed: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly releasedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly releasedById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly approval: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugApproval';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['approvalId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly bugReport: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['bugReportId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly releasedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['releasedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_release';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly approvalId: { readonly column: 'approvalId' };
+                readonly bugReportId: { readonly column: 'bugReportId' };
+                readonly checkedAt: { readonly column: 'checkedAt' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly environment: { readonly column: 'environment' };
+                readonly id: { readonly column: 'id' };
+                readonly postReleaseCheckNotes: { readonly column: 'postReleaseCheckNotes' };
+                readonly postReleaseCheckPassed: { readonly column: 'postReleaseCheckPassed' };
+                readonly releasedAt: { readonly column: 'releasedAt' };
+                readonly releasedById: { readonly column: 'releasedById' };
+                readonly version: { readonly column: 'version' };
+              };
+            };
+          };
+          readonly BugReport: {
+            readonly fields: {
+              readonly actualBehavior: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly appVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly browser: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly component: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly description: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly device: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly discoveredAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly discoverySource: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly environment: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly expectedBehavior: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly os: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly reporterId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly reproductionSteps: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+                readonly many: { readonly elementNullable: false };
+              };
+              readonly route: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly severity: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly taskId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly approvals: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugApproval';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['bugReportId'];
+                };
+              };
+              readonly evidence: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugEvidence';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['bugReportId'];
+                };
+              };
+              readonly fixAttempts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugFixAttempt';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['bugReportId'];
+                };
+              };
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly relationsFrom: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelation';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fromBugReportId'];
+                };
+              };
+              readonly relationsTo: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelation';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['toBugReportId'];
+                };
+              };
+              readonly releases: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelease';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['bugReportId'];
+                };
+              };
+              readonly reporter: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['reporterId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'bug_report';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly actualBehavior: { readonly column: 'actualBehavior' };
+                readonly appVersion: { readonly column: 'appVersion' };
+                readonly browser: { readonly column: 'browser' };
+                readonly component: { readonly column: 'component' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly description: { readonly column: 'description' };
+                readonly device: { readonly column: 'device' };
+                readonly discoveredAt: { readonly column: 'discoveredAt' };
+                readonly discoverySource: { readonly column: 'discoverySource' };
+                readonly environment: { readonly column: 'environment' };
+                readonly expectedBehavior: { readonly column: 'expectedBehavior' };
+                readonly id: { readonly column: 'id' };
+                readonly os: { readonly column: 'os' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly reporterId: { readonly column: 'reporterId' };
+                readonly reproductionSteps: { readonly column: 'reproductionSteps' };
+                readonly route: { readonly column: 'route' };
+                readonly severity: { readonly column: 'severity' };
+                readonly status: { readonly column: 'status' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly version: { readonly column: 'version' };
               };
             };
           };
@@ -6810,6 +9323,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly bugEvidence: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugEvidence';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fileAssetId'];
+                };
+              };
               readonly deletedBy: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -7319,6 +9843,28 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['archivedById'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly bugReports: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+              readonly files: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'FileAsset';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
                 };
               };
               readonly lead: {
@@ -8046,6 +10592,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly updatedAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -8068,6 +10618,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly bugReport: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
+                };
+              };
               readonly createdBy: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -8075,6 +10637,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['createdById'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly files: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'FileAsset';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
                 };
               };
               readonly project: {
@@ -8144,6 +10717,7 @@ type ContractBase = Omit<
                 readonly startDate: { readonly column: 'startDate' };
                 readonly status: { readonly column: 'status' };
                 readonly title: { readonly column: 'title' };
+                readonly type: { readonly column: 'type' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly version: { readonly column: 'version' };
               };
@@ -8817,6 +11391,83 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['assigneeId'];
                 };
               };
+              readonly bugApprovalSubmissions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugApproval';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['submittedById'];
+                };
+              };
+              readonly bugApprovals: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugApproval';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['decidedById'];
+                };
+              };
+              readonly bugEvidenceUploads: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugEvidence';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['uploadedById'];
+                };
+              };
+              readonly bugFixAttempts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugFixAttempt';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['authorId'];
+                };
+              };
+              readonly bugReleases: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelease';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['releasedById'];
+                };
+              };
+              readonly bugVerifications: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugFixAttempt';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['verifiedById'];
+                };
+              };
+              readonly createdBugRelations: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugRelation';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['createdById'];
+                };
+              };
               readonly deactivatedBy: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -8865,6 +11516,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly reportedBugs: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BugReport';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['reporterId'];
                 };
               };
               readonly team: {
@@ -9026,6 +11688,82 @@ type ContractBase = Omit<
           };
         };
         readonly enum: {
+          readonly BugApprovalStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Pending'; readonly value: 'pending' },
+              { readonly name: 'Approved'; readonly value: 'approved' },
+              { readonly name: 'Rejected'; readonly value: 'rejected' },
+            ];
+          };
+          readonly BugDiscoverySource: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'InternalQa'; readonly value: 'internal_qa' },
+              { readonly name: 'CustomerReport'; readonly value: 'customer_report' },
+              { readonly name: 'Support'; readonly value: 'support' },
+              { readonly name: 'AutomatedTest'; readonly value: 'automated_test' },
+              { readonly name: 'Monitoring'; readonly value: 'monitoring' },
+              { readonly name: 'EmployeeReport'; readonly value: 'employee_report' },
+            ];
+          };
+          readonly BugEnvironment: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Production'; readonly value: 'production' },
+              { readonly name: 'Staging'; readonly value: 'staging' },
+              { readonly name: 'Development'; readonly value: 'development' },
+              { readonly name: 'Test'; readonly value: 'test' },
+              { readonly name: 'Other'; readonly value: 'other' },
+            ];
+          };
+          readonly BugEvidenceKind: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Other'; readonly value: 'other' },
+              { readonly name: 'Before'; readonly value: 'before' },
+              { readonly name: 'After'; readonly value: 'after' },
+            ];
+          };
+          readonly BugRelationType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Recurrence'; readonly value: 'recurrence' },
+              { readonly name: 'Duplicate'; readonly value: 'duplicate' },
+            ];
+          };
+          readonly BugSeverity: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Blocker'; readonly value: 'blocker' },
+              { readonly name: 'Critical'; readonly value: 'critical' },
+              { readonly name: 'Major'; readonly value: 'major' },
+              { readonly name: 'Minor'; readonly value: 'minor' },
+              { readonly name: 'Trivial'; readonly value: 'trivial' },
+            ];
+          };
+          readonly BugVerificationOutcome: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Passed'; readonly value: 'passed' },
+              { readonly name: 'Failed'; readonly value: 'failed' },
+            ];
+          };
+          readonly BugWorkflowStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Reported'; readonly value: 'reported' },
+              { readonly name: 'Triaged'; readonly value: 'triaged' },
+              { readonly name: 'InProgress'; readonly value: 'in_progress' },
+              { readonly name: 'InVerification'; readonly value: 'in_verification' },
+              { readonly name: 'AwaitingAdminApproval'; readonly value: 'awaiting_admin_approval' },
+              { readonly name: 'ApprovedForRelease'; readonly value: 'approved_for_release' },
+              { readonly name: 'Released'; readonly value: 'released' },
+              { readonly name: 'Closed'; readonly value: 'closed' },
+              { readonly name: 'Duplicate'; readonly value: 'duplicate' },
+              { readonly name: 'Rejected'; readonly value: 'rejected' },
+            ];
+          };
           readonly NotificationType: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -9085,6 +11823,13 @@ type ContractBase = Omit<
               { readonly name: 'Done'; readonly value: 'done' },
             ];
           };
+          readonly TaskType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Task'; readonly value: 'task' },
+              { readonly name: 'Bug'; readonly value: 'bug' },
+            ];
+          };
         };
       };
     };
@@ -9125,6 +11870,54 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'activity';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_approval';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_evidence';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_fix_attempt';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_relation';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_release';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'bug_report';
             readonly field: 'id';
             readonly namespace: 'public';
           };

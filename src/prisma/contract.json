@@ -12,6 +12,30 @@
       "model": "Activity",
       "namespace": "public"
     },
+    "bug_approval": {
+      "model": "BugApproval",
+      "namespace": "public"
+    },
+    "bug_evidence": {
+      "model": "BugEvidence",
+      "namespace": "public"
+    },
+    "bug_fix_attempt": {
+      "model": "BugFixAttempt",
+      "namespace": "public"
+    },
+    "bug_relation": {
+      "model": "BugRelation",
+      "namespace": "public"
+    },
+    "bug_release": {
+      "model": "BugRelease",
+      "namespace": "public"
+    },
+    "bug_report": {
+      "model": "BugReport",
+      "namespace": "public"
+    },
     "calendar_event": {
       "model": "CalendarEvent",
       "namespace": "public"
@@ -161,6 +185,190 @@
     "namespaces": {
       "public": {
         "enum": {
+          "BugApprovalStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Pending",
+                "value": "pending"
+              },
+              {
+                "name": "Approved",
+                "value": "approved"
+              },
+              {
+                "name": "Rejected",
+                "value": "rejected"
+              }
+            ]
+          },
+          "BugDiscoverySource": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "InternalQa",
+                "value": "internal_qa"
+              },
+              {
+                "name": "CustomerReport",
+                "value": "customer_report"
+              },
+              {
+                "name": "Support",
+                "value": "support"
+              },
+              {
+                "name": "AutomatedTest",
+                "value": "automated_test"
+              },
+              {
+                "name": "Monitoring",
+                "value": "monitoring"
+              },
+              {
+                "name": "EmployeeReport",
+                "value": "employee_report"
+              }
+            ]
+          },
+          "BugEnvironment": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Production",
+                "value": "production"
+              },
+              {
+                "name": "Staging",
+                "value": "staging"
+              },
+              {
+                "name": "Development",
+                "value": "development"
+              },
+              {
+                "name": "Test",
+                "value": "test"
+              },
+              {
+                "name": "Other",
+                "value": "other"
+              }
+            ]
+          },
+          "BugEvidenceKind": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Other",
+                "value": "other"
+              },
+              {
+                "name": "Before",
+                "value": "before"
+              },
+              {
+                "name": "After",
+                "value": "after"
+              }
+            ]
+          },
+          "BugRelationType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Recurrence",
+                "value": "recurrence"
+              },
+              {
+                "name": "Duplicate",
+                "value": "duplicate"
+              }
+            ]
+          },
+          "BugSeverity": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Blocker",
+                "value": "blocker"
+              },
+              {
+                "name": "Critical",
+                "value": "critical"
+              },
+              {
+                "name": "Major",
+                "value": "major"
+              },
+              {
+                "name": "Minor",
+                "value": "minor"
+              },
+              {
+                "name": "Trivial",
+                "value": "trivial"
+              }
+            ]
+          },
+          "BugVerificationOutcome": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Passed",
+                "value": "passed"
+              },
+              {
+                "name": "Failed",
+                "value": "failed"
+              }
+            ]
+          },
+          "BugWorkflowStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Reported",
+                "value": "reported"
+              },
+              {
+                "name": "Triaged",
+                "value": "triaged"
+              },
+              {
+                "name": "InProgress",
+                "value": "in_progress"
+              },
+              {
+                "name": "InVerification",
+                "value": "in_verification"
+              },
+              {
+                "name": "AwaitingAdminApproval",
+                "value": "awaiting_admin_approval"
+              },
+              {
+                "name": "ApprovedForRelease",
+                "value": "approved_for_release"
+              },
+              {
+                "name": "Released",
+                "value": "released"
+              },
+              {
+                "name": "Closed",
+                "value": "closed"
+              },
+              {
+                "name": "Duplicate",
+                "value": "duplicate"
+              },
+              {
+                "name": "Rejected",
+                "value": "rejected"
+              }
+            ]
+          },
           "NotificationType": {
             "codecId": "pg/text@1",
             "members": [
@@ -304,6 +512,19 @@
               {
                 "name": "Done",
                 "value": "done"
+              }
+            ]
+          },
+          "TaskType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Task",
+                "value": "task"
+              },
+              {
+                "name": "Bug",
+                "value": "bug"
               }
             ]
           }
@@ -595,6 +816,1364 @@
               },
               "namespaceId": "public",
               "table": "activity"
+            }
+          },
+          "BugApproval": {
+            "fields": {
+              "bugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "comment": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "decidedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "decidedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fixAttemptId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "rejectionReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "snapshot": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugApprovalStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "submittedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "submittedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "bugReport": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "decidedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "decidedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "fixAttempt": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fixAttemptId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "releases": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "approvalId"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelease",
+                  "namespace": "public"
+                }
+              },
+              "submittedBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "submittedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "bugReportId": {
+                  "column": "bugReportId"
+                },
+                "comment": {
+                  "column": "comment"
+                },
+                "decidedAt": {
+                  "column": "decidedAt"
+                },
+                "decidedById": {
+                  "column": "decidedById"
+                },
+                "fixAttemptId": {
+                  "column": "fixAttemptId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "rejectionReason": {
+                  "column": "rejectionReason"
+                },
+                "snapshot": {
+                  "column": "snapshot"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "submittedAt": {
+                  "column": "submittedAt"
+                },
+                "submittedById": {
+                  "column": "submittedById"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_approval"
+            }
+          },
+          "BugEvidence": {
+            "fields": {
+              "bugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "caption": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "externalUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fileAssetId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "fixAttemptId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "kind": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugEvidenceKind",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "uploadedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "bugReport": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "fileAsset": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "fileAssetId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "FileAsset",
+                  "namespace": "public"
+                }
+              },
+              "fixAttempt": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "fixAttemptId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "uploadedBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "uploadedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "bugReportId": {
+                  "column": "bugReportId"
+                },
+                "caption": {
+                  "column": "caption"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "externalUrl": {
+                  "column": "externalUrl"
+                },
+                "fileAssetId": {
+                  "column": "fileAssetId"
+                },
+                "fixAttemptId": {
+                  "column": "fixAttemptId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "kind": {
+                  "column": "kind"
+                },
+                "uploadedById": {
+                  "column": "uploadedById"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_evidence"
+            }
+          },
+          "BugFixAttempt": {
+            "fields": {
+              "affectedVersion": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "authorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "bugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "commitUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "fixSummary": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fixedVersion": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "pullRequestUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "rootCause": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "testedEnvironment": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugEnvironment",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "testedVersion": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "verificationNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "verificationOutcome": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugVerificationOutcome",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "verificationSteps": {
+                "many": {
+                  "elementNullable": false
+                },
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "verifiedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "verifiedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "author": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "authorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "bugReport": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "evidence": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fixAttemptId"
+                  ]
+                },
+                "to": {
+                  "model": "BugEvidence",
+                  "namespace": "public"
+                }
+              },
+              "verifiedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "verifiedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "affectedVersion": {
+                  "column": "affectedVersion"
+                },
+                "authorId": {
+                  "column": "authorId"
+                },
+                "bugReportId": {
+                  "column": "bugReportId"
+                },
+                "commitUrl": {
+                  "column": "commitUrl"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "fixSummary": {
+                  "column": "fixSummary"
+                },
+                "fixedVersion": {
+                  "column": "fixedVersion"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "pullRequestUrl": {
+                  "column": "pullRequestUrl"
+                },
+                "rootCause": {
+                  "column": "rootCause"
+                },
+                "testedEnvironment": {
+                  "column": "testedEnvironment"
+                },
+                "testedVersion": {
+                  "column": "testedVersion"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "verificationNotes": {
+                  "column": "verificationNotes"
+                },
+                "verificationOutcome": {
+                  "column": "verificationOutcome"
+                },
+                "verificationSteps": {
+                  "column": "verificationSteps"
+                },
+                "verifiedAt": {
+                  "column": "verifiedAt"
+                },
+                "verifiedById": {
+                  "column": "verifiedById"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_fix_attempt"
+            }
+          },
+          "BugRelation": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fromBugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "toBugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugRelationType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "createdBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "fromBug": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fromBugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "toBug": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "toBugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "createdById": {
+                  "column": "createdById"
+                },
+                "fromBugReportId": {
+                  "column": "fromBugReportId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "toBugReportId": {
+                  "column": "toBugReportId"
+                },
+                "type": {
+                  "column": "type"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_relation"
+            }
+          },
+          "BugRelease": {
+            "fields": {
+              "approvalId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "bugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "checkedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "environment": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugEnvironment",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "postReleaseCheckNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "postReleaseCheckPassed": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "releasedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "releasedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "approval": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "approvalId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugApproval",
+                  "namespace": "public"
+                }
+              },
+              "bugReport": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "releasedBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "releasedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "approvalId": {
+                  "column": "approvalId"
+                },
+                "bugReportId": {
+                  "column": "bugReportId"
+                },
+                "checkedAt": {
+                  "column": "checkedAt"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "environment": {
+                  "column": "environment"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "postReleaseCheckNotes": {
+                  "column": "postReleaseCheckNotes"
+                },
+                "postReleaseCheckPassed": {
+                  "column": "postReleaseCheckPassed"
+                },
+                "releasedAt": {
+                  "column": "releasedAt"
+                },
+                "releasedById": {
+                  "column": "releasedById"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_release"
+            }
+          },
+          "BugReport": {
+            "fields": {
+              "actualBehavior": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "appVersion": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "browser": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "component": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "device": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "discoveredAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "discoverySource": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugDiscoverySource",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "environment": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugEnvironment",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "expectedBehavior": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "os": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "projectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "reporterId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reproductionSteps": {
+                "many": {
+                  "elementNullable": false
+                },
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "route": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "severity": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugSeverity",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugWorkflowStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "taskId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "approvals": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugApproval",
+                  "namespace": "public"
+                }
+              },
+              "evidence": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugEvidence",
+                  "namespace": "public"
+                }
+              },
+              "fixAttempts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "project": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Project",
+                  "namespace": "public"
+                }
+              },
+              "relationsFrom": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fromBugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelation",
+                  "namespace": "public"
+                }
+              },
+              "relationsTo": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "toBugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelation",
+                  "namespace": "public"
+                }
+              },
+              "releases": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelease",
+                  "namespace": "public"
+                }
+              },
+              "reporter": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "reporterId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actualBehavior": {
+                  "column": "actualBehavior"
+                },
+                "appVersion": {
+                  "column": "appVersion"
+                },
+                "browser": {
+                  "column": "browser"
+                },
+                "component": {
+                  "column": "component"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "device": {
+                  "column": "device"
+                },
+                "discoveredAt": {
+                  "column": "discoveredAt"
+                },
+                "discoverySource": {
+                  "column": "discoverySource"
+                },
+                "environment": {
+                  "column": "environment"
+                },
+                "expectedBehavior": {
+                  "column": "expectedBehavior"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "os": {
+                  "column": "os"
+                },
+                "projectId": {
+                  "column": "projectId"
+                },
+                "reporterId": {
+                  "column": "reporterId"
+                },
+                "reproductionSteps": {
+                  "column": "reproductionSteps"
+                },
+                "route": {
+                  "column": "route"
+                },
+                "severity": {
+                  "column": "severity"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_report"
             }
           },
           "CalendarEvent": {
@@ -1373,6 +2952,21 @@
               }
             },
             "relations": {
+              "bugEvidence": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fileAssetId"
+                  ]
+                },
+                "to": {
+                  "model": "BugEvidence",
+                  "namespace": "public"
+                }
+              },
               "deletedBy": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -2206,6 +3800,36 @@
                 },
                 "to": {
                   "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "bugReports": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "files": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "FileAsset",
                   "namespace": "public"
                 }
               },
@@ -3374,6 +4998,19 @@
                   "kind": "scalar"
                 }
               },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TaskType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -3406,6 +5043,22 @@
                   "namespace": "public"
                 }
               },
+              "bugReport": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
               "createdBy": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -3419,6 +5072,21 @@
                 },
                 "to": {
                   "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "files": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "FileAsset",
                   "namespace": "public"
                 }
               },
@@ -3534,6 +5202,9 @@
                 },
                 "title": {
                   "column": "title"
+                },
+                "type": {
+                  "column": "type"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -4603,6 +6274,111 @@
                   "namespace": "public"
                 }
               },
+              "bugApprovalSubmissions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "submittedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugApproval",
+                  "namespace": "public"
+                }
+              },
+              "bugApprovals": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "decidedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugApproval",
+                  "namespace": "public"
+                }
+              },
+              "bugEvidenceUploads": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "uploadedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugEvidence",
+                  "namespace": "public"
+                }
+              },
+              "bugFixAttempts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "authorId"
+                  ]
+                },
+                "to": {
+                  "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "bugReleases": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "releasedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelease",
+                  "namespace": "public"
+                }
+              },
+              "bugVerifications": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "verifiedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "createdBugRelations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "BugRelation",
+                  "namespace": "public"
+                }
+              },
               "deactivatedBy": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -4676,6 +6452,21 @@
                 },
                 "to": {
                   "model": "PushSubscription",
+                  "namespace": "public"
+                }
+              },
+              "reportedBugs": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "reporterId"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
                   "namespace": "public"
                 }
               },
@@ -5229,6 +7020,1372 @@
                 ]
               },
               "uniques": []
+            },
+            "bug_approval": {
+              "checks": [
+                {
+                  "expression": "(\"status\" = 'pending' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"rejectionReason\" IS NULL) OR (\"status\" = 'approved' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND \"rejectionReason\" IS NULL) OR (\"status\" = 'rejected' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND length(trim(\"rejectionReason\")) > 0)",
+                  "name": "bug_approval_decision_valid_7533cc14",
+                  "prefix": "bug_approval_decision_valid"
+                },
+                {
+                  "expression": "\"status\" IN ('pending', 'approved', 'rejected')",
+                  "name": "bug_approval_status_check_19a2b525",
+                  "prefix": "bug_approval_status_check"
+                }
+              ],
+              "columns": {
+                "bugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "comment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "decidedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "decidedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "fixAttemptId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "rejectionReason": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "snapshot": {
+                  "codecId": "pg/jsonb@1",
+                  "dataType": "pg/jsonb",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "pending"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugApprovalStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "submittedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "submittedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_approval"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "fixAttemptId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_approval"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_fix_attempt"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "submittedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_approval"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "decidedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_approval"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "bugReportId"
+                  ],
+                  "name": "bug_approval_bugReportId_idx_4618d902",
+                  "prefix": "bug_approval_bugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "decidedById",
+                    "decidedAt"
+                  ],
+                  "name": "bug_approval_decidedById_decidedAt_idx_3d834c72",
+                  "prefix": "bug_approval_decidedById_decidedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "decidedById"
+                  ],
+                  "name": "bug_approval_decidedById_idx_8194d55f",
+                  "prefix": "bug_approval_decidedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "fixAttemptId"
+                  ],
+                  "name": "bug_approval_fixAttemptId_idx_5b228f52",
+                  "prefix": "bug_approval_fixAttemptId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status",
+                    "submittedAt"
+                  ],
+                  "name": "bug_approval_status_submittedAt_idx_0938dd64",
+                  "prefix": "bug_approval_status_submittedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "submittedById"
+                  ],
+                  "name": "bug_approval_submittedById_idx_89341c73",
+                  "prefix": "bug_approval_submittedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "submittedById",
+                    "submittedAt"
+                  ],
+                  "name": "bug_approval_submittedById_submittedAt_idx_b877594d",
+                  "prefix": "bug_approval_submittedById_submittedAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "bugReportId",
+                    "fixAttemptId"
+                  ]
+                }
+              ]
+            },
+            "bug_evidence": {
+              "checks": [
+                {
+                  "expression": "\"kind\" IN ('other', 'before', 'after')",
+                  "name": "bug_evidence_kind_check_7fe3d18b",
+                  "prefix": "bug_evidence_kind_check"
+                },
+                {
+                  "expression": "(\"fileAssetId\" IS NOT NULL AND \"externalUrl\" IS NULL) OR (\"fileAssetId\" IS NULL AND \"externalUrl\" IS NOT NULL)",
+                  "name": "bug_evidence_source_xor_ad21740a",
+                  "prefix": "bug_evidence_source_xor"
+                },
+                {
+                  "expression": "\"externalUrl\" IS NULL OR \"externalUrl\" ~ '^https://[^[:space:]]+$'",
+                  "name": "bug_evidence_url_https_e620534a",
+                  "prefix": "bug_evidence_url_https"
+                }
+              ],
+              "columns": {
+                "bugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "caption": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "externalUrl": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "fileAssetId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "fixAttemptId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "kind": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugEvidenceKind",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "uploadedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_evidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "fixAttemptId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_evidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_fix_attempt"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "fileAssetId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_evidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "file_asset"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "uploadedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_evidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "bugReportId"
+                  ],
+                  "name": "bug_evidence_bugReportId_idx_4618d902",
+                  "prefix": "bug_evidence_bugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "bugReportId",
+                    "kind",
+                    "createdAt"
+                  ],
+                  "name": "bug_evidence_bugReportId_kind_createdAt_idx_a038a98e",
+                  "prefix": "bug_evidence_bugReportId_kind_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "fileAssetId"
+                  ],
+                  "name": "bug_evidence_fileAssetId_idx_84361fdc",
+                  "prefix": "bug_evidence_fileAssetId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "fixAttemptId"
+                  ],
+                  "name": "bug_evidence_fixAttemptId_idx_5b228f52",
+                  "prefix": "bug_evidence_fixAttemptId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "fixAttemptId",
+                    "kind"
+                  ],
+                  "name": "bug_evidence_fixAttemptId_kind_idx_33642ef0",
+                  "prefix": "bug_evidence_fixAttemptId_kind_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "uploadedById",
+                    "createdAt"
+                  ],
+                  "name": "bug_evidence_uploadedById_createdAt_idx_7e8cc7c7",
+                  "prefix": "bug_evidence_uploadedById_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "uploadedById"
+                  ],
+                  "name": "bug_evidence_uploadedById_idx_b92fad21",
+                  "prefix": "bug_evidence_uploadedById_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "bug_fix_attempt": {
+              "checks": [
+                {
+                  "expression": "\"testedEnvironment\" IN ('production', 'staging', 'development', 'test', 'other')",
+                  "name": "bug_fix_attempt_testedEnvironment_check_2fa9170a",
+                  "prefix": "bug_fix_attempt_testedEnvironment_check"
+                },
+                {
+                  "expression": "\"verificationOutcome\" IN ('passed', 'failed')",
+                  "name": "bug_fix_attempt_verificationOutcome_check_67654efb",
+                  "prefix": "bug_fix_attempt_verificationOutcome_check"
+                },
+                {
+                  "expression": "array_position(\"verificationSteps\", NULL) IS NULL",
+                  "name": "bug_fix_attempt_verificationSteps_elem_not_null_34f1ffc0",
+                  "prefix": "bug_fix_attempt_verificationSteps_elem_not_null"
+                },
+                {
+                  "expression": "\"version\" > 0",
+                  "name": "bug_fix_attempt_version_positive_efca705d",
+                  "prefix": "bug_fix_attempt_version_positive"
+                }
+              ],
+              "columns": {
+                "affectedVersion": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "authorId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "bugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "commitUrl": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "fixSummary": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "fixedVersion": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "pullRequestUrl": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "rootCause": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "testedEnvironment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugEnvironment",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "testedVersion": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "verificationNotes": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "verificationOutcome": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugVerificationOutcome",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "verificationSteps": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "many": {
+                    "elementNullable": false
+                  },
+                  "nullable": false
+                },
+                "verifiedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "verifiedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_fix_attempt"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "authorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_fix_attempt"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "verifiedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_fix_attempt"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "authorId",
+                    "createdAt"
+                  ],
+                  "name": "bug_fix_attempt_authorId_createdAt_idx_854b4c86",
+                  "prefix": "bug_fix_attempt_authorId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "authorId"
+                  ],
+                  "name": "bug_fix_attempt_authorId_idx_e47547ed",
+                  "prefix": "bug_fix_attempt_authorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "bugReportId",
+                    "createdAt"
+                  ],
+                  "name": "bug_fix_attempt_bugReportId_createdAt_idx_010ffdcd",
+                  "prefix": "bug_fix_attempt_bugReportId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "bugReportId"
+                  ],
+                  "name": "bug_fix_attempt_bugReportId_idx_4618d902",
+                  "prefix": "bug_fix_attempt_bugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verificationOutcome",
+                    "verifiedAt"
+                  ],
+                  "name": "bug_fix_attempt_verificationOutcome_verifiedAt_idx_92ddf49a",
+                  "prefix": "bug_fix_attempt_verificationOutcome_verifiedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verifiedById"
+                  ],
+                  "name": "bug_fix_attempt_verifiedById_idx_dfd74b37",
+                  "prefix": "bug_fix_attempt_verifiedById_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "bug_relation": {
+              "checks": [
+                {
+                  "expression": "\"fromBugReportId\" <> \"toBugReportId\"",
+                  "name": "bug_relation_not_self_e3ab3b8c",
+                  "prefix": "bug_relation_not_self"
+                },
+                {
+                  "expression": "\"type\" IN ('recurrence', 'duplicate')",
+                  "name": "bug_relation_type_check_f6e3255b",
+                  "prefix": "bug_relation_type_check"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "createdById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "fromBugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "toBugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugRelationType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "fromBugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_relation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "toBugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_relation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_relation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "createdById",
+                    "createdAt"
+                  ],
+                  "name": "bug_relation_createdById_createdAt_idx_bbcfd794",
+                  "prefix": "bug_relation_createdById_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "createdById"
+                  ],
+                  "name": "bug_relation_createdById_idx_8bf640ed",
+                  "prefix": "bug_relation_createdById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "fromBugReportId"
+                  ],
+                  "name": "bug_relation_fromBugReportId_idx_8cf8c85f",
+                  "prefix": "bug_relation_fromBugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "toBugReportId"
+                  ],
+                  "name": "bug_relation_toBugReportId_idx_0886872a",
+                  "prefix": "bug_relation_toBugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "toBugReportId",
+                    "type",
+                    "createdAt"
+                  ],
+                  "name": "bug_relation_toBugReportId_type_createdAt_idx_30839378",
+                  "prefix": "bug_relation_toBugReportId_type_createdAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "fromBugReportId",
+                    "toBugReportId",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "bug_release": {
+              "checks": [
+                {
+                  "expression": "(\"postReleaseCheckPassed\" = false AND \"checkedAt\" IS NULL) OR (\"postReleaseCheckPassed\" = true AND \"checkedAt\" IS NOT NULL)",
+                  "name": "bug_release_check_valid_23d52e8f",
+                  "prefix": "bug_release_check_valid"
+                },
+                {
+                  "expression": "\"environment\" IN ('production', 'staging', 'development', 'test', 'other')",
+                  "name": "bug_release_environment_check_d2a5394b",
+                  "prefix": "bug_release_environment_check"
+                }
+              ],
+              "columns": {
+                "approvalId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "bugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "checkedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "environment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugEnvironment",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "postReleaseCheckNotes": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "postReleaseCheckPassed": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "releasedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "releasedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "version": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_release"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "approvalId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_release"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_approval"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "releasedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_release"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "approvalId"
+                  ],
+                  "name": "bug_release_approvalId_idx_23d09a03",
+                  "prefix": "bug_release_approvalId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "bugReportId"
+                  ],
+                  "name": "bug_release_bugReportId_idx_4618d902",
+                  "prefix": "bug_release_bugReportId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "environment",
+                    "releasedAt"
+                  ],
+                  "name": "bug_release_environment_releasedAt_idx_a0a953ca",
+                  "prefix": "bug_release_environment_releasedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "releasedById"
+                  ],
+                  "name": "bug_release_releasedById_idx_f27c26c4",
+                  "prefix": "bug_release_releasedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "releasedById",
+                    "releasedAt"
+                  ],
+                  "name": "bug_release_releasedById_releasedAt_idx_6f231d18",
+                  "prefix": "bug_release_releasedById_releasedAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "bugReportId",
+                    "approvalId"
+                  ]
+                }
+              ]
+            },
+            "bug_report": {
+              "checks": [
+                {
+                  "expression": "\"discoverySource\" IN ('internal_qa', 'customer_report', 'support', 'automated_test', 'monitoring', 'employee_report')",
+                  "name": "bug_report_discoverySource_check_3697728e",
+                  "prefix": "bug_report_discoverySource_check"
+                },
+                {
+                  "expression": "\"environment\" IN ('production', 'staging', 'development', 'test', 'other')",
+                  "name": "bug_report_environment_check_d2a5394b",
+                  "prefix": "bug_report_environment_check"
+                },
+                {
+                  "expression": "array_position(\"reproductionSteps\", NULL) IS NULL",
+                  "name": "bug_report_reproductionSteps_elem_not_null_5718606e",
+                  "prefix": "bug_report_reproductionSteps_elem_not_null"
+                },
+                {
+                  "expression": "\"severity\" IN ('blocker', 'critical', 'major', 'minor', 'trivial')",
+                  "name": "bug_report_severity_check_be538c8d",
+                  "prefix": "bug_report_severity_check"
+                },
+                {
+                  "expression": "\"status\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected')",
+                  "name": "bug_report_status_check_c394d412",
+                  "prefix": "bug_report_status_check"
+                }
+              ],
+              "columns": {
+                "actualBehavior": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "appVersion": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "browser": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "component": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "device": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "discoveredAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "discoverySource": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugDiscoverySource",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "environment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugEnvironment",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "expectedBehavior": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "os": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "projectId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "reporterId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "reproductionSteps": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "many": {
+                    "elementNullable": false
+                  },
+                  "nullable": false
+                },
+                "route": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "severity": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugSeverity",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "reported"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugWorkflowStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "taskId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "projectId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "project"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "reporterId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "projectId"
+                  ],
+                  "name": "bug_report_projectId_idx_a96e4d92",
+                  "prefix": "bug_report_projectId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "projectId",
+                    "status",
+                    "severity",
+                    "discoveredAt"
+                  ],
+                  "name": "bug_report_projectId_status_severity_discoveredAt_idx_97501c36",
+                  "prefix": "bug_report_projectId_status_severity_discoveredAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "reporterId",
+                    "discoveredAt"
+                  ],
+                  "name": "bug_report_reporterId_discoveredAt_idx_f784a7c3",
+                  "prefix": "bug_report_reporterId_discoveredAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "reporterId"
+                  ],
+                  "name": "bug_report_reporterId_idx_aa245831",
+                  "prefix": "bug_report_reporterId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status",
+                    "discoveredAt"
+                  ],
+                  "name": "bug_report_status_discoveredAt_idx_e380dead",
+                  "prefix": "bug_report_status_discoveredAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "taskId"
+                  ]
+                }
+              ]
             },
             "calendar_event": {
               "checks": [
@@ -7874,6 +11031,11 @@
                   "expression": "\"status\" IN ('backlog', 'todo', 'progress', 'review', 'done')",
                   "name": "task_status_check_3309391b",
                   "prefix": "task_status_check"
+                },
+                {
+                  "expression": "\"type\" IN ('task', 'bug')",
+                  "name": "task_type_check_8ce82576",
+                  "prefix": "task_type_check"
                 }
               ],
               "columns": {
@@ -7984,6 +11146,21 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "task"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TaskType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-date@1",
@@ -9432,6 +12609,82 @@
             }
           },
           "valueSet": {
+            "BugApprovalStatus": {
+              "kind": "valueSet",
+              "values": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "BugDiscoverySource": {
+              "kind": "valueSet",
+              "values": [
+                "internal_qa",
+                "customer_report",
+                "support",
+                "automated_test",
+                "monitoring",
+                "employee_report"
+              ]
+            },
+            "BugEnvironment": {
+              "kind": "valueSet",
+              "values": [
+                "production",
+                "staging",
+                "development",
+                "test",
+                "other"
+              ]
+            },
+            "BugEvidenceKind": {
+              "kind": "valueSet",
+              "values": [
+                "other",
+                "before",
+                "after"
+              ]
+            },
+            "BugRelationType": {
+              "kind": "valueSet",
+              "values": [
+                "recurrence",
+                "duplicate"
+              ]
+            },
+            "BugSeverity": {
+              "kind": "valueSet",
+              "values": [
+                "blocker",
+                "critical",
+                "major",
+                "minor",
+                "trivial"
+              ]
+            },
+            "BugVerificationOutcome": {
+              "kind": "valueSet",
+              "values": [
+                "passed",
+                "failed"
+              ]
+            },
+            "BugWorkflowStatus": {
+              "kind": "valueSet",
+              "values": [
+                "reported",
+                "triaged",
+                "in_progress",
+                "in_verification",
+                "awaiting_admin_approval",
+                "approved_for_release",
+                "released",
+                "closed",
+                "duplicate",
+                "rejected"
+              ]
+            },
             "NotificationType": {
               "kind": "valueSet",
               "values": [
@@ -9490,6 +12743,13 @@
                 "review",
                 "done"
               ]
+            },
+            "TaskType": {
+              "kind": "valueSet",
+              "values": [
+                "task",
+                "bug"
+              ]
             }
           }
         },
@@ -9497,10 +12757,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7e3ecb92acdb436c18b9f4a11e952c59156c5c16fa8f6dba04cab511c5ffc61a"
+    "storageHash": "355cc70312fab7ba7944feadfb00a98a58e6f0fce3cc7aeb0bbd4910b49f0058"
   },
   "execution": {
-    "executionHash": "6626bacd52f04de1b6c569d8495e1eac45312ec18056cdb283b536b26ad02845",
+    "executionHash": "ab4815de7fa8d8bd30cbb0d59ef5d5e3ca04050cd5239406ba5593672109b2f2",
     "mutations": {
       "defaults": [
         {
@@ -9510,6 +12770,72 @@
           },
           "ref": {
             "entry": "activity",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_approval",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_evidence",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_fix_attempt",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_relation",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_release",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "bug_report",
             "field": "id",
             "namespace": "public"
           }

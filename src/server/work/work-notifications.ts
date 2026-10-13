@@ -14,7 +14,8 @@ export const notifyTaskAssignees = async (
   },
   assigneeIds: readonly string[],
   now: Date,
-  eventType: "assignment" | "update" = "assignment"
+  eventType: "assignment" | "update" = "assignment",
+  notificationUrl?: string
 ): Promise<void> => {
   const recipients = [...new Set(assigneeIds)].filter(
     (userId) => userId !== actor.id
@@ -81,7 +82,7 @@ export const notifyTaskAssignees = async (
             eventType,
             notificationId,
             title: text,
-            url: `/tasks/${task.id}`,
+            url: notificationUrl ?? `/tasks/${task.id}`,
             userId,
           },
           updatedAt: now,

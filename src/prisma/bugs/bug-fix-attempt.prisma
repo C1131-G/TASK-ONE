@@ -1,0 +1,34 @@
+// use prisma-8
+
+model BugFixAttempt {
+  id                  Uuid @id @default(uuid())
+  bugReportId         Uuid
+  authorId            String
+  rootCause           String
+  fixSummary          String
+  verificationSteps   String[]
+  commitUrl           String?
+  pullRequestUrl      String?
+  affectedVersion     String?
+  fixedVersion        String?
+  verificationOutcome BugVerificationOutcome?
+  testedEnvironment   BugEnvironment?
+  testedVersion       String?
+  verificationNotes   String?
+  verifiedById        String?
+  verifiedAt          TimestamptzJsDate?
+  createdAt           TimestamptzJsDate @default(now())
+  updatedAt           TimestamptzJsDate @default(now())
+  version             Int @default(1)
+
+  bugReport BugReport @relation(fields: [bugReportId], references: [id], onDelete: Restrict)
+  author    User @relation("BugFixAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  verifiedBy User? @relation("BugVerifier", fields: [verifiedById], references: [id], onDelete: Restrict)
+  evidence BugEvidence[]
+
+  @@index([bugReportId, createdAt])
+  @@index([authorId, createdAt])
+  @@index([verificationOutcome, verifiedAt])
+  @@check(expression: "\"version\" > 0", name: "bug_fix_attempt_version_positive")
+  @@map("bug_fix_attempt")
+}

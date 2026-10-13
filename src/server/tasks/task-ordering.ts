@@ -3,6 +3,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { assertOrdinaryTask } from "../work/work-internal";
 
 export interface TaskPositionChange {
   readonly taskId: string;
@@ -115,6 +116,7 @@ const reorderTasks = (
           assignments.map(({ taskId, userId }) => `${taskId}:${userId}`)
         );
         for (const task of tasks) {
+          assertOrdinaryTask(task);
           if (task.archivedAt || task.project.archivedAt) {
             throw new AppError({
               code: "FORBIDDEN",

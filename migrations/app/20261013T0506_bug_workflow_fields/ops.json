@@ -1,0 +1,128 @@
+[
+  {
+    "id": "column.public.bug_fix_attempt.testedEnvironment",
+    "label": "Add column \"testedEnvironment\" to \"bug_fix_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "testedEnvironment",
+        "table": "bug_fix_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"testedEnvironment\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_fix_attempt",
+          "testedEnvironment"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"testedEnvironment\"",
+        "sql": "ALTER TABLE \"public\".\"bug_fix_attempt\" ADD COLUMN \"testedEnvironment\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"testedEnvironment\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_fix_attempt",
+          "testedEnvironment"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_fix_attempt.testedVersion",
+    "label": "Add column \"testedVersion\" to \"bug_fix_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "testedVersion",
+        "table": "bug_fix_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"testedVersion\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_fix_attempt",
+          "testedVersion"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"testedVersion\"",
+        "sql": "ALTER TABLE \"public\".\"bug_fix_attempt\" ADD COLUMN \"testedVersion\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"testedVersion\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_fix_attempt",
+          "testedVersion"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_fix_attempt.bug_fix_attempt_testedEnvironment_check_2fa9170a",
+    "label": "Add check constraint \"bug_fix_attempt_testedEnvironment_check_2fa9170a\" on \"bug_fix_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_fix_attempt_testedEnvironment_check_2fa9170a",
+        "table": "bug_fix_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_fix_attempt_testedEnvironment_check_2fa9170a\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_fix_attempt_testedEnvironment_check_2fa9170a",
+          "public",
+          "\"public\".\"bug_fix_attempt\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_fix_attempt_testedEnvironment_check_2fa9170a\"",
+        "sql": "ALTER TABLE \"public\".\"bug_fix_attempt\" ADD CONSTRAINT \"bug_fix_attempt_testedEnvironment_check_2fa9170a\" CHECK (\"testedEnvironment\" IN ('production', 'staging', 'development', 'test', 'other'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_fix_attempt_testedEnvironment_check_2fa9170a\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_fix_attempt_testedEnvironment_check_2fa9170a",
+          "public",
+          "\"public\".\"bug_fix_attempt\""
+        ]
+      }
+    ]
+  }
+]
