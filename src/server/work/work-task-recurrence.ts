@@ -7,7 +7,7 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import type { TaskRecurrenceInput } from "./work-contracts";
 import { TaskRecurrenceInputSchema } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 
 const addDays = (date: Date, days: number): Date => {
   const result = new Date(date);
@@ -107,6 +107,7 @@ export const setTaskRecurrence = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt || task.project.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

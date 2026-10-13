@@ -11,7 +11,7 @@ import {
   decodeTaskPriority,
   decodeTaskStatus,
 } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 import { requireTaskAdmin } from "./work-task-admin";
 
 export const undoTaskCompletion = (
@@ -52,6 +52,18 @@ export const undoTaskCompletion = (
             message: "The completion undo request is invalid.",
           });
         }
+        const originalTask = await transaction.orm.public.Task.where({
+          id: undo.entityId,
+        })
+          .select("type")
+          .first();
+        if (!originalTask) {
+          throw new AppError({
+            code: "NOT_FOUND",
+            message: "The task was not found.",
+          });
+        }
+        assertOrdinaryTask(originalTask);
         const reopened = await transaction.orm.public.Task.where({
           id: undo.entityId,
           status: "done",

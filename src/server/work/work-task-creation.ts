@@ -43,7 +43,9 @@ export const allocateTaskNumber = async (
 export const createTaskInTransaction = async (
   transaction: Transaction,
   actorId: string,
-  input: CreateTaskInput
+  input: CreateTaskInput,
+  type: "task" | "bug" = "task",
+  initialStatus: "backlog" | "todo" | "progress" | "review" | "done" = "todo"
 ): Promise<CreatedTask> => {
   const actor = await transaction.orm.public.User.where({ id: actorId })
     .select("deactivatedAt", "mustChangePassword", "name")
@@ -108,8 +110,9 @@ export const createTaskInTransaction = async (
     projectId: input.projectId,
     projectTaskNumber,
     startDate: input.startDate ?? null,
-    status: "todo",
+    status: initialStatus,
     title: input.title,
+    type,
     updatedAt: now,
     version: 1,
   });

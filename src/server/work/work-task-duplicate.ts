@@ -7,7 +7,7 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import type { CreatedTask } from "./work-contracts";
 import { decodeTaskPriority } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 import { allocateTaskNumber } from "./work-task-creation";
 
 export const duplicateTask = (
@@ -49,6 +49,7 @@ export const duplicateTask = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(source);
         if (source.archivedAt || source.project.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

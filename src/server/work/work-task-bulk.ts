@@ -12,7 +12,7 @@ import type {
   TaskArchiveUndoReceipt,
 } from "./work-contracts";
 import { decodeTaskPriority, decodeTaskStatus } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 import { notifyTaskAssignees } from "./work-notifications";
 import { validateBulkTaskInput } from "./work-task-bulk-validation";
 import { createRecurrenceSuccessor } from "./work-task-state";
@@ -85,6 +85,7 @@ export const bulkUpdateTasks = (
           assignmentsByTask.set(assignment.taskId, taskAssignments);
         }
         for (const task of tasks) {
+          assertOrdinaryTask(task);
           if (task.archivedAt || task.project.archivedAt) {
             throw new AppError({
               code: "FORBIDDEN",

@@ -5,7 +5,11 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
-import { assertStartNotAfterDue, databaseError } from "./work-internal";
+import {
+  assertOrdinaryTask,
+  assertStartNotAfterDue,
+  databaseError,
+} from "./work-internal";
 import {
   assertTaskEditPermission,
   assertWorkspaceActor,
@@ -41,6 +45,7 @@ export const rescheduleTask = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt || task.project.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

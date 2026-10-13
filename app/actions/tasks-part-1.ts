@@ -49,6 +49,7 @@ export async function getProjectTaskAction(input: unknown) {
           actor.id,
           validated.projectId,
           {
+            includeBugs: true,
             limit: 1,
             offset: 0,
             taskId: validated.taskId,

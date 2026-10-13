@@ -24,6 +24,15 @@ export const databaseError = (error: unknown): AppError => {
   });
 };
 
+export const assertOrdinaryTask = (task: { readonly type: string }): void => {
+  if (task.type === "bug") {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "Manage bug workflow changes from the Bugs workspace.",
+    });
+  }
+};
+
 export const validateInput = (input: CreateTaskInput): CreateTaskInput => {
   const title = input.title.trim();
   if (!input.projectId || !title || title.length > 240) {

@@ -19,6 +19,7 @@ model FileAsset {
   task       Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
   uploadedBy User    @relation("FileUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
   deletedBy  User?   @relation("FileDeletedBy", fields: [deletedById], references: [id], onDelete: Restrict)
+  bugEvidence BugEvidence[]
 
   @@index([projectId, createdAt])
   @@index([taskId])

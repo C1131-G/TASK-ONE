@@ -33,6 +33,14 @@ model User {
   undoRecords UndoRecord[]
   idempotencyKeys IdempotencyKey[]
   uploadIntents UploadIntent[]
+  reportedBugs BugReport[] @relation("BugReporter")
+  bugFixAttempts BugFixAttempt[] @relation("BugFixAuthor")
+  bugEvidenceUploads BugEvidence[] @relation("BugEvidenceUploader")
+  bugVerifications BugFixAttempt[] @relation("BugVerifier")
+  bugApprovals BugApproval[] @relation("BugApprovalActor")
+  bugApprovalSubmissions BugApproval[] @relation("BugApprovalSubmitter")
+  bugReleases BugRelease[] @relation("BugReleaseActor")
+  createdBugRelations BugRelation[]
   pushSubscriptions PushSubscription[]
   pushDeliveries PushDelivery[]
 

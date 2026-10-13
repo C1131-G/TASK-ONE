@@ -3,6 +3,7 @@ import type { TaskRecurrenceInput } from "@/src/server/work/work-contracts";
 export interface EditableTask {
   readonly id: string;
   readonly projectId: string;
+  readonly type?: "task" | "bug";
   readonly createdById: string;
   readonly version: number;
   readonly title: string;

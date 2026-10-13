@@ -6,7 +6,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import type { TaskArchiveUndoReceipt } from "./work-contracts";
-import { databaseError } from "./work-internal";
+import { assertOrdinaryTask, databaseError } from "./work-internal";
 import { requireTaskAdmin } from "./work-task-admin";
 
 export const archiveTask = (
@@ -34,6 +34,7 @@ export const archiveTask = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt || task.project.archivedAt) {
           throw new AppError({
             code: "CONFLICT",
@@ -147,6 +148,7 @@ export const undoTaskArchive = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (
           !task.archivedAt ||
           task.archivedById !== actorId ||

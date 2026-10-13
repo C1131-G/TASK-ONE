@@ -6,6 +6,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { assertOrdinaryTask } from "../work/work-internal";
 
 export interface TaskRelationInput {
   readonly labelIds: readonly string[];
@@ -138,6 +139,7 @@ const setTaskRelations = (
             message: "The task was not found.",
           });
         }
+        assertOrdinaryTask(task);
         if (task.archivedAt || task.project.archivedAt) {
           throw new AppError({
             code: "FORBIDDEN",

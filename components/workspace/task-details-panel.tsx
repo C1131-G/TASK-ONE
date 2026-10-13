@@ -3,17 +3,9 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import { listTaskCommentsAction } from "@/app/actions/comments";
-import { listTaskSubtasksAction } from "@/app/actions/subtasks";
-import {
-  getProjectTaskAction,
-  undoTaskCompletionAction,
-} from "@/app/actions/tasks";
-import { listTaskFilesAction } from "@/app/actions/uploads";
 import {
   Sheet,
   SheetContent,
@@ -22,53 +14,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { BugTaskDetail } from "@/components/workspace/bug-task-detail";
 import { ProjectFiles } from "@/components/workspace/project-files";
 import { TaskCommentsSection } from "@/components/workspace/task-details-comments";
 import type { EditableTask } from "@/components/workspace/task-details-draft";
 import { TaskDetailsForm } from "@/components/workspace/task-details-form";
+import { readTaskBundle } from "@/components/workspace/task-details-panel-data";
+import type {
+  EmployeeOption,
+  TaskFile,
+} from "@/components/workspace/task-details-panel-data";
 import { TaskSubtasksSection } from "@/components/workspace/task-details-subtasks";
 import type { TaskSubtaskView } from "@/components/workspace/task-details-subtasks";
 import { TaskDiscardDialog } from "@/components/workspace/task-discard-dialog";
 import { TaskRecurrenceEditor } from "@/components/workspace/task-recurrence-editor";
 import { TaskRelationsEditor } from "@/components/workspace/task-relations-editor";
 import { useTaskComments } from "@/components/workspace/use-task-comments";
+import { useTaskPanelSave } from "@/components/workspace/use-task-panel-save";
 import { useTaskSubtaskActions } from "@/components/workspace/use-task-subtask-actions";
-import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
-
-interface TaskFile {
-  readonly id: string;
-  readonly projectId: string;
-  readonly taskId: string | null;
-  readonly originalName: string;
-  readonly contentType: string;
-  readonly sizeBytes: number;
-  readonly uploadedById: string;
-  readonly createdAt: string;
-  readonly copyState: "pending" | "ready" | "failed";
-}
-
-interface EmployeeOption {
-  readonly id: string;
-  readonly name: string;
-}
-
-// Reads the task and its side lists in one place, so the panel and its save path
-// load the same data.
-const readTaskBundle = async (projectId: string, taskId: string) => {
-  const [task, comments, subtasks, files] = await Promise.all([
-    getProjectTaskAction({ projectId, taskId }),
-    listTaskCommentsAction({ taskId }),
-    listTaskSubtasksAction({ taskId }),
-    listTaskFilesAction({ taskId }),
-  ]);
-  return { comments, files, subtasks, task };
-};
 
 // One panel per task. Everything it edits is read from the server when it opens,
 // so a caller only needs the task's ID, project and version. Closing with unsaved
 // details or a comment draft asks first.
 export const TaskDetailsPanel = ({
   currentUserId,
+  bugId,
   editable,
   employees,
   isAdmin,
@@ -77,11 +47,13 @@ export const TaskDetailsPanel = ({
   open,
   projectId,
   taskId,
+  taskType = "task",
   taskTitle,
   trigger,
   version,
 }: {
   readonly currentUserId: string | null;
+  readonly bugId?: string;
   readonly editable: boolean;
   readonly employees: readonly EmployeeOption[];
   readonly isAdmin: boolean;
@@ -92,12 +64,11 @@ export const TaskDetailsPanel = ({
   readonly open?: boolean;
   readonly projectId: string;
   readonly taskId: string;
+  readonly taskType?: "task" | "bug";
   readonly taskTitle?: string;
   readonly trigger?: ReactNode;
   readonly version: number;
 }) => {
-  const router = useRouter();
-  const { addUndo } = useWorkspaceUndo();
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = open ?? localOpen;
   const [task, setTask] = useState<EditableTask | null>(null);
@@ -165,6 +136,11 @@ export const TaskDetailsPanel = ({
   const refresh = useCallback(async () => {
     applyBundle(await readTaskBundle(projectId, taskId));
   }, [applyBundle, projectId, taskId]);
+  const handleSaved = useTaskPanelSave({
+    onVersionChange,
+    refresh,
+    taskTitle: task?.title ?? taskTitle ?? "task",
+  });
 
   // Loads when the panel opens; a late response for a previous task is dropped.
   useEffect(() => {
@@ -210,35 +186,6 @@ export const TaskDetailsPanel = ({
     setOpen(false);
   };
 
-  const handleSaved = (
-    nextVersion: number,
-    completionUndo: {
-      readonly undoId: string;
-      readonly expiresAt: string;
-    } | null
-  ) => {
-    onVersionChange(nextVersion);
-    if (completionUndo) {
-      addUndo({
-        expiresAt: completionUndo.expiresAt,
-        label: `Completed “${task?.title ?? taskTitle ?? "task"}”`,
-        run: async () => {
-          const result = await undoTaskCompletionAction({
-            idempotencyKey: crypto.randomUUID(),
-            undoId: completionUndo.undoId,
-          });
-          if (!result.ok) {
-            return result.error.message;
-          }
-          router.refresh();
-          return null;
-        },
-      });
-    }
-    router.refresh();
-    refresh();
-  };
-
   return (
     <section className="task-details-panel">
       <Sheet onOpenChange={requestOpenChange} open={isOpen}>
@@ -255,8 +202,9 @@ export const TaskDetailsPanel = ({
               {task?.title ?? taskTitle ?? "Task details"}
             </SheetTitle>
             <SheetDescription>
-              Edit details, subtasks, labels, dependencies, recurrence,
-              comments, and files.
+              {taskType === "bug"
+                ? "Review discovery, investigation, evidence, verification, and release history."
+                : "Edit details, subtasks, labels, dependencies, recurrence, comments, and files."}
             </SheetDescription>
           </SheetHeader>
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-6">
@@ -265,56 +213,67 @@ export const TaskDetailsPanel = ({
                 {visibleError}
               </p>
             ) : null}
-            <section className="stack">
-              <h3>Details</h3>
-              {task ? (
-                <TaskDetailsForm
+            {taskType === "bug" && bugId ? (
+              <BugTaskDetail
+                bugId={bugId}
+                employees={employees}
+                isAdmin={isAdmin}
+                userId={currentUserId ?? ""}
+              />
+            ) : (
+              <>
+                <section className="stack">
+                  <h3>Details</h3>
+                  {task ? (
+                    <TaskDetailsForm
+                      editable={editable}
+                      employees={employees}
+                      key={task.version}
+                      onDirtyChange={setDetailsDirty}
+                      onReload={() => refresh()}
+                      onSaved={handleSaved}
+                      task={task}
+                      version={version}
+                    />
+                  ) : (
+                    <p className="muted">Loading task details…</p>
+                  )}
+                </section>
+                <TaskSubtasksSection
                   editable={editable}
                   employees={employees}
-                  key={task.version}
-                  onDirtyChange={setDetailsDirty}
-                  onReload={() => refresh()}
-                  onSaved={handleSaved}
-                  task={task}
-                  version={version}
+                  onAdd={handleAddSubtask}
+                  onPromote={handlePromoteSubtask}
+                  onRemove={handleRemoveSubtask}
+                  onReorder={handleReorderSubtask}
+                  onToggle={handleToggleSubtask}
+                  onUpdate={handleUpdateSubtask}
+                  pending={subtaskActions.pending}
+                  subtasks={subtasks}
                 />
-              ) : (
-                <p className="muted">Loading task details…</p>
-              )}
-            </section>
-            <TaskSubtasksSection
-              editable={editable}
-              employees={employees}
-              onAdd={handleAddSubtask}
-              onPromote={handlePromoteSubtask}
-              onRemove={handleRemoveSubtask}
-              onReorder={handleReorderSubtask}
-              onToggle={handleToggleSubtask}
-              onUpdate={handleUpdateSubtask}
-              pending={subtaskActions.pending}
-              subtasks={subtasks}
-            />
-            {task ? (
-              <>
-                <TaskRelationsEditor
-                  dependencyIds={task.dependencyIds}
-                  editable={editable}
-                  labelIds={task.labelIds}
-                  onVersionChange={onVersionChange}
-                  projectId={projectId}
-                  taskId={taskId}
-                  version={version}
-                />
-                <TaskRecurrenceEditor
-                  dueDate={task.dueDate}
-                  editable={editable}
-                  onVersionChange={onVersionChange}
-                  recurrence={task.recurrence}
-                  taskId={taskId}
-                  version={version}
-                />
+                {task ? (
+                  <>
+                    <TaskRelationsEditor
+                      dependencyIds={task.dependencyIds}
+                      editable={editable}
+                      labelIds={task.labelIds}
+                      onVersionChange={onVersionChange}
+                      projectId={projectId}
+                      taskId={taskId}
+                      version={version}
+                    />
+                    <TaskRecurrenceEditor
+                      dueDate={task.dueDate}
+                      editable={editable}
+                      onVersionChange={onVersionChange}
+                      recurrence={task.recurrence}
+                      taskId={taskId}
+                      version={version}
+                    />
+                  </>
+                ) : null}
               </>
-            ) : null}
+            )}
             <TaskCommentsSection
               body={comments.body}
               comments={comments.comments}

@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 
 import { defaultProjectViewSearch } from "../../components/workspace/project-view-search";
 import { createProjectViewStore } from "../../components/workspace/view-store/project-view-store";
+import type { ProjectViewState } from "../../components/workspace/view-store/project-view-store";
 
 test("setSearch merges a patch and keeps the other fields", () => {
   const store = createProjectViewStore(defaultProjectViewSearch);
@@ -27,7 +28,7 @@ test("replaceSearch swaps the whole search", () => {
 test("subscribers are notified once per change with the new state", () => {
   const store = createProjectViewStore(defaultProjectViewSearch);
   const seen: string[] = [];
-  const subscription = store.subscribe(({ search }) => {
+  const subscription = store.subscribe(({ search }: ProjectViewState) => {
     seen.push(search.priority);
   });
   store.actions.setSearch({ priority: "high" });

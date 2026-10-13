@@ -75,6 +75,7 @@ export const listProjectTasks = (
   projectId: string,
   pagination: {
     readonly includeArchived?: boolean;
+    readonly includeBugs?: boolean;
     readonly limit: number;
     readonly offset: number;
     readonly taskId?: string;
@@ -110,6 +111,7 @@ export const listProjectTasks = (
       }
       const tasks = await db.orm.public.Task.where({
         ...(pagination.includeArchived ? {} : { archivedAt: null }),
+        ...(pagination.includeBugs ? {} : { type: "task" }),
         projectId,
         ...(pagination.taskId ? { id: pagination.taskId } : {}),
       })
@@ -209,6 +211,7 @@ export const listProjectTasks = (
           status: decodeTaskStatus(task.status),
           subtaskCount: taskSubtasks.length,
           title: task.title,
+          type: task.type,
           version: task.version,
         };
       });
