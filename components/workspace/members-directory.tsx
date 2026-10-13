@@ -215,7 +215,6 @@ const MembersDirectory = ({
                   <TableRow key={employee.id}>
                     <TableCell>
                       <Link
-                        aria-label={`View ${employee.name}'s profile`}
                         className="members-person members-person-link"
                         href={`/members/${employee.id}` as Route}
                       >

@@ -17,19 +17,19 @@ test.describe("people as admin", () => {
   }) => {
     await page.goto("/members");
     await page.waitForLoadState("networkidle");
-    const profileLinks = page.getByRole("link", { name: /^View .* profile$/u });
+    const profileLinks = page.locator("a.members-person-link");
     const total = await profileLinks.count();
     expect(total).toBeGreaterThan(1);
 
     await page.getByPlaceholder("Search members").fill("Test Employee");
     await expect(profileLinks).toHaveCount(1);
-    await expect(profileLinks.first()).toHaveAccessibleName(/Test Employee/u);
+    await expect(profileLinks.first()).toContainText("Test Employee");
 
     await page.getByPlaceholder("Search members").fill("");
     await page.getByRole("button", { exact: true, name: "Admin" }).click();
     await expect(profileLinks).not.toHaveCount(0);
     await expect(
-      page.getByRole("link", { name: /Test Employee/u })
+      page.locator("a.members-person-link", { hasText: "Test Employee" })
     ).toHaveCount(0);
   });
 
@@ -38,7 +38,9 @@ test.describe("people as admin", () => {
   }) => {
     await page.goto("/members");
     await page.waitForLoadState("networkidle");
-    await page.getByRole("link", { name: /View UI Admin's profile/u }).click();
+    await page
+      .locator("a.members-person-link", { hasText: "UI Admin" })
+      .click();
     await expect(page).toHaveURL(/\/members\/[0-9a-f-]{36}$/u);
     await expect(
       page.getByRole("heading", { level: 1, name: /UI Admin/u })
@@ -53,10 +55,8 @@ test.describe("people as admin", () => {
       await page.waitForLoadState("networkidle");
       // Rows and Manage buttons share one order, so match them by position.
       const names = await page
-        .getByRole("link", { name: /^View .* profile$/u })
-        .evaluateAll((links) =>
-          links.map((link) => link.getAttribute("aria-label") ?? "")
-        );
+        .locator("a.members-person-link")
+        .evaluateAll((links) => links.map((link) => link.textContent ?? ""));
       const index = names.findIndex((name) => name.includes("Test Employee"));
       expect(index).toBeGreaterThanOrEqual(0);
       await page.getByRole("button", { name: "Manage" }).nth(index).click();
@@ -120,9 +120,7 @@ test.describe("people as employee", () => {
   }) => {
     await page.goto("/members");
     await page.waitForLoadState("networkidle");
-    await expect(
-      page.getByRole("link", { name: /^View .* profile$/u }).first()
-    ).toBeVisible();
+    await expect(page.locator("a.members-person-link").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Add employee" })
     ).toHaveCount(0);

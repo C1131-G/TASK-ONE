@@ -83,11 +83,7 @@ const ProjectCard = ({
   readonly isAdmin: boolean;
 }) => (
   <article className="pcard">
-    <Link
-      aria-label={`Open ${project.name}`}
-      className="pcard-link"
-      href={`/projects/${project.id}` as Route}
-    >
+    <Link className="pcard-link" href={`/projects/${project.id}` as Route}>
       <div className="row">
         <ProjectIcon color={project.color} icon={project.icon} />
         <strong className="trunc grow">{project.name}</strong>

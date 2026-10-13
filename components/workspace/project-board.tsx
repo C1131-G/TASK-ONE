@@ -193,7 +193,14 @@ export const ProjectBoard = ({
           cards.
         </p>
       )}
-      <div aria-busy={pending} className="board">
+      <section
+        aria-busy={pending}
+        aria-label="Board columns"
+        className="board"
+        // A board wider than the screen scrolls sideways, so keyboard users must reach it.
+        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        tabIndex={0}
+      >
         {columns.map((column) => {
           const columnTasks = visibleTasks.filter(
             (task) => task.status === column.id
@@ -210,7 +217,6 @@ export const ProjectBoard = ({
                 <span className="cnt">{columnTasks.length}</span>
               </header>
               <div
-                aria-label={`Drop tasks in ${column.label}`}
                 className="bcol-b"
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
@@ -248,7 +254,7 @@ export const ProjectBoard = ({
             </section>
           );
         })}
-      </div>
+      </section>
     </div>
   );
 };

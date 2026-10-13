@@ -161,8 +161,12 @@ const NotificationList = ({
             value={filter}
           >
             <TabsList aria-label="Filter notifications">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="unread">Unread</TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="all">
+                All
+              </TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="unread">
+                Unread
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <WorkspaceButton
@@ -258,9 +262,10 @@ const NotificationList = ({
                       {item.readAt === null ? (
                         <>
                           <span
-                            aria-label="Unread"
+                            aria-hidden="true"
                             className="notification-unread-dot"
                           />
+                          <span className="sr-only">Unread</span>
                           <WorkspaceButton
                             aria-label={`Mark as read: ${item.text}`}
                             className="btn btn-sm btn-ghost notification-row-read"

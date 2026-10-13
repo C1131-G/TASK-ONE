@@ -247,7 +247,7 @@ export const InboxWorkspace = ({
           >
             <TabsList aria-label="Filter inbox by type" className="inbox-tabs">
               {FILTERS.map(({ id, label }) => (
-                <TabsTrigger key={id} value={id}>
+                <TabsTrigger aria-controls={undefined} key={id} value={id}>
                   {label} <span>{counts.get(id) ?? 0}</span>
                 </TabsTrigger>
               ))}

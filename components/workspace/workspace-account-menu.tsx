@@ -29,9 +29,11 @@ const WorkspaceAccountMenu = ({
         type="button"
         variant="ghost"
       >
-        <span aria-hidden="true" data-workspace-avatar="">
-          {name.slice(0, 1).toUpperCase()}
-        </span>
+        <span
+          aria-hidden="true"
+          data-initial={name.slice(0, 1).toUpperCase()}
+          data-workspace-avatar=""
+        />
         <span data-workspace-account-name="">{name}</span>
         <CaretUpDown aria-hidden="true" size={14} />
       </Button>
