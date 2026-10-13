@@ -30,41 +30,49 @@ import type {
   FileSort,
   ProjectFile,
 } from "@/components/workspace/project-file-types";
+import { UploadProgressList } from "@/components/workspace/upload-progress-list";
+import { useUploadQueue } from "@/components/workspace/use-upload-queue";
+import type { UploadRunner } from "@/components/workspace/use-upload-queue";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 
-const uploadOne = async (
-  projectId: string | null,
-  taskId: string | null,
-  file: File
-): Promise<string | null> => {
-  const input = {
-    contentType: file.type || "application/octet-stream",
-    fileName: file.name,
-    sizeBytes: file.size,
+const uploadRunner =
+  (projectId: string | null, taskId: string | null) =>
+  (file: File): UploadRunner => {
+    const input = {
+      contentType: file.type || "application/octet-stream",
+      fileName: file.name,
+      sizeBytes: file.size,
+    };
+    let uploadIntentId = "";
+    return {
+      finalize: async () => {
+        const result = await finalizeUploadAction({
+          idempotencyKey: crypto.randomUUID(),
+          uploadIntentId,
+        });
+        return result.ok ? null : result.error.message;
+      },
+      request: async () => {
+        const ticket = taskId
+          ? await requestTaskUploadAction({ ...input, taskId })
+          : await requestProjectUploadAction({
+              ...input,
+              projectId: projectId ?? "",
+            });
+        if (!ticket.ok) {
+          return { message: ticket.error.message, ok: false };
+        }
+        ({ uploadIntentId } = ticket.data);
+        return {
+          ok: true,
+          ticket: {
+            requiredHeaders: ticket.data.requiredHeaders,
+            uploadUrl: ticket.data.uploadUrl,
+          },
+        };
+      },
+    };
   };
-  const ticket = taskId
-    ? await requestTaskUploadAction({ ...input, taskId })
-    : await requestProjectUploadAction({
-        ...input,
-        projectId: projectId ?? "",
-      });
-  if (!ticket.ok) {
-    return ticket.error.message;
-  }
-  const response = await fetch(ticket.data.uploadUrl, {
-    body: file,
-    headers: ticket.data.requiredHeaders,
-    method: "PUT",
-  });
-  if (!response.ok) {
-    return `Upload failed for ${file.name}. Check the storage configuration and try again.`;
-  }
-  const result = await finalizeUploadAction({
-    idempotencyKey: crypto.randomUUID(),
-    uploadIntentId: ticket.data.uploadIntentId,
-  });
-  return result.ok ? null : result.error.message;
-};
 
 const ProjectFiles = ({
   projectId,
@@ -102,30 +110,20 @@ const ProjectFiles = ({
     }
   };
 
+  // Each file settles on its own, so the list refreshes as uploads finish.
+  const queue = useUploadQueue(async () => {
+    await reloadFiles();
+    router.refresh();
+  });
+
   const upload = (selectedFiles: FileList | null) => {
     if (!selectedFiles?.length) {
       return;
     }
     setError(null);
-    startTransition(async () => {
-      try {
-        const errors = await Promise.all(
-          [...selectedFiles].map((file) =>
-            uploadOne(projectId, taskId ?? null, file)
-          )
-        );
-        const firstError = errors.find((item): item is string => item !== null);
-        await reloadFiles();
-        router.refresh();
-        if (firstError) {
-          setError(firstError);
-        }
-      } catch {
-        setError(
-          "Upload failed. Check the storage configuration and try again."
-        );
-      }
-    });
+    for (const file of selectedFiles) {
+      queue.start(file, uploadRunner(projectId, taskId ?? null));
+    }
   };
 
   const actOnFile = (
@@ -277,6 +275,13 @@ const ProjectFiles = ({
           <span>Drop files here or use Upload — up to 50 MB each</span>
         </div>
       ) : null}
+      <UploadProgressList
+        onCancel={queue.handleCancel}
+        onClearFinished={queue.handleClearFinished}
+        onDismiss={queue.handleDismiss}
+        onRetry={queue.handleRetry}
+        uploads={queue.uploads}
+      />
       {error && !renamingFile ? (
         <p className="panel-b error" role="alert">
           {error}

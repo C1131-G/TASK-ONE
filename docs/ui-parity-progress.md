@@ -214,3 +214,14 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Unit tests: date arithmetic for drags and drops, and the edit rule (`tests/ui/task-dates.test.ts`).
 - Lint, typecheck and the production build pass.
 - Known gaps: milestones cannot be dragged on the timeline. Calendar moves apply to tasks with a due date only, which are the only ones the calendar shows. Dragging on touch screens relies on the Move control.
+
+## Phase 5 evidence (2026-10-13)
+
+- Drawer reach: `/tasks` and `/my-tasks` host the shared `TaskDrawerProvider`, so rows open the same drawer with `?task=` deep links and reload restore. Search results and Favorites task titles link to `/projects/<id>?task=<id>`, which the project page reads on load.
+- Mention picker: the plain listbox is now the shared Command component (`CommandList`, `CommandItem`). Focus stays in the textarea, which still owns Arrow, Enter, Tab and Escape.
+- Upload store: `upload-store.ts` (TanStack Store), `upload-transport.ts` (XHR PUT with progress and abort), `use-upload-queue.ts` (start, cancel, retry, dismiss) and `upload-progress-list.tsx` are shared by project files, task attachments and the avatar control. Each file settles on its own, a failed or cancelled upload stays listed with Retry, and Retry requests a fresh upload intent.
+- Backend fix found by the Favorites test: `listPersonalWorkspace` kept a favorite task only when its project was also a favorite, so `/favorites` showed "No favorite tasks yet" for any task in an unstarred project. It now keeps tasks whose project is not archived. `tests/backend/discovery.test.ts` covers this and fails without the fix.
+- Browser tests: `tests/e2e/task-drawer-links.spec.ts` (`/tasks` with reload, `/my-tasks`, a search result, a favorite title) and `tests/e2e/uploads.spec.ts` (upload, rename, remove and Undo; storage failure then Retry; cancel in flight). With `task-drawer.spec.ts`, 13 browser tests pass against the dev server. The full backend suite and the 45 UI tests pass; Ultracite and typecheck are clean.
+- Environment: this run used a local PostgreSQL 16 on port 5433 and an `s3rver` stand-in on port 9000 with a bucket CORS rule for `http://localhost:3000`. Without that rule the browser's signed PUT fails, which the app reports as an upload failure.
+- Not run: the production build (the dev server owned `.next`), and the employee role for these specs.
+- Known gaps: Favorites and Search results for tasks the viewer cannot see open the project page with no drawer. The upload list does not persist across navigation.

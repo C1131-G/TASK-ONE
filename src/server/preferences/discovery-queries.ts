@@ -63,7 +63,6 @@ export const listPersonalWorkspace = (
               .where((assignment) => assignment.taskId.in(favoriteTaskIds))
               .all(),
       ]);
-      const activeProjects = new Set(projects.map(({ id }) => id));
       const assigneesByTask = new Map<string, typeof assignments>();
       for (const assignment of assignments) {
         const taskAssignees = assigneesByTask.get(assignment.taskId) ?? [];
@@ -75,7 +74,8 @@ export const listPersonalWorkspace = (
       );
       const activeTasks = [];
       for (const task of tasks) {
-        if (activeProjects.has(task.projectId)) {
+        // A starred task shows even when its project is not starred.
+        if (!task.project.archivedAt) {
           activeTasks.push({
             assignees: (assigneesByTask.get(task.id) ?? []).map(({ user }) => ({
               id: user.id,

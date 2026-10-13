@@ -14,12 +14,14 @@ test.beforeEach(() => {
   );
 });
 
-const drawerTitle = (page: Page) =>
-  page.getByRole("dialog").getByLabel("Title", { exact: true });
+// The task drawer is the only dialog with a Details section. Its Title field is
+// not used here: a long title changes the field's accessible name.
+const drawerDetails = (page: Page) =>
+  page.getByRole("dialog").getByRole("heading", { name: "Details" });
 
 const expectDrawerOpen = async (page: Page) => {
   await expect(page).toHaveURL(TASK_PARAM);
-  await expect(drawerTitle(page)).not.toHaveValue("", { timeout: 15_000 });
+  await expect(drawerDetails(page)).toBeVisible({ timeout: 15_000 });
 };
 
 test.describe("task drawer links", () => {
@@ -35,7 +37,7 @@ test.describe("task drawer links", () => {
         .click();
       await expect(page).toHaveURL(TASK_PARAM, { timeout: 2000 });
     }).toPass();
-    await expect(drawerTitle(page)).not.toHaveValue("", { timeout: 15_000 });
+    await expect(drawerDetails(page)).toBeVisible({ timeout: 15_000 });
 
     const taskId = new URL(page.url()).searchParams.get("task");
     await page.reload();
@@ -55,7 +57,7 @@ test.describe("task drawer links", () => {
       await rows.first().click();
       await expect(page).toHaveURL(TASK_PARAM, { timeout: 2000 });
     }).toPass();
-    await expect(drawerTitle(page)).not.toHaveValue("", { timeout: 15_000 });
+    await expect(drawerDetails(page)).toBeVisible({ timeout: 15_000 });
   });
 
   test("a search result opens its task in the project drawer", async ({
@@ -75,16 +77,22 @@ test.describe("task drawer links", () => {
   }) => {
     await page.goto("/tasks");
     await page.waitForLoadState("networkidle");
-    const add = page
-      .getByRole("button", { exact: true, name: "Add to favorites" })
-      .first();
+    const add = page.getByRole("button", {
+      exact: true,
+      name: "Add to favorites",
+    });
+    const remove = page.getByRole("button", {
+      exact: true,
+      name: "Remove from favorites",
+    });
     test.skip((await add.count()) === 0, "No task favorite control on /tasks");
-    await add.click();
-    await expect(
-      page
-        .getByRole("button", { exact: true, name: "Remove from favorites" })
-        .first()
-    ).toBeVisible({ timeout: 15_000 });
+    // A click before hydration does nothing, so retry until the star turns on.
+    await expect(async () => {
+      if ((await remove.count()) === 0) {
+        await add.first().click();
+      }
+      await expect(remove.first()).toBeVisible({ timeout: 3000 });
+    }).toPass({ timeout: 30_000 });
 
     try {
       await page.goto("/favorites");
@@ -93,12 +101,15 @@ test.describe("task drawer links", () => {
       await title.click();
       await expectDrawerOpen(page);
     } finally {
+      // Leave the favorites as they were found.
       await page.goto("/tasks");
       await page.waitForLoadState("networkidle");
-      await page
-        .getByRole("button", { exact: true, name: "Remove from favorites" })
-        .first()
-        .click();
+      await expect(async () => {
+        if ((await remove.count()) > 0) {
+          await remove.first().click();
+        }
+        await expect(remove).toHaveCount(0, { timeout: 3000 });
+      }).toPass({ timeout: 30_000 });
     }
   });
 });

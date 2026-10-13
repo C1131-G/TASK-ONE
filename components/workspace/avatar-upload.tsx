@@ -3,13 +3,16 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 
 import {
   finalizeAvatarUploadAction,
   getAvatarDownloadUrlAction,
   requestAvatarUploadAction,
 } from "@/app/actions/uploads";
+import { UploadProgressList } from "@/components/workspace/upload-progress-list";
+import { useUploadQueue } from "@/components/workspace/use-upload-queue";
+import type { UploadRunner } from "@/components/workspace/use-upload-queue";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 
@@ -21,64 +24,63 @@ export const AvatarUpload = ({
   readonly initialUrl: string | null;
 }) => {
   const [avatarUrl, setAvatarUrl] = useState(initialUrl);
-  const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const uploadInput = useRef<HTMLInputElement>(null);
+  const queue = useUploadQueue();
+  const pending = queue.uploads.some((item) => item.status === "uploading");
+
+  const runner = (file: File): UploadRunner => {
+    let uploadIntentId = "";
+    return {
+      finalize: async () => {
+        const finalized = await finalizeAvatarUploadAction({
+          idempotencyKey: crypto.randomUUID(),
+          uploadIntentId,
+        });
+        if (!finalized.ok) {
+          return finalized.error.message;
+        }
+        const avatar = await getAvatarDownloadUrlAction({ userId });
+        if (!avatar.ok) {
+          return avatar.error.message;
+        }
+        setAvatarUrl(avatar.data);
+        return null;
+      },
+      request: async () => {
+        const ticket = await requestAvatarUploadAction({
+          contentType: file.type,
+          sizeBytes: file.size,
+        });
+        if (!ticket.ok) {
+          return { message: ticket.error.message, ok: false };
+        }
+        ({ uploadIntentId } = ticket.data);
+        return {
+          ok: true,
+          ticket: {
+            requiredHeaders: ticket.data.requiredHeaders,
+            uploadUrl: ticket.data.uploadUrl,
+          },
+        };
+      },
+    };
+  };
 
   const upload = (file: File | undefined) => {
     if (!file) {
       return;
     }
     setError(null);
-    startTransition(async () => {
-      try {
-        if (file.size > 5 * 1024 * 1024) {
-          setError("Profile photos must be 5 MB or smaller.");
-          return;
-        }
-        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-          setError("Choose a JPEG, PNG, or WebP image.");
-          return;
-        }
-        const ticket = await requestAvatarUploadAction({
-          contentType: file.type,
-          sizeBytes: file.size,
-        });
-        if (!ticket.ok) {
-          setError(ticket.error.message);
-          return;
-        }
-        const response = await fetch(ticket.data.uploadUrl, {
-          body: file,
-          headers: ticket.data.requiredHeaders,
-          method: "PUT",
-        });
-        if (!response.ok) {
-          setError(
-            "The photo upload failed. Check storage settings and try again."
-          );
-          return;
-        }
-        const finalized = await finalizeAvatarUploadAction({
-          idempotencyKey: crypto.randomUUID(),
-          uploadIntentId: ticket.data.uploadIntentId,
-        });
-        if (!finalized.ok) {
-          setError(finalized.error.message);
-          return;
-        }
-        const avatar = await getAvatarDownloadUrlAction({ userId });
-        if (!avatar.ok) {
-          setError(avatar.error.message);
-          return;
-        }
-        setAvatarUrl(avatar.data);
-      } catch {
-        setError(
-          "The photo upload failed. Check storage settings and try again."
-        );
-      }
-    });
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Profile photos must be 5 MB or smaller.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Choose a JPEG, PNG, or WebP image.");
+      return;
+    }
+    queue.start(file, runner);
   };
 
   return (
@@ -124,6 +126,13 @@ export const AvatarUpload = ({
           {error}
         </span>
       ) : null}
+      <UploadProgressList
+        onCancel={queue.handleCancel}
+        onClearFinished={queue.handleClearFinished}
+        onDismiss={queue.handleDismiss}
+        onRetry={queue.handleRetry}
+        uploads={queue.uploads}
+      />
     </div>
   );
 };
