@@ -30,6 +30,14 @@ bun run seed:test-users
 
 The command prints each account's employee ID, email, and generated temporary password once. Both accounts must change their password after their first sign-in. It only runs against a local, non-test Metsys database and refuses to overwrite either test email.
 
+To create the Cibi admin and employee accounts and populate the workspace with UI fixtures, run:
+
+```bash
+bun run seed:cibi-ui
+```
+
+This prints generated temporary passwords once. The login emails are `cibi@admin.metsys.test` and `cibi@employee.metsys.test`; both accounts must change their password at first sign-in. The command refuses to overwrite existing accounts and only runs against a local, non-test Metsys database. It seeds empty, populated, and archived projects, task assignments, milestones, recurrence, a mention notification, and a sample project file when local storage is available. Existing UI fixtures are safe to rerun with `bun run seed:ui-fixtures` after the accounts have been created.
+
 The command prints a generated temporary password once and requires a password change at first sign-in. Keep that output private. It refuses to run after an admin account exists.
 
 The service, adapter, test coverage, and remaining work checklist is in [`docs/backend-progress.md`](docs/backend-progress.md). Prisma model groups and authorization policy are in [`docs/data-model.md`](docs/data-model.md).

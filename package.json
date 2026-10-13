@@ -27,7 +27,8 @@
     "db:migrate": "prisma db migrate",
     "db:verify": "prisma db verify",
     "test:e2e": "playwright test",
-    "seed:ui-fixtures": "bun run scripts/seed-ui-fixtures.ts"
+    "seed:ui-fixtures": "bun run scripts/seed-ui-fixtures.ts",
+    "seed:cibi-ui": "bun run scripts/seed-cibi-ui-accounts.ts && bun run seed:ui-fixtures"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1147.0",
