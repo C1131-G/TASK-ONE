@@ -12,8 +12,8 @@ import {
   readGlobalTaskSearchRaw,
   sortGlobalTasks,
   writeGlobalTaskSearch,
-} from "../../components/workspace/global-task-view-state";
-import { columnWidthsFromPreferences } from "../../components/workspace/task-table-columns";
+} from "../../features/tasks/global-task-view-state";
+import { columnWidthsFromPreferences } from "../../features/tasks/task-table-columns";
 
 const task = (overrides: Record<string, unknown>) => ({
   assignees: [{ name: "Ada" }],

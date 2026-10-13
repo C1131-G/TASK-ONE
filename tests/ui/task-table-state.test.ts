@@ -1,15 +1,15 @@
 import { expect, test } from "bun:test";
 
-import { defaultProjectViewSearch } from "../../components/workspace/project-view-search";
+import { defaultProjectViewSearch } from "../../features/projects/project-view-search";
+import {
+  MAX_BULK_SELECTION,
+  createProjectViewStore,
+} from "../../features/projects/providers/project-view-store";
 import {
   clampColumnWidth,
   parseHiddenColumns,
   serializeHiddenColumns,
-} from "../../components/workspace/task-table-columns";
-import {
-  MAX_BULK_SELECTION,
-  createProjectViewStore,
-} from "../../components/workspace/view-store/project-view-store";
+} from "../../features/tasks/task-table-columns";
 
 test("hidden columns ignore columns that cannot be hidden and unknown IDs", () => {
   expect(parseHiddenColumns("task,due,actions,nope,estimate")).toEqual([

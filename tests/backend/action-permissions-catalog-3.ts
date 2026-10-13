@@ -4,9 +4,11 @@ import { entry } from "./action-permissions-shared";
 import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
-const tasks = await import("../../app/actions/tasks");
-const teams = await import("../../app/actions/teams");
-const uploads = await import("../../app/actions/uploads");
+const tasks = await import("../../features/tasks/tasks-actions");
+const teams = await import("../../features/people/actions/teams");
+const uploads = await import("../../features/files/files-actions");
+const peopleQueries = await import("../../features/people/people-queries");
+const filesQueries = await import("../../features/files/files-queries");
 
 export const actionCatalog3: readonly ActionEntry[] = [
   entry("changeTaskColumnAction", tasks.changeTaskColumnAction, () => ({
@@ -71,7 +73,7 @@ export const actionCatalog3: readonly ActionEntry[] = [
     changes: [{ expectedVersion: 1, position: 0, taskId: ids.taskId }],
     idempotencyKey: nextKey(),
   })),
-  entry("listTeamsAction", teams.listTeamsAction, () => ({})),
+  entry("listTeams", peopleQueries.listTeams, () => ({})),
   entry("createTeamAction", teams.createTeamAction, () => ({
     color: "#2563eb",
     description: null,
@@ -105,6 +107,12 @@ export const actionCatalog3: readonly ActionEntry[] = [
   ),
   entry("listProjectFilesAction", uploads.listProjectFilesAction, () => ({
     projectId: ids.projectId,
+  })),
+  entry("listProjectFiles", filesQueries.listProjectFiles, () => ({
+    projectId: ids.projectId,
+  })),
+  entry("getAvatarDownloadUrl", filesQueries.getAvatarDownloadUrl, () => ({
+    userId: ids.employeeId,
   })),
   entry("listTaskFilesAction", uploads.listTaskFilesAction, () => ({
     taskId: ids.taskId,

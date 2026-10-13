@@ -8,7 +8,7 @@ import {
   projectViewSettingsToSearch,
   readProjectViewSearch,
   writeProjectViewSearch,
-} from "../../components/workspace/project-view-search";
+} from "../../features/projects/project-view-search";
 
 test("reads defaults for an empty URL and ignores unknown values", () => {
   expect(readProjectViewSearch(new URLSearchParams())).toEqual({

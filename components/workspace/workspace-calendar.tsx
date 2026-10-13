@@ -6,12 +6,12 @@ import { Plus } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { QuickTaskForm } from "@/components/workspace/quick-task-form";
-import { TaskCalendarGrid } from "@/components/workspace/task-calendar-grid";
+import { TaskCalendarGrid } from "@/features/calendar/components/task-calendar-grid";
 import type {
   CalendarEvent,
   CalendarTask,
-} from "@/components/workspace/task-calendar-grid";
+} from "@/features/calendar/components/task-calendar-grid";
+import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
 
 interface CalendarProjectOption {
   readonly id: string;

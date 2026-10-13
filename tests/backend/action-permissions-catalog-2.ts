@@ -10,14 +10,19 @@ import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
 const personalPreferences =
-  await import("../../app/actions/personal-preferences");
-const notifications = await import("../../app/actions/notifications");
-const password = await import("../../app/actions/password");
-const projects = await import("../../app/actions/projects");
-const savedViews = await import("../../app/actions/saved-views");
-const sessions = await import("../../app/actions/sessions");
-const subtasks = await import("../../app/actions/subtasks");
-const tasks = await import("../../app/actions/tasks");
+  await import("../../features/user/actions/personal-preferences");
+const notifications =
+  await import("../../features/notifications/notifications-actions");
+const password = await import("../../features/user/actions/password");
+const projects = await import("../../features/projects/projects-actions");
+const savedViews = await import("../../features/projects/actions/saved-views");
+const sessions = await import("../../features/user/actions/sessions");
+const subtasks = await import("../../features/tasks/actions/subtasks");
+const tasks = await import("../../features/tasks/tasks-actions");
+const projectsQueries =
+  await import("../../features/projects/projects-queries");
+const userQueries = await import("../../features/user/user-queries");
+const tasksQueries = await import("../../features/tasks/tasks-queries");
 
 export const actionCatalog2: readonly ActionEntry[] = [
   entry(
@@ -63,8 +68,8 @@ export const actionCatalog2: readonly ActionEntry[] = [
     true
   ),
   entry(
-    "getPersonalPreferencesAction",
-    personalPreferences.getPersonalPreferencesAction,
+    "getPersonalPreferences",
+    userQueries.getPersonalPreferences,
     () => ({})
   ),
   entry(
@@ -77,14 +82,10 @@ export const actionCatalog2: readonly ActionEntry[] = [
     personalPreferences.saveTaskTableColumnWidthsAction,
     () => ({ columnWidths: { due: 140 }, idempotencyKey: nextKey() })
   ),
-  entry("listProjectsAction", projects.listProjectsAction, () => ({})),
-  entry(
-    "listProjectMilestonesAction",
-    projects.listProjectMilestonesAction,
-    () => ({
-      projectId: ids.projectId,
-    })
-  ),
+  entry("listProjects", projectsQueries.listProjects, () => ({})),
+  entry("listProjectMilestones", projectsQueries.listProjectMilestones, () => ({
+    projectId: ids.projectId,
+  })),
   entry("createProjectAction", projects.createProjectAction, () => ({
     description: null,
     idempotencyKey: nextKey(),
@@ -133,7 +134,7 @@ export const actionCatalog2: readonly ActionEntry[] = [
       projectId: ids.projectId,
     })
   ),
-  entry("listSavedViewsAction", savedViews.listSavedViewsAction, () => ({})),
+  entry("listSavedViews", projectsQueries.listSavedViews, () => ({})),
   entry("createSavedViewAction", savedViews.createSavedViewAction, () => ({
     idempotencyKey: nextKey(),
     view: view(),
@@ -147,19 +148,10 @@ export const actionCatalog2: readonly ActionEntry[] = [
     idempotencyKey: nextKey(),
     viewId: ids.random,
   })),
-  entry(
-    "listMySessionsAction",
-    sessions.listMySessionsAction,
-    () => ({}),
-    true
-  ),
-  entry(
-    "listEmployeeSessionsAction",
-    sessions.listEmployeeSessionsAction,
-    () => ({
-      employeeId: ids.employeeId,
-    })
-  ),
+  entry("listMySessions", userQueries.listMySessions, () => ({}), true),
+  entry("listEmployeeSessions", userQueries.listEmployeeSessions, () => ({
+    employeeId: ids.employeeId,
+  })),
   entry(
     "revokeSessionAction",
     sessions.revokeSessionAction,
@@ -199,6 +191,15 @@ export const actionCatalog2: readonly ActionEntry[] = [
     taskId: ids.taskId,
   })),
   entry("listProjectTasksAction", tasks.listProjectTasksAction, () => ({
+    limit: 10,
+    offset: 0,
+    projectId: ids.projectId,
+  })),
+  entry("getProjectTask", tasksQueries.getProjectTask, () => ({
+    projectId: ids.projectId,
+    taskId: ids.taskId,
+  })),
+  entry("listProjectTasks", tasksQueries.listProjectTasks, () => ({
     limit: 10,
     offset: 0,
     projectId: ids.projectId,

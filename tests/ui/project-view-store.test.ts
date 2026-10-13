@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 
-import { defaultProjectViewSearch } from "../../components/workspace/project-view-search";
-import { createProjectViewStore } from "../../components/workspace/view-store/project-view-store";
-import type { ProjectViewState } from "../../components/workspace/view-store/project-view-store";
+import { defaultProjectViewSearch } from "../../features/projects/project-view-search";
+import { createProjectViewStore } from "../../features/projects/providers/project-view-store";
+import type { ProjectViewState } from "../../features/projects/providers/project-view-store";
 
 test("setSearch merges a patch and keeps the other fields", () => {
   const store = createProjectViewStore(defaultProjectViewSearch);

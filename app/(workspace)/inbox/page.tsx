@@ -1,41 +1,27 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { connection } from "next/server";
+import { Suspense } from "react";
 
-import { listNotificationInboxAction } from "@/app/actions/notifications";
-import { InboxWorkspace } from "@/components/workspace/inbox-workspace";
+import {
+  InboxFeed,
+  InboxFeedSkeleton,
+} from "@/features/notifications/components/inbox-feed";
 
 export const metadata: Metadata = { title: "Inbox | Metsys" };
+export const instant = false;
 
-const InboxPage = async () => {
-  await connection();
-  const result = await listNotificationInboxAction({
-    limit: 100,
-    unreadOnly: false,
-  });
-  if (!result.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Inbox could not be loaded. Refresh to retry.
-        </div>
+const InboxPage = () => (
+  <div className="page">
+    <div className="ph">
+      <div>
+        <h1>Inbox</h1>
       </div>
-    );
-  }
-  return (
-    <div className="page">
-      <div className="ph">
-        <div>
-          <h1>Inbox</h1>
-        </div>
-      </div>
-      <InboxWorkspace
-        items={result.data.items}
-        unreadCount={result.data.unreadCount}
-      />
     </div>
-  );
-};
+    <Suspense fallback={<InboxFeedSkeleton />}>
+      <InboxFeed />
+    </Suspense>
+  </div>
+);
 
 export default InboxPage;

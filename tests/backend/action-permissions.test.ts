@@ -17,26 +17,14 @@ import type {
   ActionFunction,
   ActionResultLike,
 } from "./support/action-harness";
+import { serverEntryModules } from "./support/server-entry-modules";
 
-const calendar = await import("../../app/actions/calendar");
-const comments = await import("../../app/actions/comments");
-const companySettings = await import("../../app/actions/company-settings");
-const dashboard = await import("../../app/actions/dashboard");
-const discovery = await import("../../app/actions/discovery");
-const employees = await import("../../app/actions/employees");
-const jobs = await import("../../app/actions/jobs");
-const labels = await import("../../app/actions/labels");
-const notifications = await import("../../app/actions/notifications");
-const password = await import("../../app/actions/password");
-const personalPreferences =
-  await import("../../app/actions/personal-preferences");
-const projects = await import("../../app/actions/projects");
-const savedViews = await import("../../app/actions/saved-views");
-const sessions = await import("../../app/actions/sessions");
-const subtasks = await import("../../app/actions/subtasks");
-const tasks = await import("../../app/actions/tasks");
-const teams = await import("../../app/actions/teams");
-const uploads = await import("../../app/actions/uploads");
+const comments = await import("../../features/tasks/actions/task-comments");
+const password = await import("../../features/user/actions/password");
+const projects = await import("../../features/projects/projects-actions");
+const subtasks = await import("../../features/tasks/actions/subtasks");
+const tasks = await import("../../features/tasks/tasks-actions");
+const userQueries = await import("../../features/user/user-queries");
 
 beforeAll(setupHarness);
 afterAll(teardownHarness);
@@ -49,33 +37,26 @@ const rejectedWith =
   (result: ActionResultLike): boolean =>
     !result.ok && codes.includes(result.error?.code ?? "");
 
-it("covers every Server Action exported by the adapters", () => {
+// Server-side helpers that only combine catalogued reads (and so inherit their
+// session checks); they take no request input of their own.
+const composedReads = new Set([
+  "listAllProjectTasks",
+  "listAllProjects",
+  "listAllTeams",
+  "listProjectTaskPages",
+]);
+
+it("covers every Server Action and query exported by the features", () => {
   const exported = new Set<string>();
-  for (const actionModule of [
-    calendar,
-    comments,
-    companySettings,
-    dashboard,
-    discovery,
-    employees,
-    jobs,
-    labels,
-    notifications,
-    password,
-    personalPreferences,
-    projects,
-    savedViews,
-    sessions,
-    subtasks,
-    tasks,
-    teams,
-    uploads,
-  ]) {
+  for (const actionModule of serverEntryModules) {
     for (const name of Object.keys(actionModule)) {
       exported.add(name);
     }
   }
-  const covered = new Set(allActions.map(({ name }) => name));
+  const covered = new Set([
+    ...allActions.map(({ name }) => name),
+    ...composedReads,
+  ]);
   // Reads with their own dedicated shape of input are listed explicitly.
   const missing = [...exported].filter((name) => !covered.has(name));
   expect(missing).toEqual([]);
@@ -110,7 +91,7 @@ it("blocks accounts that must change their password from every workspace action"
 });
 
 it("lets accounts that must change their password reach the onboarding actions only", async () => {
-  const sessionList = await callAs("forced", sessions.listMySessionsAction, {});
+  const sessionList = await callAs("forced", userQueries.listMySessions, {});
   expect(sessionList.ok).toBe(true);
   const wrongPassword = await callAs(
     "forced",

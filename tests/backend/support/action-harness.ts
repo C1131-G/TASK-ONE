@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 
 import { Effect } from "effect";
 
+import "./server-only-stub";
+
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";

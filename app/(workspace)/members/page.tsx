@@ -1,55 +1,26 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { connection } from "next/server";
+import { Suspense } from "react";
 
-import { listEmployeesAction } from "@/app/actions/employees";
-import { listTeamsAction } from "@/app/actions/teams";
-import { MembersDirectory } from "@/components/workspace/members-directory";
-import { EmployeeCreateForm } from "@/components/workspace/people-admin-forms";
-import { getPageSession } from "@/src/server/auth/page-session";
+import {
+  MembersSection,
+  MembersSectionSkeleton,
+} from "@/features/people/components/members-section";
+import { parseMembersSection } from "@/features/people/members-section-param";
 
 export const metadata: Metadata = { title: "Members | Metsys" };
+export const instant = false;
 
-const MembersPage = async ({ searchParams }: PageProps<"/members">) => {
-  await connection();
-  const params = await searchParams;
-  const section = params.section === "roles" ? "roles" : "members";
-  const [result, teams, session] = await Promise.all([
-    listEmployeesAction({ search: "" }),
-    listTeamsAction({}),
-    getPageSession(),
-  ]);
-  if (!result.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Members could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="page">
-      <div className="ph">
-        <div>
-          <h1>Members</h1>
-          <p>{result.data.length} people in your Metsys workspace.</p>
-        </div>
-        {session.kind === "authenticated" && session.user.role === "admin" ? (
-          <EmployeeCreateForm teams={teams.ok ? teams.data : []} />
-        ) : null}
-      </div>
-      <MembersDirectory
-        canManageMembers={
-          session.kind === "authenticated" && session.user.role === "admin"
-        }
-        employees={result.data}
-        section={section}
-        teams={teams.ok ? teams.data : []}
-      />
-    </div>
-  );
-};
+const MembersPage = ({ searchParams }: PageProps<"/members">) => (
+  <div className="page">
+    <Suspense fallback={<MembersSectionSkeleton />}>
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+      {searchParams.then((params) => (
+        <MembersSection section={parseMembersSection(params["section"])} />
+      ))}
+    </Suspense>
+  </div>
+);
 
 export default MembersPage;

@@ -4,20 +4,32 @@ import { entry, eventBody } from "./action-permissions-shared";
 import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
-const calendar = await import("../../app/actions/calendar");
-const activity = await import("../../app/actions/activity");
-const comments = await import("../../app/actions/comments");
-const companySettings = await import("../../app/actions/company-settings");
-const dashboard = await import("../../app/actions/dashboard");
-const discovery = await import("../../app/actions/discovery");
-const employees = await import("../../app/actions/employees");
-const jobs = await import("../../app/actions/jobs");
-const labels = await import("../../app/actions/labels");
-const notifications = await import("../../app/actions/notifications");
-const taskCalendar = await import("../../app/actions/task-calendar");
+const calendar = await import("../../features/calendar/calendar-actions");
+const comments = await import("../../features/tasks/actions/task-comments");
+const companySettings = await import("../../features/company/company-actions");
+const discovery = await import("../../features/discovery/discovery-actions");
+const employees = await import("../../features/people/people-actions");
+const labels = await import("../../features/tasks/actions/labels");
+const notifications =
+  await import("../../features/notifications/notifications-actions");
+const activityQueries =
+  await import("../../features/activity/activity-queries");
+const calendarQueries =
+  await import("../../features/calendar/calendar-queries");
+const companyQueries = await import("../../features/company/company-queries");
+const dashboardQueries =
+  await import("../../features/dashboard/dashboard-queries");
+const discoveryQueries =
+  await import("../../features/discovery/discovery-queries");
+const jobsQueries = await import("../../features/jobs/jobs-queries");
+const notificationsQueries =
+  await import("../../features/notifications/notifications-queries");
+const peopleQueries = await import("../../features/people/people-queries");
+const tasks = await import("../../features/tasks/tasks-actions");
+const tasksQueries = await import("../../features/tasks/tasks-queries");
 
 export const actionCatalog1: readonly ActionEntry[] = [
-  entry("listTaskCalendarAction", taskCalendar.listTaskCalendarAction, () => ({
+  entry("listTaskCalendar", calendarQueries.listTaskCalendar, () => ({
     from: "2026-10-01",
     groupBy: "status",
     limit: 100,
@@ -27,10 +39,10 @@ export const actionCatalog1: readonly ActionEntry[] = [
     statuses: [],
     to: "2026-12-31",
   })),
-  entry("listActivityAction", activity.listActivityAction, () => ({
+  entry("listActivity", activityQueries.listActivity, () => ({
     taskId: ids.taskId,
   })),
-  entry("listCalendarEventsAction", calendar.listCalendarEventsAction, () => ({
+  entry("listCalendarEvents", calendarQueries.listCalendarEvents, () => ({
     from: "2026-01-01T00:00:00.000Z",
     to: "2026-02-01T00:00:00.000Z",
   })),
@@ -84,11 +96,7 @@ export const actionCatalog1: readonly ActionEntry[] = [
       idempotencyKey: nextKey(),
     })
   ),
-  entry(
-    "getCompanySettingsAction",
-    companySettings.getCompanySettingsAction,
-    () => ({})
-  ),
+  entry("getCompanySettings", companyQueries.getCompanySettings, () => ({})),
   entry(
     "updateCompanySettingsAction",
     companySettings.updateCompanySettingsAction,
@@ -102,13 +110,13 @@ export const actionCatalog1: readonly ActionEntry[] = [
     })
   ),
   entry(
-    "getDashboardOverviewAction",
-    dashboard.getDashboardOverviewAction,
+    "getDashboardOverview",
+    dashboardQueries.getDashboardOverview,
     () => ({})
   ),
   entry(
-    "getPersonalWorkspaceAction",
-    discovery.getPersonalWorkspaceAction,
+    "getPersonalWorkspace",
+    discoveryQueries.getPersonalWorkspace,
     () => ({})
   ),
   entry(
@@ -126,7 +134,7 @@ export const actionCatalog1: readonly ActionEntry[] = [
   entry("searchWorkspaceAction", discovery.searchWorkspaceAction, () => ({
     query: "permission",
   })),
-  entry("listEmployeesAction", employees.listEmployeesAction, () => ({
+  entry("listEmployees", peopleQueries.listEmployees, () => ({
     search: "",
   })),
   entry("createEmployeeAction", employees.createEmployeeAction, () => ({
@@ -169,8 +177,9 @@ export const actionCatalog1: readonly ActionEntry[] = [
     idempotencyKey: nextKey(),
     name: "Permission Name",
   })),
-  entry("listDeadJobsAction", jobs.listDeadJobsAction, () => ({ limit: 5 })),
-  entry("listLabelsAction", labels.listLabelsAction, () => ({})),
+  entry("listDeadJobs", jobsQueries.listDeadJobs, () => ({ limit: 5 })),
+  entry("listLabelsAction", tasks.listLabelsAction, () => ({})),
+  entry("listLabels", tasksQueries.listLabels, () => ({})),
   entry("createLabelAction", labels.createLabelAction, () => ({
     color: "#16a34a",
     idempotencyKey: nextKey(),
@@ -186,13 +195,13 @@ export const actionCatalog1: readonly ActionEntry[] = [
     labelId: ids.random,
   })),
   entry(
-    "listNotificationInboxAction",
-    notifications.listNotificationInboxAction,
+    "listNotificationInbox",
+    notificationsQueries.listNotificationInbox,
     () => ({ limit: 10, unreadOnly: false })
   ),
   entry(
-    "getNotificationPreferencesAction",
-    notifications.getNotificationPreferencesAction,
+    "getNotificationPreferences",
+    notificationsQueries.getNotificationPreferences,
     () => ({})
   ),
   entry(

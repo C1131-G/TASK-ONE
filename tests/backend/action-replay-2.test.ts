@@ -17,25 +17,27 @@ import {
 } from "./support/action-harness";
 import type { ActionFunction, Persona } from "./support/action-harness";
 
-const calendar = await import("../../app/actions/calendar");
-const comments = await import("../../app/actions/comments");
-const companySettings = await import("../../app/actions/company-settings");
-const dashboard = await import("../../app/actions/dashboard");
-const discovery = await import("../../app/actions/discovery");
-const employees = await import("../../app/actions/employees");
-const jobs = await import("../../app/actions/jobs");
-const labels = await import("../../app/actions/labels");
-const notifications = await import("../../app/actions/notifications");
-const password = await import("../../app/actions/password");
+const calendar = await import("../../features/calendar/calendar-actions");
+const comments = await import("../../features/tasks/actions/task-comments");
+const companySettings = await import("../../features/company/company-actions");
+const dashboard = await import("../../features/dashboard/dashboard-queries");
+const discovery = await import("../../features/discovery/discovery-actions");
+const employees = await import("../../features/people/people-actions");
+const jobs = await import("../../features/jobs/jobs-queries");
+const labels = await import("../../features/tasks/actions/labels");
+const notifications =
+  await import("../../features/notifications/notifications-actions");
+const password = await import("../../features/user/actions/password");
 const personalPreferences =
-  await import("../../app/actions/personal-preferences");
-const projects = await import("../../app/actions/projects");
-const savedViews = await import("../../app/actions/saved-views");
-const sessions = await import("../../app/actions/sessions");
-const subtasks = await import("../../app/actions/subtasks");
-const tasks = await import("../../app/actions/tasks");
-const teams = await import("../../app/actions/teams");
-const uploads = await import("../../app/actions/uploads");
+  await import("../../features/user/actions/personal-preferences");
+const projects = await import("../../features/projects/projects-actions");
+const savedViews = await import("../../features/projects/actions/saved-views");
+const sessions = await import("../../features/user/actions/sessions");
+const subtasks = await import("../../features/tasks/actions/subtasks");
+const tasks = await import("../../features/tasks/tasks-actions");
+const teams = await import("../../features/people/actions/teams");
+const uploads = await import("../../features/files/files-actions");
+const companyQueries = await import("../../features/company/company-queries");
 const { Idempotency, IdempotencyLive } =
   await import("../../src/server/core/idempotency");
 const { Storage } = await import("../../src/server/storage/storage");
@@ -174,11 +176,7 @@ it("replays team, label, calendar, and company-settings mutations", async () => 
     { eventId: event.id }
   );
 
-  const current = await callAs(
-    "admin",
-    companySettings.getCompanySettingsAction,
-    {}
-  );
+  const current = await callAs("admin", companyQueries.getCompanySettings, {});
   if (!current.ok) {
     throw new Error("Company settings could not be read after replay.");
   }

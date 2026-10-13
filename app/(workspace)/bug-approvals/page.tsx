@@ -1,24 +1,18 @@
-/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from workspace-reference.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Bug screens use reference workspace styles from workspace-reference.css. */
 
-import type { Metadata, Route } from "next";
-import { redirect } from "next/navigation";
-import { connection } from "next/server";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { listBugsAction } from "@/app/actions/bugs";
-import { BugList } from "@/components/workspace/bug-list";
-import { getPageSession } from "@/src/server/auth/page-session";
+import {
+  BugApprovalList,
+  BugApprovalListSkeleton,
+} from "@/features/bugs/components/bug-approval-list";
 
 export const metadata: Metadata = { title: "Bug approvals | Metsys" };
+export const instant = false;
 
-const BugApprovalInbox = async () => {
-  await connection();
-  const session = await getPageSession();
-  if (session.kind !== "authenticated" || session.user.role !== "admin") {
-    redirect("/bugs" as Route);
-  }
-  const result = await listBugsAction({ status: "awaiting_admin_approval" });
-  return (
+const BugApprovalPage = () => (
+  <div className="page flush">
     <section aria-labelledby="bug-approvals-heading" className="page bug-page">
       <header className="bug-page-header">
         <div>
@@ -29,31 +23,10 @@ const BugApprovalInbox = async () => {
           </p>
         </div>
       </header>
-      {result.ok ? (
-        <BugList
-          bugs={result.data}
-          emptyMessage="No bug fixes are waiting for approval."
-        />
-      ) : (
-        <section className="panel panel-b" role="alert">
-          The approval inbox could not be loaded.
-        </section>
-      )}
+      <Suspense fallback={<BugApprovalListSkeleton />}>
+        <BugApprovalList />
+      </Suspense>
     </section>
-  );
-};
-
-const BugApprovalLoading = () => (
-  <output aria-busy="true" aria-live="polite" className="panel panel-b muted">
-    Loading approvals…
-  </output>
-);
-
-const BugApprovalPage = () => (
-  <div className="page flush">
-    <Suspense fallback={<BugApprovalLoading />}>
-      <BugApprovalInbox />
-    </Suspense>
   </div>
 );
 

@@ -1,36 +1,22 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { connection } from "next/server";
+import { Suspense } from "react";
 
-import { listNotificationInboxAction } from "@/app/actions/notifications";
-import { NotificationList } from "@/components/workspace/notification-list";
+import {
+  NotificationFeed,
+  NotificationFeedSkeleton,
+} from "@/features/notifications/components/notification-feed";
 
 export const metadata: Metadata = { title: "Notifications | Metsys" };
+export const instant = false;
 
-const NotificationsPage = async () => {
-  await connection();
-  const result = await listNotificationInboxAction({
-    limit: 100,
-    unreadOnly: false,
-  });
-  if (!result.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Notifications could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="page">
-      <NotificationList
-        items={result.data.items}
-        unreadCount={result.data.unreadCount}
-      />
-    </div>
-  );
-};
+const NotificationsPage = () => (
+  <div className="page">
+    <Suspense fallback={<NotificationFeedSkeleton />}>
+      <NotificationFeed />
+    </Suspense>
+  </div>
+);
 
 export default NotificationsPage;

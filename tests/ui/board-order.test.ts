@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import {
   moveTaskInColumn,
   orderTasksForBoard,
-} from "../../components/workspace/board-order";
+} from "../../features/tasks/board-order";
 
 const task = (
   id: string,

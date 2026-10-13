@@ -9,7 +9,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { PushNotificationsControl } from "@/components/push-notifications-control";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -19,7 +18,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ProjectIcon } from "@/components/workspace/project-icon";
 import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-menu";
 import { WorkspaceBottomNavigation } from "@/components/workspace/workspace-bottom-navigation";
 import { WorkspaceCreateMenu } from "@/components/workspace/workspace-create-menu";
@@ -27,6 +25,8 @@ import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
 import { sections } from "@/components/workspace/workspace-navigation-data";
 import { WorkspaceSearchPalette } from "@/components/workspace/workspace-search-palette";
 import { WorkspaceUndoProvider } from "@/components/workspace/workspace-undo";
+import { PushNotificationsControl } from "@/features/notifications/components/push-notifications-control";
+import { ProjectIcon } from "@/features/projects/components/project-icon";
 
 export interface WorkspaceProject {
   readonly id: string;

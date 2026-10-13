@@ -9,11 +9,11 @@ import { Star } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   toggleProjectFavoriteAction,
   toggleTaskFavoriteAction,
-} from "@/app/actions/discovery";
-import { WorkspaceButton } from "@/components/workspace/workspace-button";
+} from "@/features/discovery/discovery-actions";
 
 const FavoriteToggle = ({
   kind,

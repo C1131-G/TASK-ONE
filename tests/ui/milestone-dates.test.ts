@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import {
   milestoneDateAfterDrag,
   withMilestoneDate,
-} from "../../components/workspace/milestone-dates";
+} from "../../features/projects/milestone-dates";
 
 const kickoff = {
   completed: true,

@@ -1,0 +1,33 @@
+// Every module whose exports are reachable from a request: Server Action
+// entries and server-only queries. Permission and replay coverage tests walk
+// this list so a new export cannot slip past them.
+export const serverEntryModules = await Promise.all([
+  import("../../../features/calendar/calendar-actions"),
+  import("../../../features/company/company-actions"),
+  import("../../../features/discovery/discovery-actions"),
+  import("../../../features/files/files-actions"),
+  import("../../../features/notifications/notifications-actions"),
+  import("../../../features/people/actions/teams"),
+  import("../../../features/people/people-actions"),
+  import("../../../features/projects/actions/saved-views"),
+  import("../../../features/projects/projects-actions"),
+  import("../../../features/tasks/actions/labels"),
+  import("../../../features/tasks/actions/subtasks"),
+  import("../../../features/tasks/actions/task-comments"),
+  import("../../../features/tasks/tasks-actions"),
+  import("../../../features/user/actions/password"),
+  import("../../../features/user/actions/personal-preferences"),
+  import("../../../features/user/actions/sessions"),
+  import("../../../features/activity/activity-queries"),
+  import("../../../features/calendar/calendar-queries"),
+  import("../../../features/company/company-queries"),
+  import("../../../features/dashboard/dashboard-queries"),
+  import("../../../features/discovery/discovery-queries"),
+  import("../../../features/files/files-queries"),
+  import("../../../features/jobs/jobs-queries"),
+  import("../../../features/notifications/notifications-queries"),
+  import("../../../features/people/people-queries"),
+  import("../../../features/projects/projects-queries"),
+  import("../../../features/tasks/tasks-queries"),
+  import("../../../features/user/user-queries"),
+]);

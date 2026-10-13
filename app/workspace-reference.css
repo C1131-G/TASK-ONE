@@ -9479,3 +9479,38 @@
     flex-direction: column;
   }
 }
+/* one-time temporary password reveal */
+.workspace-app .temp-password {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.workspace-app .temp-password-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workspace-app .temp-password-value {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+/* shared panel skeleton */
+.workspace-app .skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.workspace-app .skeleton-row {
+  height: 36px;
+}
+.workspace-app .home-stats-skeleton {
+  height: 84px;
+  margin-bottom: 16px;
+  border-radius: var(--r-lg);
+}

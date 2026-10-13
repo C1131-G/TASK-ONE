@@ -1,0 +1,60 @@
+"use server";
+
+/* eslint-disable func-style -- Next Server Actions require named declarations. */
+
+import {
+  restoreProjectAction as restoreProjectImpl,
+  saveProjectMilestonesAction as saveProjectMilestonesImpl,
+  setProjectPeopleAction as setProjectPeopleImpl,
+} from "./actions/project-people-and-milestones";
+import {
+  archiveProjectAction as archiveProjectImpl,
+  createProjectAction as createProjectImpl,
+  duplicateProjectAction as duplicateProjectImpl,
+  updateProjectAction as updateProjectImpl,
+} from "./actions/project-records";
+import {
+  createSavedViewAction as createSavedViewImpl,
+  deleteSavedViewAction as deleteSavedViewImpl,
+  updateSavedViewAction as updateSavedViewImpl,
+} from "./actions/saved-views";
+
+export async function createProjectAction(input: unknown) {
+  return await createProjectImpl(input);
+}
+
+export async function duplicateProjectAction(input: unknown) {
+  return await duplicateProjectImpl(input);
+}
+
+export async function updateProjectAction(input: unknown) {
+  return await updateProjectImpl(input);
+}
+
+export async function archiveProjectAction(input: unknown) {
+  return await archiveProjectImpl(input);
+}
+
+export async function restoreProjectAction(input: unknown) {
+  return await restoreProjectImpl(input);
+}
+
+export async function setProjectPeopleAction(input: unknown) {
+  return await setProjectPeopleImpl(input);
+}
+
+export async function saveProjectMilestonesAction(input: unknown) {
+  return await saveProjectMilestonesImpl(input);
+}
+
+export async function createSavedViewAction(input: unknown) {
+  return await createSavedViewImpl(input);
+}
+
+export async function updateSavedViewAction(input: unknown) {
+  return await updateSavedViewImpl(input);
+}
+
+export async function deleteSavedViewAction(input: unknown) {
+  return await deleteSavedViewImpl(input);
+}

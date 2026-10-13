@@ -1,0 +1,275 @@
+/* Auth buttons, links, alerts, request-access steps and password meters. */
+/* ---------- buttons & links ---------- */
+.auth-app .auth-submit {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-block-start: 4px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 6px 16px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition:
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.auth-app .auth-submit:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 88%, var(--text));
+}
+
+.auth-app .auth-submit:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.auth-app .auth-submit:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.auth-app .auth-submit svg {
+  transition: transform var(--dur) var(--ease);
+}
+
+.auth-app .auth-submit:hover:not(:disabled) .auth-submit-arrow {
+  transform: translateX(2px);
+}
+
+.auth-spin {
+  animation: auth-spin 0.7s linear infinite;
+}
+
+.auth-app .auth-ghost {
+  display: inline-flex;
+  height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-app .auth-ghost:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.auth-app .auth-icon-btn {
+  width: 30px;
+  justify-content: center;
+  padding: 0;
+}
+
+.auth-theme-sun,
+.dark .auth-theme-moon {
+  display: none;
+}
+
+.dark .auth-theme-sun {
+  display: block;
+}
+
+.auth-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-app :is(.auth-submit, .auth-ghost, .auth-eye, .auth-link):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.auth-app .auth-submit-link {
+  text-decoration: none;
+}
+
+/* ---------- request access steps ---------- */
+.auth-steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+  list-style: none;
+}
+
+.auth-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.auth-steps li + li {
+  border-top: 1px solid var(--border);
+}
+
+.auth-step-num {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.auth-step-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.auth-step-copy b {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.auth-step-copy span {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+/* ---------- messages ---------- */
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: var(--red-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--red) 22%, transparent);
+  color: var(--red);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.auth-alert:empty {
+  display: none;
+}
+
+.auth-alert svg {
+  flex: none;
+  margin-block-start: 1px;
+}
+
+.auth-foot-note {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.auth-divider {
+  height: 1px;
+  margin-block: 2px;
+  background: var(--border);
+}
+
+/* ---------- password strength ---------- */
+.auth-strength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 16px;
+}
+
+.auth-strength[data-level="0"] {
+  --meter: var(--red);
+}
+
+.auth-strength[data-level="1"] {
+  --meter: var(--amber);
+}
+
+.auth-strength[data-level="2"],
+.auth-strength[data-level="3"] {
+  --meter: var(--green);
+}
+
+.auth-strength-bars {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.auth-strength-bars i {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--surface-3);
+  transition: background 220ms var(--ease);
+}
+
+.auth-strength-bars i[data-on="true"] {
+  background: var(--meter);
+}
+
+.auth-strength-label {
+  width: 64px;
+  color: var(--meter);
+  font-size: 11.5px;
+  text-align: right;
+}
+
+.auth-match {
+  display: flex;
+  min-height: 16px;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.auth-match[data-state="ok"] {
+  color: var(--green);
+}
+
+.auth-match[data-state="no"] {
+  color: var(--text-3);
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-spin {
+    animation: none;
+  }
+}

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "bun:test";
 
-import type { EditableTask } from "../../components/workspace/task-details-draft";
+import type { EditableTask } from "../../features/tasks/task-details-draft";
 import {
   draftFromTask,
   isDraftDirty,
-} from "../../components/workspace/task-details-draft";
+} from "../../features/tasks/task-details-draft";
 
 const task: EditableTask = {
   assigneeIds: ["b-id", "a-id"],

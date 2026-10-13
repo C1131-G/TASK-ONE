@@ -5,7 +5,7 @@ import {
   insertMention,
   mentionSegments,
   mentionToken,
-} from "../../components/workspace/task-mentions";
+} from "../../features/tasks/task-mentions";
 
 const ada = "11111111-1111-4111-8111-111111111111";
 

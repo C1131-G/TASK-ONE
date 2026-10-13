@@ -19,7 +19,7 @@ export const adminOnlyNames: readonly string[] = [
   "changeEmployeeRoleAction",
   "resetEmployeePasswordAction",
   "updateEmployeeDetailsAction",
-  "listDeadJobsAction",
+  "listDeadJobs",
   "createLabelAction",
   "updateLabelAction",
   "removeLabelAction",
@@ -30,7 +30,7 @@ export const adminOnlyNames: readonly string[] = [
   "restoreProjectAction",
   "setProjectPeopleAction",
   "saveProjectMilestonesAction",
-  "listEmployeeSessionsAction",
+  "listEmployeeSessions",
   "archiveTaskAction",
   "restoreTaskAction",
   "undoTaskArchiveAction",
@@ -39,4 +39,5 @@ export const adminOnlyNames: readonly string[] = [
   "deleteTeamAction",
   "requestProjectUploadAction",
   "listProjectFilesAction",
+  "listProjectFiles",
 ];

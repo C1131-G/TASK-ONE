@@ -1,88 +1,15 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Metadata, Route } from "next";
-import Link from "next/link";
-import { connection } from "next/server";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { listProjectsAction } from "@/app/actions/projects";
-import { listProjectFilesAction } from "@/app/actions/uploads";
-import { ProjectFiles } from "@/components/workspace/project-files";
-import { getPageSession } from "@/src/server/auth/page-session";
+import {
+  WorkspaceFiles,
+  WorkspaceFilesSkeleton,
+} from "@/features/files/components/workspace-files";
 
 export const metadata: Metadata = { title: "Files | Metsys" };
-
-const FilesContent = async () => {
-  await connection();
-  const [projects, session] = await Promise.all([
-    listProjectsAction({}),
-    getPageSession(),
-  ]);
-  if (!projects.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Files could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-  const fileResults = await Promise.all(
-    projects.data.map(async (project) => ({
-      files: await listProjectFilesAction({ projectId: project.id }),
-      project,
-    }))
-  );
-  const isAdmin =
-    session.kind === "authenticated" && session.user.role === "admin";
-
-  return (
-    <>
-      {fileResults.map(({ files, project }) => (
-        <section className="stack file-project" key={project.id}>
-          <div className="row">
-            <h2>{project.name}</h2>
-            <span className="sp" />
-            <Link
-              className="btn btn-sm btn-ghost"
-              href={`/projects/${project.id}?view=files` as Route}
-            >
-              Open project files
-            </Link>
-          </div>
-          {files.ok ? (
-            <ProjectFiles
-              canUpload={isAdmin}
-              currentUserId={
-                session.kind === "authenticated" ? session.user.id : null
-              }
-              initialFiles={files.data}
-              isAdmin={isAdmin}
-              projectId={project.id}
-            />
-          ) : (
-            <p className="panel panel-b muted">
-              Files are unavailable for this project.
-            </p>
-          )}
-        </section>
-      ))}
-      {projects.data.length === 0 ? (
-        <section className="panel panel-b muted">
-          Create a project to start sharing files.
-        </section>
-      ) : null}
-    </>
-  );
-};
-
-const FilesLoading = () => (
-  <output
-    aria-busy="true"
-    aria-live="polite"
-    className="file-loading-state panel panel-b muted"
-  >
-    Loading project files…
-  </output>
-);
+export const instant = false;
 
 const FilesPage = () => (
   <div className="page wide">
@@ -92,8 +19,8 @@ const FilesPage = () => (
         <p>Files shared with your projects.</p>
       </div>
     </div>
-    <Suspense fallback={<FilesLoading />}>
-      <FilesContent />
+    <Suspense fallback={<WorkspaceFilesSkeleton />}>
+      <WorkspaceFiles />
     </Suspense>
   </div>
 );

@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import {
   createUploadStore,
   uploadPercent,
-} from "../../components/workspace/upload-store";
+} from "../../features/files/upload-store";
 
 const item = { id: "a", name: "plan.pdf", sizeBytes: 200 };
 

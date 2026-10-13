@@ -6,8 +6,8 @@ import {
   datesForDueDay,
   dayDiff,
   sameSpan,
-} from "../../components/workspace/task-dates";
-import { canEditTaskRecord } from "../../components/workspace/task-permissions";
+} from "../../features/tasks/task-dates";
+import { canEditTaskRecord } from "../../features/tasks/task-permissions";
 
 const span = { dueDate: "2026-10-12", startDate: "2026-10-08" };
 

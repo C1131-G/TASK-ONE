@@ -1,24 +1,7 @@
 import { expect, it } from "bun:test";
 
-const calendar = await import("../../app/actions/calendar");
-const comments = await import("../../app/actions/comments");
-const companySettings = await import("../../app/actions/company-settings");
-const dashboard = await import("../../app/actions/dashboard");
-const discovery = await import("../../app/actions/discovery");
-const employees = await import("../../app/actions/employees");
-const jobs = await import("../../app/actions/jobs");
-const labels = await import("../../app/actions/labels");
-const notifications = await import("../../app/actions/notifications");
-const password = await import("../../app/actions/password");
-const personalPreferences =
-  await import("../../app/actions/personal-preferences");
-const projects = await import("../../app/actions/projects");
-const savedViews = await import("../../app/actions/saved-views");
-const sessions = await import("../../app/actions/sessions");
-const subtasks = await import("../../app/actions/subtasks");
-const tasks = await import("../../app/actions/tasks");
-const teams = await import("../../app/actions/teams");
-const uploads = await import("../../app/actions/uploads");
+import "./support/server-only-stub";
+import { serverEntryModules } from "./support/server-entry-modules";
 
 const READ_ACTION_PREFIX = /^(?:get|list|search)/u;
 const excludedByDesign = new Set([
@@ -97,28 +80,7 @@ const replayedMutations = new Set([
 ]);
 
 it("accounts for each Server Action as a read, an exclusion, or a replayed mutation", () => {
-  const exported = new Set(
-    Object.values({
-      calendar,
-      comments,
-      companySettings,
-      dashboard,
-      discovery,
-      employees,
-      jobs,
-      labels,
-      notifications,
-      password,
-      personalPreferences,
-      projects,
-      savedViews,
-      sessions,
-      subtasks,
-      tasks,
-      teams,
-      uploads,
-    }).flatMap(Object.keys)
-  );
+  const exported = new Set(serverEntryModules.flatMap(Object.keys));
   expect(
     [...exported].filter(
       (name) =>

@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { QuickTaskForm } from "@/components/workspace/quick-task-form";
+import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
 
 const WorkspaceCreateMenu = ({
   isAdmin,

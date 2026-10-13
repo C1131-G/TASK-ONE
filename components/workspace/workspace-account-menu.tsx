@@ -3,7 +3,6 @@
 import { CaretUpDown } from "@phosphor-icons/react";
 import Link from "next/link";
 
-import { SignOutButton } from "@/components/sign-out-button";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SignOutButton } from "@/features/user/components/sign-out-button";
 
 const WorkspaceAccountMenu = ({
   name,
