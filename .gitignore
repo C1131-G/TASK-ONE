@@ -48,3 +48,6 @@ AGENTS.md
 /test-results/
 /playwright-report/
 /tests/e2e/.auth/
+
+# Local-only development seed scripts
+/scripts/seed-*.ts

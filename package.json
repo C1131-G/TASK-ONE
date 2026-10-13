@@ -13,7 +13,6 @@
     "test:backend": "bun run scripts/test-backend.ts",
     "test:ui": "bun test tests/ui",
     "bootstrap:admin": "bun run scripts/bootstrap-admin.ts",
-    "seed:test-users": "bun run scripts/seed-test-users.ts",
     "worker": "bun run scripts/run-worker.ts",
     "check": "ultracite check",
     "fix": "ultracite fix",
@@ -26,9 +25,7 @@
     "db:plan": "prisma migration plan",
     "db:migrate": "prisma db migrate",
     "db:verify": "prisma db verify",
-    "test:e2e": "playwright test",
-    "seed:ui-fixtures": "bun run scripts/seed-ui-fixtures.ts",
-    "seed:cibi-ui": "bun run scripts/seed-cibi-ui-accounts.ts && bun run seed:ui-fixtures"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1147.0",

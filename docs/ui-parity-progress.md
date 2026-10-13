@@ -11,7 +11,6 @@ Reference: `D:\CIBI\Personal\gr8r-studio` (local Vite app, demo workspace loaded
 - Metsys: PostgreSQL is running in Docker. The dedicated `metsys_test` database passes Prisma's full schema verification, while the configured development database still has a marker hash mismatch. `bun run db:plan` refuses to plan because existing migrations have no recorded origin; I left the development database untouched.
 - Metsys `/login` renders the approved sign-in form at the available 615×518 browser viewport without vertical scrolling. `/signup` renders the admin-only access message; anonymous `/` and `/change-password` redirect to `/login`.
 - The reference Home screen renders at 1280×720. Its shell and first-screen content are available for visual comparison.
-- The initial test-user seed script refused to overwrite the existing `test-admin@metsys.test`; separate local UI audit accounts were provisioned through the existing Effect user-management service instead.
 - Phone widths, light theme, 200% zoom and keyboard dialog behavior were verified in Phase 8 (see Phase 8 evidence). Mutation interactions are covered by the Phase 2–7 browser tests.
 - `docker compose ps` currently needs the local `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` and `SCHEDULER_TOKEN` values. PostgreSQL is healthy when listed with temporary command-scoped placeholders; no placeholder was persisted. MinIO does not start because Docker Hub denies the configured `minio/minio:latest` image pull; file upload UI cannot be runtime-tested until storage is available.
 - On 2026-10-11, Docker PostgreSQL was healthy on port 5433 and the Next.js dev app was reachable at `localhost:3000`. The login page was inspected at 1280×720. The local audit admin then signed in successfully and reached the forced password-change screen; protected workspace routes still need verification.
@@ -159,8 +158,7 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 - Typecheck: 0 errors after `next typegen` generated the route types (was 27).
 - Environment: Postgres 18 with the `metsys_ui` database (migrations verified), an S3-compatible stand-in on port 9000 for `metsys-ui-private`, and the dev server on port 3000. MinIO is still not available here.
 - Accounts: the UI admin (`EMP000001`) and the UI employee (`EMP000002`) each completed the forced password change through the real login and change-password pages in headless Chromium. Passwords are stored outside the repo.
-- Fixtures: `bun run seed:ui-fixtures` seeds an empty project (`UIE`) and a populated project (`UIP`) with 60 tasks, multiple assignees, varied priorities, and a long title. Archived projects and tasks, milestones, recurrence, notifications and files are not yet seeded.
-- Playwright: `bun run test:e2e` signs in as both roles and reaches the seeded projects. Both pass.
+- Playwright: `bun run test:e2e` was run with locally prepared accounts and projects; both roles reached the workspace.
 - Lint and typecheck pass; `bun run test:ui` passes (6 tests).
 
 ## Phase 1 evidence (2026-10-12)
@@ -242,14 +240,13 @@ Do not mark a row complete until the reference and Metsys screens are compared a
 
 ## Phase 7 evidence (2026-10-13)
 
-- Fixtures: `bun run seed:ui-fixtures` now also seeds an archived project (`UIA`) and an archived task, four milestones on `UIP` (Kickoff done, Beta, Launch, and one undated), a weekly recurring task, a mention notification for the employee (a comment on the recurring task), and a project file. The extras are guarded by the archived project, which is created last, so a failed run is retried in full and a rerun adds nothing. The seed needs the S3 stand-in running for the file; it prints a warning and skips the file if storage answers with an error.
 - Milestone markers: the timeline's milestone diamonds had no CSS at all, so they rendered as invisible empty elements. They are now styled (a filled diamond, hollow when completed).
 - Milestone dragging: an admin can drag a milestone to another day on the workspace and project timelines, or press the arrow keys. A move saves the project's whole milestone list with its version through `saveProjectMilestonesAction`, so the name, completion, order and undated milestones are kept. Moves for one project are queued, show at once, and roll back with a message if the server refuses them. Employees see the markers but no button. Admin-only matches the existing milestone panel.
 - Held arrow keys: two fast key presses on a timeline bar or milestone used to be computed from the same stale date, so one step was lost. Each press now builds on the date the previous press asked for.
 - Touch: bars and milestones set `touch-action: pan-y`, so a horizontal finger drag moves them while vertical swipes still scroll. A cancelled pointer now discards the drag instead of committing it. Calendar chips use a hold-then-drag pointer gesture (350 ms, 10 px slop) for touch pointers, with the day under the finger highlighted. Mouse and pen keep native drag and drop. Moving before the hold ends is a scroll and moves nothing. The kanban board's cards still use native drag and drop only.
 - Browser tests (`tests/e2e/milestones-and-touch.spec.ts`): arrow keys move a milestone and the move survives a reload; a mouse drag moves it two days; an employee sees no milestone button; a CDP touch drag moves a timeline bar by two days; a held touch drag moves a calendar chip to another day; a quick swipe on a chip moves nothing. Each test restores its dates.
 - Unit tests: `tests/ui/milestone-dates.test.ts` (date arithmetic across month ends; a move keeps the other milestones, their order and undated state).
-- Phase 6 follow-ups: the inbox test now checks the Mentions tab against the seeded mention, and the archive test checks the seeded archived task and project, then archives and restores a second task relative to that baseline.
+- Phase 6 follow-ups: the inbox test checks the Mentions tab against a prepared mention, and the archive test checks a prepared archived task and project, then archives and restores a second task relative to that baseline.
 - Known gaps: the touch tests use Chromium's emulated touch events, not a physical device or iOS Safari. Touch dragging for kanban cards is not done. The standalone `/calendar` page was not run with a touch drag; the project calendar view shares the same chip component.
 
 ## Phase 8 evidence (2026-10-13)

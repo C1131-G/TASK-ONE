@@ -22,34 +22,15 @@ On a fresh database, create the first administrator once with:
 BOOTSTRAP_ADMIN_NAME="Studio Admin" BOOTSTRAP_ADMIN_EMAIL="admin@example.com" bun run bootstrap:admin
 ```
 
-For local UI testing on an already initialized database, seed one test admin and one test employee with:
-
-```bash
-bun run seed:test-users
-```
-
-The command prints each account's employee ID, email, and generated temporary password once. Both accounts must change their password after their first sign-in. It only runs against a local, non-test Metsys database and refuses to overwrite either test email.
-
-To create the Cibi admin and employee accounts and populate the workspace with UI fixtures, run:
-
-```bash
-bun run seed:cibi-ui
-```
-
-This prints generated temporary passwords once. The login emails are `cibi@admin.metsys.test` and `cibi@employee.metsys.test`; both accounts must change their password at first sign-in. The command refuses to overwrite existing accounts and only runs against a local, non-test Metsys database. It seeds empty, populated, and archived projects, task assignments, milestones, recurrence, a mention notification, and a sample project file when local storage is available. Existing UI fixtures are safe to rerun with `bun run seed:ui-fixtures` after the accounts have been created.
-
-The command prints a generated temporary password once and requires a password change at first sign-in. Keep that output private. It refuses to run after an admin account exists.
+The bootstrap command prints a generated temporary password once and requires a password change at first sign-in. Keep that output private. It refuses to run after an admin account exists.
 
 The service, adapter, test coverage, and remaining work checklist is in [`docs/backend-progress.md`](docs/backend-progress.md). Prisma model groups and authorization policy are in [`docs/data-model.md`](docs/data-model.md).
 
 ## UI and browser tests
 
-`bun run test:ui` runs the fast UI unit tests. `bun run test:e2e` runs the Playwright browser tests against a running app (`bun run dev`, or `bun run build` then `bun run start`) and needs seeded data:
+`bun run test:ui` runs the fast UI unit tests. `bun run test:e2e` runs the Playwright browser tests against a running app (`bun run dev`, or `bun run build` then `bun run start`). It requires manually prepared test accounts and workspace data; this repository does not include account or workspace seed scripts.
 
-1. Create the first admin with `bun run bootstrap:admin` and sign in once to change the temporary password.
-2. Run `bun run seed:test-users`, then rename the test employee's email to `ui-employee@metsys.test` and have both accounts change their passwords. The admin must be `ui-admin@metsys.test`.
-3. Run `bun run seed:ui-fixtures`. It seeds two projects, 60 tasks, an archived project and task, milestones, a recurring task, a mention and a file. The file needs the S3 storage to be running.
-4. Export `E2E_ADMIN_PASSWORD` and `E2E_EMPLOYEE_PASSWORD`. Specs skip themselves for a role whose password is not set.
+Export `E2E_ADMIN_PASSWORD` and `E2E_EMPLOYEE_PASSWORD` for the prepared accounts. Specs skip themselves for a role whose password is not set. Configure the accounts with the emails expected by the browser tests and create the projects, tasks, milestones, notifications, and files those tests exercise.
 
 The suite checks keyboard use of every dialog, sheet and menu, WCAG A and AA rules with axe, and sideways scrolling at 320, 430, 768 and 1024px and at 200% and 400% zoom sizes, in both themes. Sign-ins are limited to five a minute, so wait a minute between full runs. A browser PUT to local S3-compatible storage needs a bucket CORS rule that allows your app's origin. Set `E2E_BASE_URL` or `E2E_CHROMIUM_PATH` if the app or the browser is somewhere else.
 
