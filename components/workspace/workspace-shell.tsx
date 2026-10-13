@@ -98,7 +98,6 @@ const WorkspaceLink = ({
   readonly unreadCount?: number;
 }) => (
   <Link
-    aria-label={unreadCount > 0 ? `${label}, ${unreadCount} unread` : undefined}
     aria-current={active ? "page" : undefined}
     className={`sitem${active ? " on" : ""}`}
     href={href as Route}
@@ -106,9 +105,12 @@ const WorkspaceLink = ({
     <Icon aria-hidden="true" size={16} weight={active ? "fill" : "regular"} />
     <span className="trunc">{label}</span>
     {unreadCount > 0 ? (
-      <span aria-hidden="true" className="ct dotc">
-        {unreadCount > 99 ? "99+" : unreadCount}
-      </span>
+      <>
+        <span className="ct dotc">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+        <span className="sr-only">unread</span>
+      </>
     ) : null}
   </Link>
 );
@@ -203,9 +205,7 @@ export const WorkspaceShell = ({
           <nav aria-label="Main" className="side">
             <div className="side-top">
               <Link aria-label="Metsys home" className="ws" href="/">
-                <span aria-hidden="true" className="ws-logo">
-                  M
-                </span>
+                <span aria-hidden="true" className="ws-logo" data-initial="M" />
                 <span className="ws-name trunc">Metsys</span>
               </Link>
             </div>
@@ -323,7 +323,7 @@ export const WorkspaceShell = ({
               <Link
                 aria-label={
                   label === "Inbox" && unreadInboxCount > 0
-                    ? `Inbox, ${unreadInboxCount} unread`
+                    ? `Inbox ${unreadInboxCount > 99 ? "99+" : unreadInboxCount} unread`
                     : undefined
                 }
                 aria-current={pathname === href ? "page" : undefined}

@@ -42,6 +42,7 @@ export const ProjectTaskViews = ({
   calendarMode,
   calendarEvents,
   milestones,
+  milestonesVersion,
   timelineRange,
 }: {
   readonly view: string;
@@ -57,6 +58,7 @@ export const ProjectTaskViews = ({
   readonly calendarMode: "month" | "week";
   readonly calendarEvents: readonly CalendarEventSummary[] | null;
   readonly milestones: readonly ProjectMilestone[];
+  readonly milestonesVersion: number;
   readonly timelineRange: { readonly from: string; readonly to: string } | null;
 }) => {
   const [calendarTaskOpen, setCalendarTaskOpen] = useState(false);
@@ -138,20 +140,18 @@ export const ProjectTaskViews = ({
         from={timelineRange.from}
         milestoneLanes={[
           {
-            milestones: milestones.flatMap((milestone) =>
-              milestone.dueDate
-                ? [
-                    {
-                      completed: milestone.completed,
-                      dueDate: milestone.dueDate,
-                      id: milestone.id,
-                      name: milestone.name,
-                    },
-                  ]
-                : []
+            allMilestones: milestones.map(
+              ({ completed, dueDate, id, name }) => ({
+                completed,
+                dueDate,
+                id,
+                name,
+              })
             ),
+            editable: isAdmin,
             projectId: project.id,
             projectName: project.name,
+            version: milestonesVersion,
           },
         ]}
         tasks={tasks.map((task) => ({

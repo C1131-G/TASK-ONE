@@ -75,21 +75,18 @@ const TimelineContent = async ({
       milestoneResult.ok
         ? [
             {
-              milestones: milestoneResult.data.milestones.flatMap(
-                (milestone) =>
-                  milestone.dueDate
-                    ? [
-                        {
-                          completed: milestone.completed,
-                          dueDate: milestone.dueDate,
-                          id: milestone.id,
-                          name: milestone.name,
-                        },
-                      ]
-                    : []
+              allMilestones: milestoneResult.data.milestones.map(
+                ({ completed, dueDate, id, name }) => ({
+                  completed,
+                  dueDate,
+                  id,
+                  name,
+                })
               ),
+              editable: isAdmin,
               projectId: project.id,
               projectName: project.name,
+              version: milestoneResult.data.version,
             },
           ]
         : []

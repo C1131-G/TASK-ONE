@@ -333,7 +333,7 @@ export const TaskCalendarGrid = ({
         ) : null}
         <div aria-label="Calendar view" className="calendar-view-toggle">
           <Button
-            aria-pressed={viewMode === "month"}
+            aria-current={viewMode === "month" ? "page" : undefined}
             asChild
             size="sm"
             variant={viewMode === "month" ? "default" : "outline"}
@@ -341,7 +341,7 @@ export const TaskCalendarGrid = ({
             <Link href={calendarHref(0, "month")}>Month</Link>
           </Button>
           <Button
-            aria-pressed={viewMode === "week"}
+            aria-current={viewMode === "week" ? "page" : undefined}
             asChild
             size="sm"
             variant={viewMode === "week" ? "default" : "outline"}

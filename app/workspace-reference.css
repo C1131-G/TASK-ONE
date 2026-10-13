@@ -792,6 +792,14 @@
   color: inherit;
   text-decoration: none;
 }
+/* A link styled as a primary button keeps the button's text colour. */
+.workspace-app a.text-primary-foreground {
+  color: var(--primary-foreground);
+}
+/* Initials are drawn by CSS so the visible text is only what the name repeats. */
+.workspace-app [data-initial]::before {
+  content: attr(data-initial);
+}
 .workspace-app svg.i {
   flex-shrink: 0;
   display: block;
@@ -4407,20 +4415,19 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex-wrap: wrap;
   margin: 0;
-  overflow-x: auto;
   padding: 0;
-  scrollbar-width: none;
   list-style: none;
 }
 .workspace-app .calendar-project-legend-item {
   display: inline-flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   color: var(--text-2);
   font-size: var(--fs-xs);
-  white-space: nowrap;
 }
 .workspace-app .calendar-project-legend-item .pdot {
   background: var(--c);
@@ -4827,6 +4834,37 @@
   white-space: nowrap;
   z-index: 3;
   user-select: none;
+}
+.workspace-app .cday[data-touch-over="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.workspace-app .cal-chip[data-touch-dragging="true"] {
+  opacity: 0.7;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
+.workspace-app .tl-milestone {
+  position: absolute;
+  top: 12px;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  z-index: 3;
+}
+.workspace-app .tl-milestone.done {
+  background: transparent;
+}
+.workspace-app .tl-milestone.movable {
+  cursor: grab;
+}
+/* A touch drag along the day axis moves the item; vertical swipes still scroll. */
+.workspace-app .bar.movable,
+.workspace-app .tl-milestone.movable {
+  touch-action: pan-y;
 }
 .workspace-app .bar:hover {
   border-color: var(--c);

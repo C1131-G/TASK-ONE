@@ -187,7 +187,7 @@ const TeamCreateForm = () => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const create = (formData: FormData) =>
+  const create = (formData: FormData, close: () => void) =>
     startTransition(async () => {
       const result = await createTeamAction({
         color: String(formData.get("color")),
@@ -200,6 +200,7 @@ const TeamCreateForm = () => {
         return;
       }
       setError(null);
+      close();
       router.refresh();
     });
   return (
@@ -212,63 +213,68 @@ const TeamCreateForm = () => {
         </WorkspaceButton>
       }
     >
-      <form
-        className="panel-b stack"
-        onSubmit={(event) => {
-          event.preventDefault();
-          create(new FormData(event.currentTarget));
-        }}
-      >
-        <div className="row">
-          <label
-            className="field grow"
-            htmlFor="metsys-people-admin-forms-field-195"
-          >
-            <span>Team name</span>
-            <WorkspaceInput
-              className="input"
-              maxLength={80}
-              name="name"
-              required
-              id="metsys-people-admin-forms-field-195"
-            />
-          </label>
+      {(close) => (
+        <form
+          className="panel-b stack"
+          onSubmit={(event) => {
+            event.preventDefault();
+            create(new FormData(event.currentTarget), close);
+          }}
+        >
+          <div className="row">
+            <label
+              className="field grow"
+              htmlFor="metsys-people-admin-forms-field-195"
+            >
+              <span>Team name</span>
+              <WorkspaceInput
+                className="input"
+                maxLength={80}
+                name="name"
+                required
+                id="metsys-people-admin-forms-field-195"
+              />
+            </label>
+            <label
+              className="field"
+              htmlFor="metsys-people-admin-forms-field-204"
+            >
+              <span>Color</span>
+              <WorkspaceInput
+                className="input"
+                defaultValue="#4b5bd6"
+                name="color"
+                type="color"
+                id="metsys-people-admin-forms-field-204"
+              />
+            </label>
+          </div>
           <label
             className="field"
-            htmlFor="metsys-people-admin-forms-field-204"
+            htmlFor="metsys-people-admin-forms-field-214"
           >
-            <span>Color</span>
+            <span>Description</span>
             <WorkspaceInput
               className="input"
-              defaultValue="#4b5bd6"
-              name="color"
-              type="color"
-              id="metsys-people-admin-forms-field-204"
+              maxLength={500}
+              name="description"
+              id="metsys-people-admin-forms-field-214"
             />
           </label>
-        </div>
-        <label className="field" htmlFor="metsys-people-admin-forms-field-214">
-          <span>Description</span>
-          <WorkspaceInput
-            className="input"
-            maxLength={500}
-            name="description"
-            id="metsys-people-admin-forms-field-214"
-          />
-        </label>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <WorkspaceButton
-          className="btn btn-primary"
-          disabled={pending}
-          type="submit"
-        >
-          {pending ? "Creating…" : "Create team"}
-        </WorkspaceButton>
-      </form>
+          {error ? (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <WorkspaceButton
+            className="btn btn-primary"
+            disabled={pending}
+            type="submit"
+          >
+            {pending ? "Creating…" : "Create team"}
+          </WorkspaceButton>
+        </form>
+      )}
     </WorkspaceDisclosure>
   );
 };

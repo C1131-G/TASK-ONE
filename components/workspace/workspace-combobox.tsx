@@ -77,7 +77,7 @@ const WorkspaceCombobox = ({
         <WorkspaceButton
           aria-expanded={open}
           aria-haspopup="listbox"
-          aria-label={ariaLabel}
+          aria-label={`${ariaLabel}: ${selectedOption?.label ?? placeholder}`}
           aria-controls={`${id}-options`}
           className={cn("w-full justify-between", className)}
           disabled={disabled}

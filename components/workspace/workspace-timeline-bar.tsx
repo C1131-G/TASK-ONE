@@ -6,7 +6,11 @@ import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 
 import type { DragMode, TaskSpan } from "@/components/workspace/task-dates";
-import { datesAfterDrag, dayDiff } from "@/components/workspace/task-dates";
+import {
+  datesAfterDrag,
+  dayDiff,
+  sameSpan,
+} from "@/components/workspace/task-dates";
 import { useTaskDrawer } from "@/components/workspace/task-drawer";
 import type { TimelineTask } from "@/components/workspace/workspace-timeline-types";
 
@@ -44,6 +48,10 @@ export const TimelineBar = ({
     readonly mode: DragMode;
   } | null>(null);
   const span: TaskSpan = { dueDate: task.dueDate, startDate: task.startDate };
+  // The span the last key press asked for, and the span it started from. A
+  // second press before the move has rendered builds on it, so a held arrow key
+  // does not lose steps; once the task has moved, the shown span is used.
+  const requested = useRef<{ from: TaskSpan; span: TaskSpan } | null>(null);
   const shown = preview
     ? datesAfterDrag(span, preview.mode, preview.days)
     : span;
@@ -102,6 +110,12 @@ export const TimelineBar = ({
     onMove(task, datesAfterDrag(span, finished.mode, finished.days));
   };
 
+  // A cancelled pointer, such as the browser taking over to scroll, drops the drag.
+  const handlePointerCancel = () => {
+    drag.current = null;
+    setPreview(null);
+  };
+
   const handleClick = () => {
     if (suppressClick.current) {
       suppressClick.current = false;
@@ -127,7 +141,13 @@ export const TimelineBar = ({
     } else if (event.shiftKey) {
       mode = "due";
     }
-    onMove(task, datesAfterDrag(span, mode, step));
+    const base =
+      requested.current && sameSpan(requested.current.from, span)
+        ? requested.current.span
+        : span;
+    const next = datesAfterDrag(base, mode, step);
+    requested.current = { from: span, span: next };
+    onMove(task, next);
   };
 
   return (
@@ -136,7 +156,7 @@ export const TimelineBar = ({
       className={`bar${task.status === "done" ? " done" : ""}${editable ? " movable" : ""}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      onPointerCancel={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

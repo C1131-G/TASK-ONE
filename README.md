@@ -34,6 +34,17 @@ The command prints a generated temporary password once and requires a password c
 
 The service, adapter, test coverage, and remaining work checklist is in [`docs/backend-progress.md`](docs/backend-progress.md). Prisma model groups and authorization policy are in [`docs/data-model.md`](docs/data-model.md).
 
+## UI and browser tests
+
+`bun run test:ui` runs the fast UI unit tests. `bun run test:e2e` runs the Playwright browser tests against a running app (`bun run dev`, or `bun run build` then `bun run start`) and needs seeded data:
+
+1. Create the first admin with `bun run bootstrap:admin` and sign in once to change the temporary password.
+2. Run `bun run seed:test-users`, then rename the test employee's email to `ui-employee@metsys.test` and have both accounts change their passwords. The admin must be `ui-admin@metsys.test`.
+3. Run `bun run seed:ui-fixtures`. It seeds two projects, 60 tasks, an archived project and task, milestones, a recurring task, a mention and a file. The file needs the S3 storage to be running.
+4. Export `E2E_ADMIN_PASSWORD` and `E2E_EMPLOYEE_PASSWORD`. Specs skip themselves for a role whose password is not set.
+
+The suite checks keyboard use of every dialog, sheet and menu, WCAG A and AA rules with axe, and sideways scrolling at 320, 430, 768 and 1024px and at 200% and 400% zoom sizes, in both themes. Sign-ins are limited to five a minute, so wait a minute between full runs. A browser PUT to local S3-compatible storage needs a bucket CORS rule that allows your app's origin. Set `E2E_BASE_URL` or `E2E_CHROMIUM_PATH` if the app or the browser is somewhere else.
+
 ## Docker
 
 Set `BETTER_AUTH_SECRET`, `SCHEDULER_TOKEN`, and a stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in `.env`, then run `docker compose up --build`. Generate the auth and scheduler secrets independently. Generate the Next.js key with `openssl rand -base64 32`; use the same key for every app replica and keep it stable across deployments. The example key is a placeholder and must be replaced.

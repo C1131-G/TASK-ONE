@@ -197,7 +197,7 @@ export const ProjectSavedViews = ({
           title="Save project view"
           trigger={
             <WorkspaceButton
-              aria-label="Save project view"
+              aria-label="Save view of this project"
               className="tab"
               type="button"
             >

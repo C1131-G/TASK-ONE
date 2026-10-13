@@ -11,7 +11,9 @@ const WorkspaceDisclosure = ({
   title,
   trigger,
 }: {
-  readonly children: ReactNode;
+  // A function child receives close, so a form can dismiss the dialog once its
+  // action succeeds.
+  readonly children: ReactNode | ((close: () => void) => ReactNode);
   readonly description: string;
   readonly title: string;
   readonly trigger: ReactNode;
@@ -26,7 +28,9 @@ const WorkspaceDisclosure = ({
       title={title}
       trigger={trigger}
     >
-      {children}
+      {typeof children === "function"
+        ? children(() => setOpen(false))
+        : children}
     </WorkspaceModal>
   );
 };

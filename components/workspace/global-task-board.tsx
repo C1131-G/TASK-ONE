@@ -102,7 +102,6 @@ export const GlobalTaskBoard = ({
                 <span className="cnt">{statusTasks.length}</span>
               </header>
               <div
-                aria-label={`Drop tasks in ${status.label}`}
                 className="bcol-b"
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {

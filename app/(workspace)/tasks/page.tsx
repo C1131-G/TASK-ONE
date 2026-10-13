@@ -11,6 +11,8 @@ import { getPersonalPreferencesAction } from "@/app/actions/personal-preferences
 import { listProjectsAction } from "@/app/actions/projects";
 import { listProjectTasksAction } from "@/app/actions/tasks";
 import { GlobalTasksWorkspace } from "@/components/workspace/global-tasks-workspace";
+import { TaskDrawerProvider } from "@/components/workspace/task-drawer";
+import { canEditTaskRecord } from "@/components/workspace/task-permissions";
 import { columnWidthsFromPreferences } from "@/components/workspace/task-table-columns";
 import { GlobalTaskViewStoreProvider } from "@/components/workspace/view-store/global-task-view-store-provider";
 import { getUtcToday } from "@/src/lib/utc-today";
@@ -18,10 +20,19 @@ import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = { title: "Tasks | Metsys" };
 
-const TasksContent = async () => {
+interface TasksSearchParams {
+  readonly task?: string;
+}
+
+const TasksContent = async ({
+  searchParams,
+}: {
+  readonly searchParams: Promise<TasksSearchParams>;
+}) => {
   await connection();
-  const [projects, session, employeeResult, personal, preferences] =
+  const [params, projects, session, employeeResult, personal, preferences] =
     await Promise.all([
+      searchParams,
       listProjectsAction({}),
       getPageSession(),
       listEmployeesAction({ search: "" }),
@@ -60,6 +71,10 @@ const TasksContent = async () => {
   const userId = session.kind === "authenticated" ? session.user.id : null;
   const isAdmin =
     session.kind === "authenticated" && session.user.role === "admin";
+  const editableTaskIds = allTasks.flatMap((task) =>
+    canEditTaskRecord(task, userId, isAdmin) ? [task.id] : []
+  );
+  const employees = employeeResult.ok ? employeeResult.data : [];
   const favoriteTaskIds = new Set(
     personal.ok ? personal.data.tasks.map(({ id }) => id) : []
   );
@@ -70,15 +85,29 @@ const TasksContent = async () => {
         preferences.ok ? preferences.data.taskTableColumnWidths : undefined
       )}
     >
-      <GlobalTasksWorkspace
-        employees={employeeResult.ok ? employeeResult.data : []}
-        favoriteTaskIds={favoriteTaskIds}
+      <TaskDrawerProvider
+        currentUserId={userId}
+        editableTaskIds={editableTaskIds}
+        employees={employees.map(({ id, name }) => ({ id, name }))}
+        initialTaskId={params.task ?? null}
         isAdmin={isAdmin}
-        projects={projects.data.map(({ id, name }) => ({ id, name }))}
-        tasks={allTasks}
-        today={getUtcToday()}
-        userId={userId}
-      />
+        tasks={allTasks.map((task) => ({
+          id: task.id,
+          projectId: task.projectId,
+          title: task.title,
+          version: task.version,
+        }))}
+      >
+        <GlobalTasksWorkspace
+          employees={employees}
+          favoriteTaskIds={favoriteTaskIds}
+          isAdmin={isAdmin}
+          projects={projects.data.map(({ id, name }) => ({ id, name }))}
+          tasks={allTasks}
+          today={getUtcToday()}
+          userId={userId}
+        />
+      </TaskDrawerProvider>
     </GlobalTaskViewStoreProvider>
   );
 };
@@ -90,10 +119,14 @@ const TasksLoading = () => (
 );
 
 // Request data is read inside Suspense so the route shell can prerender.
-const TasksPage = () => (
+const TasksPage = ({
+  searchParams,
+}: {
+  readonly searchParams: Promise<TasksSearchParams>;
+}) => (
   <div className="page flush">
     <Suspense fallback={<TasksLoading />}>
-      <TasksContent />
+      <TasksContent searchParams={searchParams} />
     </Suspense>
   </div>
 );

@@ -75,10 +75,18 @@ const ActivityFeedList = ({
         >
           <div className="activity-tabs">
             <TabsList aria-label="Filter activity">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="status">Status changes</TabsTrigger>
-              <TabsTrigger value="comments">Comments</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="all">
+                All
+              </TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="status">
+                Status changes
+              </TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="comments">
+                Comments
+              </TabsTrigger>
+              <TabsTrigger aria-controls={undefined} value="projects">
+                Projects
+              </TabsTrigger>
             </TabsList>
           </div>
         </Tabs>

@@ -9,6 +9,8 @@ import { AppError } from "../core/action-result";
 const supportedTimezones = new Set([
   ...Intl.supportedValuesOf("timeZone"),
   "UTC",
+  // Node's ICU lists only the legacy Calcutta ID, but the forms default to Kolkata.
+  "Asia/Kolkata",
   "Asia/Calcutta",
 ]);
 

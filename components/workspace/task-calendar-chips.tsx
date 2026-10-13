@@ -7,6 +7,7 @@ import type { DragEvent } from "react";
 
 import { TaskDetailsPanel } from "@/components/workspace/task-details-panel";
 import { canEditTaskRecord } from "@/components/workspace/task-permissions";
+import { useTouchChipDrag } from "@/components/workspace/use-touch-chip-drag";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
@@ -102,11 +103,30 @@ export const CalendarTaskChip = ({
     event.dataTransfer.effectAllowed = "move";
   };
 
+  // A finger holds the chip, then drags it onto a day. The drop is the same move
+  // the mouse drop and the Move control make.
+  const touch = useTouchChipDrag({
+    enabled: movable,
+    onDrop: (day) => onMove?.(task.id, day),
+  });
+
   return (
     <div
       className="cal-chip"
+      data-touch-dragging={touch.dragging || undefined}
       draggable={movable}
-      onDragStart={movable ? startDrag : undefined}
+      onDragStart={
+        movable
+          ? (event) => {
+              if (touch.dragging) {
+                event.preventDefault();
+                return;
+              }
+              startDrag(event);
+            }
+          : undefined
+      }
+      {...(movable ? touch.handlers : {})}
     >
       <TaskDetailsPanel
         currentUserId={currentUserId}

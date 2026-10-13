@@ -6,6 +6,7 @@
 import { useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 
+import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 
@@ -37,7 +38,6 @@ interface MentionEmployee {
 const MAX_MENTION_OPTIONS = 6;
 
 // The @ picker is an ARIA combobox list, which has no native element.
-// oxlint-disable jsx-a11y/prefer-tag-over-role -- ARIA listbox pattern for mentions.
 const CommentBody = ({
   body,
   names,
@@ -227,27 +227,34 @@ export const TaskCommentsSection = ({
           value={body}
         />
         {listOpen ? (
-          <div
-            aria-label="Mention an employee"
-            className="task-mention-list"
-            id={listboxId}
-            role="listbox"
+          // Focus stays in the textarea, which owns the keyboard handling, so
+          // Command only renders the list and reports the pointer selection.
+          <Command
+            className="task-mention-list h-auto rounded-none bg-transparent p-0"
+            label="Mention an employee"
+            onValueChange={(value) => {
+              const index = options.findIndex((option) => option.id === value);
+              if (index !== -1) {
+                setActiveIndex(index);
+              }
+            }}
+            shouldFilter={false}
+            value={options[activeIndex]?.id ?? ""}
           >
-            {options.map((option, index) => (
-              <button
-                aria-selected={index === activeIndex}
-                className="task-mention-option"
-                key={option.id}
-                onClick={() => chooseEmployee(option)}
-                onMouseDown={(event) => event.preventDefault()}
-                role="option"
-                tabIndex={-1}
-                type="button"
-              >
-                {option.name}
-              </button>
-            ))}
-          </div>
+            <CommandList id={listboxId}>
+              {options.map((option) => (
+                <CommandItem
+                  className="task-mention-option"
+                  key={option.id}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onSelect={() => chooseEmployee(option)}
+                  value={option.id}
+                >
+                  {option.name}
+                </CommandItem>
+              ))}
+            </CommandList>
+          </Command>
         ) : null}
       </div>
       <WorkspaceButton
