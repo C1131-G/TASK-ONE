@@ -16,7 +16,7 @@ interface RouteShell {
 // /tasks have their own specs; detail routes are named by their record.
 const ROUTES: readonly RouteShell[] = [
   {
-    heading: /^Good (?<greeting>morning|afternoon|evening), /u,
+    heading: /^Good (?:morning|afternoon|evening), /u,
     link: /^Home/u,
     loading: "Loading your tasks",
     path: "/",
