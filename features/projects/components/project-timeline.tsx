@@ -4,14 +4,14 @@ import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listTaskCalendar } from "@/features/calendar/calendar-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { WorkspaceTimeline } from "@/features/projects/components/workspace-timeline";
 import {
   listProjectMilestones,
   listProjects,
 } from "@/features/projects/projects-queries";
 import type { TimelineMilestoneLane } from "@/features/projects/types/workspace-timeline-types";
-import { TaskDrawerProvider } from "@/features/tasks/components/task-drawer";
+import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { currentUtcMonthRange } from "@/src/lib/utc-date-range";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -35,7 +35,7 @@ const ProjectTimeline = async ({
       statuses: [],
       to: range.to,
     }),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
     listProjects({}),
   ]);
   if (!result.ok) {
@@ -86,7 +86,7 @@ const ProjectTimeline = async ({
     : [];
 
   return (
-    <TaskDrawerProvider
+    <TaskDrawerHost
       currentUserId={userId}
       editableTaskIds={editableTaskIds}
       employees={employees}
@@ -107,7 +107,7 @@ const ProjectTimeline = async ({
         tasks={items}
         to={range.to}
       />
-    </TaskDrawerProvider>
+    </TaskDrawerHost>
   );
 };
 

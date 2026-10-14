@@ -5,7 +5,6 @@
 /* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- These workspace classes are defined in app/workspace-styles to match the reference UI. */
 
 import { Bug, SpinnerGap } from "@phosphor-icons/react";
-import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -92,7 +91,7 @@ export const BugReportDialog = ({
         setMessage(result.error.message);
       } else {
         setOpen(false);
-        router.push(`/bugs/${result.data.id}` as Route);
+        router.push(`/bugs/${result.data.id}`);
         router.refresh();
       }
     } catch {

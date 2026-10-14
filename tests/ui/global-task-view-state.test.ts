@@ -122,17 +122,17 @@ describe("workspace task rows", () => {
   it("filters by status, priority and query across title, project and key", () => {
     expect(
       filterGlobalTasks(tasks, search({ status: "todo" }), "2026-10-10").map(
-        (item) => item.id
+        ({ id }) => id
       )
     ).toEqual(["b"]);
     expect(
       filterGlobalTasks(tasks, search({ priority: "high" }), "2026-10-10").map(
-        (item) => item.id
+        ({ id }) => id
       )
     ).toEqual(["c"]);
     expect(
       filterGlobalTasks(tasks, search({ q: "oth" }), "2026-10-10").map(
-        (item) => item.id
+        ({ id }) => id
       )
     ).toEqual(["c"]);
   });
@@ -143,21 +143,21 @@ describe("workspace task rows", () => {
       search({ overdue: "true" }),
       "2026-10-10"
     );
-    expect(overdue.map((item) => item.id)).toEqual(["b"]);
+    expect(overdue.map(({ id }) => id)).toEqual(["b"]);
   });
 
   it("sorts by due date, priority and title", () => {
-    expect(sortGlobalTasks(tasks, "due").map((item) => item.id)).toEqual([
+    expect(sortGlobalTasks(tasks, "due").map(({ id }) => id)).toEqual([
       "b",
       "a",
       "c",
     ]);
-    expect(sortGlobalTasks(tasks, "priority").map((item) => item.id)).toEqual([
+    expect(sortGlobalTasks(tasks, "priority").map(({ id }) => id)).toEqual([
       "b",
       "c",
       "a",
     ]);
-    expect(sortGlobalTasks(tasks, "title").map((item) => item.id)).toEqual([
+    expect(sortGlobalTasks(tasks, "title").map(({ id }) => id)).toEqual([
       "b",
       "c",
       "a",
@@ -181,7 +181,7 @@ describe("workspace task rows", () => {
       "no-date",
       "completed",
     ]);
-    expect(groups[0]?.tasks.map((item) => item.id)).toEqual(["b"]);
+    expect(groups[0]?.tasks.map(({ id }) => id)).toEqual(["b"]);
   });
 });
 

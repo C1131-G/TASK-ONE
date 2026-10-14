@@ -29,7 +29,10 @@ const FavoriteToggle = ({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const toggle = () =>
+  const toggle = () => {
+    if (pending) {
+      return;
+    }
     startTransition(async () => {
       const result =
         kind === "project"
@@ -49,6 +52,7 @@ const FavoriteToggle = ({
       setFavorite(result.data);
       router.refresh();
     });
+  };
 
   return (
     <span className="col">

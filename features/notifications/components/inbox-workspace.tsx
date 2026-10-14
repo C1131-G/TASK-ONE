@@ -51,9 +51,9 @@ export const InboxWorkspace = ({
   const visibleItems = useMemo(
     () =>
       items.filter(
-        (item) =>
-          typeMatchesFilter(item.type, filter) &&
-          (!unreadOnly || item.readAt === null)
+        (notification) =>
+          typeMatchesFilter(notification.type, filter) &&
+          (!unreadOnly || notification.readAt === null)
       ),
     [filter, items, unreadOnly]
   );
@@ -63,7 +63,9 @@ export const InboxWorkspace = ({
       new Map(
         FILTERS.map(({ id }) => [
           id,
-          items.filter((item) => typeMatchesFilter(item.type, id)).length,
+          items.filter((notification) =>
+            typeMatchesFilter(notification.type, id)
+          ).length,
         ])
       ),
     [items]
@@ -161,27 +163,27 @@ export const InboxWorkspace = ({
         ) : null}
         {visibleItems.length > 0 ? (
           <ul aria-label="Notifications" className="inbox-items">
-            {visibleItems.map((item) => {
-              const isSelected = selectedItem?.id === item.id;
+            {visibleItems.map((notification) => {
+              const isSelected = selectedItem?.id === notification.id;
               return (
                 <li
-                  className={`inbox-item${item.readAt ? " read" : " unread"}${isSelected ? " selected" : ""}`}
-                  key={item.id}
+                  className={`inbox-item${notification.readAt ? " read" : " unread"}${isSelected ? " selected" : ""}`}
+                  key={notification.id}
                 >
                   <WorkspaceButton
                     aria-pressed={isSelected}
                     data-inbox-item-select=""
-                    onClick={() => selectNotification(item.id)}
+                    onClick={() => selectNotification(notification.id)}
                     size="lg"
                     type="button"
                     variant="ghost"
                     workspace
                   >
                     <span aria-hidden="true" className="ndot" />
-                    {item.actorName ? (
+                    {notification.actorName ? (
                       <Avatar className="inbox-avatar">
                         <AvatarFallback>
-                          {getInitials(item.actorName)}
+                          {getInitials(notification.actorName)}
                         </AvatarFallback>
                       </Avatar>
                     ) : (
@@ -190,36 +192,38 @@ export const InboxWorkspace = ({
                       </span>
                     )}
                     <span className="inbox-item-copy">
-                      <span className="inbox-item-title">{item.text}</span>
-                      {item.snippet ? (
+                      <span className="inbox-item-title">
+                        {notification.text}
+                      </span>
+                      {notification.snippet ? (
                         <span className="inbox-item-snippet">
-                          {item.snippet}
+                          {notification.snippet}
                         </span>
                       ) : null}
                       <span className="inbox-item-meta">
-                        {item.projectName ? (
+                        {notification.projectName ? (
                           <span className="inbox-item-project">
-                            {item.projectName}
+                            {notification.projectName}
                           </span>
                         ) : null}
                         <time
                           className="inbox-item-time"
-                          dateTime={item.createdAt}
+                          dateTime={notification.createdAt}
                           title={DATE_FORMATTER.format(
-                            new Date(item.createdAt)
+                            new Date(notification.createdAt)
                           )}
                         >
-                          {formatRelativeTime(item.createdAt)}
+                          {formatRelativeTime(notification.createdAt)}
                         </time>
                       </span>
                     </span>
                   </WorkspaceButton>
-                  {item.readAt === null ? (
+                  {notification.readAt === null ? (
                     <WorkspaceButton
-                      aria-label={`Mark as read: ${item.text}`}
+                      aria-label={`Mark as read: ${notification.text}`}
                       className="inbox-item-read"
                       disabled={pending}
-                      onClick={() => markRead(item.id)}
+                      onClick={() => markRead(notification.id)}
                       size="icon-sm"
                       type="button"
                       variant="ghost"

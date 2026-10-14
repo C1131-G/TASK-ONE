@@ -2,7 +2,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
@@ -138,11 +137,7 @@ export const GlobalTaskBoard = ({
                           {task.projectKey}-{task.projectTaskNumber}
                         </span>
                         <h3 className="title">
-                          <Link
-                            href={
-                              `/projects/${task.projectId}?view=board` as Route
-                            }
-                          >
+                          <Link href={`/projects/${task.projectId}?view=board`}>
                             {task.title}
                           </Link>
                         </h3>

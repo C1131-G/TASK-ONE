@@ -50,3 +50,12 @@
 .workspace-app[data-motion="reduce"] .kcard:hover {
   transform: none;
 }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.nav-forward),
+  ::view-transition-new(.nav-forward),
+  ::view-transition-old(.nav-back),
+  ::view-transition-new(.nav-back) {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}

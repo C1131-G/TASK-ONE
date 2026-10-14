@@ -6,7 +6,10 @@ import { connection } from "next/server";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { TeamOverview } from "@/features/people/components/team-overview";
 import type { TeamTask } from "@/features/people/components/team-overview";
-import { listAllTeams, listEmployees } from "@/features/people/people-queries";
+import {
+  listAllTeams,
+  listAllEmployees,
+} from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -17,7 +20,7 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
     await Promise.all([
       listAllTeams(),
       listProjects({}),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       getPageSession(),
     ]);
 
@@ -29,7 +32,7 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
     );
   }
 
-  const team = teamsResult.data.find((item) => item.id === teamId);
+  const team = teamsResult.data.find(({ id }) => id === teamId);
   if (!team) {
     notFound();
   }

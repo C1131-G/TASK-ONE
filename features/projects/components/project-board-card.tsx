@@ -86,11 +86,7 @@ export const ProjectBoardCard = ({
         {task.labelIds.flatMap((labelId) => {
           const label = labelsById.get(labelId);
           return label ? (
-            <span
-              className="lbl"
-              key={label.id}
-              style={{ "--c": label.color } as React.CSSProperties}
-            >
+            <span className="lbl" key={label.id} style={{ "--c": label.color }}>
               <span aria-hidden="true" className="lbl-dot" />
               {label.name}
             </span>

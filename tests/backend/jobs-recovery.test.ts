@@ -5,8 +5,8 @@ import { Effect, Layer } from "effect";
 
 import { authPool } from "../../src/server/auth/database";
 import { AppError } from "../../src/server/core/action-result";
-import { JobHandlersLive } from "../../src/server/jobs/handlers";
 import { JobHandlers } from "../../src/server/jobs/job-handlers";
+import { JobHandlersLive } from "../../src/server/jobs/job-handlers-live";
 import {
   JobProcessor,
   JobProcessorLive,

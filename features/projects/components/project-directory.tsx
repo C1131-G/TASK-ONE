@@ -11,7 +11,7 @@ import {
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { ProjectCreateForm } from "@/features/projects/components/project-create-form";
 import {
   ProjectGridView,
@@ -38,7 +38,7 @@ const ProjectDirectory = async ({
     listProjects({}),
     getPageSession(),
     getPersonalWorkspace({}),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
   ]);
   if (!result.ok) {
     return (

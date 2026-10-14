@@ -6,11 +6,11 @@ import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { calendarPeriod } from "@/features/calendar/calendar-params";
 import type { CalendarMode } from "@/features/calendar/calendar-params";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import type { AssignedTask } from "@/features/tasks/components/my-tasks-workspace";
 import { MyTasksWorkspace } from "@/features/tasks/components/my-tasks-workspace";
-import { TaskDrawerProvider } from "@/features/tasks/components/task-drawer";
+import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { GlobalTaskViewStoreProvider } from "@/features/tasks/providers/global-task-view-store-provider";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { columnWidthsFromPreferences } from "@/features/tasks/task-table-columns";
@@ -41,7 +41,7 @@ const MyTasks = async ({
     await Promise.all([
       getPageSession(),
       listProjects({}),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       getPersonalWorkspace({}),
       getPersonalPreferences({}),
     ]);
@@ -103,7 +103,7 @@ const MyTasks = async ({
         preferences.ok ? preferences.data.taskTableColumnWidths : undefined
       )}
     >
-      <TaskDrawerProvider
+      <TaskDrawerHost
         currentUserId={session.user.id}
         editableTaskIds={editableTaskIds}
         employees={employees.map(({ id, name }) => ({ id, name }))}
@@ -130,7 +130,7 @@ const MyTasks = async ({
           today={dateKey()}
           userId={session.user.id}
         />
-      </TaskDrawerProvider>
+      </TaskDrawerHost>
     </GlobalTaskViewStoreProvider>
   );
 };

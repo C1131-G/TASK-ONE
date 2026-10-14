@@ -51,15 +51,15 @@ export const BugVerificationSection = ({
       <form
         className="bug-detail-form-grid"
         onSubmit={(event) =>
-          submit(event, (data) =>
+          submit(event, (formData) =>
             verifyBugFixAction({
               attemptId: latestAttempt.id,
               bugId: history.bug.id,
               expectedVersion: history.bug.version,
-              notes: String(data.get("verificationNotes") ?? ""),
+              notes: String(formData.get("verificationNotes") ?? ""),
               outcome: verificationOutcome,
               testedEnvironment: environment,
-              testedVersion: String(data.get("testedVersion") ?? ""),
+              testedVersion: String(formData.get("testedVersion") ?? ""),
             })
           )
         }

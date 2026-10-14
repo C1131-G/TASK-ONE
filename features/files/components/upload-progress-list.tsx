@@ -7,17 +7,17 @@ import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { uploadPercent } from "@/features/files/upload-store";
 import type { UploadItem } from "@/features/files/upload-store";
 
-const statusLabel = (item: UploadItem): string => {
-  if (item.status === "done") {
+const statusLabel = (upload: UploadItem): string => {
+  if (upload.status === "done") {
     return "Uploaded";
   }
-  if (item.status === "cancelled") {
+  if (upload.status === "cancelled") {
     return "Cancelled";
   }
-  if (item.status === "error") {
-    return item.error ?? "Upload failed";
+  if (upload.status === "error") {
+    return upload.error ?? "Upload failed";
   }
-  return `${uploadPercent(item)}%`;
+  return `${uploadPercent(upload)}%`;
 };
 
 export const UploadProgressList = ({
@@ -36,24 +36,24 @@ export const UploadProgressList = ({
   if (uploads.length === 0) {
     return null;
   }
-  const finished = uploads.some((item) => item.status !== "uploading");
+  const finished = uploads.some((upload) => upload.status !== "uploading");
   return (
     <section aria-label="Uploads" className="panel-b stack upload-list">
       <ul className="stack">
-        {uploads.map((item) => (
-          <li className="stack" key={item.id}>
+        {uploads.map((upload) => (
+          <li className="stack" key={upload.id}>
             <div className="row">
-              <span className="trunc grow">{item.name}</span>
+              <span className="trunc grow">{upload.name}</span>
               <span
-                className={item.status === "error" ? "error" : "muted"}
-                role={item.status === "error" ? "alert" : undefined}
+                className={upload.status === "error" ? "error" : "muted"}
+                role={upload.status === "error" ? "alert" : undefined}
               >
-                {statusLabel(item)}
+                {statusLabel(upload)}
               </span>
-              {item.status === "uploading" ? (
+              {upload.status === "uploading" ? (
                 <WorkspaceButton
-                  aria-label={`Cancel upload of ${item.name}`}
-                  onClick={() => onCancel(item.id)}
+                  aria-label={`Cancel upload of ${upload.name}`}
+                  onClick={() => onCancel(upload.id)}
                   size="sm"
                   type="button"
                   workspace
@@ -62,10 +62,10 @@ export const UploadProgressList = ({
                 </WorkspaceButton>
               ) : (
                 <>
-                  {item.status === "done" ? null : (
+                  {upload.status === "done" ? null : (
                     <WorkspaceButton
-                      aria-label={`Retry upload of ${item.name}`}
-                      onClick={() => onRetry(item.id)}
+                      aria-label={`Retry upload of ${upload.name}`}
+                      onClick={() => onRetry(upload.id)}
                       size="sm"
                       type="button"
                       workspace
@@ -74,8 +74,8 @@ export const UploadProgressList = ({
                     </WorkspaceButton>
                   )}
                   <WorkspaceButton
-                    aria-label={`Dismiss ${item.name}`}
-                    onClick={() => onDismiss(item.id)}
+                    aria-label={`Dismiss ${upload.name}`}
+                    onClick={() => onDismiss(upload.id)}
                     size="sm"
                     type="button"
                     workspace
@@ -85,10 +85,10 @@ export const UploadProgressList = ({
                 </>
               )}
             </div>
-            {item.status === "uploading" ? (
+            {upload.status === "uploading" ? (
               <Progress
-                aria-label={`Uploading ${item.name}`}
-                value={uploadPercent(item)}
+                aria-label={`Uploading ${upload.name}`}
+                value={uploadPercent(upload)}
               />
             ) : null}
           </li>

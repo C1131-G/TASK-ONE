@@ -74,7 +74,7 @@ const getBugHistory = (
         .orderBy((attempt) => attempt.createdAt.asc())
         .all(),
       transaction.orm.public.BugEvidence.where({ bugReportId: bug.id })
-        .orderBy((item) => item.createdAt.asc())
+        .orderBy((evidenceRow) => evidenceRow.createdAt.asc())
         .all(),
       transaction.orm.public.BugApproval.where({ bugReportId: bug.id })
         .orderBy((approval) => approval.submittedAt.asc())
@@ -204,12 +204,14 @@ const getBugHistory = (
         project.key,
         task.projectTaskNumber
       ),
-      evidence: evidence.map((item) => {
-        const file = item.fileAssetId ? fileById.get(item.fileAssetId) : null;
+      evidence: evidence.map((evidenceRow) => {
+        const file = evidenceRow.fileAssetId
+          ? fileById.get(evidenceRow.fileAssetId)
+          : null;
         return {
-          caption: item.caption,
-          createdAt: item.createdAt.toISOString(),
-          externalUrl: item.externalUrl,
+          caption: evidenceRow.caption,
+          createdAt: evidenceRow.createdAt.toISOString(),
+          externalUrl: evidenceRow.externalUrl,
           file: file
             ? {
                 contentType: file.contentType,
@@ -218,8 +220,8 @@ const getBugHistory = (
                 sizeBytes: Number(file.sizeBytes),
               }
             : null,
-          id: item.id,
-          kind: item.kind,
+          id: evidenceRow.id,
+          kind: evidenceRow.kind,
         };
       }),
       priority: task.priority,

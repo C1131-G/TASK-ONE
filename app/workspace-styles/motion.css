@@ -11,6 +11,44 @@
     transform: none;
   }
 }
+
+::view-transition-old(.nav-forward) {
+  --nav-offset: -20px;
+  animation:
+    150ms ease-in both fade reverse,
+    350ms ease-in-out both slide-nav reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --nav-offset: 20px;
+  animation:
+    210ms ease-out 150ms both fade,
+    350ms ease-in-out both slide-nav;
+}
+
+::view-transition-old(.nav-back) {
+  --nav-offset: 20px;
+  animation:
+    150ms ease-in both fade reverse,
+    350ms ease-in-out both slide-nav reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --nav-offset: -20px;
+  animation:
+    210ms ease-out 150ms both fade,
+    350ms ease-in-out both slide-nav;
+}
+
+@keyframes slide-nav {
+  from {
+    translate: var(--nav-offset);
+  }
+
+  to {
+    translate: 0;
+  }
+}
 @keyframes slideInR {
   from {
     opacity: 0;

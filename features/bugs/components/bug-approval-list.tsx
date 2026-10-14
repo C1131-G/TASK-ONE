@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Bug screens use app/workspace-styles. */
 
-import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 
@@ -13,7 +12,7 @@ const BugApprovalList = async () => {
   await connection();
   const session = await getPageSession();
   if (session.kind !== "authenticated" || session.user.role !== "admin") {
-    redirect("/bugs" as Route);
+    redirect("/bugs");
   }
   const result = await listBugs({ status: "awaiting_admin_approval" });
   return result.ok ? (

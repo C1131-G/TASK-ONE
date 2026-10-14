@@ -6,15 +6,21 @@ import type { TaskSubtaskView } from "@/features/tasks/components/task-details-s
 import { useTaskComments } from "@/features/tasks/hooks/use-task-comments";
 import type { EditableTask } from "@/features/tasks/task-details-draft";
 import { readTaskBundle } from "@/features/tasks/task-details-panel-data";
-import type { TaskFile } from "@/features/tasks/task-details-panel-data";
+import type {
+  TaskBundle,
+  TaskFile,
+} from "@/features/tasks/task-details-panel-data";
 
 // Reads everything the task panel shows while it is open, and owns the panel's
-// error so the reads and the comment actions report into one place.
+// error so the reads and the comment actions report into one place. A deep link
+// hands in the server's read as initialBundle, so the first load skips a round trip.
 export const useTaskBundle = ({
+  initialBundle,
   isOpen,
   projectId,
   taskId,
 }: {
+  readonly initialBundle: Promise<TaskBundle> | null;
   readonly isOpen: boolean;
   readonly projectId: string;
   readonly taskId: string;
@@ -28,7 +34,7 @@ export const useTaskBundle = ({
 
   // The first failing read is reported; the reads that succeeded still show.
   const applyBundle = useCallback(
-    (bundle: Awaited<ReturnType<typeof readTaskBundle>>) => {
+    (bundle: TaskBundle) => {
       const failure = [
         bundle.task,
         bundle.comments,
@@ -63,7 +69,7 @@ export const useTaskBundle = ({
     }
     let current = true;
     const load = async () => {
-      const bundle = await readTaskBundle(projectId, taskId);
+      const bundle = await (initialBundle ?? readTaskBundle(projectId, taskId));
       if (current) {
         applyBundle(bundle);
       }
@@ -72,7 +78,7 @@ export const useTaskBundle = ({
     return () => {
       current = false;
     };
-  }, [applyBundle, isOpen, projectId, taskId]);
+  }, [applyBundle, initialBundle, isOpen, projectId, taskId]);
 
   return { comments, error, files, refresh, setSubtasks, subtasks, task };
 };

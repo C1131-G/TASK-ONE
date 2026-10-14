@@ -4,6 +4,7 @@ import type { BugVersionInput } from "./bug-contracts";
 import { BugVersionInputSchema } from "./bug-contracts";
 import { transitionBugStatus } from "./bug-workflow";
 import {
+  decodeBugWorkflowStatus,
   assertWritable,
   conflict,
   forbidden,
@@ -66,7 +67,7 @@ export const archiveBug = async (
   });
   return {
     bugId: bug.id,
-    status: bug.status as BugWorkflowReceipt["status"],
+    status: decodeBugWorkflowStatus(bug.status),
     version,
   };
 };
@@ -122,7 +123,7 @@ export const restoreBug = async (
   });
   return {
     bugId: bug.id,
-    status: bug.status as BugWorkflowReceipt["status"],
+    status: decodeBugWorkflowStatus(bug.status),
     version,
   };
 };

@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 
 import {
@@ -62,8 +61,8 @@ export const ProjectActivityFeed = ({
           <div className="feed lined">
             {groupEntries.map((entry) => {
               const activityHref = entry.projectId
-                ? (`/projects/${entry.projectId}` as Route)
-                : null;
+                ? (`/projects/${entry.projectId}` as const)
+                : undefined;
               let taskLink = null;
               if (entry.taskTitle && activityHref) {
                 taskLink = (

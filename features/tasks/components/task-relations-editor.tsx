@@ -44,7 +44,10 @@ export const TaskRelationsEditor = ({
   >([]);
   const [error, setError] = useState<string | null>(null);
 
-  const load = () =>
+  const load = () => {
+    if (pending || loaded) {
+      return;
+    }
     startTransition(async () => {
       const [labelResult, taskResult] = await Promise.all([
         listLabelsAction({}),
@@ -72,8 +75,12 @@ export const TaskRelationsEditor = ({
           : labelResult.error.message
       );
     });
+  };
 
-  const save = (formData: FormData) =>
+  const save = (formData: FormData) => {
+    if (pending || !editable) {
+      return;
+    }
     startTransition(async () => {
       const result = await setTaskRelationsAction({
         dependencyTaskIds: formData.getAll("dependencyTaskIds").map(String),
@@ -90,6 +97,7 @@ export const TaskRelationsEditor = ({
       setError(null);
       router.refresh();
     });
+  };
 
   return (
     <section className="stack">

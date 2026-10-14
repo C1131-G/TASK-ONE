@@ -4,7 +4,6 @@
 "use client";
 
 import { Check, Minus } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -216,7 +215,7 @@ const MembersDirectory = ({
                     <TableCell>
                       <Link
                         className="members-person members-person-link"
-                        href={`/members/${employee.id}` as Route}
+                        href={`/members/${employee.id}`}
                       >
                         <Avatar className="members-avatar">
                           {employee.avatar ? (

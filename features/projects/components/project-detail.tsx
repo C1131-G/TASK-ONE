@@ -14,7 +14,7 @@ import { ProjectViewTabs } from "@/features/projects/components/project-view-tab
 import { getProjectDetailData } from "@/features/projects/project-detail-data";
 import type { ProjectDetailQuery } from "@/features/projects/project-detail-data";
 import { ProjectViewStoreProvider } from "@/features/projects/providers/project-view-store-provider";
-import { TaskDrawerProvider } from "@/features/tasks/components/task-drawer";
+import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 
 const ProjectDetail = async ({
   initialTaskId,
@@ -72,7 +72,7 @@ const ProjectDetail = async ({
   );
   return (
     <ProjectViewStoreProvider initialColumnWidths={initialColumnWidths}>
-      <TaskDrawerProvider
+      <TaskDrawerHost
         currentUserId={currentUserId}
         editableTaskIds={[...editableTaskIds]}
         employees={employees}
@@ -150,7 +150,7 @@ const ProjectDetail = async ({
             view={view}
           />
         </div>
-      </TaskDrawerProvider>
+      </TaskDrawerHost>
     </ProjectViewStoreProvider>
   );
 };

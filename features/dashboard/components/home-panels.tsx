@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import type { Route } from "next";
 import Link from "next/link";
 
 import { Progress } from "@/components/ui/progress";
@@ -99,7 +98,7 @@ export const MyTasksPanel = ({
               <Link
                 aria-current={taskView === tab ? "page" : undefined}
                 className={taskView === tab ? "on" : ""}
-                href={`/?taskView=${tab}` as Route}
+                href={`/?taskView=${tab}`}
                 key={tab}
               >
                 {tab[0]?.toUpperCase()}
@@ -111,7 +110,7 @@ export const MyTasksPanel = ({
           <Link
             aria-label="Open all my tasks"
             className="ibtn ibtn-sm"
-            href={"/my-tasks" as Route}
+            href="/my-tasks"
           >
             <OpenTasksIcon />
           </Link>
@@ -128,7 +127,7 @@ export const MyTasksPanel = ({
             />
             <Link
               className="trunc grow"
-              href={`/projects/${task.projectId}?view=board` as Route}
+              href={`/projects/${task.projectId}?view=board`}
             >
               {task.title}
             </Link>
@@ -144,7 +143,7 @@ export const MyTasksPanel = ({
         </div>
       )}
       {taskViews[taskView].length > 7 ? (
-        <Link className="addrow" href={"/my-tasks" as Route}>
+        <Link className="addrow" href="/my-tasks">
           View all {taskViews[taskView].length} tasks
           <ViewAllTasksIcon />
         </Link>
@@ -164,7 +163,7 @@ export const ProjectProgressPanel = ({
   <section className="panel">
     <div className="panel-h">
       <h2>Project progress</h2>
-      <Link className="btn btn-sm btn-ghost" href={"/projects" as Route}>
+      <Link className="btn btn-sm btn-ghost" href="/projects">
         All projects
       </Link>
     </div>
@@ -185,7 +184,7 @@ export const ProjectProgressPanel = ({
             <TableCell>
               <Link
                 className="row"
-                href={`/projects/${project.id}?view=overview` as Route}
+                href={`/projects/${project.id}?view=overview`}
               >
                 <ProjectIcon
                   color={project.color}
@@ -238,7 +237,7 @@ export const UpcomingDeadlinesPanel = ({
   <section className="panel">
     <div className="panel-h">
       <h2>Upcoming deadlines</h2>
-      <Link className="btn btn-sm btn-ghost" href={"/calendar" as Route}>
+      <Link className="btn btn-sm btn-ghost" href="/calendar">
         Calendar
       </Link>
     </div>
@@ -252,13 +251,13 @@ export const UpcomingDeadlinesPanel = ({
           {group.tasks.slice(0, 4).map((task) => (
             <Link
               className="row deadline-row"
-              href={`/projects/${task.projectId}?view=board` as Route}
+              href={`/projects/${task.projectId}?view=board`}
               key={task.id}
             >
               <span
                 aria-hidden="true"
                 className="pdot"
-                style={{ "--c": task.projectColor } as React.CSSProperties}
+                style={{ "--c": task.projectColor }}
               />
               <span className="trunc grow">{task.title}</span>
               <span className="muted">
@@ -270,7 +269,7 @@ export const UpcomingDeadlinesPanel = ({
             <span className="faint">Nothing due</span>
           ) : null}
           {group.tasks.length > 4 ? (
-            <Link className="faint" href={"/calendar" as Route}>
+            <Link className="faint" href="/calendar">
               +{group.tasks.length - 4} more
             </Link>
           ) : null}

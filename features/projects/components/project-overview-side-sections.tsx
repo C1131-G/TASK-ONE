@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -44,7 +43,7 @@ const ProjectDetails = ({
           <dt>Team</dt>
           <dd>
             {team ? (
-              <Link href={`/teams/${team.id}` as Route}>{team.name}</Link>
+              <Link href={`/teams/${team.id}`}>{team.name}</Link>
             ) : (
               "No team"
             )}
@@ -144,7 +143,7 @@ const ProjectRecentActivity = ({
         <h2 id="project-recent-activity-heading">Recent activity</h2>
         <Link
           className="project-overview-text-link"
-          href={`/projects/${projectId}?view=activity` as Route}
+          href={`/projects/${projectId}?view=activity`}
         >
           View all
         </Link>

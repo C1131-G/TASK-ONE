@@ -87,7 +87,7 @@ it("creates a project for an admin and rejects employee project creation", async
     );
     expect(projectWithPeople.leadId).toBe(employeeId);
     expect(projectWithPeople.memberIds).toEqual([employeeId]);
-    expect(employeeProjects.some((item) => item.id === project.id)).toBe(true);
+    expect(employeeProjects.some(({ id }) => id === project.id)).toBe(true);
 
     const update = Effect.gen(function* updateProject() {
       const projects = yield* ProjectManagement;

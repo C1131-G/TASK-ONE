@@ -41,7 +41,7 @@ const TaskStatusSelect = ({
   const [error, setError] = useState<string | null>(null);
 
   const changeStatus = (nextStatus: TaskStatus) => {
-    if (nextStatus === status) {
+    if (pending || nextStatus === status) {
       return;
     }
     setError(null);

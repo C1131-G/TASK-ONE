@@ -11,6 +11,7 @@ import {
   EMAIL_DOMAIN,
   ids,
   nextKey,
+  replay,
   personaId,
   setupHarness,
   teardownHarness,
@@ -48,37 +49,6 @@ const { UploadsLive } = await import("../../src/server/storage/uploads");
 const unique = (): string => randomUUID().replaceAll("-", "").slice(0, 8);
 const projectKey = (): string => `R${unique().slice(0, 6)}`.toUpperCase();
 
-/**
- * Runs an action twice with the same idempotency key and checks that the
- * second call replays the first result exactly instead of acting again.
- */
-const replay = async <Data>(
-  name: string,
-  persona: Persona,
-  action: unknown,
-  input: Record<string, unknown>
-): Promise<Data> => {
-  const idempotencyKey = nextKey();
-  const run = () =>
-    callAs(persona, action as ActionFunction, { ...input, idempotencyKey });
-  const first = await run();
-  if (!first.ok) {
-    throw new Error(
-      `${name} failed on the first call: ${first.error?.code} ${first.error?.message}`
-    );
-  }
-  const second = await run();
-  if (!second.ok) {
-    throw new Error(
-      `${name} failed on the replay: ${second.error?.code} ${second.error?.message}`
-    );
-  }
-  expect(JSON.stringify(second.data), `${name} replay result`).toBe(
-    JSON.stringify(first.data)
-  );
-  return first.data as Data;
-};
-
 const taskVersion = async (taskId: string): Promise<number> => {
   const rows = await authPool.query("SELECT version FROM task WHERE id = $1", [
     taskId,
@@ -112,7 +82,7 @@ beforeAll(async () => {
 afterAll(teardownHarness);
 
 it("replays team, label, calendar, and company-settings mutations", async () => {
-  const team = await replay<{ id: string }>(
+  const team = await replay(
     "createTeamAction",
     "admin",
     teams.createTeamAction,
@@ -134,7 +104,7 @@ it("replays team, label, calendar, and company-settings mutations", async () => 
     teamId: team.id,
   });
 
-  const label = await replay<{ id: string }>(
+  const label = await replay(
     "createLabelAction",
     "admin",
     labels.createLabelAction,
@@ -157,7 +127,7 @@ it("replays team, label, calendar, and company-settings mutations", async () => 
     startsAt: "2026-12-01T09:00:00.000Z",
     title: "Replay event",
   };
-  const event = await replay<{ id: string }>(
+  const event = await replay(
     "createCalendarEventAction",
     "admin",
     calendar.createCalendarEventAction,

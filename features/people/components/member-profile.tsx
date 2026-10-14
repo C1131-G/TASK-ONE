@@ -2,9 +2,7 @@
 /* eslint-disable shadcn/no-restyle */
 
 import { ArrowLeft, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
-import type { Route } from "next";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +60,11 @@ const MemberProfile = ({
 
   return (
     <div className="page member-profile-page">
-      <Link className="member-profile-back" href="/members">
+      <Link
+        className="member-profile-back"
+        href="/members"
+        transitionTypes={["nav-back"]}
+      >
         <ArrowLeft aria-hidden="true" size={15} />
         All members
       </Link>
@@ -140,13 +142,13 @@ const MemberProfile = ({
           <nav aria-label="Member task filters" className="member-profile-tabs">
             <Link
               aria-current={tab === "assigned" ? "page" : undefined}
-              href={`/members/${employee.id}?tab=assigned` as Route}
+              href={`/members/${employee.id}?tab=assigned`}
             >
               Assigned · {openTasks.length}
             </Link>
             <Link
               aria-current={tab === "completed" ? "page" : undefined}
-              href={`/members/${employee.id}?tab=completed` as Route}
+              href={`/members/${employee.id}?tab=completed`}
             >
               Completed · {completedTasks.length}
             </Link>
@@ -173,11 +175,9 @@ const MemberProfile = ({
                       <span
                         aria-hidden="true"
                         className="member-profile-project-color"
-                        style={
-                          {
-                            "--project-color": project.color,
-                          } as CSSProperties
-                        }
+                        style={{
+                          "--project-color": project.color,
+                        }}
                       />
                       <span>{project.name}</span>
                       <span className="faint">

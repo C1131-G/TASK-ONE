@@ -5,7 +5,10 @@
 import { useState } from "react";
 
 import { TaskCalendarGrid } from "@/features/calendar/components/task-calendar-grid";
-import type { CalendarTask } from "@/features/calendar/components/task-calendar-grid";
+import type {
+  CalendarHrefPrefix,
+  CalendarTask,
+} from "@/features/calendar/components/task-calendar-grid";
 import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
 
 interface ProjectOption {
@@ -26,7 +29,7 @@ export const MyTasksCalendar = ({
   viewMode,
 }: {
   // Month links carry the active filters, so the prefix is built by the caller.
-  readonly hrefPrefix: string;
+  readonly hrefPrefix: CalendarHrefPrefix;
   readonly monthOffset: number;
   readonly monthLabel: string;
   readonly tasks: readonly CalendarTask[];

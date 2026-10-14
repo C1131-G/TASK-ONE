@@ -107,7 +107,7 @@ export const ProjectBoard = ({
     });
 
   const moveTask = (status: Task["status"]) => {
-    const task = tasks.find((item) => item.id === draggedTaskId.current);
+    const task = tasks.find(({ id }) => id === draggedTaskId.current);
     if (!task || task.status === status) {
       draggedTaskId.current = null;
       return;

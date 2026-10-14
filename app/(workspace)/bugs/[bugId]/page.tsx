@@ -3,13 +3,19 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { bugMetadata } from "@/features/bugs/bug-metadata";
 import {
   BugDetail,
   BugDetailSkeleton,
 } from "@/features/bugs/components/bug-detail";
 
-export const metadata: Metadata = { title: "Bug details | Metsys" };
 export const instant = false;
+export const generateMetadata = async ({
+  params,
+}: PageProps<"/bugs/[bugId]">): Promise<Metadata> => {
+  const { bugId } = await params;
+  return await bugMetadata(bugId);
+};
 
 const BugDetailPage = ({ params }: PageProps<"/bugs/[bugId]">) => (
   <div className="page flush">

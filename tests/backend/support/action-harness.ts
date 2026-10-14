@@ -1,8 +1,9 @@
-import { mock } from "bun:test";
+import { expect, mock } from "bun:test";
 import { randomUUID } from "node:crypto";
 
 import { Effect } from "effect";
 
+import type { ActionResult } from "../../../src/server/core/action-result";
 import "./server-only-stub";
 
 process.env["BETTER_AUTH_SECRET"] ??=
@@ -98,6 +99,36 @@ export const callAs = async <Result extends ActionResultLike>(
 ): Promise<Result> => {
   currentHeaders = personas.get(persona)?.headers ?? new Headers();
   return await action(input);
+};
+
+/**
+ * Runs an action twice with the same idempotency key and checks that the
+ * second call replays the first result exactly instead of acting again.
+ */
+export const replay = async <Data>(
+  name: string,
+  persona: Persona,
+  action: (input: unknown) => Promise<ActionResult<Data>>,
+  input: Record<string, unknown>
+): Promise<Data> => {
+  const idempotencyKey = nextKey();
+  const run = () => callAs(persona, action, { ...input, idempotencyKey });
+  const first = await run();
+  if (!first.ok) {
+    throw new Error(
+      `${name} failed on the first call: ${first.error.code} ${first.error.message}`
+    );
+  }
+  const second = await run();
+  if (!second.ok) {
+    throw new Error(
+      `${name} failed on the replay: ${second.error.code} ${second.error.message}`
+    );
+  }
+  expect(JSON.stringify(second.data), `${name} replay result`).toBe(
+    JSON.stringify(first.data)
+  );
+  return first.data;
 };
 
 export const createPersona = async (

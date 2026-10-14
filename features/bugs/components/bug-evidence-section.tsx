@@ -135,13 +135,13 @@ export const BugEvidenceSection = ({
         ].map(({ kind, title, items }) => (
           <div className="bug-evidence-column" key={kind}>
             <h3>{title}</h3>
-            {items.map((item) => (
-              <article className="bug-evidence-item" key={item.id}>
-                <p>{item.caption}</p>
-                <small>{formatBugDate(item.createdAt)}</small>
+            {items.map((evidenceEntry) => (
+              <article className="bug-evidence-item" key={evidenceEntry.id}>
+                <p>{evidenceEntry.caption}</p>
+                <small>{formatBugDate(evidenceEntry.createdAt)}</small>
                 <BugEvidenceResource
-                  externalUrl={item.externalUrl}
-                  file={item.file}
+                  externalUrl={evidenceEntry.externalUrl}
+                  file={evidenceEntry.file}
                   openFile={openFile}
                 />
               </article>
@@ -152,12 +152,12 @@ export const BugEvidenceSection = ({
       <form
         className="bug-inline-form"
         onSubmit={(event) =>
-          submit(event, (data) =>
+          submit(event, (formData) =>
             addBugEvidenceAction({
               bugId: history.bug.id,
-              caption: String(data.get("caption") ?? ""),
+              caption: String(formData.get("caption") ?? ""),
               expectedVersion: history.bug.version,
-              externalUrl: String(data.get("externalUrl") ?? "") || null,
+              externalUrl: String(formData.get("externalUrl") ?? "") || null,
               fileAssetId: null,
               fixAttemptId: latestAttempt?.id ?? null,
               kind: evidenceKind,

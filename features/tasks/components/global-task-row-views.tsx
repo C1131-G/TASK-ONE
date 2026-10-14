@@ -3,7 +3,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -98,10 +97,7 @@ const renderGlobalCell = (
   switch (columnId) {
     case "task": {
       return (
-        <Link
-          className="trunc"
-          href={`/projects/${task.projectId}?view=board` as Route}
-        >
+        <Link className="trunc" href={`/projects/${task.projectId}?view=board`}>
           <span className="mono faint">
             {task.projectKey}-{task.projectTaskNumber}
           </span>{" "}
@@ -130,9 +126,7 @@ const renderGlobalCell = (
     }
     case "project": {
       return (
-        <Link href={`/projects/${task.projectId}` as Route}>
-          {task.projectName}
-        </Link>
+        <Link href={`/projects/${task.projectId}`}>{task.projectName}</Link>
       );
     }
     case "actions": {
@@ -261,7 +255,7 @@ export const GlobalTaskList = ({
                   </span>
                   <Link
                     className="trunc"
-                    href={`/projects/${task.projectId}?view=board` as Route}
+                    href={`/projects/${task.projectId}?view=board`}
                   >
                     {task.title}
                   </Link>
@@ -277,7 +271,7 @@ export const GlobalTaskList = ({
                 <div className="c-meta">{task.priority}</div>
                 <div className="c-meta num">{task.dueDate ?? "—"}</div>
                 <div className="c-meta">
-                  <Link href={`/projects/${task.projectId}` as Route}>
+                  <Link href={`/projects/${task.projectId}`}>
                     {task.projectName}
                   </Link>
                 </div>

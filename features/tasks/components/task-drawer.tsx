@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { TaskDetailsPanel } from "@/features/tasks/components/task-details-panel";
+import type { TaskBundle } from "@/features/tasks/task-details-panel-data";
 
 interface DrawerTask {
   readonly bugId?: string;
@@ -17,6 +18,19 @@ interface DrawerTask {
 interface EmployeeOption {
   readonly id: string;
   readonly name: string;
+}
+
+export interface TaskDrawerProviderProps {
+  readonly children: ReactNode;
+  readonly currentUserId: string | null;
+  readonly editableTaskIds: readonly string[];
+  readonly employees: readonly EmployeeOption[];
+  // The server's unawaited read of the deep-linked task, if any.
+  readonly initialTaskBundle?: Promise<TaskBundle> | null;
+  // The ?task= value the server saw, so a deep link renders on the first response.
+  readonly initialTaskId: string | null;
+  readonly isAdmin: boolean;
+  readonly tasks: readonly DrawerTask[];
 }
 
 interface TaskDrawerValue {
@@ -55,23 +69,19 @@ export const TaskDrawerProvider = ({
   currentUserId,
   editableTaskIds,
   employees,
+  initialTaskBundle = null,
   initialTaskId,
   isAdmin,
   tasks,
-}: {
-  readonly children: ReactNode;
-  readonly currentUserId: string | null;
-  readonly editableTaskIds: readonly string[];
-  readonly employees: readonly EmployeeOption[];
-  // The ?task= value the server saw, so a deep link renders on the first response.
-  readonly initialTaskId: string | null;
-  readonly isAdmin: boolean;
-  readonly tasks: readonly DrawerTask[];
-}) => {
+}: TaskDrawerProviderProps) => {
   // Kept in state rather than read from useSearchParams, which does not follow
   // history.replaceState. Back and forward are handled by popstate.
   const [selectedId, setSelectedId] = useState<string | null>(initialTaskId);
   const selected = tasks.find((task) => task.id === selectedId) ?? null;
+  // Used once: after the deep-linked task closes, or another task opens, the
+  // panel reads fresh data itself. Held in state so a server refresh's new
+  // promise does not replace it.
+  const [initialBundle, setInitialBundle] = useState(initialTaskBundle);
   const [versionOverride, setVersionOverride] = useState<{
     readonly sourceVersion: number;
     readonly taskId: string;
@@ -80,6 +90,7 @@ export const TaskDrawerProvider = ({
   const value = useMemo<TaskDrawerValue>(
     () => ({
       openTask: (taskId) => {
+        setInitialBundle(null);
         setSelectedId(taskId);
         writeTaskParam(taskId);
       },
@@ -88,8 +99,10 @@ export const TaskDrawerProvider = ({
   );
 
   useEffect(() => {
-    const syncFromUrl = () =>
+    const syncFromUrl = () => {
+      setInitialBundle(null);
       setSelectedId(new URLSearchParams(window.location.search).get("task"));
+    };
     window.addEventListener("popstate", syncFromUrl);
     return () => window.removeEventListener("popstate", syncFromUrl);
   }, []);
@@ -116,10 +129,12 @@ export const TaskDrawerProvider = ({
           currentUserId={currentUserId}
           editable={editable}
           employees={employees}
+          initialBundle={selected.id === initialTaskId ? initialBundle : null}
           isAdmin={isAdmin}
           key={selected.id}
           onOpenChange={(next) => {
             if (!next) {
+              setInitialBundle(null);
               setSelectedId(null);
               writeTaskParam(null);
             }

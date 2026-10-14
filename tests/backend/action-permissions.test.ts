@@ -40,6 +40,7 @@ const rejectedWith =
 // Server-side helpers that only combine catalogued reads (and so inherit their
 // session checks); they take no request input of their own.
 const composedReads = new Set([
+  "listAllEmployees",
   "listAllProjectTasks",
   "listAllProjects",
   "listAllTeams",

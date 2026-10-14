@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowUpRight, Bug } from "@phosphor-icons/react/dist/ssr";
-import type { Route } from "next";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -34,13 +33,13 @@ const statusLabel: Record<BugListItem["bug"]["status"], string> = {
   triaged: "Triaged",
 };
 
-export const BugCard = ({ item }: { readonly item: BugListItem }) => {
+export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
   const drawer = useTaskDrawer();
   const { archived, assigneeIds, bug, priority, projectName, relatedBugIds } =
-    item;
+    bugEntry;
   return (
     <article className="panel panel-b bug-list-item" key={bug.id}>
-      <Link className="bug-list-link" href={`/bugs/${bug.id}` as Route}>
+      <Link className="bug-list-link" href={`/bugs/${bug.id}`}>
         <span
           aria-hidden="true"
           className={`bug-severity bug-severity-${bug.severity}`}
@@ -108,8 +107,8 @@ export const BugList = ({
 
   return (
     <div aria-label="Bug reports" className="bug-list">
-      {bugs.map((item) => (
-        <BugCard item={item} key={item.bug.id} />
+      {bugs.map((bugEntry) => (
+        <BugCard bugEntry={bugEntry} key={bugEntry.bug.id} />
       ))}
     </div>
   );

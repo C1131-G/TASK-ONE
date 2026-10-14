@@ -10,6 +10,7 @@ import {
   EMAIL_DOMAIN,
   ids,
   nextKey,
+  replay,
   personaId,
   setupHarness,
   teardownHarness,
@@ -45,37 +46,6 @@ const { UploadsLive } = await import("../../src/server/storage/uploads");
 
 const unique = (): string => randomUUID().replaceAll("-", "").slice(0, 8);
 const projectKey = (): string => `R${unique().slice(0, 6)}`.toUpperCase();
-
-/**
- * Runs an action twice with the same idempotency key and checks that the
- * second call replays the first result exactly instead of acting again.
- */
-const replay = async <Data>(
-  name: string,
-  persona: Persona,
-  action: unknown,
-  input: Record<string, unknown>
-): Promise<Data> => {
-  const idempotencyKey = nextKey();
-  const run = () =>
-    callAs(persona, action as ActionFunction, { ...input, idempotencyKey });
-  const first = await run();
-  if (!first.ok) {
-    throw new Error(
-      `${name} failed on the first call: ${first.error?.code} ${first.error?.message}`
-    );
-  }
-  const second = await run();
-  if (!second.ok) {
-    throw new Error(
-      `${name} failed on the replay: ${second.error?.code} ${second.error?.message}`
-    );
-  }
-  expect(JSON.stringify(second.data), `${name} replay result`).toBe(
-    JSON.stringify(first.data)
-  );
-  return first.data as Data;
-};
 
 const taskVersion = async (taskId: string): Promise<number> => {
   const rows = await authPool.query("SELECT version FROM task WHERE id = $1", [
@@ -115,7 +85,7 @@ it("replays every subtask and comment mutation", async () => {
     description: null,
     dueDate: null,
   };
-  const first = await replay<SubtaskResult>(
+  const first = await replay(
     "createSubtaskAction",
     "owner",
     subtasks.createSubtaskAction,
@@ -126,7 +96,7 @@ it("replays every subtask and comment mutation", async () => {
       title: "Replay subtask one",
     }
   );
-  const renamed = await replay<SubtaskResult>(
+  const renamed = await replay(
     "updateSubtaskAction",
     "owner",
     subtasks.updateSubtaskAction,
@@ -138,7 +108,7 @@ it("replays every subtask and comment mutation", async () => {
       title: "Replay subtask one renamed",
     }
   );
-  const second = await replay<SubtaskResult>(
+  const second = await replay(
     "createSubtaskAction",
     "owner",
     subtasks.createSubtaskAction,
@@ -149,14 +119,16 @@ it("replays every subtask and comment mutation", async () => {
       title: "Replay subtask two",
     }
   );
-  const reordered = await replay<{
-    parentVersion: number;
-    subtasks: readonly { id: string }[];
-  }>("reorderSubtasksAction", "owner", subtasks.reorderSubtasksAction, {
-    expectedTaskVersion: second.parentVersion,
-    subtaskIds: [second.subtask.id, first.subtask.id],
-    taskId: state.taskId,
-  });
+  const reordered = await replay(
+    "reorderSubtasksAction",
+    "owner",
+    subtasks.reorderSubtasksAction,
+    {
+      expectedTaskVersion: second.parentVersion,
+      subtaskIds: [second.subtask.id, first.subtask.id],
+      taskId: state.taskId,
+    }
+  );
   await replay("promoteSubtaskAction", "owner", subtasks.promoteSubtaskAction, {
     expectedTaskVersion: reordered.parentVersion,
     subtaskId: second.subtask.id,
@@ -166,7 +138,7 @@ it("replays every subtask and comment mutation", async () => {
     subtaskId: first.subtask.id,
   });
 
-  const comment = await replay<{ id: string }>(
+  const comment = await replay(
     "createCommentAction",
     "owner",
     comments.createCommentAction,
@@ -178,7 +150,7 @@ it("replays every subtask and comment mutation", async () => {
     comments.toggleCommentReactionAction,
     { commentId: comment.id, emoji: "👍" }
   );
-  const removal = await replay<{ undoId: string }>(
+  const removal = await replay(
     "removeCommentAction",
     "owner",
     comments.removeCommentAction,
@@ -193,7 +165,7 @@ it("replays every subtask and comment mutation", async () => {
 });
 
 it("replays task completion, archive, restore, and both Undo actions", async () => {
-  const task = await replay<Versioned>(
+  const task = await replay(
     "createTaskAction",
     "owner",
     tasks.createTaskAction,
@@ -206,18 +178,21 @@ it("replays task completion, archive, restore, and both Undo actions", async () 
       title: "Replay completion task",
     }
   );
-  const completed = await replay<{
-    completionUndo?: { undoId: string };
-  }>("updateTaskAction", "owner", tasks.updateTaskAction, {
-    assigneeIds: [],
-    description: null,
-    dueDate: null,
-    expectedVersion: task.version,
-    priority: "medium",
-    status: "done",
-    taskId: task.id,
-    title: "Replay completion task",
-  });
+  const completed = await replay(
+    "updateTaskAction",
+    "owner",
+    tasks.updateTaskAction,
+    {
+      assigneeIds: [],
+      description: null,
+      dueDate: null,
+      expectedVersion: task.version,
+      priority: "medium",
+      status: "done",
+      taskId: task.id,
+      title: "Replay completion task",
+    }
+  );
   const { completionUndo } = completed;
   if (!completionUndo) {
     throw new Error("Completing a task should return an Undo receipt.");
@@ -229,7 +204,7 @@ it("replays task completion, archive, restore, and both Undo actions", async () 
     { undoId: completionUndo.undoId }
   );
 
-  const archived = await replay<{ undoId: string }>(
+  const archived = await replay(
     "archiveTaskAction",
     "admin",
     tasks.archiveTaskAction,
@@ -242,13 +217,8 @@ it("replays task completion, archive, restore, and both Undo actions", async () 
     expectedVersion: await taskVersion(task.id),
     taskId: task.id,
   });
-  await replay<Versioned>(
-    "restoreTaskAction",
-    "admin",
-    tasks.restoreTaskAction,
-    {
-      expectedVersion: await taskVersion(task.id),
-      taskId: task.id,
-    }
-  );
+  await replay("restoreTaskAction", "admin", tasks.restoreTaskAction, {
+    expectedVersion: await taskVersion(task.id),
+    taskId: task.id,
+  });
 });

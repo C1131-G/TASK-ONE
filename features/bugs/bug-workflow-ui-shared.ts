@@ -9,7 +9,7 @@ export type BugActionResult = Awaited<
 >;
 export type BugSubmit = (
   event: FormEvent<HTMLFormElement>,
-  action: (data: FormData) => Promise<BugActionResult>
+  action: (formData: FormData) => Promise<BugActionResult>
 ) => void;
 export type BugActionRunner = (action: Promise<BugActionResult>) => void;
 

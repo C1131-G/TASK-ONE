@@ -3,7 +3,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -86,7 +85,7 @@ const ProjectAdminControls = ({
         setError(result.error.message);
         return;
       }
-      router.push("/archive" as Route);
+      router.push("/archive");
       router.refresh();
     });
 

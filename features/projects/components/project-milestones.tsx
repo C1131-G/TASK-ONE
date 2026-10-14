@@ -37,9 +37,9 @@ export const ProjectMilestones = ({
 }) => {
   const router = useRouter();
   const [milestones, setMilestones] = useState<readonly Milestone[]>(() =>
-    initialMilestones.map((item, index) => ({
-      ...item,
-      key: item.id ?? `initial-${index}`,
+    initialMilestones.map((milestone, index) => ({
+      ...milestone,
+      key: milestone.id ?? `initial-${index}`,
     }))
   );
   const currentVersion = useRef(version);
@@ -68,7 +68,10 @@ export const ProjectMilestones = ({
       setError(null);
       currentVersion.current = result.data.version;
       setMilestones(
-        result.data.milestones.map((item) => ({ ...item, key: item.id }))
+        result.data.milestones.map((milestone) => ({
+          ...milestone,
+          key: milestone.id,
+        }))
       );
       router.refresh();
     });

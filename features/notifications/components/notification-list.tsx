@@ -3,7 +3,6 @@
 "use client";
 
 import { Bell, Check, GearSix } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -39,7 +38,7 @@ const NotificationList = ({
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationFilter>("all");
   const visibleItems = items.filter(
-    (item) => filter === "all" || item.readAt === null
+    (notification) => filter === "all" || notification.readAt === null
   );
   const groupedItems = new Map<DateBucket, NotificationItem[]>(
     DATE_BUCKETS.map((bucket) => [bucket, []])
@@ -148,12 +147,12 @@ const NotificationList = ({
             >
               <h2>{bucket}</h2>
               <div className="panel notification-card">
-                {bucketItems.map((item) => {
-                  const Icon = getNotificationIcon(item.type);
+                {bucketItems.map((notification) => {
+                  const Icon = getNotificationIcon(notification.type);
                   return (
                     <article
-                      className={`notification-row${item.readAt === null ? " unread" : ""}`}
-                      key={item.id}
+                      className={`notification-row${notification.readAt === null ? " unread" : ""}`}
+                      key={notification.id}
                     >
                       <span
                         aria-hidden="true"
@@ -163,41 +162,39 @@ const NotificationList = ({
                       </span>
                       <div className="notification-row-copy">
                         <p className="notification-row-title">
-                          {item.projectId ? (
+                          {notification.projectId ? (
                             <Link
-                              href={
-                                `/projects/${item.projectId}?view=board` as Route
-                              }
+                              href={`/projects/${notification.projectId}?view=board`}
                             >
-                              {item.text}
+                              {notification.text}
                             </Link>
                           ) : (
-                            item.text
+                            notification.text
                           )}
                         </p>
-                        {item.snippet ? (
+                        {notification.snippet ? (
                           <p className="notification-row-snippet">
-                            {item.snippet}
+                            {notification.snippet}
                           </p>
                         ) : null}
                         <p className="notification-row-meta">
-                          {item.projectName ? (
-                            <span>{item.projectName}</span>
+                          {notification.projectName ? (
+                            <span>{notification.projectName}</span>
                           ) : null}
-                          {item.projectName ? (
+                          {notification.projectName ? (
                             <span aria-hidden="true">·</span>
                           ) : null}
                           <time
-                            dateTime={item.createdAt}
+                            dateTime={notification.createdAt}
                             title={DATE_FORMATTER.format(
-                              new Date(item.createdAt)
+                              new Date(notification.createdAt)
                             )}
                           >
-                            {formatRelativeTime(item.createdAt)}
+                            {formatRelativeTime(notification.createdAt)}
                           </time>
                         </p>
                       </div>
-                      {item.readAt === null ? (
+                      {notification.readAt === null ? (
                         <>
                           <span
                             aria-hidden="true"
@@ -205,10 +202,10 @@ const NotificationList = ({
                           />
                           <span className="sr-only">Unread</span>
                           <WorkspaceButton
-                            aria-label={`Mark as read: ${item.text}`}
+                            aria-label={`Mark as read: ${notification.text}`}
                             className="btn btn-sm btn-ghost notification-row-read"
                             disabled={pending}
-                            onClick={() => markRead(item.id)}
+                            onClick={() => markRead(notification.id)}
                             type="button"
                           >
                             <Check aria-hidden="true" size={15} />

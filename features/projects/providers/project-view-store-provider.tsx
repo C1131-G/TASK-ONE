@@ -46,7 +46,7 @@ export const ProjectViewStoreProvider = ({
       initialColumnWidths
     ),
     projectViewActions
-  ) as ProjectViewStore;
+  );
 
   // URL changed from outside (navigation, back/forward, saved view link).
   useEffect(() => {

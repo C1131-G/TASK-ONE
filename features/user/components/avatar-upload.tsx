@@ -27,7 +27,7 @@ export const AvatarUpload = ({
   const [error, setError] = useState<string | null>(null);
   const uploadInput = useRef<HTMLInputElement>(null);
   const queue = useUploadQueue();
-  const pending = queue.uploads.some((item) => item.status === "uploading");
+  const pending = queue.uploads.some((upload) => upload.status === "uploading");
 
   const runner = (file: File): UploadRunner => {
     let uploadIntentId = "";

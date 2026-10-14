@@ -142,7 +142,7 @@ export const CalendarTaskChip = ({
             aria-label={`Open details for ${task.title}`}
             className="cev"
             data-done={task.status === "done"}
-            style={{ "--c": projectColor } as React.CSSProperties}
+            style={{ "--c": projectColor }}
             title={`${task.title} · ${task.projectName}`}
             type="button"
           >
@@ -193,7 +193,7 @@ export const CalendarEventChip = ({
     trigger={
       <WorkspaceButton
         className="cev event"
-        style={{ "--c": projectColor } as React.CSSProperties}
+        style={{ "--c": projectColor }}
         title={event.title}
         type="button"
       >

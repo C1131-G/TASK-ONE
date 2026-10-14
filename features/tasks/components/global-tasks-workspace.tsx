@@ -92,16 +92,16 @@ export const GlobalTasksWorkspace = ({
         showGroup
       />
       <nav aria-label="Task view" className="row task-view-tabs">
-        {GLOBAL_TASK_VIEWS.map((item) => (
+        {GLOBAL_TASK_VIEWS.map((taskView) => (
           <WorkspaceButton
-            aria-current={view === item ? "page" : undefined}
-            key={item}
-            onClick={() => update({ view: item })}
+            aria-current={view === taskView ? "page" : undefined}
+            key={taskView}
+            onClick={() => update({ view: taskView })}
             size="sm"
-            variant={view === item ? "default" : "secondary"}
+            variant={view === taskView ? "default" : "secondary"}
           >
-            {item[0]?.toLocaleUpperCase()}
-            {item.slice(1)}
+            {taskView[0]?.toLocaleUpperCase()}
+            {taskView.slice(1)}
           </WorkspaceButton>
         ))}
       </nav>

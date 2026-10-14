@@ -7,10 +7,16 @@ import {
   MemberDetail,
   MemberDetailSkeleton,
 } from "@/features/people/components/member-detail";
+import { memberMetadata } from "@/features/people/member-metadata";
 import { parseMemberTab } from "@/features/people/member-tab";
 
-export const metadata: Metadata = { title: "Member profile | Metsys" };
 export const instant = false;
+export const generateMetadata = async ({
+  params,
+}: PageProps<"/members/[employeeId]">): Promise<Metadata> => {
+  const { employeeId } = await params;
+  return await memberMetadata(employeeId);
+};
 
 const MemberProfilePage = ({
   params,

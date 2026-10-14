@@ -5,7 +5,6 @@
 /* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- These workspace classes are defined in app/workspace-styles to match the reference UI. */
 
 import { ArrowLeft } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -124,7 +123,11 @@ export const BugDetailWorkflow = ({
       className={`page bug-detail-page${embedded ? " bug-detail-embedded" : ""}`}
     >
       {embedded ? null : (
-        <Link className="bug-back-link" href={"/bugs" as Route}>
+        <Link
+          className="bug-back-link"
+          href="/bugs"
+          transitionTypes={["nav-back"]}
+        >
           <ArrowLeft aria-hidden="true" size={15} /> Bugs
         </Link>
       )}

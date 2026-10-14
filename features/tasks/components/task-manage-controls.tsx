@@ -68,7 +68,10 @@ const TaskManageControls = ({
     }
   };
 
-  const duplicate = () =>
+  const duplicate = () => {
+    if (pending) {
+      return;
+    }
     startTransition(async () => {
       const result = await duplicateTaskAction({
         expectedVersion: version,
@@ -82,8 +85,12 @@ const TaskManageControls = ({
       setError(null);
       router.refresh();
     });
+  };
 
-  const archive = () =>
+  const archive = () => {
+    if (pending) {
+      return;
+    }
     startTransition(async () => {
       const result = await archiveTaskAction({
         expectedVersion: version,
@@ -111,6 +118,7 @@ const TaskManageControls = ({
         },
       });
     });
+  };
 
   return (
     <div className="task-manage">

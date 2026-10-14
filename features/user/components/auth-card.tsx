@@ -16,7 +16,11 @@ const AuthCard = ({
   readonly title: string;
   readonly titleId: string;
 }) => (
-  <section aria-labelledby={titleId} className="auth-card">
+  <section
+    aria-labelledby={titleId}
+    className="auth-card"
+    data-testid="auth-shell-marker"
+  >
     <div className="auth-head">
       {badge ? (
         <span aria-hidden="true" className="auth-badge">

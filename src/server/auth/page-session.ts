@@ -1,6 +1,7 @@
 import "server-only";
 import { Cause, Effect, Exit } from "effect";
 import { headers } from "next/headers";
+import { cache } from "react";
 
 import { AppError } from "../core/action-result";
 import { AuthSession, AuthSessionLive } from "./session";
@@ -10,7 +11,9 @@ export type PageSession =
   | { readonly kind: "anonymous" }
   | { readonly kind: "authenticated"; readonly user: AuthenticatedUser };
 
-export const getPageSession = async (): Promise<PageSession> => {
+// The workspace gate, shell and page sections all ask for the session; one
+// request resolves it once.
+export const getPageSession = cache(async (): Promise<PageSession> => {
   const requestHeaders = await headers();
   const exit = await Effect.runPromiseExit(
     Effect.gen(function* readPageSession() {
@@ -35,4 +38,4 @@ export const getPageSession = async (): Promise<PageSession> => {
   throw failure._tag === "Some"
     ? failure.value
     : new Error("The authentication service is unavailable.");
-};
+});

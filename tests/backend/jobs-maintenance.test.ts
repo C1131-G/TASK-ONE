@@ -4,8 +4,8 @@ import { randomUUID } from "node:crypto";
 import { Effect, Layer } from "effect";
 
 import { authPool } from "../../src/server/auth/database";
-import { JobHandlersLive } from "../../src/server/jobs/handlers";
 import { JobHandlers } from "../../src/server/jobs/job-handlers";
+import { JobHandlersLive } from "../../src/server/jobs/job-handlers-live";
 import {
   JobProcessor,
   JobProcessorLive,

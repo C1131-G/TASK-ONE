@@ -73,14 +73,16 @@ export const BugEvidenceHistory = ({
       {["before", "after", "other"].map((kind) => (
         <div className="bug-evidence-column" key={kind}>
           <h3>{kind}</h3>
-          {(evidenceByKind.get(kind) ?? []).map((item) => {
-            const { file } = item;
+          {(evidenceByKind.get(kind) ?? []).map((evidenceEntry) => {
+            const { file } = evidenceEntry;
             return (
-              <article className="bug-evidence-item" key={item.id}>
-                <p>{item.caption}</p>
-                <small>{dateFormatter.format(new Date(item.createdAt))}</small>
+              <article className="bug-evidence-item" key={evidenceEntry.id}>
+                <p>{evidenceEntry.caption}</p>
+                <small>
+                  {dateFormatter.format(new Date(evidenceEntry.createdAt))}
+                </small>
                 <BugEvidenceResource
-                  externalUrl={item.externalUrl}
+                  externalUrl={evidenceEntry.externalUrl}
                   file={file}
                   openFile={openFile}
                 />

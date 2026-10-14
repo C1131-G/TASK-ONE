@@ -10,6 +10,7 @@ export interface AuthenticatedUser {
   readonly role: "admin" | "employee";
   readonly employeeNumber: number;
   readonly mustChangePassword: boolean;
+  readonly name: string;
   readonly timeZone: string | null;
 }
 
@@ -58,6 +59,7 @@ const loadSessionUser = (
             "role",
             "employeeNumber",
             "mustChangePassword",
+            "name",
             "deactivatedAt",
             "timeZone"
           )
@@ -76,6 +78,7 @@ const loadSessionUser = (
       employeeNumber: user.employeeNumber,
       id: session.user.id,
       mustChangePassword: user.mustChangePassword,
+      name: user.name,
       role: user.role,
       timeZone: user.timeZone,
     };

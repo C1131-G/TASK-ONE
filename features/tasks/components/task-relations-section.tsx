@@ -54,10 +54,7 @@ export const TaskRelationsSection = ({
                     value={label.id}
                     id={`label-${label.id}-field-81`}
                   />
-                  <span
-                    className="pdot"
-                    style={{ "--c": label.color } as React.CSSProperties}
-                  />
+                  <span className="pdot" style={{ "--c": label.color }} />
                   <span>{label.name}</span>
                 </label>
               ))

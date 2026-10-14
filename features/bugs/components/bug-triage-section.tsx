@@ -43,13 +43,13 @@ export const BugTriageSection = ({
       <form
         className="bug-inline-form"
         onSubmit={(event) =>
-          submit(event, (data) =>
+          submit(event, (formData) =>
             triageBugAction({
-              assigneeIds: data.getAll("assigneeIds").map(String),
+              assigneeIds: formData.getAll("assigneeIds").map(String),
               bugId: history.bug.id,
               expectedVersion: history.bug.version,
-              priority: String(data.get("priority") ?? "none"),
-              severity: String(data.get("severity") ?? "major"),
+              priority: String(formData.get("priority") ?? "none"),
+              severity: String(formData.get("severity") ?? "major"),
             })
           )
         }

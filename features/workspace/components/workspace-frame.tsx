@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 
 import { WorkspaceShell } from "@/components/workspace/workspace-shell";
 import { listNotificationInbox } from "@/features/notifications/notifications-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
@@ -32,13 +32,13 @@ const WorkspaceFrame = async ({
   const [projectResult, employeeResult, notificationResult] = await Promise.all(
     [
       listProjects({}),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       listNotificationInbox({ limit: 1, unreadOnly: false }),
     ]
   );
   const projects = projectResult.ok ? projectResult.data : [];
   const employee = employeeResult.ok
-    ? employeeResult.data.find((item) => item.id === session.user.id)
+    ? employeeResult.data.find(({ id }) => id === session.user.id)
     : null;
 
   return (

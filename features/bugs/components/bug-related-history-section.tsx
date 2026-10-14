@@ -47,11 +47,11 @@ export const BugRelatedHistorySection = ({
         <form
           className="bug-inline-form"
           onSubmit={(event) =>
-            submit(event, (data) =>
+            submit(event, (formData) =>
               relateBugAction({
                 bugId: history.bug.id,
                 expectedVersion: history.bug.version,
-                relatedBugId: String(data.get("relatedBugId") ?? ""),
+                relatedBugId: String(formData.get("relatedBugId") ?? ""),
                 type: relationType,
               })
             )

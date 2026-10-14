@@ -32,7 +32,7 @@ const projectHref = (
     }
   }
   params.set("view", view);
-  return `/projects?${params.toString()}` as Route;
+  return `/projects?${params.toString()}`;
 };
 
 interface ProjectFilters {

@@ -39,6 +39,9 @@ export const CalendarEventManager = ({
   const [error, setError] = useState<string | null>(null);
 
   const updateEvent = (event: CalendarEventSummary, formData: FormData) => {
+    if (pending) {
+      return;
+    }
     const startsAt = String(formData.get("startsAt") ?? "");
     const endsAt = String(formData.get("endsAt") ?? "");
     if (!startsAt) {
@@ -66,7 +69,10 @@ export const CalendarEventManager = ({
     });
   };
 
-  const deleteEvent = (eventId: string) =>
+  const deleteEvent = (eventId: string) => {
+    if (pending) {
+      return;
+    }
     startTransition(async () => {
       const result = await deleteCalendarEventAction({
         eventId,
@@ -79,6 +85,7 @@ export const CalendarEventManager = ({
       setError(null);
       router.refresh();
     });
+  };
 
   return (
     <section className="panel">

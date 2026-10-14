@@ -4,7 +4,6 @@
 "use client";
 
 import { Plus, X } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -95,7 +94,7 @@ export const ProjectSavedViews = ({
         return;
       }
       setError(null);
-      router.push(projectViewHref(projectId, result.data.id, search) as Route);
+      router.push(projectViewHref(projectId, result.data.id, search));
       router.refresh();
     });
 
@@ -135,7 +134,7 @@ export const ProjectSavedViews = ({
       }
       setError(null);
       if (selectedId === viewId) {
-        router.push(`/projects/${projectId}?view=board` as Route);
+        router.push(`/projects/${projectId}?view=board`);
       }
       router.refresh();
     });
@@ -163,13 +162,11 @@ export const ProjectSavedViews = ({
             <Link
               aria-current={selectedId === view.id ? "page" : undefined}
               className={`tab${selectedId === view.id ? " on" : ""}`}
-              href={
-                projectViewHref(
-                  projectId,
-                  view.id,
-                  projectViewSettingsToSearch(view)
-                ) as Route
-              }
+              href={projectViewHref(
+                projectId,
+                view.id,
+                projectViewSettingsToSearch(view)
+              )}
             >
               {view.name}
             </Link>

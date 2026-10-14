@@ -37,18 +37,19 @@ export const BugInvestigationSection = ({
       <form
         className="bug-detail-form-grid"
         onSubmit={(event) =>
-          submit(event, (data) =>
+          submit(event, (formData) =>
             addBugFixAttemptAction({
               affectedVersion:
-                String(data.get("affectedVersion") ?? "") || null,
+                String(formData.get("affectedVersion") ?? "") || null,
               bugId: history.bug.id,
-              commitUrl: String(data.get("commitUrl") ?? "") || null,
+              commitUrl: String(formData.get("commitUrl") ?? "") || null,
               expectedVersion: history.bug.version,
-              fixSummary: String(data.get("fixSummary") ?? ""),
-              fixedVersion: String(data.get("fixedVersion") ?? "") || null,
-              pullRequestUrl: String(data.get("pullRequestUrl") ?? "") || null,
-              rootCause: String(data.get("rootCause") ?? ""),
-              verificationSteps: String(data.get("verificationSteps") ?? "")
+              fixSummary: String(formData.get("fixSummary") ?? ""),
+              fixedVersion: String(formData.get("fixedVersion") ?? "") || null,
+              pullRequestUrl:
+                String(formData.get("pullRequestUrl") ?? "") || null,
+              rootCause: String(formData.get("rootCause") ?? ""),
+              verificationSteps: String(formData.get("verificationSteps") ?? "")
                 .split("\n")
                 .map((step) => step.trim())
                 .filter(Boolean),

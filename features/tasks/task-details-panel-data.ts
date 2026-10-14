@@ -31,3 +31,5 @@ export const readTaskBundle = async (projectId: string, taskId: string) => {
   ]);
   return { comments, files, subtasks, task };
 };
+
+export type TaskBundle = Awaited<ReturnType<typeof readTaskBundle>>;

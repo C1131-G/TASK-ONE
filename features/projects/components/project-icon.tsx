@@ -52,11 +52,7 @@ const ProjectIcon = ({
 }) => {
   const IconComponent = icons[icon] ?? FolderOpen;
   return (
-    <span
-      aria-hidden="true"
-      className="pico"
-      style={{ "--c": color } as React.CSSProperties}
-    >
+    <span aria-hidden="true" className="pico" style={{ "--c": color }}>
       <IconComponent size={size} weight="regular" />
     </span>
   );

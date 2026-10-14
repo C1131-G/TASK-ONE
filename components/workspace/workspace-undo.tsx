@@ -112,8 +112,8 @@ const WorkspaceUndoProvider = ({
   }, []);
 
   const dismiss = (id: string) => {
-    const notice = items.find((item) => item.id === id);
-    setItems((current) => current.filter((item) => item.id !== id));
+    const notice = items.find((undoNotice) => undoNotice.id === id);
+    setItems((current) => current.filter((undoNotice) => undoNotice.id !== id));
     if (notice) {
       setAnnouncement(`${notice.label} dismissed.`);
     }

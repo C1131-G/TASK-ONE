@@ -51,7 +51,10 @@ export const TaskRecurrenceEditor = ({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const save = (formData: FormData) =>
+  const save = (formData: FormData) => {
+    if (pending || !editable || !dueDate) {
+      return;
+    }
     startTransition(async () => {
       const result = await setTaskRecurrenceAction({
         expectedVersion: version,
@@ -71,8 +74,12 @@ export const TaskRecurrenceEditor = ({
       onVersionChange(result.data.version);
       setError(null);
     });
+  };
 
-  const clear = () =>
+  const clear = () => {
+    if (pending || !editable) {
+      return;
+    }
     startTransition(async () => {
       const result = await setTaskRecurrenceAction({
         expectedVersion: version,
@@ -87,6 +94,7 @@ export const TaskRecurrenceEditor = ({
       onVersionChange(result.data.version);
       setError(null);
     });
+  };
 
   let saveLabel = recurrence ? "Update recurrence" : "Set recurrence";
   if (pending) {

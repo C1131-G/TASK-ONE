@@ -59,3 +59,9 @@ export const listTeams = async (input: unknown) =>
 // Team pages read the full list for both their title and their body; one
 // request shares a single read.
 export const listAllTeams = cache(async () => await listTeams({}));
+
+// The shell and most pages read the full directory; an object-literal argument
+// would defeat cache, so the unfiltered read gets its own memoized entry.
+export const listAllEmployees = cache(
+  async () => await listEmployees({ search: "" })
+);

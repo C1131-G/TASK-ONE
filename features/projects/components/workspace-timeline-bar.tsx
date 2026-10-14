@@ -2,7 +2,7 @@
 
 "use client";
 
-import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 
 import type { TimelineTask } from "@/features/projects/types/workspace-timeline-types";
@@ -156,14 +156,12 @@ export const TimelineBar = ({
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      style={
-        {
-          "--c": "var(--accent)",
-          left: clippedStart * dayWidth,
-          top: 6,
-          width,
-        } as CSSProperties
-      }
+      style={{
+        "--c": "var(--accent)",
+        left: clippedStart * dayWidth,
+        top: 6,
+        width,
+      }}
       title={`${task.title} · ${shownStart} → ${shownEnd}`}
       type="button"
     >

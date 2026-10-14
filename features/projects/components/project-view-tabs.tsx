@@ -12,7 +12,6 @@ import {
   Table,
   Pulse,
 } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 
 const views = [
@@ -39,7 +38,7 @@ export const ProjectViewTabs = ({
       <Link
         aria-current={selected === id ? "page" : undefined}
         className={`tab${selected === id ? " on" : ""}`}
-        href={`/projects/${projectId}?view=${id}` as Route}
+        href={`/projects/${projectId}?view=${id}`}
         key={id}
       >
         <Icon aria-hidden="true" size={14} />

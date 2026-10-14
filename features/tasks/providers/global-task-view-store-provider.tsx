@@ -45,7 +45,7 @@ export const GlobalTaskViewStoreProvider = ({
       initialColumnWidths
     ),
     globalTaskViewActions
-  ) as GlobalTaskViewStore;
+  );
 
   useEffect(() => {
     const incoming = readGlobalTaskSearchRaw(

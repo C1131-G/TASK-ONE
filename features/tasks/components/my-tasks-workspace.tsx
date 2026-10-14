@@ -2,7 +2,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -19,6 +18,7 @@ import {
   MY_TASK_VIEWS,
   filterGlobalTasks,
   globalTaskHref,
+  globalTaskQuery,
   groupTasksByDueDate,
   sortGlobalTasks,
 } from "@/features/tasks/global-task-view-state";
@@ -188,10 +188,10 @@ export const MyTasksWorkspace = ({
     [visibleTasks]
   );
   const view = search.view === "calendar" ? "calendar" : "list";
-  const calendarHrefPrefix = `${globalTaskHref("/my-tasks", raw, {
+  const calendarHrefPrefix = `/my-tasks?${globalTaskQuery(raw, {
     monthOffset: "",
     view: "calendar",
-  })}&monthOffset=`;
+  })}&monthOffset=` as const;
 
   return (
     <div className="page flush">
@@ -213,7 +213,7 @@ export const MyTasksWorkspace = ({
           >
             <Link
               aria-current={view === "list" ? "page" : undefined}
-              href={globalTaskHref("/my-tasks", raw, { view: "list" }) as Route}
+              href={globalTaskHref("/my-tasks", raw, { view: "list" })}
             >
               List
             </Link>
@@ -225,9 +225,7 @@ export const MyTasksWorkspace = ({
           >
             <Link
               aria-current={view === "calendar" ? "page" : undefined}
-              href={
-                globalTaskHref("/my-tasks", raw, { view: "calendar" }) as Route
-              }
+              href={globalTaskHref("/my-tasks", raw, { view: "calendar" })}
             >
               Calendar
             </Link>

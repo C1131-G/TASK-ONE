@@ -16,6 +16,11 @@ export const BugWorkflowReceiptSchema = Schema.Struct({
 
 export type BugWorkflowReceipt = typeof BugWorkflowReceiptSchema.Type;
 
+// Bug rows store the status as text; decoding rejects a value outside the workflow.
+export const decodeBugWorkflowStatus = Schema.decodeUnknownSync(
+  BugWorkflowStatusSchema
+);
+
 export const required = (message: string): never => {
   throw new AppError({ code: "VALIDATION_FAILED", message });
 };

@@ -8,7 +8,6 @@ import {
   CheckCircle,
   UsersThree,
 } from "@phosphor-icons/react/dist/ssr";
-import type { Route } from "next";
 import Link from "next/link";
 
 import { Progress } from "@/components/ui/progress";
@@ -92,7 +91,7 @@ const TeamOverview = ({
               {projects.map((project) => (
                 <Link
                   className="team-project-row"
-                  href={`/projects/${project.id}?view=overview` as Route}
+                  href={`/projects/${project.id}?view=overview`}
                   key={project.id}
                 >
                   <span
@@ -140,7 +139,7 @@ const TeamOverview = ({
               {openTasks.map((task) => (
                 <Link
                   className="team-open-task-row"
-                  href={`/projects/${task.projectId}?view=board` as Route}
+                  href={`/projects/${task.projectId}?view=board`}
                   key={task.id}
                 >
                   <span

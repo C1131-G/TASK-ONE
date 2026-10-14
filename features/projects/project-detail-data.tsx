@@ -7,7 +7,7 @@ import type { CalendarMode } from "@/features/calendar/calendar-params";
 import { listCalendarEvents } from "@/features/calendar/calendar-queries";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listProjectFiles } from "@/features/files/files-queries";
-import { listEmployees, listTeams } from "@/features/people/people-queries";
+import { listAllEmployees, listTeams } from "@/features/people/people-queries";
 import { ProjectMilestones } from "@/features/projects/components/project-milestones";
 import type { listProjects } from "@/features/projects/projects-queries";
 import {
@@ -139,7 +139,7 @@ export const getProjectDetailData = async (
   ] = await Promise.all([
     getPageSession(),
     listAllProjects(),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
     getPersonalWorkspace({}),
     listProjectMilestones({ projectId }),
     listTeams({}),
@@ -150,7 +150,7 @@ export const getProjectDetailData = async (
   if (!projects.ok) {
     return { kind: "error" as const };
   }
-  const project = projects.data.find((item) => item.id === projectId);
+  const project = projects.data.find(({ id }) => id === projectId);
   if (!project) {
     return { kind: "not-found" as const };
   }

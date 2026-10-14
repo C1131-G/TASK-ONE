@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-restyle */
 
 import { EnvelopeOpen } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,7 +42,7 @@ const InboxDetailContent = ({
       {item.projectName && item.projectId ? (
         <Link
           className="btn btn-secondary"
-          href={`/projects/${item.projectId}?view=board` as Route}
+          href={`/projects/${item.projectId}?view=board`}
         >
           Open {item.projectName}
         </Link>

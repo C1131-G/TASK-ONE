@@ -3,7 +3,6 @@
 "use client";
 
 import { DotsThree, FolderOpen } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -16,7 +15,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-menu";
-import { mobileItems } from "@/components/workspace/workspace-navigation-data";
+import {
+  getNavigationTransitionType,
+  mobileItems,
+} from "@/components/workspace/workspace-navigation-data";
 
 export const WorkspaceBottomNavigation = ({
   mobileNavigation,
@@ -41,8 +43,9 @@ export const WorkspaceBottomNavigation = ({
         }
         aria-current={pathname === href ? "page" : undefined}
         className={pathname === href ? "on" : ""}
-        href={href as Route}
+        href={href}
         key={href}
+        transitionTypes={[getNavigationTransitionType(pathname, href)]}
       >
         <Icon aria-hidden="true" size={19} />
         <span>{label}</span>
@@ -51,7 +54,11 @@ export const WorkspaceBottomNavigation = ({
         ) : null}
       </Link>
     ))}
-    <Link className={pathname === "/projects" ? "on" : ""} href="/projects">
+    <Link
+      className={pathname === "/projects" ? "on" : ""}
+      href="/projects"
+      transitionTypes={[getNavigationTransitionType(pathname, "/projects")]}
+    >
       <FolderOpen aria-hidden="true" size={19} />
       <span>Projects</span>
     </Link>

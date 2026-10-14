@@ -56,7 +56,7 @@ export const defaultGlobalTaskSearch: GlobalTaskSearch = {
 const pick = <Value extends string>(
   values: readonly Value[],
   value: string | null | undefined
-): Value | undefined => values.find((item) => item === value);
+): Value | undefined => values.find((candidate) => candidate === value);
 
 // Older links used "name" for the title sort; it maps to the same field.
 const SORT_ALIASES: Readonly<Record<string, string>> = { name: "title" };
@@ -84,6 +84,9 @@ export const readGlobalTaskSearchRaw = (
   };
 };
 
+const isGlobalTaskSearchKey = (key: string): key is keyof GlobalTaskSearch =>
+  Object.hasOwn(defaultGlobalTaskSearch, key);
+
 // Keeps unrelated params (for example a saved view or a deep link) and writes
 // the search fields, dropping any field that is at its default.
 export const writeGlobalTaskSearch = (
@@ -91,9 +94,9 @@ export const writeGlobalTaskSearch = (
   search: GlobalTaskSearch
 ): URLSearchParams => {
   const next = new URLSearchParams(params);
-  for (const key of Object.keys(
-    defaultGlobalTaskSearch
-  ) as (keyof GlobalTaskSearch)[]) {
+  for (const key of Object.keys(defaultGlobalTaskSearch).filter(
+    isGlobalTaskSearchKey
+  )) {
     const value = search[key];
     if (value === defaultGlobalTaskSearch[key] || value === "") {
       next.delete(key);
@@ -104,15 +107,21 @@ export const writeGlobalTaskSearch = (
   return next;
 };
 
-export const globalTaskHref = (
-  pathname: string,
+export const globalTaskQuery = (
   search: GlobalTaskSearch,
   patch: Partial<GlobalTaskSearch> = {}
-): string => {
-  const query = writeGlobalTaskSearch(new URLSearchParams(), {
+): string =>
+  writeGlobalTaskSearch(new URLSearchParams(), {
     ...search,
     ...patch,
   }).toString();
+
+export const globalTaskHref = <Pathname extends string>(
+  pathname: Pathname,
+  search: GlobalTaskSearch,
+  patch: Partial<GlobalTaskSearch> = {}
+): Pathname | `${Pathname}?${string}` => {
+  const query = globalTaskQuery(search, patch);
   return query ? `${pathname}?${query}` : pathname;
 };
 

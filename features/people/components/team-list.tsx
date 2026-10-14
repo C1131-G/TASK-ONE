@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles -- Workspace classes are defined in app/workspace-styles. */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -36,13 +35,13 @@ const TeamList = async () => {
                 <span
                   aria-hidden="true"
                   className="pico"
-                  style={{ "--c": team.color } as React.CSSProperties}
+                  style={{ "--c": team.color }}
                 >
                   ●
                 </span>
                 <Link
                   className="team-card-link grow"
-                  href={`/teams/${team.id}` as Route}
+                  href={`/teams/${team.id}`}
                 >
                   <strong>{team.name}</strong>
                   <span className="muted">{team.memberCount} members</span>

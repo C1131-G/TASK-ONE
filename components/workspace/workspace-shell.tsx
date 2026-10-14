@@ -4,10 +4,10 @@
 "use client";
 
 import { Bell, List } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { ViewTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,11 @@ import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-m
 import { WorkspaceBottomNavigation } from "@/components/workspace/workspace-bottom-navigation";
 import { WorkspaceCreateMenu } from "@/components/workspace/workspace-create-menu";
 import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
-import { sections } from "@/components/workspace/workspace-navigation-data";
+import {
+  getNavigationTransitionType,
+  isNavigationItemActive,
+  sections,
+} from "@/components/workspace/workspace-navigation-data";
 import { WorkspaceSearchPalette } from "@/components/workspace/workspace-search-palette";
 import { WorkspaceUndoProvider } from "@/components/workspace/workspace-undo";
 import { PushNotificationsControl } from "@/features/notifications/components/push-notifications-control";
@@ -70,7 +74,7 @@ export const WorkspaceShell = ({
     activeProject?.name ??
     sections
       .flatMap((section) => section.items)
-      .find((item) => item.href === pathname)?.label ??
+      .find((link) => isNavigationItemActive(pathname, link.href))?.label ??
     "Workspace";
   const mobileNavigation = (
     <div className="mobile-navigation">
@@ -86,10 +90,15 @@ export const WorkspaceShell = ({
             return [
               <SheetClose asChild key={href}>
                 <WorkspaceLink
-                  active={pathname === href}
+                  active={
+                    href === "/projects"
+                      ? pathname === href
+                      : isNavigationItemActive(pathname, href)
+                  }
                   href={href}
                   Icon={Icon}
                   label={label}
+                  transitionType={getNavigationTransitionType(pathname, href)}
                   unreadCount={unreadCountFor(label)}
                 />
               </SheetClose>,
@@ -106,7 +115,13 @@ export const WorkspaceShell = ({
                 activeProject?.id === project.id ? "page" : undefined
               }
               className={`sitem${activeProject?.id === project.id ? " on" : ""}`}
-              href={`/projects/${project.id}` as Route}
+              href={`/projects/${project.id}`}
+              transitionTypes={[
+                getNavigationTransitionType(
+                  pathname,
+                  `/projects/${project.id}`
+                ),
+              ]}
             >
               <ProjectIcon
                 color={project.color}
@@ -129,7 +144,12 @@ export const WorkspaceShell = ({
         <div className="shell">
           <nav aria-label="Main" className="side">
             <div className="side-top">
-              <Link aria-label="Metsys home" className="ws" href="/">
+              <Link
+                aria-label="Metsys home"
+                className="ws"
+                href="/"
+                transitionTypes={[getNavigationTransitionType(pathname, "/")]}
+              >
                 <span aria-hidden="true" className="ws-logo" data-initial="M" />
                 <span className="ws-name trunc">Metsys</span>
               </Link>
@@ -146,11 +166,19 @@ export const WorkspaceShell = ({
                     }
                     return [
                       <WorkspaceLink
-                        active={pathname === href}
+                        active={
+                          href === "/projects"
+                            ? pathname === href
+                            : isNavigationItemActive(pathname, href)
+                        }
                         href={href}
                         Icon={Icon}
                         key={href}
                         label={label}
+                        transitionType={getNavigationTransitionType(
+                          pathname,
+                          href
+                        )}
                         unreadCount={unreadCountFor(label)}
                       />,
                     ];
@@ -165,8 +193,14 @@ export const WorkspaceShell = ({
                       activeProject?.id === project.id ? "page" : undefined
                     }
                     className={`sitem${activeProject?.id === project.id ? " on" : ""}`}
-                    href={`/projects/${project.id}` as Route}
+                    href={`/projects/${project.id}`}
                     key={project.id}
+                    transitionTypes={[
+                      getNavigationTransitionType(
+                        pathname,
+                        `/projects/${project.id}`
+                      ),
+                    ]}
                   >
                     <ProjectIcon
                       color={project.color}
@@ -225,7 +259,10 @@ export const WorkspaceShell = ({
                     : "Open notifications"
                 }
                 className="ibtn"
-                href={"/notifications" as Route}
+                href="/notifications"
+                transitionTypes={[
+                  getNavigationTransitionType(pathname, "/notifications"),
+                ]}
               >
                 <Bell aria-hidden="true" size={16} />
                 {unreadNotificationCount > 0 ? (
@@ -245,7 +282,21 @@ export const WorkspaceShell = ({
               <WorkspaceAccountMenu name={name} role={role} />
             </header>
             <div className="content" id="main-content" tabIndex={-1}>
-              {children}
+              <ViewTransition
+                default="none"
+                enter={{
+                  default: "none",
+                  "nav-back": "nav-back",
+                  "nav-forward": "nav-forward",
+                }}
+                exit={{
+                  default: "none",
+                  "nav-back": "nav-back",
+                  "nav-forward": "nav-forward",
+                }}
+              >
+                {children}
+              </ViewTransition>
             </div>
           </main>
           <WorkspaceBottomNavigation

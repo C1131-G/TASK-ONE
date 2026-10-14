@@ -68,8 +68,10 @@ export const useTaskSubtaskActions = ({
       }
       onVersionChange(result.data.parentVersion);
       setSubtasks(
-        subtasks.map((item) =>
-          item.id === subtask.id ? result.data.subtask : item
+        subtasks.map((existingSubtask) =>
+          existingSubtask.id === subtask.id
+            ? result.data.subtask
+            : existingSubtask
         )
       );
       setError(null);
@@ -94,8 +96,10 @@ export const useTaskSubtaskActions = ({
       }
       onVersionChange(result.data.parentVersion);
       setSubtasks(
-        subtasks.map((item) =>
-          item.id === subtask.id ? result.data.subtask : item
+        subtasks.map((existingSubtask) =>
+          existingSubtask.id === subtask.id
+            ? result.data.subtask
+            : existingSubtask
         )
       );
       setError(null);
@@ -114,7 +118,7 @@ export const useTaskSubtaskActions = ({
         return;
       }
       onVersionChange(result.data.parentVersion);
-      setSubtasks(subtasks.filter((item) => item.id !== subtask.id));
+      setSubtasks(subtasks.filter(({ id }) => id !== subtask.id));
       setError(null);
       router.refresh();
     });
@@ -134,7 +138,7 @@ export const useTaskSubtaskActions = ({
       const result = await reorderSubtasksAction({
         expectedTaskVersion: version,
         idempotencyKey: crypto.randomUUID(),
-        subtaskIds: ordered.map((item) => item.id),
+        subtaskIds: ordered.map(({ id }) => id),
         taskId,
       });
       if (!result.ok) {
@@ -159,7 +163,7 @@ export const useTaskSubtaskActions = ({
         return;
       }
       onVersionChange(version + 1);
-      setSubtasks(subtasks.filter((item) => item.id !== subtask.id));
+      setSubtasks(subtasks.filter(({ id }) => id !== subtask.id));
       setError(null);
       router.refresh();
     });

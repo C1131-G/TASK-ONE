@@ -7,7 +7,7 @@ const teamMetadata = async (teamId: string): Promise<Metadata> => {
   await connection();
   const result = await listAllTeams();
   const team = result.ok
-    ? result.data.find((item) => item.id === teamId)
+    ? result.data.find(({ id }) => id === teamId)
     : undefined;
   return { title: `${team?.name ?? "Team"} | Metsys` };
 };

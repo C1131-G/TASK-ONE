@@ -32,27 +32,20 @@ const PushNotificationsControl = ({ publicKey }: { publicKey: string }) => {
       return;
     }
 
+    // Only the workspace shell mounts this, after WorkspaceFrame has gated the
+    // session, so no client-side session check is needed.
     let cancelled = false;
-    const registerForSignedInUser = async () => {
+    const registerServiceWorker = async () => {
       try {
-        const response = await fetch("/api/auth/get-session", {
-          credentials: "same-origin",
-        });
-        if (!response.ok) {
-          return;
-        }
-        const session: unknown = await response.json();
-        if (session) {
-          await navigator.serviceWorker.register("/sw.js");
-          if (!cancelled) {
-            setAvailable(true);
-          }
+        await navigator.serviceWorker.register("/sw.js");
+        if (!cancelled) {
+          setAvailable(true);
         }
       } catch {
         // Push is an optional browser enhancement; the workspace remains usable.
       }
     };
-    void registerForSignedInUser();
+    void registerServiceWorker();
 
     return () => {
       cancelled = true;

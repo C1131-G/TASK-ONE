@@ -70,7 +70,7 @@ const MAX_QUERY_LENGTH = 200;
 const pick = <Value extends string>(
   values: readonly Value[],
   value: string | null | undefined
-): Value | undefined => values.find((item) => item === value);
+): Value | undefined => values.find((candidate) => candidate === value);
 
 export const normalizeProjectViewSearch = (
   raw: ProjectViewSearch
@@ -172,7 +172,7 @@ export const projectViewHref = (
   projectId: string,
   viewId: string,
   search: NormalizedProjectViewSearch
-): string => {
+): `/projects/${string}?${string}` => {
   const params = writeProjectViewSearch(
     new URLSearchParams({ view: `saved-${viewId}` }),
     toRawProjectViewSearch(search)

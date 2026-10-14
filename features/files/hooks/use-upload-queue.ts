@@ -4,7 +4,6 @@ import { useCreateStore, useSelector } from "@tanstack/react-store";
 import { useRef } from "react";
 
 import { uploadActions } from "../upload-store";
-import type { UploadStore } from "../upload-store";
 import { putWithProgress } from "../upload-transport";
 
 export interface UploadTicket {
@@ -35,7 +34,7 @@ const FAILED_MESSAGE = (name: string) =>
 export const useUploadQueue = (
   onSettled?: (id: string) => void | Promise<void>
 ) => {
-  const store = useCreateStore({ uploads: [] }, uploadActions) as UploadStore;
+  const store = useCreateStore({ uploads: [] }, uploadActions);
   const entries = useRef(new Map<string, Entry>());
   const uploads = useSelector(store, (state) => state.uploads);
 

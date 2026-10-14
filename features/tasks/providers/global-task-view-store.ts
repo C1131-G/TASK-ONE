@@ -1,4 +1,4 @@
-import type { Store, StoreActionsFactory } from "@tanstack/store";
+import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
 import { MAX_BULK_SELECTION } from "../../projects/providers/project-view-store";
@@ -76,10 +76,7 @@ export const createGlobalTaskViewStore = (
 ) =>
   createStore<GlobalTaskViewState, GlobalTaskViewActions>(
     createInitialGlobalTaskViewState(search, columnWidths),
-    globalTaskViewActions as StoreActionsFactory<
-      GlobalTaskViewState,
-      GlobalTaskViewActions
-    >
+    globalTaskViewActions
   );
 
 export type GlobalTaskViewStore = ReturnType<typeof createGlobalTaskViewStore>;

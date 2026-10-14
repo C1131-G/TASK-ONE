@@ -6,7 +6,7 @@ import {
   ServerActionOutputSchema,
   runServerAction,
 } from "@/src/server/core/server-action";
-import { JobHandlersLive } from "@/src/server/jobs/handlers";
+import { JobHandlersLive } from "@/src/server/jobs/job-handlers-live";
 import { JobProcessor, JobProcessorLive } from "@/src/server/jobs/processor";
 import { PushTransportLive } from "@/src/server/notifications/push-transport";
 import { StorageLive } from "@/src/server/storage/storage";

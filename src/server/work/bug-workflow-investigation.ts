@@ -14,6 +14,7 @@ import {
 } from "./bug-contracts";
 import { transitionBugStatus } from "./bug-workflow";
 import {
+  decodeBugWorkflowStatus,
   assertBugEditor,
   assertWritable,
   conflict,
@@ -95,7 +96,7 @@ export const addFixAttempt = async (
   });
   return {
     bugId: bug.id,
-    status: bug.status as BugWorkflowReceipt["status"],
+    status: decodeBugWorkflowStatus(bug.status),
     version: nextVersion,
   };
 };
@@ -175,7 +176,7 @@ export const addEvidence = async (
   });
   return {
     bugId: bug.id,
-    status: bug.status as BugWorkflowReceipt["status"],
+    status: decodeBugWorkflowStatus(bug.status),
     version,
   };
 };

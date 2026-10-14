@@ -8,7 +8,7 @@ import {
   Collaboration,
   CollaborationLive,
 } from "../../src/server/collaboration/service";
-import { JobHandlersLive } from "../../src/server/jobs/handlers";
+import { JobHandlersLive } from "../../src/server/jobs/job-handlers-live";
 import {
   JobProcessor,
   JobProcessorLive,

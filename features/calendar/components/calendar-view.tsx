@@ -12,7 +12,7 @@ import {
 } from "@/features/calendar/calendar-queries";
 import { CalendarEventForm } from "@/features/calendar/components/calendar-event-form";
 import { CalendarEventManager } from "@/features/calendar/components/calendar-event-manager";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
@@ -42,7 +42,7 @@ const CalendarView = async ({
     }),
     getPageSession(),
     listProjects({}),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
   ]);
   if (!tasks.ok || !events.ok) {
     return (

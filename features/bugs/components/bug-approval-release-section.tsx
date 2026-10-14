@@ -86,13 +86,15 @@ export const BugApprovalReleaseSection = ({
             <form
               className="bug-reject-form"
               onSubmit={(event) =>
-                submit(event, (data) =>
+                submit(event, (formData) =>
                   decideBugApprovalAction({
                     approvalId: pendingApproval.id,
                     comment: null,
                     decision: "rejected",
                     expectedVersion: history.bug.version,
-                    rejectionReason: String(data.get("rejectionReason") ?? ""),
+                    rejectionReason: String(
+                      formData.get("rejectionReason") ?? ""
+                    ),
                   })
                 )
               }
@@ -119,14 +121,14 @@ export const BugApprovalReleaseSection = ({
           <form
             className="bug-inline-form"
             onSubmit={(event) =>
-              submit(event, (data) =>
+              submit(event, (formData) =>
                 recordBugReleaseAction({
                   approvalId: latestApproved.id,
                   bugId: history.bug.id,
                   environment,
                   expectedVersion: history.bug.version,
-                  notes: String(data.get("releaseNotes") ?? "") || null,
-                  version: String(data.get("releaseVersion") ?? ""),
+                  notes: String(formData.get("releaseNotes") ?? "") || null,
+                  version: String(formData.get("releaseVersion") ?? ""),
                 })
               )
             }
@@ -164,12 +166,12 @@ export const BugApprovalReleaseSection = ({
           <form
             className="bug-inline-form"
             onSubmit={(event) =>
-              submit(event, (data) =>
+              submit(event, (formData) =>
                 recordBugPostReleaseCheckAction({
                   bugId: history.bug.id,
                   expectedVersion: history.bug.version,
-                  notes: String(data.get("postReleaseNotes") ?? ""),
-                  passed: data.get("passed") === "true",
+                  notes: String(formData.get("postReleaseNotes") ?? ""),
+                  passed: formData.get("passed") === "true",
                   releaseId: activeRelease.id,
                 })
               )

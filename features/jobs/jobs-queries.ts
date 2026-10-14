@@ -5,7 +5,7 @@ import { AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
-import { JobHandlersLive } from "@/src/server/jobs/handlers";
+import { JobHandlersLive } from "@/src/server/jobs/job-handlers-live";
 import {
   DeadJobListSchema,
   JobProcessor,

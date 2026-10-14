@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from app/workspace-styles. */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -13,9 +12,9 @@ import { listBugs } from "@/features/bugs/bugs-queries";
 import { BugBoard } from "@/features/bugs/components/bug-board";
 import { BugList } from "@/features/bugs/components/bug-list";
 import { BugReportDialog } from "@/features/bugs/components/bug-report-dialog";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
-import { TaskDrawerProvider } from "@/features/tasks/components/task-drawer";
+import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { getPageSession } from "@/src/server/auth/page-session";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
@@ -58,7 +57,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
   const [projectsResult, employeeResult, session, bugsResult] =
     await Promise.all([
       listProjects({}),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       getPageSession(),
       listBugs({
         includeArchived: filters.archived,
@@ -106,7 +105,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           <Button type="submit">Search</Button>
           <Link
             className="btn btn-ghost"
-            href={(filters.archived ? "/bugs" : "/bugs?archived=true") as Route}
+            href={filters.archived ? "/bugs" : "/bugs?archived=true"}
           >
             {filters.archived ? "Active bugs" : "Include archived"}
           </Link>
@@ -128,7 +127,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
             <Link
               aria-current={filters.status === value ? "page" : undefined}
               className={`bug-status-filter${filters.status === value ? " selected" : ""}`}
-              href={`/bugs${query.size ? `?${query.toString()}` : ""}` as Route}
+              href={query.size ? `/bugs?${query.toString()}` : "/bugs"}
               key={value || "all"}
             >
               {label}
@@ -153,7 +152,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
         </Link>
       </nav>
       {bugsResult.ok ? (
-        <TaskDrawerProvider
+        <TaskDrawerHost
           currentUserId={currentUserId}
           editableTaskIds={drawer.editableTaskIds}
           employees={employees.map(({ id, name }) => ({ id, name }))}
@@ -166,7 +165,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           ) : (
             <BugList bugs={bugs} />
           )}
-        </TaskDrawerProvider>
+        </TaskDrawerHost>
       ) : (
         <section className="panel panel-b" role="alert">
           Bug reports could not be loaded. Refresh the page to retry.

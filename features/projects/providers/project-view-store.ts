@@ -1,4 +1,4 @@
-import type { Store, StoreActionsFactory } from "@tanstack/store";
+import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
 import type { TaskTableColumnId } from "../../tasks/task-table-columns";
@@ -83,10 +83,7 @@ export const createProjectViewStore = (
 ) =>
   createStore<ProjectViewState, ProjectViewActions>(
     createInitialProjectViewState(search, columnWidths),
-    projectViewActions as StoreActionsFactory<
-      ProjectViewState,
-      ProjectViewActions
-    >
+    projectViewActions
   );
 
 export type ProjectViewStore = ReturnType<typeof createProjectViewStore>;

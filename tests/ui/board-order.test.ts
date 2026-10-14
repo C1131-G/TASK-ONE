@@ -23,7 +23,7 @@ test("orders by position, then by task number", () => {
     task("a", 0, 1),
     task("b", -1, 2),
   ]);
-  expect(ordered.map((item) => item.id)).toEqual(["b", "a", "c"]);
+  expect(ordered.map(({ id }) => id)).toEqual(["b", "a", "c"]);
 });
 
 test("moving a card down swaps it with its neighbour and renumbers the column", () => {

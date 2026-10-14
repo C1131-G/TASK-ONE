@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -135,7 +134,7 @@ const WorkspaceOverview = async () => {
                       <Link
                         aria-label={`Open ${project.name}`}
                         className="row"
-                        href={`/projects/${project.id}` as Route}
+                        href={`/projects/${project.id}`}
                       >
                         <ProjectIcon
                           color={project.color}
@@ -189,7 +188,7 @@ const WorkspaceOverview = async () => {
               return (
                 <Link
                   className="overview-status-row"
-                  href={`/tasks?status=${status}&group=status` as Route}
+                  href={`/tasks?status=${status}&group=status`}
                   key={status}
                 >
                   <span>{label}</span>
@@ -248,9 +247,7 @@ const WorkspaceOverview = async () => {
               {dashboard.data.upcomingMilestones.map((milestone) => (
                 <Link
                   className="row overview-milestone-row"
-                  href={
-                    `/projects/${milestone.projectId}?view=overview` as Route
-                  }
+                  href={`/projects/${milestone.projectId}?view=overview`}
                   key={milestone.id}
                 >
                   <span className="trunc grow">{milestone.name}</span>

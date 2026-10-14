@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
@@ -13,7 +12,7 @@ const RecentActivityPanel = ({
   <section className="panel">
     <div className="panel-h">
       <h2>Recent activity</h2>
-      <Link className="btn btn-sm btn-ghost" href={"/activity" as Route}>
+      <Link className="btn btn-sm btn-ghost" href="/activity">
         View all
       </Link>
     </div>

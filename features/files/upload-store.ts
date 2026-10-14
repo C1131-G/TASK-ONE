@@ -1,4 +1,4 @@
-import type { Store, StoreActionsFactory } from "@tanstack/store";
+import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
 export type UploadStatus = "uploading" | "done" | "error" | "cancelled";
@@ -25,8 +25,8 @@ const patchItem = (
   id: string,
   patch: Partial<UploadItem>
 ): UploadState => ({
-  uploads: state.uploads.map((item) =>
-    item.id === id ? { ...item, ...patch } : item
+  uploads: state.uploads.map((upload) =>
+    upload.id === id ? { ...upload, ...patch } : upload
   ),
 });
 
@@ -35,22 +35,24 @@ export const uploadActions = ({
 }: {
   readonly setState: UploadStoreSetState;
 }) => ({
-  add: (item: Pick<UploadItem, "id" | "name" | "sizeBytes">) =>
+  add: (upload: Pick<UploadItem, "id" | "name" | "sizeBytes">) =>
     setState((previous) => ({
       uploads: [
         ...previous.uploads,
-        { ...item, error: null, loadedBytes: 0, status: "uploading" },
+        { ...upload, error: null, loadedBytes: 0, status: "uploading" },
       ],
     })),
   cancelled: (id: string) =>
     setState((previous) => patchItem(previous, id, { status: "cancelled" })),
   clearFinished: () =>
     setState((previous) => ({
-      uploads: previous.uploads.filter((item) => item.status === "uploading"),
+      uploads: previous.uploads.filter(
+        (upload) => upload.status === "uploading"
+      ),
     })),
   dismiss: (id: string) =>
     setState((previous) => ({
-      uploads: previous.uploads.filter((item) => item.id !== id),
+      uploads: previous.uploads.filter((upload) => upload.id !== id),
     })),
   done: (id: string) =>
     setState((previous) => {
@@ -78,14 +80,11 @@ export const uploadActions = ({
 export type UploadActions = ReturnType<typeof uploadActions>;
 
 export const createUploadStore = () =>
-  createStore<UploadState, UploadActions>(
-    { uploads: [] },
-    uploadActions as StoreActionsFactory<UploadState, UploadActions>
-  );
+  createStore<UploadState, UploadActions>({ uploads: [] }, uploadActions);
 
 export type UploadStore = ReturnType<typeof createUploadStore>;
 
-export const uploadPercent = (item: UploadItem): number =>
-  item.sizeBytes <= 0
+export const uploadPercent = (upload: UploadItem): number =>
+  upload.sizeBytes <= 0
     ? 0
-    : Math.min(100, Math.round((item.loadedBytes / item.sizeBytes) * 100));
+    : Math.min(100, Math.round((upload.loadedBytes / upload.sizeBytes) * 100));

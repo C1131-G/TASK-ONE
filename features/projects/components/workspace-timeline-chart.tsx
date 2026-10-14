@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import type { Route } from "next";
 import Link from "next/link";
 import type { RefObject } from "react";
 
@@ -106,7 +105,7 @@ export const WorkspaceTimelineChart = ({
               <li className="tl-row" key={row.key}>
                 <Link
                   className="timeline-row-link"
-                  href={`/projects/${row.task.projectId}?view=board` as Route}
+                  href={`/projects/${row.task.projectId}?view=board`}
                 >
                   <span className="trunc grow">{row.task.title}</span>
                   <span className="faint">{row.task.projectName}</span>

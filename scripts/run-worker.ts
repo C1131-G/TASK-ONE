@@ -2,7 +2,7 @@ import "dotenv/config";
 import { Effect, Layer } from "effect";
 
 import { authPool } from "../src/server/auth/database";
-import { JobHandlersLive } from "../src/server/jobs/handlers";
+import { JobHandlersLive } from "../src/server/jobs/job-handlers-live";
 import { JobProcessor, JobProcessorLive } from "../src/server/jobs/processor";
 import { PushTransportLive } from "../src/server/notifications/push-transport";
 import { StorageLive } from "../src/server/storage/storage";

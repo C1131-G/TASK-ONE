@@ -3,7 +3,6 @@
 "use client";
 
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
-import type { Route } from "next";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -37,6 +36,10 @@ interface CalendarProject {
   readonly color: string;
 }
 const NO_CALENDAR_PROJECTS: readonly CalendarProject[] = [];
+// Each prefix ends just before the month offset value.
+export type CalendarHrefPrefix =
+  `${"/calendar" | "/my-tasks" | `/projects/${string}`}?${string}`;
+
 const NO_EMPLOYEES: readonly { readonly id: string; readonly name: string }[] =
   [];
 
@@ -55,7 +58,7 @@ export const TaskCalendarGrid = ({
 }: {
   readonly monthOffset: number;
   readonly monthLabel: string;
-  readonly hrefPrefix?: string;
+  readonly hrefPrefix?: CalendarHrefPrefix;
   readonly tasks: readonly CalendarTask[];
   readonly events: readonly CalendarEvent[];
   readonly projects?: readonly CalendarProject[];
@@ -101,7 +104,7 @@ export const TaskCalendarGrid = ({
   const reschedule = useTaskReschedule(tasks);
   const moveToDay = (taskId: string, day: string) => {
     // Read the displayed task: a move made a moment ago is not in the props yet.
-    const task = reschedule.tasks.find((item) => item.id === taskId);
+    const task = reschedule.tasks.find(({ id }) => id === taskId);
     if (!task || !canEditTaskRecord(task, currentUserId, isAdmin)) {
       return;
     }
@@ -156,8 +159,8 @@ export const TaskCalendarGrid = ({
     eventByDay.set(key, existing);
   }
   const projectById = new Map(projects.map((project) => [project.id, project]));
-  const calendarHref = (offset: number, mode = viewMode): Route =>
-    `${navigation}${offset}&calendarMode=${mode}` as Route;
+  const calendarHref = (offset: number, mode = viewMode): CalendarHrefPrefix =>
+    `${navigation}${offset}&calendarMode=${mode}`;
 
   return (
     <section className="panel cal workspace-calendar">
@@ -209,7 +212,7 @@ export const TaskCalendarGrid = ({
                 <span
                   aria-hidden="true"
                   className="pdot"
-                  style={{ "--c": project.color } as React.CSSProperties}
+                  style={{ "--c": project.color }}
                 />
                 {project.name}
               </li>

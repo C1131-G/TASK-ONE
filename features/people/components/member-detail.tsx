@@ -7,7 +7,7 @@ import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listActivity } from "@/features/activity/activity-queries";
 import { MemberProfile } from "@/features/people/components/member-profile";
 import type { MemberTab } from "@/features/people/member-tab";
-import { listEmployees, listTeams } from "@/features/people/people-queries";
+import { listAllEmployees, listTeams } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -22,7 +22,7 @@ const MemberDetail = async ({
   await connection();
   const [employeesResult, projectsResult, teamsResult, session] =
     await Promise.all([
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       listProjects({}),
       listTeams({}),
       getPageSession(),

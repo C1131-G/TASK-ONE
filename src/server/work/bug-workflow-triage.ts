@@ -6,6 +6,7 @@ import type { BugRelationInput, BugTriageInput } from "./bug-contracts";
 import { BugRelationInputSchema, BugTriageInputSchema } from "./bug-contracts";
 import { transitionBugStatus } from "./bug-workflow";
 import {
+  decodeBugWorkflowStatus,
   assertBugEditor,
   assertWritable,
   conflict,
@@ -166,7 +167,7 @@ export const addBugRelation = async (
   if (existing) {
     return {
       bugId: source.bug.id,
-      status: source.bug.status as BugWorkflowReceipt["status"],
+      status: decodeBugWorkflowStatus(source.bug.status),
       version: source.bug.version,
     };
   }
@@ -201,7 +202,7 @@ export const addBugRelation = async (
   const nextStatus =
     input.type === "duplicate"
       ? "duplicate"
-      : (source.bug.status as BugWorkflowReceipt["status"]);
+      : decodeBugWorkflowStatus(source.bug.status);
   const result =
     input.type === "duplicate"
       ? await updateBugStatus(transaction, {

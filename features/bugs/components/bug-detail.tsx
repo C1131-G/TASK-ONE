@@ -6,21 +6,25 @@ import { connection } from "next/server";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
 import { BugDetailWorkflow } from "@/features/bugs/components/bug-detail-workflow";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const BugDetail = async ({ bugId }: { readonly bugId: string }) => {
   await connection();
   const [session, employeesResult, historyResult] = await Promise.all([
     getPageSession(),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
     getBugHistory({ bugId }),
   ]);
   if (session.kind !== "authenticated") {
     notFound();
   }
   if (!historyResult.ok) {
-    if (historyResult.error.code === "NOT_FOUND") {
+    // A malformed id fails validation; to the visitor it is a missing bug.
+    if (
+      historyResult.error.code === "NOT_FOUND" ||
+      historyResult.error.code === "VALIDATION_FAILED"
+    ) {
       notFound();
     }
     return (

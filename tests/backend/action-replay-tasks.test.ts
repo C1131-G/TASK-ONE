@@ -10,6 +10,7 @@ import {
   EMAIL_DOMAIN,
   ids,
   nextKey,
+  replay,
   personaId,
   setupHarness,
   teardownHarness,
@@ -46,37 +47,6 @@ const { UploadsLive } = await import("../../src/server/storage/uploads");
 const unique = (): string => randomUUID().replaceAll("-", "").slice(0, 8);
 const projectKey = (): string => `R${unique().slice(0, 6)}`.toUpperCase();
 
-/**
- * Runs an action twice with the same idempotency key and checks that the
- * second call replays the first result exactly instead of acting again.
- */
-const replay = async <Data>(
-  name: string,
-  persona: Persona,
-  action: unknown,
-  input: Record<string, unknown>
-): Promise<Data> => {
-  const idempotencyKey = nextKey();
-  const run = () =>
-    callAs(persona, action as ActionFunction, { ...input, idempotencyKey });
-  const first = await run();
-  if (!first.ok) {
-    throw new Error(
-      `${name} failed on the first call: ${first.error?.code} ${first.error?.message}`
-    );
-  }
-  const second = await run();
-  if (!second.ok) {
-    throw new Error(
-      `${name} failed on the replay: ${second.error?.code} ${second.error?.message}`
-    );
-  }
-  expect(JSON.stringify(second.data), `${name} replay result`).toBe(
-    JSON.stringify(first.data)
-  );
-  return first.data as Data;
-};
-
 const taskVersion = async (taskId: string): Promise<number> => {
   const rows = await authPool.query("SELECT version FROM task WHERE id = $1", [
     taskId,
@@ -104,7 +74,7 @@ const state: {
 
 beforeAll(async () => {
   await setupHarness();
-  const destinationProject = await replay<Versioned>(
+  const destinationProject = await replay(
     "createProjectAction",
     "admin",
     projects.createProjectAction,
@@ -121,7 +91,7 @@ beforeAll(async () => {
 afterAll(teardownHarness);
 
 it("replays every task mutation", async () => {
-  const task = await replay<Versioned>(
+  const task = await replay(
     "createTaskAction",
     "owner",
     tasks.createTaskAction,
@@ -135,7 +105,7 @@ it("replays every task mutation", async () => {
     }
   );
   state.taskId = task.id;
-  const updated = await replay<Versioned>(
+  const updated = await replay(
     "updateTaskAction",
     "owner",
     tasks.updateTaskAction,
@@ -150,7 +120,7 @@ it("replays every task mutation", async () => {
       title: "Replay task renamed",
     }
   );
-  const column = await replay<Versioned>(
+  const column = await replay(
     "changeTaskColumnAction",
     "owner",
     tasks.changeTaskColumnAction,
@@ -160,7 +130,7 @@ it("replays every task mutation", async () => {
       taskId: task.id,
     }
   );
-  const recurrence = await replay<VersionOnly>(
+  const recurrence = await replay(
     "setTaskRecurrenceAction",
     "owner",
     tasks.setTaskRecurrenceAction,
@@ -175,7 +145,7 @@ it("replays every task mutation", async () => {
       taskId: task.id,
     }
   );
-  const related = await replay<VersionOnly>(
+  const related = await replay(
     "setTaskRelationsAction",
     "owner",
     tasks.setTaskRelationsAction,
@@ -186,13 +156,13 @@ it("replays every task mutation", async () => {
       taskId: task.id,
     }
   );
-  const copy = await replay<Versioned>(
+  const copy = await replay(
     "duplicateTaskAction",
     "owner",
     tasks.duplicateTaskAction,
     { expectedVersion: related.version, taskId: task.id }
   );
-  const bulk = await replay<Versioned[]>(
+  const bulk = await replay(
     "bulkUpdateTasksAction",
     "owner",
     tasks.bulkUpdateTasksAction,
@@ -206,7 +176,7 @@ it("replays every task mutation", async () => {
       targets: [{ expectedVersion: copy.version, taskId: copy.id }],
     }
   );
-  const ordered = await replay<{ version: number }[]>(
+  const ordered = await replay(
     "reorderTasksAction",
     "owner",
     tasks.reorderTasksAction,
@@ -220,7 +190,7 @@ it("replays every task mutation", async () => {
       ],
     }
   );
-  await replay<Versioned>("moveTaskAction", "owner", tasks.moveTaskAction, {
+  await replay("moveTaskAction", "owner", tasks.moveTaskAction, {
     destinationProjectId: state.projectId,
     expectedVersion: ordered[0]?.version ?? 0,
     taskId: copy.id,

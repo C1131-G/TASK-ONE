@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -16,7 +15,7 @@ import {
 import type { TaskViewLists } from "@/features/dashboard/components/home-panels";
 import { getDashboardOverview } from "@/features/dashboard/dashboard-queries";
 import type { HomeTaskView } from "@/features/dashboard/home-task-view";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { ProjectCreateForm } from "@/features/projects/components/project-create-form";
 import { listProjects } from "@/features/projects/projects-queries";
 import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
@@ -52,7 +51,7 @@ const HOUR_FORMATTER = new Intl.DateTimeFormat("en", {
 const localDateString = (date: Date): string => {
   const parts = DATE_PART_FORMATTER.formatToParts(date);
   const part = (type: "year" | "month" | "day") =>
-    parts.find((item) => item.type === type)?.value ?? "";
+    parts.find((datePart) => datePart.type === type)?.value ?? "";
   return `${part("year")}-${part("month")}-${part("day")}`;
 };
 
@@ -67,7 +66,7 @@ const WorkspaceHome = async ({
       getDashboardOverview({}),
       listProjects({}),
       getPageSession(),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
     ]);
   if (!dashboardResult.ok || !projectResult.ok) {
     return (
@@ -87,7 +86,7 @@ const WorkspaceHome = async ({
     session.kind === "authenticated" && session.user.role === "admin";
   const employee =
     userId && employeesResult.ok
-      ? employeesResult.data.find((item) => item.id === userId)
+      ? employeesResult.data.find(({ id }) => id === userId)
       : null;
   // eslint-disable-next-line react/purity -- Request-time dashboard dates follow the workspace time zone.
   const now = new Date();
@@ -205,7 +204,7 @@ const WorkspaceHome = async ({
           <p>{todayLabel} · Here is what is happening across your workspace.</p>
         </div>
         <div className="acts">
-          <Link className="btn btn-secondary hide-m" href={"/members" as Route}>
+          <Link className="btn btn-secondary hide-m" href="/members">
             Invite member
           </Link>
           {isAdmin ? <ProjectCreateForm /> : null}

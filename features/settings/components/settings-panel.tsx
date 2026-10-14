@@ -6,7 +6,7 @@ import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getCompanySettings } from "@/features/company/company-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
 import { getNotificationPreferences } from "@/features/notifications/notifications-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import {
   CompanySettingsForm,
   NotificationPreferencesForm,
@@ -40,14 +40,14 @@ const SettingsPanel = async ({
     getPageSession(),
     getPersonalPreferences({}),
     getCompanySettings({}),
-    listEmployees({ search: "" }),
+    listAllEmployees(),
     listMySessions({}),
     getNotificationPreferences({}),
   ]);
   const user = session.kind === "authenticated" ? session.user : null;
   const employee =
     user && employees.ok
-      ? employees.data.find((item) => item.id === user.id)
+      ? employees.data.find(({ id }) => id === user.id)
       : null;
   const isAdmin = user?.role === "admin";
   const avatar = user ? await getAvatarDownloadUrl({ userId: user.id }) : null;

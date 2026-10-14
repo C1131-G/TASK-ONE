@@ -8,8 +8,6 @@ import {
 
 import "../workspace-styles/workspace-styles";
 
-export const instant = false;
-
 // The shell repeats on every workspace route, so its boundary lives here.
 const WorkspaceLayout = ({ children }: { readonly children: ReactNode }) => (
   <Suspense fallback={<WorkspaceFrameSkeleton />}>

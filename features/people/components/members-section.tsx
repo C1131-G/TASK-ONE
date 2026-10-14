@@ -6,7 +6,7 @@ import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { MembersDirectory } from "@/features/people/components/members-directory";
 import { EmployeeCreateForm } from "@/features/people/components/people-admin-forms";
 import type { MembersSectionName } from "@/features/people/members-section-param";
-import { listEmployees, listTeams } from "@/features/people/people-queries";
+import { listAllEmployees, listTeams } from "@/features/people/people-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const MembersSection = async ({
@@ -16,7 +16,7 @@ const MembersSection = async ({
 }) => {
   await connection();
   const [result, teams, session] = await Promise.all([
-    listEmployees({ search: "" }),
+    listAllEmployees(),
     listTeams({}),
     getPageSession(),
   ]);

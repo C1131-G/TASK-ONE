@@ -35,6 +35,7 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command";
+import { getNavigationTransitionType } from "@/components/workspace/workspace-navigation-data";
 
 const pages = [
   { Icon: House, href: "/", label: "Home" },
@@ -81,10 +82,12 @@ const WorkspaceSearchPalette = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const navigate = (href: string) => {
+  const navigate = <Href extends string>(href: Route<Href>) => {
     setOpen(false);
     setQuery("");
-    router.push(href as Route);
+    router.push(href, {
+      transitionTypes: [getNavigationTransitionType(pathname, href)],
+    });
   };
 
   return (

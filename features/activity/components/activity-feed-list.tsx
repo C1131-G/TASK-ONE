@@ -2,7 +2,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -139,8 +138,8 @@ const ActivityFeedList = ({
               {groupEntries.map((entry) => {
                 const linkedName = entry.taskTitle ?? entry.projectName;
                 const href = entry.projectId
-                  ? (`/projects/${entry.projectId}` as Route)
-                  : null;
+                  ? (`/projects/${entry.projectId}` as const)
+                  : undefined;
                 let titleNode = null;
                 if (linkedName && href) {
                   titleNode = (
@@ -160,14 +159,11 @@ const ActivityFeedList = ({
                     <p className="activity-copy grow">
                       <strong>{entry.actorName}</strong>{" "}
                       {getActivityVerb(entry.action)} {titleNode}
-                      {entry.taskTitle && entry.projectName ? (
+                      {entry.taskTitle && entry.projectName && href ? (
                         <>
                           {" "}
                           in{" "}
-                          <Link
-                            className="activity-project"
-                            href={href as Route}
-                          >
+                          <Link className="activity-project" href={href}>
                             {entry.projectName}
                           </Link>
                         </>

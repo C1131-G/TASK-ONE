@@ -19,6 +19,9 @@ const CalendarEventForm = () => {
   const [open, setOpen] = useState(false);
 
   const createEvent = (formData: FormData) => {
+    if (pending) {
+      return;
+    }
     const startValue = String(formData.get("startsAt") ?? "");
     const endValue = String(formData.get("endsAt") ?? "");
     if (!startValue) {

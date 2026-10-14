@@ -16,8 +16,21 @@ import {
   UsersThree,
   Pulse as Activity,
 } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
+import type { Route } from "next";
 
-export const sections = [
+interface NavigationItem {
+  readonly Icon: Icon;
+  readonly href: Route;
+  readonly label: string;
+}
+
+interface NavigationSection {
+  readonly items: readonly NavigationItem[];
+  readonly label?: string;
+}
+
+export const sections: readonly NavigationSection[] = [
   {
     items: [
       { Icon: House, href: "/", label: "Home" },
@@ -47,8 +60,24 @@ export const sections = [
   },
 ];
 
-export const mobileItems = [
+export const mobileItems: readonly NavigationItem[] = [
   { Icon: House, href: "/", label: "Home" },
   { Icon: CheckCircle, href: "/my-tasks", label: "My Tasks" },
   { Icon: Tray, href: "/inbox", label: "Inbox" },
 ];
+
+export const isNavigationItemActive = (
+  pathname: string,
+  href: Route
+): boolean =>
+  href === "/"
+    ? pathname === href
+    : pathname === href || pathname.startsWith(`${href}/`);
+
+export const getNavigationTransitionType = (
+  pathname: string,
+  href: string
+): "nav-back" | "nav-forward" =>
+  pathname !== href && (href === "/" || pathname.startsWith(`${href}/`))
+    ? "nav-back"
+    : "nav-forward";

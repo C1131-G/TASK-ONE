@@ -27,11 +27,13 @@ export const hasRequiredBugEvidence = (
   fixAttemptId: string
 ): boolean => {
   const relevantEvidence = evidence.filter(
-    (item) => item.fixAttemptId === null || item.fixAttemptId === fixAttemptId
+    (evidenceRow) =>
+      evidenceRow.fixAttemptId === null ||
+      evidenceRow.fixAttemptId === fixAttemptId
   );
   return (
-    relevantEvidence.some((item) => item.kind === "before") &&
-    relevantEvidence.some((item) => item.kind === "after")
+    relevantEvidence.some((evidenceRow) => evidenceRow.kind === "before") &&
+    relevantEvidence.some((evidenceRow) => evidenceRow.kind === "after")
   );
 };
 

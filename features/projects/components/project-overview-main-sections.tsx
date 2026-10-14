@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 
 import { ProjectUpcomingTaskDetails } from "@/features/projects/components/project-upcoming-task-details";
@@ -133,7 +132,7 @@ const ProjectUpcomingTasks = ({
         <h2 id="project-coming-up-heading">Coming up</h2>
         <Link
           className="project-overview-text-link"
-          href={`/projects/${project.id}?view=list` as Route}
+          href={`/projects/${project.id}?view=list`}
         >
           View list
         </Link>

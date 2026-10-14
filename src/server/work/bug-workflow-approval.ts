@@ -68,10 +68,12 @@ export const submitApproval = async (
     bugReportId: bug.id,
   }).all();
   const evidence = bugEvidence.filter(
-    (item) => item.fixAttemptId === null || item.fixAttemptId === attempt.id
+    (evidenceRow) =>
+      evidenceRow.fixAttemptId === null ||
+      evidenceRow.fixAttemptId === attempt.id
   );
-  const fileIds = evidence.flatMap((item) =>
-    item.fileAssetId ? [item.fileAssetId] : []
+  const fileIds = evidence.flatMap((evidenceRow) =>
+    evidenceRow.fileAssetId ? [evidenceRow.fileAssetId] : []
   );
   const files =
     fileIds.length > 0

@@ -4,10 +4,10 @@ import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { GlobalTasksWorkspace } from "@/features/tasks/components/global-tasks-workspace";
-import { TaskDrawerProvider } from "@/features/tasks/components/task-drawer";
+import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { GlobalTaskViewStoreProvider } from "@/features/tasks/providers/global-task-view-store-provider";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { columnWidthsFromPreferences } from "@/features/tasks/task-table-columns";
@@ -28,7 +28,7 @@ const AllTasks = async ({
     await Promise.all([
       listProjects({}),
       getPageSession(),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       getPersonalWorkspace({}),
       getPersonalPreferences({}),
     ]);
@@ -78,7 +78,7 @@ const AllTasks = async ({
         preferences.ok ? preferences.data.taskTableColumnWidths : undefined
       )}
     >
-      <TaskDrawerProvider
+      <TaskDrawerHost
         currentUserId={userId}
         editableTaskIds={editableTaskIds}
         employees={employees.map(({ id, name }) => ({ id, name }))}
@@ -100,7 +100,7 @@ const AllTasks = async ({
           today={getUtcToday()}
           userId={userId}
         />
-      </TaskDrawerProvider>
+      </TaskDrawerHost>
     </GlobalTaskViewStoreProvider>
   );
 };

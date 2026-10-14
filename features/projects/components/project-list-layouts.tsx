@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle */
 
 import { formatDistanceToNowStrict } from "date-fns";
-import type { Route } from "next";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -83,7 +82,7 @@ const ProjectCard = ({
   readonly isAdmin: boolean;
 }) => (
   <article className="pcard">
-    <Link className="pcard-link" href={`/projects/${project.id}` as Route}>
+    <Link className="pcard-link" href={`/projects/${project.id}`}>
       <div className="row">
         <ProjectIcon color={project.color} icon={project.icon} />
         <strong className="trunc grow">{project.name}</strong>
@@ -144,7 +143,7 @@ export const ProjectListView = ({
         <Link
           aria-label={`Open ${project.name}`}
           className="project-list-main"
-          href={`/projects/${project.id}` as Route}
+          href={`/projects/${project.id}`}
         >
           <ProjectIcon color={project.color} icon={project.icon} />
           <span className="project-list-title">
@@ -211,7 +210,7 @@ export const ProjectTableView = ({
           <TableCell>
             <Link
               className="project-table-name"
-              href={`/projects/${project.id}` as Route}
+              href={`/projects/${project.id}`}
             >
               <ProjectIcon color={project.color} icon={project.icon} />
               <span>{project.name}</span>

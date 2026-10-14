@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import type { Route } from "next";
 import Link from "next/link";
 
 const HomeStats = ({
@@ -19,22 +18,22 @@ const HomeStats = ({
   readonly overdue: number;
 }) => (
   <div className="stats" style={{ marginBottom: 16 }}>
-    <Link className="stat" href={"/projects" as Route}>
+    <Link className="stat" href="/projects">
       <span className="k">Active projects</span>
       <span className="v">{activeProjects}</span>
       <span className="d">{atRisk} at risk</span>
     </Link>
-    <Link className="stat" href={"/tasks" as Route}>
+    <Link className="stat" href="/tasks">
       <span className="k">Open tasks</span>
       <span className="v">{openTasks}</span>
       <span className="d">{assignedTasks} assigned to you</span>
     </Link>
-    <Link className="stat" href={"/tasks?status=done" as Route}>
+    <Link className="stat" href="/tasks?status=done">
       <span className="k">Completed</span>
       <span className="v">{completed}</span>
       <span className="d">this week</span>
     </Link>
-    <Link className="stat" href={"/tasks?overdue=true" as Route}>
+    <Link className="stat" href="/tasks?overdue=true">
       <span className="k">Overdue</span>
       <span
         className="v"

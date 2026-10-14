@@ -27,7 +27,7 @@ export const BugBoard = ({ bugs }: { readonly bugs: readonly BugItem[] }) => (
   <div aria-label="Bug workflow board" className="bug-board">
     {columns.map((column) => {
       const states = new Set<string>(column.states);
-      const items = bugs.filter((item) => states.has(item.bug.status));
+      const items = bugs.filter((bugEntry) => states.has(bugEntry.bug.status));
       return (
         <section
           aria-labelledby={`bug-column-${column.id}`}
@@ -40,7 +40,9 @@ export const BugBoard = ({ bugs }: { readonly bugs: readonly BugItem[] }) => (
           </header>
           <div className="bug-board-cards">
             {items.length ? (
-              items.map((item) => <BugCard item={item} key={item.bug.id} />)
+              items.map((bugEntry) => (
+                <BugCard bugEntry={bugEntry} key={bugEntry.bug.id} />
+              ))
             ) : (
               <p className="muted bug-board-empty">No bugs</p>
             )}

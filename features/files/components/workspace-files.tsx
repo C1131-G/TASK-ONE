@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -41,7 +40,7 @@ const WorkspaceFiles = async () => {
             <span className="sp" />
             <Link
               className="btn btn-sm btn-ghost"
-              href={`/projects/${project.id}?view=files` as Route}
+              href={`/projects/${project.id}?view=files`}
             >
               Open project files
             </Link>

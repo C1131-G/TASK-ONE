@@ -8,7 +8,6 @@ import {
 import { parseHomeTaskView } from "@/features/dashboard/home-task-view";
 
 export const metadata: Metadata = { title: "Home | Metsys" };
-export const instant = false;
 
 const HomePage = ({ searchParams }: PageProps<"/">) => (
   <Suspense fallback={<WorkspaceHomeSkeleton />}>

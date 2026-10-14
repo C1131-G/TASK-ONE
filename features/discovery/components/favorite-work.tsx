@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import type { Route } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -8,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
-import { listEmployees } from "@/features/people/people-queries";
+import { listAllEmployees } from "@/features/people/people-queries";
 import { ProjectGridView } from "@/features/projects/components/project-list-layouts";
 import { listProjects } from "@/features/projects/projects-queries";
 import { TaskCompletionCheckbox } from "@/features/tasks/components/task-completion-checkbox";
@@ -36,7 +35,7 @@ const FavoriteWork = async () => {
     await Promise.all([
       getPersonalWorkspace({}),
       listProjects({}),
-      listEmployees({ search: "" }),
+      listAllEmployees(),
       getPageSession(),
     ]);
 
@@ -116,15 +115,13 @@ const FavoriteWork = async () => {
                   <div className="favorite-task-main">
                     <Link
                       className="favorite-task-title"
-                      href={
-                        `/projects/${task.projectId}?task=${task.id}` as Route
-                      }
+                      href={`/projects/${task.projectId}?task=${task.id}`}
                     >
                       {task.title}
                     </Link>
                     <Link
                       className="favorite-task-project"
-                      href={`/projects/${task.projectId}` as Route}
+                      href={`/projects/${task.projectId}`}
                     >
                       {task.projectName}
                     </Link>

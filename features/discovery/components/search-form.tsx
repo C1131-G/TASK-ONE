@@ -3,7 +3,6 @@
 
 "use client";
 
-import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -113,7 +112,7 @@ const SearchForm = ({
             {results.projects.map((project) => (
               <Link
                 className="mini"
-                href={`/projects/${project.id}` as Route}
+                href={`/projects/${project.id}`}
                 key={project.id}
               >
                 {project.name}
@@ -130,7 +129,7 @@ const SearchForm = ({
             {results.tasks.map((task) => (
               <Link
                 className="mini"
-                href={`/projects/${task.projectId}?task=${task.id}` as Route}
+                href={`/projects/${task.projectId}?task=${task.id}`}
                 key={task.id}
               >
                 <span className="trunc grow">{task.title}</span>
@@ -149,14 +148,14 @@ const SearchForm = ({
             <h2>Recent searches</h2>
           </div>
           <div className="panel-b row">
-            {recentSearches.map((item) => (
+            {recentSearches.map((recentQuery) => (
               <WorkspaceButton
                 className="chip"
-                key={item}
-                onClick={() => executeSearch(item)}
+                key={recentQuery}
+                onClick={() => executeSearch(recentQuery)}
                 type="button"
               >
-                {item}
+                {recentQuery}
               </WorkspaceButton>
             ))}
           </div>

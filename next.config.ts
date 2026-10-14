@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const exposeTestingApi = process.env["EXPOSE_TESTING_API"] === "1";
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   cacheLife: {
@@ -11,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: false,
     agentUpgrade: "latest",
+    exposeTestingApiInProductionBuild: exposeTestingApi,
     instantInsights: {
       validationLevel: "warning",
     },

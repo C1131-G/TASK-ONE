@@ -16,7 +16,10 @@ import { TaskWorkSections } from "@/features/tasks/components/task-work-sections
 import { useTaskBundle } from "@/features/tasks/hooks/use-task-bundle";
 import { useTaskPanelSave } from "@/features/tasks/hooks/use-task-panel-save";
 import { useTaskSubtaskActions } from "@/features/tasks/hooks/use-task-subtask-actions";
-import type { EmployeeOption } from "@/features/tasks/task-details-panel-data";
+import type {
+  EmployeeOption,
+  TaskBundle,
+} from "@/features/tasks/task-details-panel-data";
 
 // One panel per task. Everything it edits is read from the server when it opens,
 // so a caller only needs the task's ID, project and version. Closing with unsaved
@@ -26,6 +29,7 @@ export const TaskDetailsPanel = ({
   bugId,
   editable,
   employees,
+  initialBundle = null,
   isAdmin,
   onOpenChange,
   onVersionChange,
@@ -41,6 +45,8 @@ export const TaskDetailsPanel = ({
   readonly bugId?: string;
   readonly editable: boolean;
   readonly employees: readonly EmployeeOption[];
+  // The server's read for a deep-linked task, used for the first load only.
+  readonly initialBundle?: Promise<TaskBundle> | null;
   readonly isAdmin: boolean;
   // When open is passed, the caller owns the open state (for example a drawer
   // driven by the URL). Otherwise the trigger opens the panel.
@@ -63,7 +69,7 @@ export const TaskDetailsPanel = ({
     detailsDirtyRef.current = dirty;
   }, []);
   const { comments, error, files, refresh, setSubtasks, subtasks, task } =
-    useTaskBundle({ isOpen, projectId, taskId });
+    useTaskBundle({ initialBundle, isOpen, projectId, taskId });
   const subtaskActions = useTaskSubtaskActions({
     onVersionChange,
     setSubtasks,
