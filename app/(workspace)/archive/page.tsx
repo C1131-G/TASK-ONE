@@ -9,7 +9,6 @@ import {
 } from "@/features/archive/components/archived-work";
 
 export const metadata: Metadata = { title: "Archive | Metsys" };
-export const instant = false;
 
 const ArchivePage = () => (
   <div className="page">

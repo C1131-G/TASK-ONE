@@ -52,7 +52,8 @@ const projectMutationAction = (
       return "project.restored";
     }
     default: {
-      throw new Error("Unsupported project operation.");
+      const _exhaustive: never = operation;
+      return _exhaustive;
     }
   }
 };

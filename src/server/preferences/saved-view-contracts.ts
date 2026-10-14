@@ -69,12 +69,12 @@ export class SavedViewManagement extends Context.Service<
     ) => Effect.Effect<readonly SavedViewSummary[], AppError>;
     readonly createView: (
       userId: string,
-      input: SavedViewInput
+      input: unknown
     ) => Effect.Effect<SavedViewSummary, AppError>;
     readonly updateView: (
       userId: string,
       viewId: string,
-      input: SavedViewInput
+      input: unknown
     ) => Effect.Effect<SavedViewSummary, AppError>;
     readonly deleteView: (
       userId: string,

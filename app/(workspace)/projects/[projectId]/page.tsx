@@ -9,7 +9,6 @@ import { parseProjectDetailQuery } from "@/features/projects/project-detail-para
 import { projectMetadata } from "@/features/projects/project-metadata";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
 
-export const instant = false;
 export const generateMetadata = async ({
   params,
 }: PageProps<"/projects/[projectId]">): Promise<Metadata> => {

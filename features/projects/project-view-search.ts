@@ -2,7 +2,8 @@ import type {
   SavedViewFilters,
   SavedViewGroupBy,
   SavedViewSort,
-} from "../../src/server/preferences/saved-view-settings";
+} from "@/src/server/preferences/saved-view-settings";
+
 import type { TaskTableColumnId } from "../tasks/task-table-columns";
 import {
   parseHiddenColumns,

@@ -4,9 +4,9 @@ import { useSelector } from "@tanstack/react-store";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
+import { useProjectViewStore } from "@/features/projects/providers/project-view-store-provider";
 import { reorderTasksAction } from "@/features/tasks/tasks-actions";
 
-import { useProjectViewStore } from "../../projects/providers/project-view-store-provider";
 import type { OrderableTask } from "../board-order";
 import { moveTaskInColumn } from "../board-order";
 

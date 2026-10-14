@@ -26,7 +26,7 @@ export interface TaskDrawerProviderProps {
   readonly editableTaskIds: readonly string[];
   readonly employees: readonly EmployeeOption[];
   // The server's unawaited read of the deep-linked task, if any.
-  readonly initialTaskBundle?: Promise<TaskBundle> | null;
+  readonly initialTaskBundlePromise?: Promise<TaskBundle> | null;
   // The ?task= value the server saw, so a deep link renders on the first response.
   readonly initialTaskId: string | null;
   readonly isAdmin: boolean;
@@ -69,7 +69,7 @@ export const TaskDrawerProvider = ({
   currentUserId,
   editableTaskIds,
   employees,
-  initialTaskBundle = null,
+  initialTaskBundlePromise = null,
   initialTaskId,
   isAdmin,
   tasks,
@@ -81,7 +81,9 @@ export const TaskDrawerProvider = ({
   // Used once: after the deep-linked task closes, or another task opens, the
   // panel reads fresh data itself. Held in state so a server refresh's new
   // promise does not replace it.
-  const [initialBundle, setInitialBundle] = useState(initialTaskBundle);
+  const [initialBundlePromise, setInitialBundlePromise] = useState(
+    initialTaskBundlePromise
+  );
   const [versionOverride, setVersionOverride] = useState<{
     readonly sourceVersion: number;
     readonly taskId: string;
@@ -90,7 +92,7 @@ export const TaskDrawerProvider = ({
   const value = useMemo<TaskDrawerValue>(
     () => ({
       openTask: (taskId) => {
-        setInitialBundle(null);
+        setInitialBundlePromise(null);
         setSelectedId(taskId);
         writeTaskParam(taskId);
       },
@@ -100,7 +102,7 @@ export const TaskDrawerProvider = ({
 
   useEffect(() => {
     const syncFromUrl = () => {
-      setInitialBundle(null);
+      setInitialBundlePromise(null);
       setSelectedId(new URLSearchParams(window.location.search).get("task"));
     };
     window.addEventListener("popstate", syncFromUrl);
@@ -129,12 +131,14 @@ export const TaskDrawerProvider = ({
           currentUserId={currentUserId}
           editable={editable}
           employees={employees}
-          initialBundle={selected.id === initialTaskId ? initialBundle : null}
+          initialBundlePromise={
+            selected.id === initialTaskId ? initialBundlePromise : null
+          }
           isAdmin={isAdmin}
           key={selected.id}
           onOpenChange={(next) => {
             if (!next) {
-              setInitialBundle(null);
+              setInitialBundlePromise(null);
               setSelectedId(null);
               writeTaskParam(null);
             }

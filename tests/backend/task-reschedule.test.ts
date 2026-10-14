@@ -67,21 +67,33 @@ const failureCode = async (promise: Promise<unknown>) => {
   try {
     await promise;
   } catch (error) {
-    return (error as { code?: string }).code ?? String(error);
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof error.code === "string"
+    ) {
+      return error.code;
+    }
+    return String(error);
   }
   return "succeeded";
 };
 
 const readDates = async (taskId: string) => {
-  const rows = await authPool.query(
+  const rows = await authPool.query<{
+    readonly due: string | null;
+    readonly start: string | null;
+    readonly title: string;
+  }>(
     'SELECT "startDate"::text AS start, "dueDate"::text AS due, title FROM task WHERE id = $1',
     [taskId]
   );
-  return rows.rows[0] as {
-    start: string | null;
-    due: string | null;
-    title: string;
-  };
+  const [row] = rows.rows;
+  if (!row) {
+    throw new Error("The task dates could not be read.");
+  }
+  return row;
 };
 
 const createTask = (

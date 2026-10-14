@@ -1,9 +1,11 @@
 import { Context, Effect, Layer, Schema } from "effect";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { HexColorSchema } from "../core/input-schemas";
+import { teamSummariesTag } from "./team-cache";
 
 export interface TeamInput {
   readonly color: string;
@@ -120,6 +122,30 @@ const countActiveMembers = async (teamId: string): Promise<number> => {
   return members.filter((member) => member.deactivatedAt === null).length;
 };
 
+// Team rows and active-member counts change only through the team and employee
+// actions that call updateTag, so the summaries are cached across requests.
+const readTeamSummaries = async (): Promise<readonly TeamSummary[]> => {
+  "use cache";
+  cacheTag(teamSummariesTag);
+  cacheLife("moderate");
+  const [teams, members] = await Promise.all([
+    db.orm.public.Team.orderBy((team) => team.name.asc()).all(),
+    db.orm.public.User.where({ deactivatedAt: null }).select("teamId").all(),
+  ]);
+  const memberCounts = new Map<string, number>();
+  for (const member of members) {
+    if (member.teamId) {
+      memberCounts.set(
+        member.teamId,
+        (memberCounts.get(member.teamId) ?? 0) + 1
+      );
+    }
+  }
+  return teams.map((team) =>
+    teamSummary({ ...team, memberCount: memberCounts.get(team.id) ?? 0 })
+  );
+};
+
 const listTeams = (
   requesterId: string
 ): Effect.Effect<readonly TeamSummary[], AppError> =>
@@ -127,24 +153,7 @@ const listTeams = (
     catch: mapError,
     try: async () => {
       await requireActor(requesterId, false);
-      const [teams, members] = await Promise.all([
-        db.orm.public.Team.orderBy((team) => team.name.asc()).all(),
-        db.orm.public.User.where({ deactivatedAt: null })
-          .select("teamId")
-          .all(),
-      ]);
-      const memberCounts = new Map<string, number>();
-      for (const member of members) {
-        if (member.teamId) {
-          memberCounts.set(
-            member.teamId,
-            (memberCounts.get(member.teamId) ?? 0) + 1
-          );
-        }
-      }
-      return teams.map((team) =>
-        teamSummary({ ...team, memberCount: memberCounts.get(team.id) ?? 0 })
-      );
+      return await readTeamSummaries();
     },
   });
 

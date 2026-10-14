@@ -17,14 +17,19 @@ export const ServerActionOutputSchema = Schema.UndefinedOr(
   ServerActionOutputTreeSchema
 );
 
-type ValidatedActionOutput<
+export function runServerAction<
+  InputSchema extends Schema.Codec<unknown, unknown, never, never>,
   Result,
-  OutputSchema extends Schema.Codec<unknown, unknown, never, never>,
-> = OutputSchema extends typeof ServerActionOutputSchema
-  ? Result
-  : OutputSchema["Type"];
+  ErrorType,
+>(
+  input: unknown,
+  schema: InputSchema,
+  execute: (validated: InputSchema["Type"]) => Effect.Effect<Result, ErrorType>,
+  requestId: string | undefined,
+  outputSchema: typeof ServerActionOutputSchema
+): Promise<ActionResult<Result>>;
 
-export const runServerAction = <
+export function runServerAction<
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
   Result,
   ErrorType,
@@ -35,10 +40,24 @@ export const runServerAction = <
   execute: (validated: InputSchema["Type"]) => Effect.Effect<Result, ErrorType>,
   requestId: string | undefined,
   outputSchema: OutputSchema
-): Promise<ActionResult<ValidatedActionOutput<Result, OutputSchema>>> => {
-  const program: Effect.Effect<unknown, unknown> = Schema.decodeUnknownEffect(
-    schema
-  )(input).pipe(
+): Promise<ActionResult<OutputSchema["Type"]>>;
+
+export function runServerAction<
+  InputSchema extends Schema.Codec<unknown, unknown, never, never>,
+  Result,
+  ErrorType,
+  OutputSchema extends Schema.Codec<unknown, unknown, never, never>,
+>(
+  input: unknown,
+  schema: InputSchema,
+  execute: (validated: InputSchema["Type"]) => Effect.Effect<Result, ErrorType>,
+  requestId: string | undefined,
+  outputSchema: OutputSchema
+): Promise<unknown> {
+  const program: Effect.Effect<
+    { readonly result: Result; readonly validatedOutput: OutputSchema["Type"] },
+    unknown
+  > = Schema.decodeUnknownEffect(schema)(input).pipe(
     Effect.mapError(
       () =>
         new AppError({
@@ -47,22 +66,27 @@ export const runServerAction = <
         })
     ),
     Effect.flatMap(execute),
-    Effect.flatMap((result): Effect.Effect<unknown, AppError> => {
-      const validateOutput: Effect.Effect<unknown, unknown> =
-        Schema.decodeUnknownEffect(Schema.toType(outputSchema))(result);
-      return validateOutput.pipe(
+    Effect.flatMap((result) =>
+      Schema.decodeUnknownEffect(Schema.toType(outputSchema))(result).pipe(
         Effect.mapError(
           () =>
             new AppError({
               code: "UNAVAILABLE",
               message: "The request could not be completed.",
             })
-        )
-      );
-    })
+        ),
+        Effect.map((validatedOutput) => ({ result, validatedOutput }))
+      )
+    )
   );
 
-  return runEffectResult(program, requestId) as Promise<
-    ActionResult<ValidatedActionOutput<Result, OutputSchema>>
-  >;
-};
+  return runEffectResult(program, requestId).then((action) => {
+    if (!action.ok) {
+      return action;
+    }
+    const data = Object.is(outputSchema, ServerActionOutputSchema)
+      ? action.data.result
+      : action.data.validatedOutput;
+    return { ...action, data };
+  });
+}

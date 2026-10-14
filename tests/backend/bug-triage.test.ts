@@ -87,6 +87,18 @@ it("lets an admin triage a bug, set severity and priority, and assign an employe
     });
   } finally {
     await authPool.query(
+      'DELETE FROM job WHERE "dedupeKey" IN (SELECT \'push:\' || id::text FROM notification WHERE "userId" IN ($1, $2))',
+      [adminId, employeeId]
+    );
+    await authPool.query(
+      'DELETE FROM push_delivery WHERE "userId" IN ($1, $2)',
+      [adminId, employeeId]
+    );
+    await authPool.query(
+      'DELETE FROM notification WHERE "userId" IN ($1, $2)',
+      [adminId, employeeId]
+    );
+    await authPool.query(
       'DELETE FROM job WHERE "dedupeKey" IN (SELECT \'push:\' || id::text FROM notification WHERE "taskId" IN (SELECT id FROM task WHERE "projectId" = $1))',
       [projectId]
     );

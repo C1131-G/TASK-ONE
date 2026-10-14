@@ -13,7 +13,6 @@ import {
 } from "@/features/calendar/components/calendar-view";
 
 export const metadata: Metadata = { title: "Calendar | Metsys" };
-export const instant = false;
 
 const CalendarPage = ({ searchParams }: PageProps<"/calendar">) => (
   <div className="page">

@@ -8,7 +8,6 @@ import {
   TeamListSkeleton,
 } from "@/features/people/components/team-list";
 
-export const instant = false;
 export const metadata: Metadata = { title: "Teams | Metsys" };
 
 const TeamsPage = () => (

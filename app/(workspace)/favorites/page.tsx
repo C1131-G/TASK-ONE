@@ -9,7 +9,6 @@ import {
 } from "@/features/discovery/components/favorite-work";
 
 export const metadata: Metadata = { title: "Favorites | Metsys" };
-export const instant = false;
 
 const FavoritesPage = () => (
   <div className="page">

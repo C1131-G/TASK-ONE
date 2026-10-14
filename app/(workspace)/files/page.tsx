@@ -9,7 +9,6 @@ import {
 } from "@/features/files/components/workspace-files";
 
 export const metadata: Metadata = { title: "Files | Metsys" };
-export const instant = false;
 
 const FilesPage = () => (
   <div className="page wide">

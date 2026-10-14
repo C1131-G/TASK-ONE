@@ -29,7 +29,7 @@ export const TaskDetailsPanel = ({
   bugId,
   editable,
   employees,
-  initialBundle = null,
+  initialBundlePromise = null,
   isAdmin,
   onOpenChange,
   onVersionChange,
@@ -46,7 +46,7 @@ export const TaskDetailsPanel = ({
   readonly editable: boolean;
   readonly employees: readonly EmployeeOption[];
   // The server's read for a deep-linked task, used for the first load only.
-  readonly initialBundle?: Promise<TaskBundle> | null;
+  readonly initialBundlePromise?: Promise<TaskBundle> | null;
   readonly isAdmin: boolean;
   // When open is passed, the caller owns the open state (for example a drawer
   // driven by the URL). Otherwise the trigger opens the panel.
@@ -69,7 +69,12 @@ export const TaskDetailsPanel = ({
     detailsDirtyRef.current = dirty;
   }, []);
   const { comments, error, files, refresh, setSubtasks, subtasks, task } =
-    useTaskBundle({ initialBundle, isOpen, projectId, taskId });
+    useTaskBundle({
+      initialBundle: initialBundlePromise,
+      isOpen,
+      projectId,
+      taskId,
+    });
   const subtaskActions = useTaskSubtaskActions({
     onVersionChange,
     setSubtasks,

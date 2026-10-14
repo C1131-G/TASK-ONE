@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace page classes are authored in app/workspace-styles. */
 
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
@@ -10,7 +9,6 @@ import { listAllEmployees } from "@/features/people/people-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const BugDetail = async ({ bugId }: { readonly bugId: string }) => {
-  await connection();
   const [session, employeesResult, historyResult] = await Promise.all([
     getPageSession(),
     listAllEmployees(),

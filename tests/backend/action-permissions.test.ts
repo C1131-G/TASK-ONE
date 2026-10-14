@@ -189,21 +189,27 @@ it("enforces ownership on comments and subtasks created by someone else", async 
     throw new Error("The task owner could not create a subtask.");
   }
   const created = subtask.data;
-  for (const [action, extra] of [
-    [subtasks.updateSubtaskAction, { completed: false, title: "Hijacked" }],
-    [subtasks.removeSubtaskAction, {}],
-    [subtasks.promoteSubtaskAction, {}],
-  ] as const) {
+  const subtaskActions: readonly {
+    readonly action: ActionFunction;
+    readonly input: Record<string, unknown>;
+  }[] = [
+    {
+      action: subtasks.updateSubtaskAction,
+      input: { completed: false, title: "Hijacked" },
+    },
+    { action: subtasks.removeSubtaskAction, input: {} },
+    { action: subtasks.promoteSubtaskAction, input: {} },
+  ];
+  for (const { action, input: extra } of subtaskActions) {
     // Sequential on purpose: the persona headers are shared.
     // eslint-disable-next-line no-await-in-loop
-    const result = await callAs("outsider", action as ActionFunction, {
+    const result = await callAs("outsider", action, {
       assigneeId: null,
       description: null,
       dueDate: null,
       expectedTaskVersion: created.parentVersion,
       idempotencyKey: nextKey(),
       subtaskId: created.subtask.id,
-      title: "Hijacked",
       ...extra,
     });
     expect(result).toMatchObject({

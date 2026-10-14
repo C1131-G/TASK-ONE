@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { calendarPeriod } from "@/features/calendar/calendar-params";
 import type { CalendarMode } from "@/features/calendar/calendar-params";
@@ -36,7 +34,6 @@ const MyTasks = async ({
   readonly initialTaskId: string | null;
   readonly monthOffset: number;
 }) => {
-  await connection();
   const [session, projectResult, employeeResult, personal, preferences] =
     await Promise.all([
       getPageSession(),
@@ -135,8 +132,17 @@ const MyTasks = async ({
   );
 };
 
+// The subtitle summarizes due tasks, so the skeleton reserves its line.
 const MyTasksSkeleton = () => (
-  <PanelSkeleton label="Loading your tasks…" rows={6} />
+  <>
+    <div className="ph my-tasks-header">
+      <div>
+        <h1>My Tasks</h1>
+        <p aria-hidden="true">&nbsp;</p>
+      </div>
+    </div>
+    <PanelSkeleton label="Loading your tasks…" rows={6} />
+  </>
 );
 
 export { MyTasks, MyTasksSkeleton };

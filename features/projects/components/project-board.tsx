@@ -11,10 +11,10 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
+import { useBoardReorder } from "@/features/tasks/hooks/use-board-reorder";
 import { changeTaskColumnAction } from "@/features/tasks/tasks-actions";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 
-import { useBoardReorder } from "../../tasks/hooks/use-board-reorder";
 import { useProjectViewSearch } from "../hooks/use-project-view-search";
 import type { BoardTask as Task } from "../types/project-board-types";
 import { ProjectBoardCard } from "./project-board-card";

@@ -9,7 +9,6 @@ import {
 } from "@/features/activity/components/activity-feed";
 
 export const metadata: Metadata = { title: "Activity | Metsys" };
-export const instant = false;
 
 const ActivityPage = () => (
   <div className="page">

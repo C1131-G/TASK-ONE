@@ -1,7 +1,8 @@
 import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
-import { MAX_BULK_SELECTION } from "../../projects/providers/project-view-store";
+import { MAX_BULK_SELECTION } from "@/features/projects/providers/project-view-store";
+
 import type { GlobalTaskSearch } from "../global-task-view-state";
 import type { TaskTableColumnId } from "../task-table-columns";
 import { clampColumnWidth } from "../task-table-columns";

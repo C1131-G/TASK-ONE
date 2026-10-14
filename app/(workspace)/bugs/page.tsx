@@ -10,7 +10,6 @@ import {
 } from "@/features/bugs/components/bug-tracker";
 
 export const metadata: Metadata = { title: "Bugs | Metsys" };
-export const instant = false;
 
 const BugsPage = ({ searchParams }: PageProps<"/bugs">) => (
   <div className="page flush">

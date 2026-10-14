@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { MembersDirectory } from "@/features/people/components/members-directory";
 import { EmployeeCreateForm } from "@/features/people/components/people-admin-forms";
@@ -14,7 +12,6 @@ const MembersSection = async ({
 }: {
   readonly section: MembersSectionName;
 }) => {
-  await connection();
   const [result, teams, session] = await Promise.all([
     listAllEmployees(),
     listTeams({}),

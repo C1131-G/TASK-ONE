@@ -1,12 +1,9 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import { connection } from "next/server";
-
 import { listActivity } from "@/features/activity/activity-queries";
 import { ActivityFeedList } from "@/features/activity/components/activity-feed-list";
 
 const ActivityFeed = async () => {
-  await connection();
   const result = await listActivity({ limit: 100 });
   if (!result.ok) {
     return (

@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -23,7 +21,6 @@ const AllTasks = async ({
 }: {
   readonly initialTaskId: string | null;
 }) => {
-  await connection();
   const [projects, session, employeeResult, personal, preferences] =
     await Promise.all([
       listProjects({}),
@@ -105,8 +102,18 @@ const AllTasks = async ({
   );
 };
 
+// The header's subtitle follows the filters, so the skeleton keeps only the
+// title and reserves the subtitle's line.
 const AllTasksSkeleton = () => (
-  <PanelSkeleton label="Loading tasks…" rows={6} />
+  <>
+    <div className="ph">
+      <div>
+        <h1>Tasks</h1>
+        <p aria-hidden="true">&nbsp;</p>
+      </div>
+    </div>
+    <PanelSkeleton label="Loading tasks…" rows={6} />
+  </>
 );
 
 export { AllTasks, AllTasksSkeleton };

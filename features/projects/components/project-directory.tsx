@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle -- Workspace classes are defined in app/workspace-styles. */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -33,7 +32,6 @@ const ProjectDirectory = async ({
 }: {
   readonly filters: ProjectFilters;
 }) => {
-  await connection();
   const [result, session, personal, employeeResult] = await Promise.all([
     listProjects({}),
     getPageSession(),

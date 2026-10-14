@@ -1,7 +1,7 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
@@ -20,6 +20,7 @@ import {
   ServerActionOutputSchema,
   runServerAction,
 } from "@/src/server/core/server-action";
+import { teamSummariesTag } from "@/src/server/people/team-cache";
 import {
   TeamManagement,
   TeamManagementLive,
@@ -78,6 +79,7 @@ export async function createTeamAction(input: unknown) {
     ServerActionOutputSchema
   );
   if (result.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/teams");
   }
   return result;
@@ -120,6 +122,7 @@ export async function updateTeamAction(input: unknown) {
     ServerActionOutputSchema
   );
   if (result.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/teams");
   }
   return result;
@@ -159,6 +162,7 @@ export async function deleteTeamAction(input: unknown) {
     ServerActionOutputSchema
   );
   if (result.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/teams");
     revalidatePath("/settings/people");
   }

@@ -65,8 +65,8 @@ export const addFixAttempt = async (
   });
   if (bug.status === "triaged" || bug.status === "rejected") {
     transitionBugStatus({
-      actorRole: actor.role as "admin" | "employee",
-      currentStatus: bug.status as "triaged" | "rejected",
+      actorRole: actor.role,
+      currentStatus: bug.status,
       nextStatus: "in_progress",
     });
     return updateBugStatus(transaction, {

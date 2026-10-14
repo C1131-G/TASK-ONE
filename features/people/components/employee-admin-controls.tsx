@@ -185,7 +185,11 @@ export const EmployeeAdminControls = ({
           <WorkspaceSelect
             className="input"
             disabled={pending}
-            onValueChange={(role) => changeRole(role as "admin" | "employee")}
+            onValueChange={(role) => {
+              if (role === "admin" || role === "employee") {
+                changeRole(role);
+              }
+            }}
             value={employee.role}
             id={`employee-${employee.id}-field-170`}
           >

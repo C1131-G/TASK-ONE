@@ -111,7 +111,7 @@ export interface TaskTableColumnDef {
 }
 
 // Workspace task tables (/tasks and /my-tasks) sort on title, priority and due.
-export const GLOBAL_TASK_COLUMNS: readonly TaskTableColumnDef[] = [
+export const GLOBAL_TASK_COLUMNS = [
   { ...TASK_TABLE_COLUMNS[0], sortField: "title" },
   TASK_TABLE_COLUMNS[1],
   TASK_TABLE_COLUMNS[3],
@@ -119,7 +119,7 @@ export const GLOBAL_TASK_COLUMNS: readonly TaskTableColumnDef[] = [
   TASK_TABLE_COLUMNS[5],
   PROJECT_COLUMN,
   TASK_TABLE_COLUMNS[9],
-];
+] as const satisfies readonly TaskTableColumnDef[];
 
 const MAX_COLUMN_WIDTH = 800;
 

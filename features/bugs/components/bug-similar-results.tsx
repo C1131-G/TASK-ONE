@@ -2,6 +2,8 @@
 
 "use client";
 
+import Link from "next/link";
+
 export interface SimilarBug {
   readonly id: string;
   readonly latestFixOutcome: "passed" | "failed" | null;
@@ -20,10 +22,10 @@ export const SimilarBugResults = ({
     <ul aria-label="Similar earlier bugs" className="bug-similar-results">
       {bugs.map((bug) => (
         <li key={bug.id}>
-          <a href={`/bugs/${bug.id}`} rel="noopener noreferrer" target="_blank">
+          <Link href={`/bugs/${bug.id}`} target="_blank">
             {bug.projectKey}-{bug.projectTaskNumber} · {bug.title}{" "}
             <span>{bug.status}</span>
-          </a>
+          </Link>
           {bug.latestFixSummary ? (
             <p>Latest verified fix: {bug.latestFixSummary}</p>
           ) : null}

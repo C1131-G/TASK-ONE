@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { ArchiveWorkspace } from "@/features/archive/components/archive-workspace";
 import type {
@@ -13,7 +11,6 @@ import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const ArchivedWork = async () => {
-  await connection();
   const [projectsResult, session] = await Promise.all([
     listProjects({ includeArchived: true }),
     getPageSession(),

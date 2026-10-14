@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { ProjectFiles } from "@/features/files/components/project-files";
@@ -10,7 +9,6 @@ import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const WorkspaceFiles = async () => {
-  await connection();
   const [projects, session] = await Promise.all([
     listProjects({}),
     getPageSession(),

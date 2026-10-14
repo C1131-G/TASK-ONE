@@ -13,8 +13,6 @@ export const BugTransitionInputSchema = Schema.Struct({
   nextStatus: BugWorkflowStatusSchema,
 });
 
-type TransitionInput = typeof BugTransitionInputSchema.Type;
-
 const fail = (message: string): never => {
   throw new AppError({ code: "FORBIDDEN", message });
 };
@@ -38,7 +36,7 @@ export const hasRequiredBugEvidence = (
 };
 
 export const transitionBugStatus = (
-  rawInput: TransitionInput
+  rawInput: unknown
 ): typeof BugWorkflowStatusSchema.Type => {
   const input = Schema.decodeUnknownSync(BugTransitionInputSchema)(rawInput);
   const { actorRole, currentStatus, nextStatus } = input;

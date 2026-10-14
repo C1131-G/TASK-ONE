@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { Progress } from "@/components/ui/progress";
 import {
@@ -26,7 +25,6 @@ import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const WorkspaceOverview = async () => {
-  await connection();
   const [dashboard, projects, session] = await Promise.all([
     getDashboardOverview({}),
     listProjects({}),

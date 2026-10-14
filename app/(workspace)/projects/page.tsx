@@ -10,7 +10,6 @@ import {
 import { parseProjectFilters } from "@/features/projects/project-filters";
 
 export const metadata: Metadata = { title: "Projects | Metsys" };
-export const instant = false;
 
 const ProjectsPage = ({ searchParams }: PageProps<"/projects">) => (
   <div className="page">

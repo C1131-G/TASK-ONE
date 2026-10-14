@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { Effect } from "effect";
 
+import "./support/next-cache-mock";
 import { authPool } from "../../src/server/auth/database";
 import {
   TeamManagement,

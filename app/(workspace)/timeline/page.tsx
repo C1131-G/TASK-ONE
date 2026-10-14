@@ -9,7 +9,6 @@ import {
 } from "@/features/projects/components/project-timeline";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
 
-export const instant = false;
 export const metadata: Metadata = { title: "Timeline | Metsys" };
 
 const TimelinePage = ({ searchParams }: PageProps<"/timeline">) => (

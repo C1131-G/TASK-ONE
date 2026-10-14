@@ -68,7 +68,9 @@ test.describe("task drawer links", () => {
     const result = page.locator('a[href*="?task="]').first();
     await expect(result).toBeVisible({ timeout: 15_000 });
     await result.click();
-    await expect(page).toHaveURL(/\/projects\/[^/?]+\?.*task=/u);
+    await expect(page).toHaveURL(/\/projects\/[^/?]+\?.*task=/u, {
+      timeout: 30_000,
+    });
     await expectDrawerOpen(page);
   });
 

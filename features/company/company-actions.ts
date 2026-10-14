@@ -1,9 +1,10 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
+import { companySettingsTag } from "@/src/server/company/company-cache";
 import {
   CompanySettingsInputSchema,
   CompanySettingsManagement,
@@ -51,6 +52,7 @@ export async function updateCompanySettingsAction(input: unknown) {
     ServerActionOutputSchema
   );
   if (result.ok) {
+    updateTag(companySettingsTag);
     revalidatePath("/");
     revalidatePath("/settings");
   }

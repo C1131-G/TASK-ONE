@@ -209,7 +209,8 @@ export const ProjectTaskTable = ({
         );
       }
       default: {
-        return null;
+        const _exhaustive: never = column;
+        return _exhaustive;
       }
     }
   };

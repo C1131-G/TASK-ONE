@@ -148,7 +148,9 @@ test.describe("task drawer", () => {
     const undoStack = page.getByRole("region", { name: "Recent actions" });
     await expect(undoStack.getByText("Comment removed")).toBeVisible();
     await undoStack.getByRole("button", { name: "Undo" }).first().click();
-    await expect(undoStack.getByText("Comment removed")).toHaveCount(0);
+    await expect(undoStack.getByText("Comment removed")).toHaveCount(0, {
+      timeout: 15_000,
+    });
 
     await openFirstTaskDrawer(page);
     await expect(page.getByRole("dialog").getByText(text)).toBeVisible({

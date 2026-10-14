@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { Cause, Data, Effect, Exit } from "effect";
+import { io } from "next/cache";
 
 export type AppErrorCode =
   | "UNAUTHENTICATED"
@@ -39,12 +40,14 @@ const safeFailure = (requestId: string): ActionResult<never> => ({
 
 export const runEffectResult = async <Result, ErrorType>(
   program: Effect.Effect<Result, ErrorType>,
-  requestId: string = randomUUID()
+  requestId?: string
 ): Promise<ActionResult<Result>> => {
+  await io();
+  const resolvedRequestId = requestId ?? randomUUID();
   const exit = await Effect.runPromiseExit(program);
 
   if (Exit.isSuccess(exit)) {
-    return { data: exit.value, ok: true, requestId };
+    return { data: exit.value, ok: true, requestId: resolvedRequestId };
   }
 
   const failure = Cause.findErrorOption(exit.cause);
@@ -53,11 +56,11 @@ export const runEffectResult = async <Result, ErrorType>(
       error: {
         code: failure.value.code,
         message: failure.value.message,
-        requestId,
+        requestId: resolvedRequestId,
       },
       ok: false,
     };
   }
 
-  return safeFailure(requestId);
+  return safeFailure(resolvedRequestId);
 };

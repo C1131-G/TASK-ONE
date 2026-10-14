@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   WorkspaceHome,
   WorkspaceHomeSkeleton,
@@ -10,12 +11,14 @@ import { parseHomeTaskView } from "@/features/dashboard/home-task-view";
 export const metadata: Metadata = { title: "Home | Metsys" };
 
 const HomePage = ({ searchParams }: PageProps<"/">) => (
-  <Suspense fallback={<WorkspaceHomeSkeleton />}>
-    {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-    {searchParams.then((params) => (
-      <WorkspaceHome taskView={parseHomeTaskView(params["taskView"])} />
-    ))}
-  </Suspense>
+  <SectionErrorBoundary title="Your workspace could not be loaded">
+    <Suspense fallback={<WorkspaceHomeSkeleton />}>
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- Resolve URL state at the route boundary while keeping the page synchronous. */}
+      {searchParams.then((params) => (
+        <WorkspaceHome taskView={parseHomeTaskView(params["taskView"])} />
+      ))}
+    </Suspense>
+  </SectionErrorBoundary>
 );
 
 export default HomePage;

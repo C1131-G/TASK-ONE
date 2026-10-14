@@ -1,18 +1,13 @@
 import type { ReactNode } from "react";
-import { Suspense } from "react";
 
-import {
-  WorkspaceFrame,
-  WorkspaceFrameSkeleton,
-} from "@/features/workspace/components/workspace-frame";
+import { WorkspaceFrame } from "@/features/workspace/components/workspace-frame";
 
 import "../workspace-styles/workspace-styles";
 
-// The shell repeats on every workspace route, so its boundary lives here.
+// The frame renders without waiting on the session; its own boundaries stream
+// the navigation data, and pages keep their own loading states.
 const WorkspaceLayout = ({ children }: { readonly children: ReactNode }) => (
-  <Suspense fallback={<WorkspaceFrameSkeleton />}>
-    <WorkspaceFrame>{children}</WorkspaceFrame>
-  </Suspense>
+  <WorkspaceFrame>{children}</WorkspaceFrame>
 );
 
 export default WorkspaceLayout;

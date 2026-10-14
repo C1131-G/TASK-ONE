@@ -1,8 +1,10 @@
 import { Context, Effect, Layer, Schema } from "effect";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { companySettingsTag } from "./company-cache";
 
 const supportedTimezones = new Set([
   ...Intl.supportedValuesOf("timeZone"),
@@ -130,6 +132,15 @@ const toValues = (
   timeZone: settings.timeZone,
 });
 
+// The row has one writer (`update`), whose action calls updateTag, so it never
+// goes stale outside the app and can live in the cache indefinitely.
+const readCompanySettings = async () => {
+  "use cache";
+  cacheTag(companySettingsTag);
+  cacheLife("max");
+  return toValues(await ensureCompanySettings());
+};
+
 export const CompanySettingsManagementLive = Layer.succeed(
   CompanySettingsManagement,
   CompanySettingsManagement.of({
@@ -138,7 +149,7 @@ export const CompanySettingsManagementLive = Layer.succeed(
         catch: mapError,
         try: async () => {
           await getActor(actorId, false);
-          return toValues(await ensureCompanySettings());
+          return await readCompanySettings();
         },
       }),
     update: (actorId, input) =>

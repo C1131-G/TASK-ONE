@@ -9,7 +9,6 @@ import {
 } from "@/features/dashboard/components/workspace-overview";
 
 export const metadata: Metadata = { title: "Overview | Metsys" };
-export const instant = false;
 
 const OverviewPage = () => (
   <div className="page">

@@ -9,7 +9,6 @@ import {
   BugDetailSkeleton,
 } from "@/features/bugs/components/bug-detail";
 
-export const instant = false;
 export const generateMetadata = async ({
   params,
 }: PageProps<"/bugs/[bugId]">): Promise<Metadata> => {

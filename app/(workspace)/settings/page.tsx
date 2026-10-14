@@ -9,7 +9,6 @@ import {
 } from "@/features/settings/components/settings-panel";
 import { parseSettingsSection } from "@/features/settings/settings-section";
 
-export const instant = false;
 export const metadata: Metadata = { title: "Settings | Metsys" };
 
 const SettingsPage = ({ searchParams }: PageProps<"/settings">) => (

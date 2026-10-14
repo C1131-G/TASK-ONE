@@ -1,0 +1,43 @@
+@keyframes workspace-reveal {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.workspace-app .topbar,
+.workspace-app .side,
+.workspace-app .content {
+  animation: workspace-reveal 250ms cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+.workspace-app .topbar {
+  animation-delay: 0ms;
+}
+
+.workspace-app .side {
+  animation-delay: 100ms;
+}
+
+.workspace-app .content {
+  animation-delay: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-app .topbar,
+  .workspace-app .side,
+  .workspace-app .content {
+    animation: none;
+  }
+}
+
+.workspace-app[data-motion="reduce"] .topbar,
+.workspace-app[data-motion="reduce"] .side,
+.workspace-app[data-motion="reduce"] .content {
+  animation: none;
+}

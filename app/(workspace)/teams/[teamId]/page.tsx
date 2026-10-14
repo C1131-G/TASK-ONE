@@ -9,7 +9,6 @@ import {
 } from "@/features/people/components/team-detail";
 import { teamMetadata } from "@/features/people/team-metadata";
 
-export const instant = false;
 export const generateMetadata = async ({
   params,
 }: PageProps<"/teams/[teamId]">): Promise<Metadata> => {

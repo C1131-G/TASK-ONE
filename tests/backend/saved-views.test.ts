@@ -138,12 +138,12 @@ it("rejects saved-view settings outside the supported typed shape", async () => 
           const views = yield* SavedViewManagement;
           return yield* views.createView(administratorId, {
             filters: { priority: ["high"], query: "", status: ["todo"] },
-            groupBy: "assignee" as never,
+            groupBy: "assignee",
             hiddenColumns: [],
             isShared: false,
             name: "Unsupported grouping",
             projectId: null,
-            sort: { direction: "asc", field: "dueDate" as never },
+            sort: { direction: "asc", field: "dueDate" },
             type: "list",
           });
         }),

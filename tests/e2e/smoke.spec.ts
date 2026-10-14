@@ -24,6 +24,7 @@ for (const role of roles) {
     test.skip(!password, `${role.passwordEnv} is not set`);
 
     await page.goto("/login");
+    await expect(page.locator('form[data-hydrated="true"]')).toBeVisible();
     await page.fill('input[name="email"]', role.email);
     await page.fill('input[name="password"]', password ?? "");
     await page.click('button[type="submit"]');

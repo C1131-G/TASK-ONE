@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listActivity } from "@/features/activity/activity-queries";
@@ -19,7 +18,6 @@ const MemberDetail = async ({
   readonly employeeId: string;
   readonly tab: MemberTab;
 }) => {
-  await connection();
   const [employeesResult, projectsResult, teamsResult, session] =
     await Promise.all([
       listAllEmployees(),

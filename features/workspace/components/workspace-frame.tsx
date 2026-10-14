@@ -1,32 +1,24 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
-
 import type { Route } from "next";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 
 import { WorkspaceShell } from "@/components/workspace/workspace-shell";
+import type { WorkspaceFrameData } from "@/components/workspace/workspace-shell";
 import { listNotificationInbox } from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
-// The shell's server half: it gates the session and loads the navigation data.
 const LOGIN_PATH: Route = "/login";
 const CHANGE_PASSWORD_PATH: Route = "/change-password";
 
-const WorkspaceFrame = async ({
-  children,
-}: {
-  readonly children: ReactNode;
-}) => {
-  await connection();
+// Resolves the session and navigation data for the shell chrome. It returns
+// null for visitors the gate below redirects, so no data loads for them.
+const loadWorkspaceFrame = async (): Promise<WorkspaceFrameData | null> => {
   const session = await getPageSession();
-  if (session.kind === "anonymous") {
-    redirect(LOGIN_PATH);
-  }
-  if (session.user.mustChangePassword) {
-    redirect(CHANGE_PASSWORD_PATH);
+  if (session.kind === "anonymous" || session.user.mustChangePassword) {
+    return null;
   }
 
   const [projectResult, employeeResult, notificationResult] = await Promise.all(
@@ -36,58 +28,53 @@ const WorkspaceFrame = async ({
       listNotificationInbox({ limit: 1, unreadOnly: false }),
     ]
   );
-  const projects = projectResult.ok ? projectResult.data : [];
   const employee = employeeResult.ok
     ? employeeResult.data.find(({ id }) => id === session.user.id)
     : null;
 
-  return (
-    <WorkspaceShell
-      name={
-        employee?.name ??
-        `EMP${String(session.user.employeeNumber).padStart(6, "0")}`
-      }
-      projects={projects.map((project) => ({
-        color: project.color,
-        icon: project.icon,
-        id: project.id,
-        name: project.name,
-      }))}
-      publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
-      role={session.user.role}
-      unreadInboxCount={
-        notificationResult.ok ? notificationResult.data.unreadInboxCount : 0
-      }
-      unreadNotificationCount={
-        notificationResult.ok ? notificationResult.data.unreadCount : 0
-      }
-    >
-      {children}
-    </WorkspaceShell>
-  );
+  return {
+    name:
+      employee?.name ??
+      `EMP${String(session.user.employeeNumber).padStart(6, "0")}`,
+    projects: (projectResult.ok ? projectResult.data : []).map((project) => ({
+      color: project.color,
+      icon: project.icon,
+      id: project.id,
+      name: project.name,
+    })),
+    role: session.user.role,
+    unreadInboxCount: notificationResult.ok
+      ? notificationResult.data.unreadInboxCount
+      : 0,
+    unreadNotificationCount: notificationResult.ok
+      ? notificationResult.data.unreadCount
+      : 0,
+  };
 };
 
-// Mirrors the shell's sidebar, top bar and page frame while the session loads.
-const WorkspaceFrameSkeleton = () => (
-  <div aria-busy="true" className="workspace-app workspace-loading">
-    <output aria-live="polite" className="sr-only">
-      Loading workspace
-    </output>
-    <aside aria-hidden="true" className="workspace-loading-sidebar">
-      <div className="workspace-loading-brand" />
-      <div className="workspace-loading-nav" />
-      <div className="workspace-loading-nav" />
-      <div className="workspace-loading-nav" />
-      <div className="workspace-loading-nav" />
-    </aside>
-    <div aria-hidden="true" className="workspace-loading-main">
-      <div className="workspace-loading-topbar" />
-      <main className="workspace-loading-page">
-        <div className="workspace-loading-heading" />
-        <div className="workspace-loading-panel" />
-      </main>
-    </div>
-  </div>
+// Sends signed-out visitors to sign in. It renders nothing, so its boundary
+// needs no fallback; page data still checks access in its own queries.
+const WorkspaceAccessGate = async () => {
+  const session = await getPageSession();
+  if (session.kind === "anonymous") {
+    redirect(LOGIN_PATH);
+  }
+  if (session.user.mustChangePassword) {
+    redirect(CHANGE_PASSWORD_PATH);
+  }
+  return null;
+};
+
+const WorkspaceFrame = ({ children }: { readonly children: ReactNode }) => (
+  <WorkspaceShell
+    frame={loadWorkspaceFrame()}
+    publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
+  >
+    <Suspense fallback={null}>
+      <WorkspaceAccessGate />
+    </Suspense>
+    {children}
+  </WorkspaceShell>
 );
 
-export { WorkspaceFrame, WorkspaceFrameSkeleton };
+export { WorkspaceFrame };

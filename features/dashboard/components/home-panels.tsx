@@ -62,6 +62,9 @@ const formatDate = (value: string | null): string => {
 
 const projectStatusLabel = (status: ProjectListItem["status"]): string => {
   switch (status) {
+    case "planning": {
+      return "Planning";
+    }
     case "active": {
       return "In Progress";
     }
@@ -75,7 +78,8 @@ const projectStatusLabel = (status: ProjectListItem["status"]): string => {
       return "On Hold";
     }
     default: {
-      return "Planning";
+      const _exhaustive: never = status;
+      return _exhaustive;
     }
   }
 };

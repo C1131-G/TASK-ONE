@@ -1,7 +1,7 @@
 import { expect, it } from "bun:test";
 import { randomUUID } from "node:crypto";
 
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Schema } from "effect";
 
 import { authPool } from "../../src/server/auth/database";
 import { AppError } from "../../src/server/core/action-result";
@@ -95,11 +95,13 @@ it("queues a private file copy and makes the duplicate downloadable only after t
       "SELECT payload FROM job WHERE kind = $1 AND payload->>'targetFileId' = $2",
       ["storage.copy-file", copy.fileId]
     );
-    const payload = job.rows[0]?.payload as {
-      sourceFileId: string;
-      sourceKey: string;
-      targetKey: string;
-    };
+    const payload = Schema.decodeUnknownSync(
+      Schema.Struct({
+        sourceFileId: Schema.String,
+        sourceKey: Schema.String,
+        targetKey: Schema.String,
+      })
+    )(job.rows[0]?.payload);
     const failedCopy = await Effect.runPromise(
       Effect.provide(
         Effect.gen(function* failCopy() {

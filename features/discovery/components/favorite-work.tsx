@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { Badge } from "@/components/ui/badge";
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
@@ -30,7 +29,6 @@ const taskPriorityLabels = {
 } as const;
 
 const FavoriteWork = async () => {
-  await connection();
   const [personal, projectsResult, employeesResult, session] =
     await Promise.all([
       getPersonalWorkspace({}),

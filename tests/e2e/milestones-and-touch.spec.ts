@@ -189,6 +189,7 @@ test.describe("touch dragging as admin", () => {
     const targetCell = page.locator(`[data-day="${target}"]`);
     await expect(targetCell).toBeVisible();
 
+    await targetCell.scrollIntoViewIfNeeded();
     const start = await centre(chip);
     const end = await centre(targetCell);
     await touchDrag(page, start, end, 600);
@@ -235,8 +236,10 @@ test.describe("touch dragging as admin", () => {
     const target = new Date(Date.parse(`${from}T00:00:00Z`) + 3 * 86_400_000)
       .toISOString()
       .slice(0, 10);
+    const targetCell = page.locator(`[data-day="${target}"]`);
+    await targetCell.scrollIntoViewIfNeeded();
     const start = await centre(chip);
-    const end = await centre(page.locator(`[data-day="${target}"]`));
+    const end = await centre(targetCell);
     // No hold: the finger moves at once, which is a scroll, not a drag.
     await touchDrag(page, start, end, 0);
     await page.waitForTimeout(1500);

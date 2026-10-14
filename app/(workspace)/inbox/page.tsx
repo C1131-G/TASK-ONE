@@ -9,7 +9,6 @@ import {
 } from "@/features/notifications/components/inbox-feed";
 
 export const metadata: Metadata = { title: "Inbox | Metsys" };
-export const instant = false;
 
 const InboxPage = () => (
   <div className="page">

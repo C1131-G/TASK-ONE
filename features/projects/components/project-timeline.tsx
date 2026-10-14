@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listTaskCalendar } from "@/features/calendar/calendar-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -21,7 +19,6 @@ const ProjectTimeline = async ({
 }: {
   readonly initialTaskId: string | null;
 }) => {
-  await connection();
   const session = await getPageSession();
   const range = currentUtcMonthRange(0, 4);
   const [result, peopleResult, projectResult] = await Promise.all([

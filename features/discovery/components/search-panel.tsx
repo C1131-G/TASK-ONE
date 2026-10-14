@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { SearchForm } from "@/features/discovery/components/search-form";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
@@ -11,7 +9,6 @@ const SearchPanel = async ({
 }: {
   readonly initialQuery: string;
 }) => {
-  await connection();
   const result = await getPersonalWorkspace({});
   return (
     <SearchForm

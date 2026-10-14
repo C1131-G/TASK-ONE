@@ -1,13 +1,14 @@
 import { existsSync } from "node:fs";
 
 import { defineConfig, devices } from "@playwright/test";
+import { config } from "dotenv";
 
 import { ADMIN_STATE } from "./tests/e2e/auth-state";
 
+config({ path: ".env.e2e.local", quiet: true });
+
 const baseURL = process.env["E2E_BASE_URL"] ?? "http://localhost:3000";
-const chromiumPath =
-  process.env["E2E_CHROMIUM_PATH"] ??
-  "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+const chromiumPath = process.env["E2E_CHROMIUM_PATH"];
 
 export default defineConfig({
   forbidOnly: Boolean(process.env["CI"]),
@@ -32,7 +33,7 @@ export default defineConfig({
   timeout: 120_000,
   use: {
     baseURL,
-    launchOptions: { executablePath: chromiumPath },
+    launchOptions: chromiumPath ? { executablePath: chromiumPath } : {},
     trace: "retain-on-failure",
   },
 });

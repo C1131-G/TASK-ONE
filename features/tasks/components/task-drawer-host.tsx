@@ -6,7 +6,7 @@ import { readTaskBundle } from "@/features/tasks/task-details-panel-data";
 // are read during the request and streamed to the drawer as an unawaited
 // promise, so the page is not held back and the drawer skips a client round trip.
 export const TaskDrawerHost = (
-  props: Omit<TaskDrawerProviderProps, "initialTaskBundle">
+  props: Omit<TaskDrawerProviderProps, "initialTaskBundlePromise">
 ) => {
   const initialTask = props.initialTaskId
     ? props.tasks.find((task) => task.id === props.initialTaskId)
@@ -15,6 +15,9 @@ export const TaskDrawerHost = (
     ? readTaskBundle(initialTask.projectId, initialTask.id)
     : null;
   return (
-    <TaskDrawerProvider {...props} initialTaskBundle={initialTaskBundle} />
+    <TaskDrawerProvider
+      {...props}
+      initialTaskBundlePromise={initialTaskBundle}
+    />
   );
 };

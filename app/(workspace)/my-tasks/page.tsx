@@ -11,7 +11,6 @@ import { MyTasks, MyTasksSkeleton } from "@/features/tasks/components/my-tasks";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
 
 export const metadata: Metadata = { title: "My Tasks | Metsys" };
-export const instant = false;
 
 const MyTasksPage = ({ searchParams }: PageProps<"/my-tasks">) => (
   <div className="page flush">

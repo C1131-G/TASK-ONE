@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listActivity } from "@/features/activity/activity-queries";
@@ -55,12 +54,19 @@ const localDateString = (date: Date): string => {
   return `${part("year")}-${part("month")}-${part("day")}`;
 };
 
+const HomeTaskViewPanel = ({
+  taskView,
+  taskViews,
+}: {
+  readonly taskView: HomeTaskView;
+  readonly taskViews: TaskViewLists;
+}) => <MyTasksPanel taskView={taskView} taskViews={taskViews} />;
+
 const WorkspaceHome = async ({
   taskView,
 }: {
   readonly taskView: HomeTaskView;
 }) => {
-  await connection();
   const [dashboardResult, projectResult, session, employeesResult] =
     await Promise.all([
       getDashboardOverview({}),
@@ -228,7 +234,7 @@ const WorkspaceHome = async ({
       />
       <div className="grid2 home-columns">
         <div className="stack">
-          <MyTasksPanel taskView={taskView} taskViews={taskViews} />
+          <HomeTaskViewPanel taskView={taskView} taskViews={taskViews} />
           <ProjectProgressPanel
             projects={activeProjects}
             membersById={membersById}

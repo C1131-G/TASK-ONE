@@ -10,7 +10,6 @@ import {
 import { memberMetadata } from "@/features/people/member-metadata";
 import { parseMemberTab } from "@/features/people/member-tab";
 
-export const instant = false;
 export const generateMetadata = async ({
   params,
 }: PageProps<"/members/[employeeId]">): Promise<Metadata> => {

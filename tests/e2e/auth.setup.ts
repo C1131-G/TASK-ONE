@@ -12,6 +12,7 @@ setup("admin signs in once", async ({ page }) => {
     "E2E_ADMIN_PASSWORD is not set"
   );
   await page.goto("/login");
+  await expect(page.locator('form[data-hydrated="true"]')).toBeVisible();
   await page.fill('input[name="email"]', "ui-admin@metsys.test");
   await page.fill(
     'input[name="password"]',
@@ -33,6 +34,7 @@ setup("employee signs in once", async ({ page }) => {
     "E2E_EMPLOYEE_PASSWORD is not set"
   );
   await page.goto("/login");
+  await expect(page.locator('form[data-hydrated="true"]')).toBeVisible();
   await page.fill('input[name="email"]', "ui-employee@metsys.test");
   await page.fill(
     'input[name="password"]',

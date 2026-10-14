@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from app/workspace-styles. */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +52,6 @@ const drawerData = (
 };
 
 const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
-  await connection();
   const [projectsResult, employeeResult, session, bugsResult] =
     await Promise.all([
       listProjects({}),

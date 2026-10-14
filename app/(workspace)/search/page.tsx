@@ -9,7 +9,6 @@ import {
 } from "@/features/discovery/components/search-panel";
 import { parseSearchQuery } from "@/features/discovery/search-query";
 
-export const instant = false;
 export const metadata: Metadata = { title: "Search | Metsys" };
 
 const SearchPage = ({ searchParams }: PageProps<"/search">) => (

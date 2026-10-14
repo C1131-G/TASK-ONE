@@ -1,6 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { connection } from "next/server";
+import { io } from "next/cache";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { WorkspaceCalendar } from "@/components/workspace/workspace-calendar";
@@ -23,7 +23,7 @@ const CalendarView = async ({
   readonly monthOffset: number;
   readonly viewMode: CalendarMode;
 }) => {
-  await connection();
+  await io();
   const { label: monthLabel, range } = calendarPeriod(viewMode, monthOffset);
   const [tasks, events, session, projects, employeeResult] = await Promise.all([
     listTaskCalendar({
@@ -91,7 +91,15 @@ const CalendarView = async ({
 };
 
 const CalendarViewSkeleton = () => (
-  <PanelSkeleton label="Loading calendar…" rows={8} />
+  <>
+    <div className="ph">
+      <div>
+        <h1>Calendar</h1>
+        <p>Deadlines and events across every project.</p>
+      </div>
+    </div>
+    <PanelSkeleton label="Loading calendar…" rows={8} />
+  </>
 );
 
 export { CalendarView, CalendarViewSkeleton };

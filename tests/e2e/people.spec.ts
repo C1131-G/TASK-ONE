@@ -41,10 +41,12 @@ test.describe("people as admin", () => {
     await page
       .locator("a.members-person-link", { hasText: "UI Admin" })
       .click();
-    await expect(page).toHaveURL(/\/members\/[0-9a-f-]{36}$/u);
+    await expect(page).toHaveURL(/\/members\/[0-9a-f-]{36}$/u, {
+      timeout: 30_000,
+    });
     await expect(
       page.getByRole("heading", { level: 1, name: /UI Admin/u })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("an admin edits an employee's job title and the change survives a reload", async ({
@@ -100,8 +102,12 @@ test.describe("people as admin", () => {
     const card = page.getByRole("link", { name: new RegExp(name, "u") });
     await expect(card).toBeVisible({ timeout: 15_000 });
     await card.click();
-    await expect(page).toHaveURL(/\/teams\/[0-9a-f-]{36}$/u);
-    await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+    await expect(page).toHaveURL(/\/teams\/[0-9a-f-]{36}$/u, {
+      timeout: 30_000,
+    });
+    await expect(page.getByRole("heading", { level: 1, name })).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 

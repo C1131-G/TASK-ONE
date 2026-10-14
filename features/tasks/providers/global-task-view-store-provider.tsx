@@ -9,7 +9,8 @@ import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 
-import { usePersistColumnWidths } from "../../../components/workspace/column-width-persistence";
+import { usePersistColumnWidths } from "@/components/workspace/column-width-persistence";
+
 import {
   isSameGlobalTaskSearch,
   readGlobalTaskSearchRaw,

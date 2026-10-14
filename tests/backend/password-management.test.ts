@@ -18,14 +18,29 @@ import {
 it("lets a forced-change account replace its temporary password and access the workspace", async () => {
   const email = `password-${randomUUID()}@example.test`;
   let userId: string | undefined;
+  const administratorId = randomUUID();
 
   try {
-    const bootstrap = Effect.gen(function* createAdmin() {
+    await authPool.query(
+      'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, \'admin\', false)',
+      [
+        administratorId,
+        "Password Test Administrator",
+        `password-admin-${administratorId}@example.test`,
+      ]
+    );
+    const createForcedEmployee = Effect.gen(function* createForcedEmployee() {
       const users = yield* UserManagement;
-      return yield* users.createFirstAdmin({ email, name: "Password Admin" });
+      return yield* users.createEmployee(administratorId, {
+        email,
+        jobTitle: null,
+        name: "Password Employee",
+        role: "employee",
+        teamId: null,
+      });
     });
     const created = await Effect.runPromise(
-      Effect.provide(bootstrap, UserManagementLive)
+      Effect.provide(createForcedEmployee, UserManagementLive)
     );
     userId = created.id;
 
@@ -69,11 +84,15 @@ it("lets a forced-change account replace its temporary password and access the w
     expect(user.id).toBe(created.id);
     expect(user.mustChangePassword).toBe(false);
   } finally {
+    await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
+      administratorId,
+    ]);
     if (userId) {
       await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
         userId,
       ]);
       await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);
     }
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [administratorId]);
   }
 });

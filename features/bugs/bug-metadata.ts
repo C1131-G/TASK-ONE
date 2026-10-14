@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { connection } from "next/server";
 
 import { getBug } from "@/features/bugs/bugs-queries";
 
 const bugMetadata = async (bugId: string): Promise<Metadata> => {
-  await connection();
   const result = await getBug({ bugId });
   const title = result.ok
     ? `${result.data.projectKey}-${result.data.projectTaskNumber} ${result.data.title}`

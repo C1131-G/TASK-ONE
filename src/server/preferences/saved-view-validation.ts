@@ -3,7 +3,7 @@ import { Schema } from "effect";
 import type { CodecTypes } from "@/src/prisma/contract.d";
 
 import { AppError } from "../core/action-result";
-import type { SavedViewInput, SavedViewType } from "./saved-view-contracts";
+import type { SavedViewType } from "./saved-view-contracts";
 import {
   SavedViewFiltersSchema,
   SavedViewGroupBySchema,
@@ -33,7 +33,7 @@ export const mapError = (error: unknown): AppError =>
       });
 
 export const validateInput = (
-  input: SavedViewInput
+  input: unknown
 ): {
   readonly name: string;
   readonly projectId: string | null;

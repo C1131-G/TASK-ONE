@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles -- Workspace classes are defined in app/workspace-styles. */
 
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { TeamCreateForm } from "@/features/people/components/people-admin-forms";
@@ -10,7 +9,6 @@ import { listTeams } from "@/features/people/people-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const TeamList = async () => {
-  await connection();
   const [result, session] = await Promise.all([
     listTeams({}),
     getPageSession(),

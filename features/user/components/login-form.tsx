@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent } from "react";
 
 import { Input } from "@/components/ui/input";
@@ -18,11 +18,23 @@ import { PasswordInput } from "@/features/user/components/password-input";
 import { readFormText } from "@/features/user/read-form-text";
 import { authClient } from "@/src/client/auth-client";
 
+const subscribeHydration = (onStoreChange: () => void) => {
+  window.addEventListener("pageshow", onStoreChange);
+  return () => window.removeEventListener("pageshow", onStoreChange);
+};
+const getHydratedSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
 const LoginForm = () => {
   const router = useRouter();
   const passwordRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const hydrated = useSyncExternalStore(
+    subscribeHydration,
+    getHydratedSnapshot,
+    getServerHydrationSnapshot
+  );
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,7 +75,12 @@ const LoginForm = () => {
   return (
     <>
       <AuthAlert id="login-error" message={error} />
-      <form className="auth-form" onSubmit={submit}>
+      <form
+        className="auth-form"
+        data-hydrated={hydrated ? "true" : "false"}
+        method="post"
+        onSubmit={submit}
+      >
         <div className="auth-field">
           <label className="auth-label" htmlFor="login-email">
             Work email

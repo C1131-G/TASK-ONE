@@ -9,7 +9,6 @@ import {
 } from "@/features/notifications/components/notification-feed";
 
 export const metadata: Metadata = { title: "Notifications | Metsys" };
-export const instant = false;
 
 const NotificationsPage = () => (
   <div className="page">

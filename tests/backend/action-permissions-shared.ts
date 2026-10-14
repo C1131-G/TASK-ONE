@@ -14,11 +14,11 @@ export interface ActionEntry {
 
 export const entry = (
   name: string,
-  action: (input: unknown) => Promise<unknown>,
+  action: ActionFunction,
   input: () => unknown,
   authOnly = false
 ): ActionEntry => ({
-  action: action as ActionFunction,
+  action,
   authOnly,
   input,
   name,

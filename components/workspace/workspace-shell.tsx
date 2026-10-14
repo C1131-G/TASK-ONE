@@ -1,36 +1,16 @@
 /* eslint-disable shadcn/no-unknown-classes */
-/* eslint-disable shadcn/no-restyle */
 
-"use client";
-
-import { Bell, List } from "@phosphor-icons/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { ViewTransition } from "react";
+import { Suspense, ViewTransition } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-menu";
-import { WorkspaceBottomNavigation } from "@/components/workspace/workspace-bottom-navigation";
-import { WorkspaceCreateMenu } from "@/components/workspace/workspace-create-menu";
-import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
-import {
-  getNavigationTransitionType,
-  isNavigationItemActive,
-  sections,
-} from "@/components/workspace/workspace-navigation-data";
-import { WorkspaceSearchPalette } from "@/components/workspace/workspace-search-palette";
+  WorkspaceBottomChrome,
+  WorkspaceSidebar,
+  WorkspaceSidebarFallback,
+  WorkspaceTopbar,
+} from "@/components/workspace/workspace-shell-sections";
 import { WorkspaceUndoProvider } from "@/components/workspace/workspace-undo";
 import { PushNotificationsControl } from "@/features/notifications/components/push-notifications-control";
-import { ProjectIcon } from "@/features/projects/components/project-icon";
 
 export interface WorkspaceProject {
   readonly id: string;
@@ -39,277 +19,66 @@ export interface WorkspaceProject {
   readonly icon: string;
 }
 
-export const WorkspaceShell = ({
-  children,
-  name,
-  role,
-  projects,
-  publicKey,
-  unreadInboxCount,
-  unreadNotificationCount,
-}: {
-  readonly children: ReactNode;
+// The request-specific data the shell chrome needs; null while signed out.
+export interface WorkspaceFrameData {
   readonly name: string;
   readonly role: "admin" | "employee";
   readonly projects: readonly WorkspaceProject[];
-  readonly publicKey: string;
   readonly unreadInboxCount: number;
   readonly unreadNotificationCount: number;
-}) => {
-  const pathname = usePathname();
-  const unreadCountFor = (label: string): number => {
-    if (label === "Inbox") {
-      return unreadInboxCount;
-    }
-    if (label === "Notifications") {
-      return unreadNotificationCount;
-    }
-    return 0;
-  };
-  const activeProject = projects.find(({ id }) => {
-    const projectPath = `/projects/${id}`;
-    return pathname === projectPath || pathname.startsWith(`${projectPath}/`);
-  });
-  const title =
-    activeProject?.name ??
-    sections
-      .flatMap((section) => section.items)
-      .find((link) => isNavigationItemActive(pathname, link.href))?.label ??
-    "Workspace";
-  const mobileNavigation = (
-    <div className="mobile-navigation">
-      {sections.map((section) => (
-        <div className="sgroup" key={section.label ?? "personal"}>
-          {section.label ? (
-            <div className="sgroup-h">{section.label}</div>
-          ) : null}
-          {section.items.flatMap(({ href, label, Icon }) => {
-            if (href === "/bug-approvals" && role !== "admin") {
-              return [];
-            }
-            return [
-              <SheetClose asChild key={href}>
-                <WorkspaceLink
-                  active={
-                    href === "/projects"
-                      ? pathname === href
-                      : isNavigationItemActive(pathname, href)
-                  }
-                  href={href}
-                  Icon={Icon}
-                  label={label}
-                  transitionType={getNavigationTransitionType(pathname, href)}
-                  unreadCount={unreadCountFor(label)}
-                />
-              </SheetClose>,
-            ];
-          })}
-        </div>
-      ))}
-      <div className="sgroup">
-        <div className="sgroup-h">Projects</div>
-        {projects.map((project) => (
-          <SheetClose asChild key={project.id}>
-            <Link
-              aria-current={
-                activeProject?.id === project.id ? "page" : undefined
-              }
-              className={`sitem${activeProject?.id === project.id ? " on" : ""}`}
-              href={`/projects/${project.id}`}
-              transitionTypes={[
-                getNavigationTransitionType(
-                  pathname,
-                  `/projects/${project.id}`
-                ),
-              ]}
+}
+
+// The frame markup and page slot are static. Only the navigation, top bar and
+// bottom bar wait for the session data, each behind its own boundary.
+export const WorkspaceShell = ({
+  children,
+  frame,
+  publicKey,
+}: {
+  readonly children: ReactNode;
+  readonly frame: Promise<WorkspaceFrameData | null>;
+  readonly publicKey: string;
+}) => (
+  <div className="workspace-app">
+    <WorkspaceUndoProvider>
+      <a className="skip" href="#main-content">
+        Skip to content
+      </a>
+      <div className="shell">
+        <nav aria-label="Main" className="side">
+          <Suspense fallback={<WorkspaceSidebarFallback />}>
+            <WorkspaceSidebar frame={frame} />
+          </Suspense>
+        </nav>
+        <main className="main">
+          <header className="topbar">
+            <Suspense fallback={<span className="sp" />}>
+              <WorkspaceTopbar frame={frame} />
+            </Suspense>
+          </header>
+          <div className="content" id="main-content" tabIndex={-1}>
+            <ViewTransition
+              default="none"
+              enter={{
+                default: "none",
+                "nav-back": "nav-back",
+                "nav-forward": "nav-forward",
+              }}
+              exit={{
+                default: "none",
+                "nav-back": "nav-back",
+                "nav-forward": "nav-forward",
+              }}
             >
-              <ProjectIcon
-                color={project.color}
-                icon={project.icon}
-                size={13}
-              />
-              <span className="trunc">{project.name}</span>
-            </Link>
-          </SheetClose>
-        ))}
+              {children}
+            </ViewTransition>
+          </div>
+        </main>
+        <Suspense fallback={null}>
+          <WorkspaceBottomChrome frame={frame} />
+        </Suspense>
       </div>
-    </div>
-  );
-  return (
-    <div className="workspace-app">
-      <WorkspaceUndoProvider>
-        <a className="skip" href="#main-content">
-          Skip to content
-        </a>
-        <div className="shell">
-          <nav aria-label="Main" className="side">
-            <div className="side-top">
-              <Link
-                aria-label="Metsys home"
-                className="ws"
-                href="/"
-                transitionTypes={[getNavigationTransitionType(pathname, "/")]}
-              >
-                <span aria-hidden="true" className="ws-logo" data-initial="M" />
-                <span className="ws-name trunc">Metsys</span>
-              </Link>
-            </div>
-            <div className="side-scroll">
-              {sections.map((section) => (
-                <div className="sgroup" key={section.label ?? "personal"}>
-                  {section.label ? (
-                    <div className="sgroup-h">{section.label}</div>
-                  ) : null}
-                  {section.items.flatMap(({ href, label, Icon }) => {
-                    if (href === "/bug-approvals" && role !== "admin") {
-                      return [];
-                    }
-                    return [
-                      <WorkspaceLink
-                        active={
-                          href === "/projects"
-                            ? pathname === href
-                            : isNavigationItemActive(pathname, href)
-                        }
-                        href={href}
-                        Icon={Icon}
-                        key={href}
-                        label={label}
-                        transitionType={getNavigationTransitionType(
-                          pathname,
-                          href
-                        )}
-                        unreadCount={unreadCountFor(label)}
-                      />,
-                    ];
-                  })}
-                </div>
-              ))}
-              <div className="sgroup" id="side-projects">
-                <div className="sgroup-h">Projects</div>
-                {projects.map((project) => (
-                  <Link
-                    aria-current={
-                      activeProject?.id === project.id ? "page" : undefined
-                    }
-                    className={`sitem${activeProject?.id === project.id ? " on" : ""}`}
-                    href={`/projects/${project.id}`}
-                    key={project.id}
-                    transitionTypes={[
-                      getNavigationTransitionType(
-                        pathname,
-                        `/projects/${project.id}`
-                      ),
-                    ]}
-                  >
-                    <ProjectIcon
-                      color={project.color}
-                      icon={project.icon}
-                      size={13}
-                    />
-                    <span className="trunc">{project.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="side-bot">
-              <WorkspaceAccountMenu name={name} role={role} />
-            </div>
-          </nav>
-          <main className="main">
-            <header className="topbar">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button
-                    aria-label="Open workspace navigation"
-                    data-workspace-mobile-menu=""
-                    size="icon-sm"
-                    variant="ghost"
-                  >
-                    <List aria-hidden="true" size={18} />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent
-                  className="workspace-app"
-                  data-workspace-nav=""
-                  data-workspace-sheet=""
-                  side="left"
-                >
-                  <SheetHeader>
-                    <SheetTitle>Metsys</SheetTitle>
-                  </SheetHeader>
-                  <nav
-                    aria-label="Workspace"
-                    className="mobile-navigation-scroll"
-                  >
-                    {mobileNavigation}
-                  </nav>
-                  <div className="mobile-navigation-footer">
-                    <WorkspaceAccountMenu name={name} role={role} />
-                  </div>
-                </SheetContent>
-              </Sheet>
-              <span className="crumbs">{title}</span>
-              <span className="sp" />
-              <WorkspaceSearchPalette projects={projects} />
-              <Link
-                aria-label={
-                  unreadNotificationCount > 0
-                    ? `Notifications, ${unreadNotificationCount} unread`
-                    : "Open notifications"
-                }
-                className="ibtn"
-                href="/notifications"
-                transitionTypes={[
-                  getNavigationTransitionType(pathname, "/notifications"),
-                ]}
-              >
-                <Bell aria-hidden="true" size={16} />
-                {unreadNotificationCount > 0 ? (
-                  <span
-                    aria-hidden="true"
-                    className="topbar-notification-dot"
-                  />
-                ) : null}
-              </Link>
-              <WorkspaceCreateMenu
-                isAdmin={role === "admin"}
-                projects={projects.map(({ id, name: projectName }) => ({
-                  id,
-                  name: projectName,
-                }))}
-              />
-              <WorkspaceAccountMenu name={name} role={role} />
-            </header>
-            <div className="content" id="main-content" tabIndex={-1}>
-              <ViewTransition
-                default="none"
-                enter={{
-                  default: "none",
-                  "nav-back": "nav-back",
-                  "nav-forward": "nav-forward",
-                }}
-                exit={{
-                  default: "none",
-                  "nav-back": "nav-back",
-                  "nav-forward": "nav-forward",
-                }}
-              >
-                {children}
-              </ViewTransition>
-            </div>
-          </main>
-          <WorkspaceBottomNavigation
-            mobileNavigation={mobileNavigation}
-            name={name}
-            pathname={pathname}
-            role={role}
-            unreadInboxCount={unreadInboxCount}
-          />
-        </div>
-        <PushNotificationsControl publicKey={publicKey} />
-        <span className="sr-only">Signed in as {name}</span>
-      </WorkspaceUndoProvider>
-    </div>
-  );
-};
+      <PushNotificationsControl publicKey={publicKey} />
+    </WorkspaceUndoProvider>
+  </div>
+);

@@ -1,8 +1,9 @@
 import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
-import type { TaskTableColumnId } from "../../tasks/task-table-columns";
-import { clampColumnWidth } from "../../tasks/task-table-columns";
+import type { TaskTableColumnId } from "@/features/tasks/task-table-columns";
+import { clampColumnWidth } from "@/features/tasks/task-table-columns";
+
 import type { ProjectViewSearch } from "../project-view-search";
 
 // Client UI state for one project page. Server data (tasks, members, labels)

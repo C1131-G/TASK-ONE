@@ -9,8 +9,9 @@ import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 
-import { usePersistColumnWidths } from "../../../components/workspace/column-width-persistence";
-import type { TaskTableColumnId } from "../../tasks/task-table-columns";
+import { usePersistColumnWidths } from "@/components/workspace/column-width-persistence";
+import type { TaskTableColumnId } from "@/features/tasks/task-table-columns";
+
 import {
   isSameProjectViewSearch,
   readProjectViewSearchRaw,

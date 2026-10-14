@@ -1,5 +1,7 @@
 import { expect, it } from "bun:test";
 
+import { Schema } from "effect";
+
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";
@@ -53,10 +55,14 @@ it("requires the scheduler token before running any durable jobs", async () => {
       method: "POST",
     })
   );
-  const result = (await response.json()) as {
-    ok: boolean;
-    error?: { code: string; requestId: string };
-  };
+  const result = Schema.decodeUnknownSync(
+    Schema.Struct({
+      error: Schema.optional(
+        Schema.Struct({ code: Schema.String, requestId: Schema.String })
+      ),
+      ok: Schema.Boolean,
+    })
+  )(await response.json());
 
   expect(response.status).toBe(401);
   expect(result.ok).toBe(false);

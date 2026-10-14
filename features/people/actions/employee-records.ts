@@ -1,7 +1,7 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
@@ -19,6 +19,7 @@ import {
   ServerActionOutputSchema,
   runServerAction,
 } from "@/src/server/core/server-action";
+import { teamSummariesTag } from "@/src/server/people/team-cache";
 import {
   CreatedEmployeeSchema,
   CreateEmployeeInputSchema,
@@ -50,6 +51,7 @@ export async function createEmployeeAction(input: unknown) {
   );
 
   if (action.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/people");
   }
   return action;
@@ -94,6 +96,7 @@ export async function deactivateEmployeeAction(input: unknown) {
   );
 
   if (action.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/people");
   }
   return action;
@@ -138,6 +141,7 @@ export async function reactivateEmployeeAction(input: unknown) {
   );
 
   if (action.ok) {
+    updateTag(teamSummariesTag);
     revalidatePath("/settings/people");
   }
   return action;

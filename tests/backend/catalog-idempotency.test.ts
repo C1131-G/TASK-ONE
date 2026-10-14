@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { Effect, Layer } from "effect";
 
+import "./support/next-cache-mock";
 import { authPool } from "../../src/server/auth/database";
 import {
   Idempotency,

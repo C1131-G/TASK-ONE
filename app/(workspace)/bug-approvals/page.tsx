@@ -9,7 +9,6 @@ import {
 } from "@/features/bugs/components/bug-approval-list";
 
 export const metadata: Metadata = { title: "Bug approvals | Metsys" };
-export const instant = false;
 
 const BugApprovalPage = () => (
   <div className="page flush">

@@ -2,6 +2,7 @@
 
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -37,10 +38,10 @@ export const BugRelatedHistorySection = ({
       <h2>Related bugs and history</h2>
       <div className="bug-related-list">
         {history.relations.map(({ bug, type }) => (
-          <a href={`/bugs/${bug.id}`} key={`${type}-${bug.id}`}>
+          <Link href={`/bugs/${bug.id}`} key={`${type}-${bug.id}`}>
             {type === "recurrence" ? "Recurrence of" : "Duplicate of"}{" "}
             {bug.projectKey}-{bug.projectTaskNumber} · {bug.title}
-          </a>
+          </Link>
         ))}
       </div>
       {!isReadOnly && canEdit ? (

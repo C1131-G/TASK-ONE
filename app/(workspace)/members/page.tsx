@@ -10,7 +10,6 @@ import {
 import { parseMembersSection } from "@/features/people/members-section-param";
 
 export const metadata: Metadata = { title: "Members | Metsys" };
-export const instant = false;
 
 const MembersPage = ({ searchParams }: PageProps<"/members">) => (
   <div className="page">

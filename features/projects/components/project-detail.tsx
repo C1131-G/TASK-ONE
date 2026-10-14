@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles -- Project details use reference workspace styles. */
 
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
@@ -25,7 +24,6 @@ const ProjectDetail = async ({
   readonly projectId: string;
   readonly query: ProjectDetailQuery;
 }) => {
-  await connection();
   const model = await getProjectDetailData(projectId, query);
   if (model.kind === "error") {
     return (

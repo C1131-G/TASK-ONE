@@ -106,9 +106,12 @@ test.describe("workspace task pages", () => {
 
     // Widths persist between runs, so resize toward the middle of the range.
     const dueHeader = page.locator('th[data-column="due"]');
-    const startWidth = await dueHeader.evaluate((element) =>
-      Number((element as HTMLElement).style.width.replace("px", ""))
-    );
+    const startWidth = await dueHeader.evaluate((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return 0;
+      }
+      return Number(element.style.width.replace("px", ""));
+    });
     const dueResize = page.getByRole("separator", {
       name: "Resize Due column",
     });

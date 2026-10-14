@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import { connection } from "next/server";
-
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getCompanySettings } from "@/features/company/company-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
@@ -28,7 +26,6 @@ const SettingsPanel = async ({
 }: {
   readonly initialSection: SettingsSection;
 }) => {
-  await connection();
   const [
     session,
     preferences,

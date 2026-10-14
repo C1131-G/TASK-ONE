@@ -51,7 +51,15 @@ const failureCode = async (promise: Promise<unknown>) => {
   try {
     await promise;
   } catch (error) {
-    return (error as { code?: string }).code ?? String(error);
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof error.code === "string"
+    ) {
+      return error.code;
+    }
+    return String(error);
   }
   return "succeeded";
 };

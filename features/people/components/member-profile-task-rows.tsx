@@ -31,7 +31,8 @@ const formatTaskStatus = (status: MemberTask["status"]): string => {
       return "To Do";
     }
     default: {
-      return status;
+      const _exhaustive: never = status;
+      return _exhaustive;
     }
   }
 };

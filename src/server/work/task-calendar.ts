@@ -92,6 +92,9 @@ const taskGroupKey = (
   assigneeIds: readonly string[]
 ): string | null => {
   switch (groupBy) {
+    case "none": {
+      return null;
+    }
     case "status": {
       return status;
     }
@@ -102,7 +105,8 @@ const taskGroupKey = (
       return assigneeIds[0] ?? "unassigned";
     }
     default: {
-      return null;
+      const _exhaustive: never = groupBy;
+      return _exhaustive;
     }
   }
 };

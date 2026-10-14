@@ -90,7 +90,7 @@ const TaskActions = ({
 );
 
 const renderGlobalCell = (
-  columnId: TaskTableColumnId,
+  columnId: (typeof GLOBAL_TASK_COLUMNS)[number]["id"],
   task: GlobalTask,
   props: GlobalTaskViewProps
 ): ReactNode => {
@@ -133,7 +133,8 @@ const renderGlobalCell = (
       return <TaskActions {...props} task={task} />;
     }
     default: {
-      return null;
+      const _exhaustive: never = columnId;
+      return _exhaustive;
     }
   }
 };
@@ -153,8 +154,9 @@ export const GlobalTaskTable = ({
   readonly onSort: (field: string) => void;
   readonly props: GlobalTaskViewProps;
 }) => {
-  const visibleColumns: readonly TaskTableColumnDef[] =
-    GLOBAL_TASK_COLUMNS.filter((column) => !hidden.includes(column.id));
+  const visibleColumns = GLOBAL_TASK_COLUMNS.filter(
+    (column) => !hidden.includes(column.id)
+  );
   const widthOf = (column: TaskTableColumnDef) =>
     columnWidths[column.id] ?? defaultColumnWidth(column.id);
 
