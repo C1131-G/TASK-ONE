@@ -192,6 +192,20 @@ export const PortalLifecycleSchema = Schema.Struct({
   ),
 });
 
+// "We usually respond within X": first-response targets in business time.
+export const PortalResponseTimesSchema = Schema.Struct({
+  businessDays: Schema.Array(Schema.Number),
+  businessEndMinute: Schema.Number,
+  businessStartMinute: Schema.Number,
+  firstResponseMinutes: Schema.Struct({
+    high: Schema.Number,
+    low: Schema.Number,
+    medium: Schema.Number,
+    urgent: Schema.Number,
+  }),
+  timeZone: Schema.String,
+});
+
 export const PortalBugDetailSchema = Schema.Struct({
   ...PortalBugSummarySchema.fields,
   actualBehavior: Schema.String,
@@ -205,6 +219,11 @@ export const PortalBugDetailSchema = Schema.Struct({
   description: Schema.NullOr(Schema.String),
   device: Schema.NullOr(Schema.String),
   expectedBehavior: Schema.String,
+  // The team's first response: when it came, or the target for this bug.
+  firstResponse: Schema.Struct({
+    respondedAt: Schema.NullOr(Schema.String),
+    targetMinutes: Schema.NullOr(Schema.Number),
+  }),
   lifecycle: PortalLifecycleSchema,
   os: Schema.NullOr(Schema.String),
   pageUrl: Schema.String,
@@ -232,6 +251,7 @@ export const PortalNotificationListSchema = Schema.Struct({
   unreadCount: Schema.Number,
 });
 
+export type PortalResponseTimes = typeof PortalResponseTimesSchema.Type;
 export type PortalProject = typeof PortalProjectSchema.Type;
 export type PortalBugSummary = typeof PortalBugSummarySchema.Type;
 export type PortalBugDetail = typeof PortalBugDetailSchema.Type;
@@ -253,6 +273,9 @@ export class PortalBugs extends Context.Service<
     readonly listProjects: (
       actor: PortalActor
     ) => Effect.Effect<readonly PortalProject[], AppError>;
+    readonly responseTimes: (
+      actor: PortalActor
+    ) => Effect.Effect<PortalResponseTimes, AppError>;
     readonly listBugs: (
       actor: PortalActor,
       input: ListCompanyBugsInput

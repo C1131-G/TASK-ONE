@@ -2673,6 +2673,13 @@
                   "kind": "scalar"
                 }
               },
+              "resolutionStartedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
               "resolvedAt": {
                 "nullable": true,
                 "type": {
@@ -2748,6 +2755,9 @@
                 },
                 "resolutionDueAt": {
                   "column": "resolutionDueAt"
+                },
+                "resolutionStartedAt": {
+                  "column": "resolutionStartedAt"
                 },
                 "resolvedAt": {
                   "column": "resolvedAt"
@@ -10019,6 +10029,15 @@
                   "dataType": "pg/timestamptz",
                   "nullable": false
                 },
+                "resolutionStartedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
                 "resolvedAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
@@ -15032,7 +15051,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "8314e79f5bf578c3f197f6956169c1816915afffd19b0d8c13ccdb6effb49296"
+    "storageHash": "15e177bc3628643bbddfcbefce631baf5a64f6750a45ca10c460ab21e7d92fdc"
   },
   "execution": {
     "executionHash": "eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651",

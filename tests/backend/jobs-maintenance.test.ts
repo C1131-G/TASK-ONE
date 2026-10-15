@@ -42,11 +42,12 @@ it("enqueues one idempotent daily maintenance job for worker or scheduler runs",
   try {
     expect(result.first.jobId).toBe(result.second.jobId);
   } finally {
-    // Maintenance enqueues a cleanup job and a daily-summary scan; both keys
-    // carry the scheduled date.
-    await authPool.query('DELETE FROM job WHERE "dedupeKey" LIKE $1', [
-      "%2099-03-14%",
-    ]);
+    // Maintenance enqueues a cleanup job, a daily-summary scan (both keys carry
+    // the scheduled date) and the five-minute SLA sweep (keyed by interval).
+    await authPool.query(
+      'DELETE FROM job WHERE "dedupeKey" LIKE $1 OR ("dedupeKey" LIKE \'bug.sla_sweep:%\' AND "availableAt" = $2)',
+      ["%2099-03-14%", scheduledAt]
+    );
   }
 });
 

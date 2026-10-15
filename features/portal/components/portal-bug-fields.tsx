@@ -17,7 +17,11 @@ import {
   impactText,
   portalImpacts,
 } from "@/features/portal/portal-format";
-import type { PortalProject } from "@/src/server/portal/portal-contracts";
+import { usuallyRespondText } from "@/features/portal/portal-response-time";
+import type {
+  PortalResponseTimes,
+  PortalProject,
+} from "@/src/server/portal/portal-contracts";
 
 type Patch = (patch: Partial<Values>) => void;
 
@@ -286,11 +290,13 @@ const ImpactField = ({
   errors,
   onPatch,
   pending,
+  responseTimes,
   value,
 }: {
   readonly errors: Errors;
   readonly onPatch: Patch;
   readonly pending: boolean;
+  readonly responseTimes?: PortalResponseTimes | null | undefined;
   readonly value: Values["impact"];
 }) => (
   <fieldset
@@ -324,6 +330,14 @@ const ImpactField = ({
         </label>
       ))}
     </div>
+    {responseTimes && value ? (
+      <output className="portal-response-note">
+        {usuallyRespondText(
+          responseTimes.firstResponseMinutes[value],
+          responseTimes
+        )}
+      </output>
+    ) : null}
     <FieldError errors={errors} field="impact" />
   </fieldset>
 );

@@ -11,6 +11,7 @@ import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
+import { SLA_SWEEP_JOB, runSlaSweep } from "../work/bug-sla";
 import {
   AWAITING_CLIENT_AUTOCLOSE_JOB,
   NEEDS_INFO_AUTOCLOSE_JOB,
@@ -176,6 +177,19 @@ export const JobHandlersLive = Layer.effect(
             ),
             Effect.asVoid
           );
+        }
+        if (kind === SLA_SWEEP_JOB) {
+          return Effect.tryPromise({
+            catch: () =>
+              new AppError({
+                code: "UNAVAILABLE",
+                message: "The SLA sweep could not be completed.",
+              }),
+            try: () =>
+              db.transaction((transaction) =>
+                runSlaSweep(transaction, new Date())
+              ),
+          }).pipe(Effect.asVoid);
         }
         if (kind === UNPICKED_REMINDER_JOB) {
           return Effect.try({

@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { enqueueSlaSweep } from "../work/bug-sla";
 import type { DeadJobSummary } from "./processor-contracts";
 
 export const enqueueMaintenance = (
@@ -55,6 +56,7 @@ export const enqueueMaintenance = (
           update: { updatedAt: scheduledAt },
         }),
       ]);
+      await enqueueSlaSweep(db, scheduledAt);
       return { jobId: job.id };
     },
   });

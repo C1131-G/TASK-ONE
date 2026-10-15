@@ -27,9 +27,11 @@ import type { ClientCompanyDetail } from "@/src/server/clients/client-company-co
 const BugSummary = ({
   bugCounts,
   satisfaction,
+  sla,
 }: {
   readonly bugCounts: ClientCompanyDetail["bugCounts"];
   readonly satisfaction: ClientCompanyDetail["satisfaction"];
+  readonly sla: ClientCompanyDetail["sla"];
 }) => {
   const rated = satisfaction.up + satisfaction.down;
   const total = bugCounts.reduce((sum, { count }) => sum + count, 0);
@@ -76,6 +78,12 @@ const BugSummary = ({
           </div>
         ))}
       </div>
+      <p className="panel-b clients-ratings clients-sla">
+        <span className="sub">SLA</span>{" "}
+        {sla.tracked === 0
+          ? "No SLA-tracked bugs yet."
+          : `${sla.tracked} tracked · ${sla.responseBreaches} first-response ${sla.responseBreaches === 1 ? "breach" : "breaches"} · ${sla.resolutionBreaches} resolution ${sla.resolutionBreaches === 1 ? "breach" : "breaches"}`}
+      </p>
       <p className="panel-b clients-ratings">
         <span className="sub">Client ratings</span>{" "}
         <span aria-hidden="true">
@@ -198,6 +206,7 @@ const ClientCompanyWorkspace = ({
           <BugSummary
             bugCounts={detail.bugCounts}
             satisfaction={detail.satisfaction}
+            sla={detail.sla}
           />
         </TabsContent>
       </Tabs>

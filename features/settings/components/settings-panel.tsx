@@ -2,6 +2,7 @@
 
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getCompanySettings } from "@/features/company/company-queries";
+import { getSlaSettings } from "@/features/company/sla-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
 import { getNotificationPreferences } from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -12,6 +13,7 @@ import {
   ProfileForm,
 } from "@/features/settings/components/settings-forms";
 import { SettingsWorkspace } from "@/features/settings/components/settings-workspace";
+import { SlaSettingsForm } from "@/features/settings/components/sla-settings-form";
 import type { SettingsSection } from "@/features/settings/settings-section";
 import { AvatarUpload } from "@/features/user/components/avatar-upload";
 import { SessionList } from "@/features/user/components/session-list";
@@ -20,6 +22,10 @@ import {
   listMySessions,
 } from "@/features/user/user-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
+
+const listTimeZones = () => [
+  ...new Set(["UTC", "Asia/Kolkata", ...Intl.supportedValuesOf("timeZone")]),
+];
 
 const SettingsPanel = async ({
   initialSection,
@@ -47,6 +53,7 @@ const SettingsPanel = async ({
       ? employees.data.find(({ id }) => id === user.id)
       : null;
   const isAdmin = user?.role === "admin";
+  const sla = isAdmin ? await getSlaSettings({}) : null;
   const avatar = user ? await getAvatarDownloadUrl({ userId: user.id }) : null;
   return (
     <SettingsWorkspace
@@ -81,6 +88,17 @@ const SettingsPanel = async ({
           </div>
         ) : (
           <div className="panel-b muted">Profile details are unavailable.</div>
+        )
+      }
+      sla={
+        sla?.ok ? (
+          <SlaSettingsForm
+            key={JSON.stringify(sla.data)}
+            timeZones={listTimeZones()}
+            values={sla.data}
+          />
+        ) : (
+          <div className="panel-b muted">SLA settings could not be loaded.</div>
         )
       }
       sessions={

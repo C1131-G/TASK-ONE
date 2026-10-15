@@ -10,8 +10,10 @@ import {
 import { db } from "@/src/prisma/db";
 
 import { createCommentInTransaction } from "../collaboration/create-comment";
+import { loadSlaSettings } from "../company/sla-settings";
 import { AppError } from "../core/action-result";
 import { createBugReport } from "../work/bug-management";
+import { createBugSla } from "../work/bug-sla";
 import {
   CLIENT_REOPEN_LIMIT,
   confirmClientFix,
@@ -43,6 +45,7 @@ import type {
   PortalComment,
   PortalNotificationList,
   PortalProject,
+  PortalResponseTimes,
   RateClientBugInput,
   ReopenClientFixInput,
   SubmitClientBugInput,
@@ -313,27 +316,30 @@ const getBug = (
       actor,
       bugId
     );
-    const [comments, evidence, activities, reporter] = await Promise.all([
-      transaction.orm.public.Comment.include("author")
-        .where({ deletedAt: null, taskId: task.id, visibility: "public" })
-        .orderBy((comment) => comment.createdAt.asc())
-        .limit(200)
-        .all(),
-      transaction.orm.public.BugEvidence.where((row) =>
-        and(row.bugReportId.eq(bug.id), row.fileAssetId.isNotNull())
-      )
-        .orderBy((row) => row.createdAt.asc())
-        .all(),
-      transaction.orm.public.Activity.where((activity) =>
-        and(activity.taskId.eq(task.id), activity.action.in(timelineActions))
-      )
-        .orderBy((activity) => activity.createdAt.asc())
-        .limit(200)
-        .all(),
-      transaction.orm.public.User.where({ id: bug.reporterId })
-        .select("name")
-        .first(),
-    ]);
+    const [comments, evidence, activities, reporter, sla, slaSettings] =
+      await Promise.all([
+        transaction.orm.public.Comment.include("author")
+          .where({ deletedAt: null, taskId: task.id, visibility: "public" })
+          .orderBy((comment) => comment.createdAt.asc())
+          .limit(200)
+          .all(),
+        transaction.orm.public.BugEvidence.where((row) =>
+          and(row.bugReportId.eq(bug.id), row.fileAssetId.isNotNull())
+        )
+          .orderBy((row) => row.createdAt.asc())
+          .all(),
+        transaction.orm.public.Activity.where((activity) =>
+          and(activity.taskId.eq(task.id), activity.action.in(timelineActions))
+        )
+          .orderBy((activity) => activity.createdAt.asc())
+          .limit(200)
+          .all(),
+        transaction.orm.public.User.where({ id: bug.reporterId })
+          .select("name")
+          .first(),
+        transaction.orm.public.BugSla.where({ bugId: bug.id }).first(),
+        loadSlaSettings(transaction),
+      ]);
     const fileIds = evidence.flatMap(({ fileAssetId }) =>
       fileAssetId ? [fileAssetId] : []
     );
@@ -408,6 +414,12 @@ const getBug = (
       description: bug.description,
       device: bug.device,
       expectedBehavior: bug.expectedBehavior,
+      firstResponse: {
+        respondedAt: sla?.firstRespondedAt?.toISOString() ?? null,
+        targetMinutes: bug.clientImpact
+          ? slaSettings.targets[bug.clientImpact].firstResponseMinutes
+          : null,
+      },
       id: bug.id,
       impact: bug.clientImpact,
       isMine: isReporter,
@@ -424,6 +436,26 @@ const getBug = (
       title: task.title,
       updatedAt: bug.updatedAt.toISOString(),
       version: bug.version,
+    };
+  });
+
+const responseTimes = (
+  _actor: PortalActor
+): Effect.Effect<PortalResponseTimes, AppError> =>
+  run(async (transaction) => {
+    const settings = await loadSlaSettings(transaction);
+    const { targets, calendar } = settings;
+    return {
+      businessDays: [...calendar.days],
+      businessEndMinute: calendar.endMinute,
+      businessStartMinute: calendar.startMinute,
+      firstResponseMinutes: {
+        high: targets.high.firstResponseMinutes,
+        low: targets.low.firstResponseMinutes,
+        medium: targets.medium.firstResponseMinutes,
+        urgent: targets.urgent.firstResponseMinutes,
+      },
+      timeZone: calendar.timeZone,
     };
   });
 
@@ -467,6 +499,11 @@ const submitBug = (
       },
       { clientCompanyId: actor.clientCompanyId, clientImpact: input.impact }
     );
+    await createBugSla(transaction, {
+      bugId: created.id,
+      impact: input.impact,
+      now: new Date(),
+    });
     if (input.recurrenceOfBugId) {
       const earlier = await loadCompanyBug(
         transaction,
@@ -788,6 +825,7 @@ export const PortalBugsLive = Layer.succeed(
     listProjects,
     rateBug,
     reopenFix,
+    responseTimes,
     submitBug,
     taskIdForBug,
     withdrawBug,

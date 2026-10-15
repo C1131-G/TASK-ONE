@@ -1,3 +1,5 @@
+import { loadSlaSettings } from "../company/sla-settings";
+import { buildSlaView } from "./bug-sla";
 import type { Transaction } from "./work-internal";
 
 // The client-report facts the team sees on a bug: where it came from, who
@@ -6,6 +8,7 @@ export const loadClientReport = async (
   transaction: Transaction,
   actor: { readonly id: string; readonly role: string },
   bug: {
+    readonly id: string;
     readonly awaitingClientSince: Date | null;
     readonly clientCompanyId: string | null;
     readonly clientReopenCount: number;
@@ -23,32 +26,35 @@ export const loadClientReport = async (
     return null;
   }
   const companyId = bug.clientCompanyId;
-  const [company, picker, handler, assignment] = await Promise.all([
-    transaction.orm.public.ClientCompany.where({ id: companyId })
-      .select("name", "deactivatedAt")
-      .first(),
-    bug.pickedById
-      ? transaction.orm.public.User.where({ id: bug.pickedById })
-          .select("name")
-          .first()
-      : null,
-    actor.role === "employee"
-      ? transaction.orm.public.ClientCompanyHandler.where({
-          companyId,
-          employeeId: actor.id,
-        })
-          .select("id")
-          .first()
-      : null,
-    actor.role === "employee"
-      ? transaction.orm.public.TaskAssignee.where({
-          taskId: bug.taskId,
-          userId: actor.id,
-        })
-          .select("userId")
-          .first()
-      : null,
-  ]);
+  const [company, picker, handler, assignment, sla, settings] =
+    await Promise.all([
+      transaction.orm.public.ClientCompany.where({ id: companyId })
+        .select("name", "deactivatedAt")
+        .first(),
+      bug.pickedById
+        ? transaction.orm.public.User.where({ id: bug.pickedById })
+            .select("name")
+            .first()
+        : null,
+      actor.role === "employee"
+        ? transaction.orm.public.ClientCompanyHandler.where({
+            companyId,
+            employeeId: actor.id,
+          })
+            .select("id")
+            .first()
+        : null,
+      actor.role === "employee"
+        ? transaction.orm.public.TaskAssignee.where({
+            taskId: bug.taskId,
+            userId: actor.id,
+          })
+            .select("userId")
+            .first()
+        : null,
+      transaction.orm.public.BugSla.where({ bugId: bug.id }).first(),
+      loadSlaSettings(transaction),
+    ]);
   const canWork = actor.role === "admin" || Boolean(assignment);
   return {
     awaitingClientSince: bug.awaitingClientSince?.toISOString() ?? null,
@@ -72,5 +78,6 @@ export const loadClientReport = async (
     resolution: bug.resolution,
     satisfaction: bug.satisfaction,
     satisfactionComment: bug.satisfactionComment,
+    sla: sla ? buildSlaView(sla, settings, new Date()) : null,
   };
 };

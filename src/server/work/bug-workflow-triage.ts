@@ -4,6 +4,7 @@ import { Schema } from "effect";
 
 import type { BugRelationInput, BugTriageInput } from "./bug-contracts";
 import { BugRelationInputSchema, BugTriageInputSchema } from "./bug-contracts";
+import { markFirstResponse } from "./bug-sla";
 import { transitionBugStatus } from "./bug-workflow";
 import {
   decodeBugWorkflowStatus,
@@ -123,6 +124,7 @@ export const applyTriage = async (
     });
   }
   if (bug.clientCompanyId) {
+    await markFirstResponse(transaction, bug.id, now);
     // Whoever gets a client bug now owns it: an unpicked report counts as
     // picked by its first assignee, and a reassignment flag is resolved.
     const [firstAssignee] = assigneeIds;

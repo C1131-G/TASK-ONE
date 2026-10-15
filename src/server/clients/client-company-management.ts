@@ -222,10 +222,17 @@ const getCompany = (
         companyId,
       }).all(),
       transaction.orm.public.BugReport.where({ clientCompanyId: companyId })
-        .select("status", "resolution", "satisfaction")
+        .select("id", "status", "resolution", "satisfaction")
         .all(),
     ]);
-    const [projects, employees] = await Promise.all([
+    const [slas, projects, employees] = await Promise.all([
+      bugs.length === 0
+        ? []
+        : transaction.orm.public.BugSla.where((sla) =>
+            sla.bugId.in(bugs.map(({ id }) => id))
+          )
+            .select("breachedResolution", "breachedResponse")
+            .all(),
       links.length === 0
         ? []
         : transaction.orm.public.Project.where((project) =>
@@ -284,6 +291,15 @@ const getCompany = (
       satisfaction: {
         down: bugs.filter(({ satisfaction }) => satisfaction === "down").length,
         up: bugs.filter(({ satisfaction }) => satisfaction === "up").length,
+      },
+      sla: {
+        resolutionBreaches: slas.filter(
+          ({ breachedResolution }) => breachedResolution
+        ).length,
+        responseBreaches: slas.filter(
+          ({ breachedResponse }) => breachedResponse
+        ).length,
+        tracked: slas.length,
       },
       users: users.map((user) => ({
         active: user.deactivatedAt === null,

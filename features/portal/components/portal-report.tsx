@@ -5,11 +5,13 @@ import { FolderSimple } from "@phosphor-icons/react/dist/ssr";
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
 import {
   getPortalBug,
+  getPortalResponseTimes,
   listPortalProjects,
 } from "@/features/portal/portal-queries";
 import type {
   PortalBugDetail,
   PortalProject,
+  PortalResponseTimes,
 } from "@/src/server/portal/portal-contracts";
 
 const UUID_PATTERN =
@@ -38,9 +40,11 @@ const loadRecurrence = async (
 const PortalReportBody = ({
   projects,
   recurrenceOf,
+  responseTimes,
 }: {
   readonly projects: readonly PortalProject[];
   readonly recurrenceOf: PortalBugDetail | null;
+  readonly responseTimes: PortalResponseTimes | null;
 }) => {
   if (projects.length === 0) {
     return (
@@ -69,6 +73,7 @@ const PortalReportBody = ({
           mode={{
             kind: "create",
             projects,
+            responseTimes,
             ...(recurrenceOf ? { recurrenceOf } : {}),
           }}
         />
@@ -82,7 +87,10 @@ const PortalReport = async ({
 }: {
   readonly from: string | undefined;
 }) => {
-  const result = await listPortalProjects({});
+  const [result, times] = await Promise.all([
+    listPortalProjects({}),
+    getPortalResponseTimes({}),
+  ]);
   const recurrenceOf = result.ok
     ? await loadRecurrence(from, result.data)
     : null;
@@ -98,7 +106,11 @@ const PortalReport = async ({
         </div>
       </div>
       {result.ok ? (
-        <PortalReportBody projects={result.data} recurrenceOf={recurrenceOf} />
+        <PortalReportBody
+          projects={result.data}
+          recurrenceOf={recurrenceOf}
+          responseTimes={times.ok ? times.data : null}
+        />
       ) : (
         <div className="panel portal-alert" role="alert">
           Projects could not be loaded. Refresh to try again.

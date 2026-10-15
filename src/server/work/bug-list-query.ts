@@ -3,10 +3,12 @@ import { Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { loadSlaSettings } from "../company/sla-settings";
 import { AppError } from "../core/action-result";
 import type { BugListInput } from "./bug-contracts";
 import { BugListInputSchema } from "./bug-contracts";
 import { BugListSchema, toBugReportItem } from "./bug-management-contracts";
+import { buildSlaView } from "./bug-sla";
 
 const ensureBugListAccess = async (
   actorId: string
@@ -172,31 +174,36 @@ const loadBugListRecords = async (tasks: BugTasks, input: BugListInput) => {
     .limit(200)
     .all();
   const bugIds = bugs.map(({ id }) => id);
-  const [assignees, relations, fixAttempts] = await Promise.all([
-    db.orm.public.TaskAssignee.where((assignment) =>
-      assignment.taskId.in(taskIds)
-    )
-      .select("taskId", "userId")
-      .all(),
-    bugIds.length
-      ? db.orm.public.BugRelation.where((relation) =>
-          or(
-            relation.fromBugReportId.in(bugIds),
-            relation.toBugReportId.in(bugIds)
+  const [assignees, relations, fixAttempts, slas, slaSettings] =
+    await Promise.all([
+      db.orm.public.TaskAssignee.where((assignment) =>
+        assignment.taskId.in(taskIds)
+      )
+        .select("taskId", "userId")
+        .all(),
+      bugIds.length
+        ? db.orm.public.BugRelation.where((relation) =>
+            or(
+              relation.fromBugReportId.in(bugIds),
+              relation.toBugReportId.in(bugIds)
+            )
           )
-        )
-          .select("fromBugReportId", "toBugReportId")
-          .all()
-      : [],
-    bugIds.length
-      ? db.orm.public.BugFixAttempt.where((attempt) =>
-          attempt.bugReportId.in(bugIds)
-        )
-          .orderBy((attempt) => attempt.createdAt.desc())
-          .all()
-      : [],
-  ]);
-  return { assignees, bugs, fixAttempts, relations };
+            .select("fromBugReportId", "toBugReportId")
+            .all()
+        : [],
+      bugIds.length
+        ? db.orm.public.BugFixAttempt.where((attempt) =>
+            attempt.bugReportId.in(bugIds)
+          )
+            .orderBy((attempt) => attempt.createdAt.desc())
+            .all()
+        : [],
+      bugIds.length
+        ? db.orm.public.BugSla.where((sla) => sla.bugId.in(bugIds)).all()
+        : [],
+      loadSlaSettings(db),
+    ]);
+  return { assignees, bugs, fixAttempts, relations, slaSettings, slas };
 };
 
 type BugListRecords = Awaited<ReturnType<typeof loadBugListRecords>>;
@@ -254,6 +261,11 @@ const toBugListRows = (
   tasks: BugTasks,
   projectById: BugProjectMap
 ): typeof BugListSchema.Type => {
+  const slaByBug = new Map(records.slas.map((sla) => [sla.bugId, sla]));
+  const slaFor = (bugId: string) => {
+    const sla = slaByBug.get(bugId);
+    return sla ? buildSlaView(sla, records.slaSettings, new Date()) : null;
+  };
   const { latestAttemptByBug, latestVerifiedFixByBug } = indexFixAttempts(
     records.fixAttempts
   );
@@ -282,6 +294,7 @@ const toBugListRows = (
       priority: task.priority,
       projectName: project.name,
       relatedBugIds: [...(relatedByBug.get(bug.id) ?? [])],
+      sla: slaFor(bug.id),
     });
   }
   return Schema.decodeUnknownSync(Schema.toType(BugListSchema))(rows);

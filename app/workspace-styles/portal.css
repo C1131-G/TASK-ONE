@@ -833,3 +833,12 @@
     min-height: 40px;
   }
 }
+.portal-app .portal-response-note {
+  margin: 8px 0 0;
+  color: var(--muted-foreground, var(--text));
+  font-size: var(--fs);
+}
+.portal-app .portal-notice.portal-response-note {
+  margin: 0 0 14px;
+  color: var(--text);
+}

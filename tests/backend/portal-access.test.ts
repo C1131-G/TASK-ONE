@@ -36,6 +36,11 @@ const portalActions: readonly ActionEntry[] = [
   entry("listPortalBugs", portalQueries.listPortalBugs, () => ({})),
   entry("getPortalBug", portalQueries.getPortalBug, bug),
   entry(
+    "getPortalResponseTimes",
+    portalQueries.getPortalResponseTimes,
+    () => ({})
+  ),
+  entry(
     "listPortalNotifications",
     portalQueries.listPortalNotifications,
     () => ({})

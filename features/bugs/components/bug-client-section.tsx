@@ -22,6 +22,7 @@ import {
 } from "@/features/bugs/components/bug-client-dialogs";
 import { BugPickForm } from "@/features/bugs/components/bug-pick-form";
 
+import { slaClockText } from "../bug-sla-format";
 import { formatBugDate } from "../bug-workflow-ui-shared";
 import type { BugHistory } from "../bug-workflow-ui-shared";
 
@@ -101,6 +102,30 @@ const ClientOutcomeFacts = ({
         <dd>{resolutionText}</dd>
       </div>
     ) : null}
+  </>
+);
+
+const SlaFacts = ({
+  sla,
+}: {
+  readonly sla: NonNullable<NonNullable<BugHistory["clientReport"]>["sla"]>;
+}) => (
+  <>
+    {(
+      [
+        ["First response", sla.firstResponse],
+        ["Resolution", sla.resolution],
+      ] as const
+    ).map(([label, clock]) => (
+      <div key={label}>
+        <dt>{label}</dt>
+        <dd>
+          <span className={`bug-sla-text bug-sla-${clock.state}`}>
+            {slaClockText(clock)}
+          </span>
+        </dd>
+      </div>
+    ))}
   </>
 );
 
@@ -222,6 +247,7 @@ export const BugClientSection = ({
             </dd>
           </div>
         ) : null}
+        {report.sla ? <SlaFacts sla={report.sla} /> : null}
         <ClientOutcomeFacts report={report} resolutionText={resolutionText} />
       </dl>
       {bug.needsReassignment ? (

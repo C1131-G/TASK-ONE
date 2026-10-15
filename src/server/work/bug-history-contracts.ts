@@ -3,6 +3,7 @@ import { Schema } from "effect";
 import { UUIDSchema } from "../core/input-schemas";
 import { BugEnvironmentSchema } from "./bug-contracts";
 import { BugReportItemSchema } from "./bug-management";
+import { SlaViewSchema } from "./bug-management-contracts";
 
 const BugEvidenceHistorySchema = Schema.Struct({
   caption: Schema.String,
@@ -75,6 +76,7 @@ export const BugHistorySchema = Schema.Struct({
       resolution: Schema.NullOr(Schema.String),
       satisfaction: Schema.NullOr(Schema.Literals(["up", "down"])),
       satisfactionComment: Schema.NullOr(Schema.String),
+      sla: Schema.NullOr(SlaViewSchema),
     })
   ),
   evidence: Schema.Array(BugEvidenceHistorySchema),

@@ -25,6 +25,7 @@ const replayedMutations = new Set([
   "changeEmployeeRoleAction",
   "changeTaskColumnAction",
   "createClientCompanyAction",
+  "updateSlaSettingsAction",
   "deactivateClientCompanyAction",
   "reactivateClientCompanyAction",
   "setClientCompanyHandlersAction",

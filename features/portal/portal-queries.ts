@@ -9,6 +9,7 @@ import {
   PortalBugs,
   PortalNotificationListSchema,
   PortalProjectSchema,
+  PortalResponseTimesSchema,
 } from "@/src/server/portal/portal-contracts";
 
 import { runPortalAction, toPortalActor } from "./portal-action-runner";
@@ -59,4 +60,16 @@ export const listPortalNotifications = async (input: unknown) =>
         return yield* bugs.listNotifications(toPortalActor(user));
       }),
     PortalNotificationListSchema
+  );
+
+export const getPortalResponseTimes = async (input: unknown) =>
+  await runPortalAction(
+    input,
+    Schema.Struct({}),
+    (user) =>
+      Effect.gen(function* getPortalResponseTimesProgram() {
+        const bugs = yield* PortalBugs;
+        return yield* bugs.responseTimes(toPortalActor(user));
+      }),
+    PortalResponseTimesSchema
   );

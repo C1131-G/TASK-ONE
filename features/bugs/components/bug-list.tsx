@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { BugPickDialog } from "@/features/bugs/components/bug-pick-dialog";
+import { BugSlaChip } from "@/features/bugs/components/bug-sla-chip";
 import { useTaskDrawer } from "@/features/tasks/components/task-drawer";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
@@ -45,6 +46,8 @@ const impactLabel = {
 } as const;
 
 const DAY_MS = 86_400_000;
+
+const CLOSED_STATUSES = new Set(["closed", "duplicate", "withdrawn"]);
 
 const ageLabel = (discoveredAt: string): string => {
   const days = Math.floor((Date.now() - Date.parse(discoveredAt)) / DAY_MS);
@@ -87,6 +90,9 @@ export const BugCard = ({
               >
                 {impactLabel[bug.clientImpact]}
               </span>
+            ) : null}
+            {bugEntry.sla && !CLOSED_STATUSES.has(bug.status) ? (
+              <BugSlaChip sla={bugEntry.sla} />
             ) : null}
             {relatedBugIds.length > 0 ? (
               <span className="bug-related-count">

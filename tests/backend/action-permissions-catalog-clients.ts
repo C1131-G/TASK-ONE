@@ -4,6 +4,8 @@ import { ids, nextKey } from "./support/action-harness";
 
 const clients = await import("../../features/clients/clients-actions");
 const clientQueries = await import("../../features/clients/clients-queries");
+const slaActions = await import("../../features/company/sla-actions");
+const slaQueries = await import("../../features/company/sla-queries");
 
 export const clientActionCatalog: readonly ActionEntry[] = [
   entry("listClientCompanies", clientQueries.listClientCompanies, () => ({})),
@@ -65,6 +67,20 @@ export const clientActionCatalog: readonly ActionEntry[] = [
   })),
   entry("unlockUserAction", clients.unlockUserAction, () => ({
     userId: ids.employeeId,
+  })),
+  entry("getSlaSettings", slaQueries.getSlaSettings, () => ({})),
+  entry("updateSlaSettingsAction", slaActions.updateSlaSettingsAction, () => ({
+    businessDays: [1, 2, 3, 4, 5],
+    businessEndMinute: 1080,
+    businessStartMinute: 540,
+    businessTimeZone: null,
+    idempotencyKey: nextKey(),
+    slaTargets: {
+      high: { firstResponseMinutes: 240, resolutionMinutes: 1440 },
+      low: { firstResponseMinutes: 1440, resolutionMinutes: 14_400 },
+      medium: { firstResponseMinutes: 480, resolutionMinutes: 4800 },
+      urgent: { firstResponseMinutes: 60, resolutionMinutes: 480 },
+    },
   })),
 ];
 

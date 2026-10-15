@@ -6,6 +6,7 @@ import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
 import type { BugRelationInput } from "./bug-contracts";
 import { BugWorkflowStatusSchema } from "./bug-contracts";
+import { slaOnStatusChange } from "./bug-sla";
 import type { Transaction } from "./work-internal";
 
 export const BugWorkflowReceiptSchema = Schema.Struct({
@@ -268,6 +269,12 @@ export const updateBugStatus = async (
   if (!taskUpdated) {
     conflict();
   }
+  await slaOnStatusChange(transaction, {
+    bugId: input.bug.id,
+    from: input.bug.status,
+    now: input.now,
+    to: input.nextStatus,
+  });
   await writeActivity(transaction, {
     action: "bug.status_changed",
     actorId: input.actorId,

@@ -13,7 +13,11 @@ import { PortalStatusChip } from "@/features/portal/components/portal-status-chi
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
 import { impactText } from "@/features/portal/portal-format";
-import { getPortalBug } from "@/features/portal/portal-queries";
+import {
+  getPortalBug,
+  getPortalResponseTimes,
+} from "@/features/portal/portal-queries";
+import { usuallyRespondText } from "@/features/portal/portal-response-time";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
 
 const isHttpUrl = (value: string) => {
@@ -133,6 +137,11 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
   }
   const bug = result.data;
   const readOnly = !bug.canEdit;
+  const awaitingResponse =
+    (bug.status === "submitted" || bug.status === "acknowledged") &&
+    bug.firstResponse.respondedAt === null &&
+    bug.firstResponse.targetMinutes !== null;
+  const times = awaitingResponse ? await getPortalResponseTimes({}) : null;
   return (
     <div className="portal-detail">
       <Link className="portal-back" href="/portal">
@@ -155,6 +164,13 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           </span>
         </div>
       </header>
+      {awaitingResponse &&
+      times?.ok &&
+      bug.firstResponse.targetMinutes !== null ? (
+        <output className="portal-notice portal-response-note">
+          {usuallyRespondText(bug.firstResponse.targetMinutes, times.data)}
+        </output>
+      ) : null}
       <PortalLifecycleBanner bug={bug} />
       {readOnly && !hasLifecycleBanner(bug) ? (
         <p className="portal-banner" role="note">

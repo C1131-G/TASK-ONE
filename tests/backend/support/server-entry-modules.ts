@@ -6,6 +6,8 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/clients/clients-actions"),
   import("../../../features/clients/clients-queries"),
   import("../../../features/company/company-actions"),
+  import("../../../features/company/sla-actions"),
+  import("../../../features/company/sla-queries"),
   import("../../../features/discovery/discovery-actions"),
   import("../../../features/files/files-actions"),
   import("../../../features/notifications/notifications-actions"),

@@ -56,6 +56,7 @@ import "./overview-panels.css";
 import "./task-views-responsive.css";
 import "./favorites.css";
 import "./settings-workspace.css";
+import "./settings-sla.css";
 import "./members.css";
 import "./member-profile.css";
 import "./member-profile-responsive.css";

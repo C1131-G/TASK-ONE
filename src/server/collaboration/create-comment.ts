@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { notifyUsers } from "../notifications/notify-users";
+import { markFirstResponse } from "../work/bug-sla";
 import type { CommentVisibility, CreatedComment } from "./contracts";
 import { mapError, uuidSchema, extractMentionIds } from "./internal";
 
@@ -202,6 +203,10 @@ export const createCommentInTransaction = async (
     projectId: task.projectId,
     taskId,
   });
+  if (visibility === "public" && actor.role !== "client" && bug) {
+    // The team's first public reply answers the client.
+    await markFirstResponse(transaction, bug.id, createdAt);
+  }
   const snippet = body.slice(0, 240);
   const staffUrl = bug ? `/bugs/${bug.id}` : `/tasks/${taskId}`;
   await notifyUsers(transaction, {

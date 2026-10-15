@@ -4,6 +4,7 @@ model BugSla {
   bugId               Uuid @id
   firstResponseDueAt  TimestamptzJsDate
   firstRespondedAt    TimestamptzJsDate?
+  resolutionStartedAt TimestamptzJsDate @default(now())
   resolutionDueAt     TimestamptzJsDate
   resolvedAt          TimestamptzJsDate?
   pausedAt            TimestamptzJsDate?

@@ -44,6 +44,7 @@ import { PORTAL_MAX_FILES_PER_BUG } from "@/features/portal/portal-upload-rules"
 import type {
   PortalBugDetail,
   PortalProject,
+  PortalResponseTimes,
 } from "@/src/server/portal/portal-contracts";
 
 type Mode =
@@ -52,6 +53,7 @@ type Mode =
       readonly projects: readonly PortalProject[];
       // A closed bug being reported again; its fields prefill the form.
       readonly recurrenceOf?: PortalBugDetail;
+      readonly responseTimes?: PortalResponseTimes | null;
     }
   | {
       readonly kind: "edit";
@@ -291,6 +293,7 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
         errors={errors}
         onPatch={patch}
         pending={pending}
+        responseTimes={mode.kind === "create" ? mode.responseTimes : null}
         value={values.impact}
       />
       <EnvironmentFields

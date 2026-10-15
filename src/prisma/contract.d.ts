@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'8314e79f5bf578c3f197f6956169c1816915afffd19b0d8c13ccdb6effb49296'>;
+  StorageHashBase<'15e177bc3628643bbddfcbefce631baf5a64f6750a45ca10c460ab21e7d92fdc'>;
 export type ExecutionHash =
   ExecutionHashBase<'eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651'>;
 export type ProfileHash =
@@ -415,6 +415,7 @@ export type FieldOutputTypes = {
       readonly pausedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly pausedBusinessMs: CodecTypes['pg/int4@1']['output'];
       readonly resolutionDueAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly resolutionStartedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly resolvedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly warnedResolution: CodecTypes['pg/bool@1']['output'];
@@ -991,6 +992,7 @@ export type FieldInputTypes = {
       readonly pausedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly pausedBusinessMs: CodecTypes['pg/int4@1']['input'];
       readonly resolutionDueAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly resolutionStartedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly resolvedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly warnedResolution: CodecTypes['pg/bool@1']['input'];
@@ -1567,6 +1569,7 @@ export type StorageColumnTypes = {
       readonly pausedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly pausedBusinessMs: CodecTypes['pg/int4@1']['output'];
       readonly resolutionDueAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly resolutionStartedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly resolvedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly warnedResolution: CodecTypes['pg/bool@1']['output'];
@@ -2143,6 +2146,7 @@ export type StorageColumnInputTypes = {
       readonly pausedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly pausedBusinessMs: CodecTypes['pg/int4@1']['input'];
       readonly resolutionDueAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly resolutionStartedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly resolvedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly warnedResolution: CodecTypes['pg/bool@1']['input'];
@@ -2775,6 +2779,7 @@ export namespace Models {
     pausedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     pausedBusinessMs: CodecTypes['pg/int4@1']['output'];
     resolutionDueAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    resolutionStartedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     resolvedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     warnedResolution: CodecTypes['pg/bool@1']['output'];
@@ -4985,6 +4990,13 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly resolutionStartedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly many: false;
                 };
                 readonly resolvedAt: {
@@ -10390,6 +10402,13 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-date@1';
                 };
               };
+              readonly resolutionStartedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
               readonly resolvedAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -10440,6 +10459,7 @@ type ContractBase = Omit<
                 readonly pausedAt: { readonly column: 'pausedAt' };
                 readonly pausedBusinessMs: { readonly column: 'pausedBusinessMs' };
                 readonly resolutionDueAt: { readonly column: 'resolutionDueAt' };
+                readonly resolutionStartedAt: { readonly column: 'resolutionStartedAt' };
                 readonly resolvedAt: { readonly column: 'resolvedAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly warnedResolution: { readonly column: 'warnedResolution' };

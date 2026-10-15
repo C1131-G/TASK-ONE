@@ -118,6 +118,11 @@ export const ClientCompanyDetailSchema = Schema.Struct({
     })
   ),
   satisfaction: Schema.Struct({ down: Schema.Number, up: Schema.Number }),
+  sla: Schema.Struct({
+    resolutionBreaches: Schema.Number,
+    responseBreaches: Schema.Number,
+    tracked: Schema.Number,
+  }),
   users: Schema.Array(ClientCompanyUserSchema),
 });
 

@@ -50,6 +50,7 @@ const SettingsWorkspace = ({
   preferences,
   profile,
   sessions,
+  sla,
   workspace,
 }: {
   readonly canManageWorkspace: boolean;
@@ -58,6 +59,7 @@ const SettingsWorkspace = ({
   readonly preferences: ReactNode;
   readonly profile: ReactNode;
   readonly sessions: ReactNode;
+  readonly sla: ReactNode;
   readonly workspace: ReactNode;
 }) => {
   const { setTheme, theme } = useTheme();
@@ -76,6 +78,9 @@ const SettingsWorkspace = ({
         <TabsTrigger value="sessions">Sessions</TabsTrigger>
         {canManageWorkspace ? (
           <TabsTrigger value="workspace">Workspace</TabsTrigger>
+        ) : null}
+        {canManageWorkspace ? (
+          <TabsTrigger value="sla">SLA &amp; business hours</TabsTrigger>
         ) : null}
       </TabsList>
       <div className="settings-content">
@@ -158,6 +163,17 @@ const SettingsWorkspace = ({
                 <p>Manage company identity and default time zone.</p>
               </div>
               {workspace}
+            </section>
+          </TabsContent>
+        ) : null}
+        {canManageWorkspace ? (
+          <TabsContent value="sla">
+            <section className="panel">
+              <div className="panel-h">
+                <h2>SLA &amp; business hours</h2>
+                <p>Set response and resolution targets for client bugs.</p>
+              </div>
+              {sla}
             </section>
           </TabsContent>
         ) : null}
