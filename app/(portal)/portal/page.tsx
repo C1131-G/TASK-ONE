@@ -1,6 +1,7 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { PortalBugList } from "@/features/portal/components/portal-bug-list";
@@ -16,9 +17,14 @@ const Page = ({ searchParams }: PageProps<"/portal">) => (
   <div className="page">
     <Suspense fallback={<PortalListSkeleton label="Loading company bugs" />}>
       {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {searchParams.then((params) => (
-        <PortalBugList filters={parsePortalBugFilters(params)} />
-      ))}
+      {searchParams.then((params) => {
+        const as = Array.isArray(params["as"]) ? params["as"][0] : params["as"];
+        if (as) {
+          // The documented entry URL for "View as client".
+          redirect(`/portal/preview?as=${encodeURIComponent(as)}` as Route);
+        }
+        return <PortalBugList filters={parsePortalBugFilters(params)} />;
+      })}
     </Suspense>
   </div>
 );

@@ -3,10 +3,14 @@
 import { Bell } from "@phosphor-icons/react/dist/ssr";
 
 import { PortalNotificationList } from "@/features/portal/components/portal-notification-list";
+import { getPortalCompany } from "@/features/portal/portal-company";
 import { listPortalNotifications } from "@/features/portal/portal-queries";
 
 const PortalNotifications = async () => {
-  const result = await listPortalNotifications({});
+  const [result, company] = await Promise.all([
+    listPortalNotifications({}),
+    getPortalCompany(),
+  ]);
   if (!result.ok) {
     return (
       <div className="panel portal-alert" role="alert">
@@ -39,7 +43,11 @@ const PortalNotifications = async () => {
           </p>
         </div>
       ) : (
-        <PortalNotificationList items={items} unreadCount={unreadCount} />
+        <PortalNotificationList
+          isPreview={Boolean(company?.preview)}
+          items={items}
+          unreadCount={unreadCount}
+        />
       )}
     </>
   );

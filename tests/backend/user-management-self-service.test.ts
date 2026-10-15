@@ -64,6 +64,14 @@ it("creates an employee whose one-time password works with Better Auth", async (
     expect(signIn.user.email).toBe(employeeEmail);
   } finally {
     await authPool.query(
+      'DELETE FROM audit_event WHERE "actorId" = $1 OR "subjectUserId" IN (SELECT id FROM "user" WHERE id = $1 OR "emailNormalized" = $2)',
+      [administratorId, employeeEmail]
+    );
+    await authPool.query(
+      'DELETE FROM audit_event WHERE "actorId" IN (SELECT id FROM "user" WHERE "emailNormalized" = $1)',
+      [employeeEmail]
+    );
+    await authPool.query(
       'DELETE FROM activity WHERE "actorId" = $1 OR details->>\'userId\' IN (SELECT id FROM "user" WHERE id = $1 OR "emailNormalized" = $2)',
       [administratorId, employeeEmail]
     );

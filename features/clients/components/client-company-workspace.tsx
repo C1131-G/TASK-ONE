@@ -100,6 +100,90 @@ const BugSummary = ({
   );
 };
 
+const formatBusinessMinutes = (minutes: number): string => {
+  const total = Math.round(minutes);
+  const days = Math.floor(total / (24 * 60));
+  const hours = Math.floor((total % (24 * 60)) / 60);
+  const mins = total % 60;
+  const parts = [
+    days ? `${days}d` : null,
+    hours ? `${hours}h` : null,
+    mins || total === 0 ? `${mins}m` : null,
+  ].filter(Boolean);
+  return `${parts.join(" ")} of business time`;
+};
+
+const formatPercent = (rate: number | null): string =>
+  rate === null ? "—" : `${Math.round(rate * 100)}%`;
+
+const InsightPanel = ({ detail }: { readonly detail: ClientCompanyDetail }) => {
+  const { insight, satisfaction, sla } = detail;
+  const rated = satisfaction.up + satisfaction.down;
+  const openBugs = detail.bugCounts.filter(
+    ({ count, label }) => isOpenClientLabel(label) && count > 0
+  );
+  return (
+    <section
+      aria-labelledby="client-insight-heading"
+      className="panel clients-panel"
+    >
+      <div className="panel-h clients-panel-h">
+        <div>
+          <h2 id="client-insight-heading">Insight</h2>
+          <p className="muted">
+            Response times, SLA and satisfaction for this client.
+          </p>
+        </div>
+      </div>
+      <dl className="clients-insight-list">
+        <div>
+          <dt>Open bugs</dt>
+          <dd>
+            {openBugs.length ? (
+              openBugs
+                .map(
+                  ({ count, label }) => `${clientStatusText[label]}: ${count}`
+                )
+                .join(" · ")
+            ) : (
+              <small>No open bugs</small>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>Average first response</dt>
+          <dd>
+            {insight.averageFirstResponseMinutes === null
+              ? "No responses yet"
+              : formatBusinessMinutes(insight.averageFirstResponseMinutes)}
+          </dd>
+        </div>
+        <div>
+          <dt>SLA breach rate</dt>
+          <dd>
+            {formatPercent(insight.slaBreachRate)}{" "}
+            <small>
+              {sla.tracked === 0
+                ? "no tracked bugs"
+                : `${sla.tracked} tracked · ${sla.responseBreaches} response, ${sla.resolutionBreaches} resolution breaches`}
+            </small>
+          </dd>
+        </div>
+        <div>
+          <dt>Reopen rate</dt>
+          <dd>{formatPercent(insight.reopenRate)}</dd>
+        </div>
+        <div>
+          <dt>Thumbs-up rate</dt>
+          <dd>
+            {formatPercent(insight.thumbsUpRate)} <small>{rated} rated</small>
+          </dd>
+        </div>
+      </dl>
+    </section>
+  );
+};
+
 const ClientCompanyWorkspace = ({
   detail,
   employeeOptions,
@@ -175,6 +259,7 @@ const ClientCompanyWorkspace = ({
             Handlers <span className="ct">{detail.handlers.length}</span>
           </TabsTrigger>
           <TabsTrigger value="bugs">Bugs summary</TabsTrigger>
+          <TabsTrigger value="insight">Insight</TabsTrigger>
         </TabsList>
         <TabsContent value="users">
           <ClientCompanyUsers
@@ -208,6 +293,9 @@ const ClientCompanyWorkspace = ({
             satisfaction={detail.satisfaction}
             sla={detail.sla}
           />
+        </TabsContent>
+        <TabsContent value="insight">
+          <InsightPanel detail={detail} />
         </TabsContent>
       </Tabs>
     </div>

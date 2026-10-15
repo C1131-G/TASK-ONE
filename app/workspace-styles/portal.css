@@ -842,3 +842,26 @@
   margin: 0 0 14px;
   color: var(--text);
 }
+
+/* Admin "View as client" preview: a persistent, unmissable read-only bar. */
+.portal-app .portal-preview-banner {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 2px solid var(--amber);
+  background: var(--amber-soft);
+  color: var(--text);
+  font-size: var(--fs);
+}
+.portal-app .portal-preview-banner p {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

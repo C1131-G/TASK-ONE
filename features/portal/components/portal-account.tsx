@@ -34,29 +34,44 @@ const PortalAccount = async () => {
             </div>
           </dl>
         </section>
-        <section
-          aria-labelledby="portal-password-h"
-          className="panel portal-panel"
-        >
-          <h2 className="sec" id="portal-password-h">
-            Change password
-          </h2>
-          <PortalChangePassword />
-        </section>
-        <section aria-labelledby="portal-push-h" className="panel portal-panel">
-          <h2 className="sec" id="portal-push-h">
-            Push notifications
-          </h2>
-          <PortalPushControl
-            publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
-          />
-        </section>
-        <section aria-labelledby="portal-out-h" className="panel portal-panel">
-          <h2 className="sec" id="portal-out-h">
-            Sign out
-          </h2>
-          <PortalSignOut />
-        </section>
+        {company?.preview ? (
+          <p className="portal-banner" role="note">
+            Password, push notification and sign-out controls are not available
+            while previewing a client. Use Exit preview above to return.
+          </p>
+        ) : (
+          <>
+            <section
+              aria-labelledby="portal-password-h"
+              className="panel portal-panel"
+            >
+              <h2 className="sec" id="portal-password-h">
+                Change password
+              </h2>
+              <PortalChangePassword />
+            </section>
+            <section
+              aria-labelledby="portal-push-h"
+              className="panel portal-panel"
+            >
+              <h2 className="sec" id="portal-push-h">
+                Push notifications
+              </h2>
+              <PortalPushControl
+                publicKey={process.env["VAPID_PUBLIC_KEY"] ?? ""}
+              />
+            </section>
+            <section
+              aria-labelledby="portal-out-h"
+              className="panel portal-panel"
+            >
+              <h2 className="sec" id="portal-out-h">
+                Sign out
+              </h2>
+              <PortalSignOut />
+            </section>
+          </>
+        )}
       </div>
     </>
   );

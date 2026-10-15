@@ -322,6 +322,17 @@ const ClientUserActions = ({
     <div className="clients-row-actions">
       <div className="clients-row-buttons">
         <ResetPasswordDialog user={user} />
+        {user.active && companyActive ? (
+          // A plain link keeps Next from prefetching the audited preview.
+          // oxlint-disable-next-line nextjs/no-html-link-for-pages
+          <a
+            aria-label={`View as client: ${user.name}`}
+            className="btn btn-sm btn-ghost"
+            href={`/portal/preview?as=${encodeURIComponent(user.id)}`}
+          >
+            View as client
+          </a>
+        ) : null}
         {user.locked ? (
           <WorkspaceButton
             aria-label={`Unlock ${user.name}`}
@@ -393,7 +404,11 @@ const ClientCompanyUsers = ({
     <div className="panel-h clients-panel-h">
       <div>
         <h2 id="client-users-heading">Users</h2>
-        {companyActive ? null : (
+        {companyActive ? (
+          <p className="clients-preview-note">
+            Read-only preview; recorded in the audit log
+          </p>
+        ) : (
           <p className="muted">
             Reactivate the company to add users or restore their access.
           </p>

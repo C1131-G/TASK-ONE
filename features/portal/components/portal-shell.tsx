@@ -21,6 +21,28 @@ const PortalCompanyName = async () => {
   );
 };
 
+const PortalPreviewBanner = async () => {
+  const company = await getPortalCompany();
+  if (!company?.preview) {
+    return null;
+  }
+  return (
+    <output className="portal-preview-banner">
+      <p>
+        <strong>
+          Previewing as {company.userName} ({company.companyName}) — read only.
+        </strong>{" "}
+        Changes are disabled and your visit is recorded.
+      </p>
+      {/* A plain anchor: the exit route redirects out of the portal and must not be prefetched. */}
+      {/* oxlint-disable-next-line next/no-html-link-for-pages, react-doctor/nextjs-no-a-element -- The exit route is a handler that must be a full navigation. */}
+      <a className="btn btn-secondary btn-sm" href="/portal/preview?exit=1">
+        Exit preview
+      </a>
+    </output>
+  );
+};
+
 const PortalNavWithCount = async () => {
   const result = await listPortalNotifications({});
   return <PortalNav unreadCount={result.ok ? result.data.unreadCount : 0} />;
@@ -50,6 +72,9 @@ const PortalShell = ({ children }: { readonly children: ReactNode }) => (
         </Suspense>
       </div>
     </header>
+    <Suspense fallback={null}>
+      <PortalPreviewBanner />
+    </Suspense>
     <main className="portal-main" id="portal-main" tabIndex={-1}>
       {children}
     </main>

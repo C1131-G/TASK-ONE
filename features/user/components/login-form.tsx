@@ -25,7 +25,7 @@ const subscribeHydration = (onStoreChange: () => void) => {
 const getHydratedSnapshot = () => true;
 const getServerHydrationSnapshot = () => false;
 
-const LoginForm = () => {
+const LoginForm = ({ notice = "" }: { readonly notice?: string }) => {
   const router = useRouter();
   const passwordRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState(false);
@@ -76,6 +76,7 @@ const LoginForm = () => {
 
   return (
     <>
+      {notice ? <output className="auth-notice">{notice}</output> : null}
       <AuthAlert id="login-error" message={error} />
       <form
         className="auth-form"

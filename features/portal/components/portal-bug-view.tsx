@@ -12,6 +12,7 @@ import { PortalLifecycleBanner } from "@/features/portal/components/portal-lifec
 import { PortalStatusChip } from "@/features/portal/components/portal-status-chip";
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
+import { getPortalCompany } from "@/features/portal/portal-company";
 import { impactText } from "@/features/portal/portal-format";
 import {
   getPortalBug,
@@ -120,7 +121,11 @@ const BugSections = ({ bug }: { readonly bug: PortalBugDetail }) => {
 };
 
 const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
-  const result = await getPortalBug({ bugId });
+  const [result, company] = await Promise.all([
+    getPortalBug({ bugId }),
+    getPortalCompany(),
+  ]);
+  const isPreview = Boolean(company?.preview);
   if (!result.ok) {
     if (
       ["NOT_FOUND", "FORBIDDEN", "VALIDATION_FAILED"].includes(
@@ -135,7 +140,22 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
       </div>
     );
   }
-  const bug = result.data;
+  // Preview is read only: every capability the server reports is turned off
+  // so no mutating control renders. The server refuses these actions anyway.
+  const bug: PortalBugDetail = isPreview
+    ? {
+        ...result.data,
+        canAttach: false,
+        canComment: false,
+        canEdit: false,
+        canWithdraw: false,
+        lifecycle: {
+          ...result.data.lifecycle,
+          canRate: false,
+          canReportAgain: false,
+        },
+      }
+    : result.data;
   const readOnly = !bug.canEdit;
   const awaitingResponse =
     (bug.status === "submitted" || bug.status === "acknowledged") &&
@@ -171,8 +191,13 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           {usuallyRespondText(bug.firstResponse.targetMinutes, times.data)}
         </output>
       ) : null}
-      <PortalLifecycleBanner bug={bug} />
-      {readOnly && !hasLifecycleBanner(bug) ? (
+      <PortalLifecycleBanner bug={bug} isPreview={isPreview} />
+      {isPreview ? (
+        <p className="portal-banner" role="note">
+          Editing, comments, attachments and replies are disabled in preview.
+        </p>
+      ) : null}
+      {readOnly && !isPreview && !hasLifecycleBanner(bug) ? (
         <p className="portal-banner" role="note">
           {readOnlyMessage(bug)}
         </p>

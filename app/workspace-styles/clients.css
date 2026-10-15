@@ -365,3 +365,89 @@
   font-size: var(--fs-sm);
   margin: 0;
 }
+
+/* audit log + insight */
+.workspace-app .audit-locked-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workspace-app .audit-locked-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .audit-locked-info {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+.workspace-app .audit-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+.workspace-app .audit-filters .field {
+  min-width: 140px;
+}
+.workspace-app .audit-filter-actions {
+  display: flex;
+  gap: 8px;
+}
+.workspace-app .audit-table {
+  min-width: 960px;
+}
+.workspace-app .audit-details {
+  display: grid;
+  margin: 0;
+  gap: 2px;
+  font-size: var(--fs-sm);
+}
+.workspace-app .audit-details dt,
+.workspace-app .audit-details dd {
+  display: inline;
+  margin: 0;
+}
+.workspace-app .audit-details dt {
+  color: var(--text-3);
+}
+.workspace-app .clients-insight-list {
+  display: grid;
+  margin: 0;
+  gap: 0;
+}
+.workspace-app .clients-insight-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .clients-insight-list dt {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.workspace-app .clients-insight-list dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.workspace-app .clients-insight-list small {
+  color: var(--text-3);
+  font-weight: 400;
+}
+.workspace-app .clients-preview-note {
+  margin: 4px 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs, var(--fs-sm));
+}

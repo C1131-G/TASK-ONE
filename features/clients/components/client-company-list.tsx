@@ -45,6 +45,9 @@ const ClientCompanyList = async () => {
           </p>
         </div>
         <div className="acts">
+          <Link className="btn btn-secondary btn-sm" href="/clients/audit">
+            Audit log
+          </Link>
           <ClientCompanyCreateForm />
         </div>
       </div>

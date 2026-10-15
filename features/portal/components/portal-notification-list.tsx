@@ -16,9 +16,11 @@ import type { PortalNotificationList as PortalNotificationData } from "@/src/ser
 type Item = PortalNotificationData["items"][number];
 
 const PortalNotificationList = ({
+  isPreview = false,
   items,
   unreadCount,
 }: {
+  readonly isPreview?: boolean;
   readonly items: readonly Item[];
   readonly unreadCount: number;
 }) => {
@@ -28,6 +30,9 @@ const PortalNotificationList = ({
   const [readIds, setReadIds] = useState<ReadonlySet<string>>(new Set());
 
   const markOne = async (id: string) => {
+    if (isPreview) {
+      return;
+    }
     setError("");
     try {
       const result = await markPortalNotificationReadAction({
@@ -74,8 +79,9 @@ const PortalNotificationList = ({
         <div className="acts">
           <button
             className="btn btn-secondary btn-sm"
-            disabled={busy || remaining === 0}
+            disabled={isPreview || busy || remaining === 0}
             onClick={markAll}
+            title={isPreview ? "Disabled in preview" : undefined}
             type="button"
           >
             {busy ? "Marking…" : "Mark all as read"}
@@ -130,7 +136,7 @@ const PortalNotificationList = ({
               ) : (
                 <div className="portal-notif-main">{body}</div>
               )}
-              {unread ? (
+              {unread && !isPreview ? (
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={() => markOne(item.id)}

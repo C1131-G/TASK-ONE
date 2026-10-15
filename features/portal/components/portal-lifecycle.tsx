@@ -22,7 +22,13 @@ const closedText = {
 const latestTeamComment = (bug: PortalBugDetail) =>
   bug.comments.findLast((comment) => comment.isTeam)?.body ?? null;
 
-const QuestionBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
+const QuestionBanner = ({
+  bug,
+  isPreview,
+}: {
+  readonly bug: PortalBugDetail;
+  readonly isPreview: boolean;
+}) => {
   const { question } = bug.lifecycle;
   if (!question) {
     return null;
@@ -43,7 +49,11 @@ const QuestionBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
       {bug.canComment ? (
         <ReplyBox bugId={bug.id} />
       ) : (
-        <p className="hint">Replies are closed on this bug.</p>
+        <p className="hint">
+          {isPreview
+            ? "Replying is disabled in preview."
+            : "Replies are closed on this bug."}
+        </p>
       )}
       <p className="hint">
         If we don&apos;t hear back, we&apos;ll close this bug automatically
@@ -53,7 +63,13 @@ const QuestionBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
   );
 };
 
-const VerifyBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
+const VerifyBanner = ({
+  bug,
+  isPreview,
+}: {
+  readonly bug: PortalBugDetail;
+  readonly isPreview: boolean;
+}) => {
   const { verification } = bug.lifecycle;
   if (!verification) {
     return null;
@@ -69,7 +85,11 @@ const VerifyBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
         We believe this is fixed (since <PortalTime iso={verification.since} />
         ). Please check it and let us know.
       </p>
-      <VerifyActions bug={bug} />
+      {isPreview ? (
+        <p className="hint">Confirming is disabled in preview.</p>
+      ) : (
+        <VerifyActions bug={bug} />
+      )}
       <p className="hint">
         If we don&apos;t hear back, we&apos;ll close this bug automatically
         after 7 days.
@@ -159,13 +179,19 @@ const MergedPanel = ({
   </section>
 );
 
-const PortalLifecycleBanner = ({ bug }: { readonly bug: PortalBugDetail }) => {
+const PortalLifecycleBanner = ({
+  bug,
+  isPreview = false,
+}: {
+  readonly bug: PortalBugDetail;
+  readonly isPreview?: boolean;
+}) => {
   const { lifecycle } = bug;
   if (lifecycle.question) {
-    return <QuestionBanner bug={bug} />;
+    return <QuestionBanner bug={bug} isPreview={isPreview} />;
   }
   if (lifecycle.verification) {
-    return <VerifyBanner bug={bug} />;
+    return <VerifyBanner bug={bug} isPreview={isPreview} />;
   }
   if (lifecycle.duplicateOf) {
     return <MergedPanel duplicateOf={lifecycle.duplicateOf} />;

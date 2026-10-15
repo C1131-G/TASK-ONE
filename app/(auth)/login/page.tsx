@@ -18,7 +18,10 @@ const CHANGE_PASSWORD_PATH: Route<"/change-password"> = "/change-password";
 const WORKSPACE_PATH: Route = "/";
 const PORTAL_PATH: Route = "/portal";
 
-const LoginRedirect = async () => {
+const INACTIVITY_NOTICE =
+  "You were signed out after 2 hours of inactivity. Sign in again to continue.";
+
+const LoginRedirect = async ({ notice }: { readonly notice: string }) => {
   const session = await getPageSession();
   if (session.kind === "authenticated") {
     if (session.user.mustChangePassword) {
@@ -26,17 +29,26 @@ const LoginRedirect = async () => {
     }
     redirect(session.user.role === "client" ? PORTAL_PATH : WORKSPACE_PATH);
   }
-  return <LoginForm />;
+  return <LoginForm notice={notice} />;
 };
 
-const Page = () => (
+const Page = ({ searchParams }: PageProps<"/login">) => (
   <AuthCard
     description="Sign in to your Metsys workspace"
     title="Welcome back"
     titleId="login-title"
   >
     <Suspense fallback={<LoginFormSkeleton />}>
-      <LoginRedirect />
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+      {searchParams.then(({ reason }) => (
+        <LoginRedirect
+          notice={
+            (Array.isArray(reason) ? reason[0] : reason) === "inactivity"
+              ? INACTIVITY_NOTICE
+              : ""
+          }
+        />
+      ))}
     </Suspense>
   </AuthCard>
 );

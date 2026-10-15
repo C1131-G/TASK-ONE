@@ -55,6 +55,10 @@ it("bootstraps the first admin once with a forced password change", async () => 
     expect(second).toMatchObject({ error: { code: "CONFLICT" }, ok: false });
   } finally {
     await authPool.query(
+      'DELETE FROM audit_event WHERE "actorId" IN (SELECT id FROM "user" WHERE "emailNormalized" = $1) OR "subjectUserId" IN (SELECT id FROM "user" WHERE "emailNormalized" = $1)',
+      [email]
+    );
+    await authPool.query(
       'DELETE FROM activity WHERE "actorId" IN (SELECT id FROM "user" WHERE "emailNormalized" = $1)',
       [email]
     );
@@ -110,6 +114,10 @@ it("lets admins update an employee's login email, title, and optional team", asy
       teamId,
     });
   } finally {
+    await authPool.query(
+      'DELETE FROM audit_event WHERE "actorId" = ANY($1::text[]) OR "subjectUserId" = ANY($1::text[])',
+      [[administratorId, employeeId]]
+    );
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       administratorId,
     ]);

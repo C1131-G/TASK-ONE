@@ -3,6 +3,7 @@
 import { FolderSimple } from "@phosphor-icons/react/dist/ssr";
 
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
+import { getPortalCompany } from "@/features/portal/portal-company";
 import {
   getPortalBug,
   getPortalResponseTimes,
@@ -87,6 +88,21 @@ const PortalReport = async ({
 }: {
   readonly from: string | undefined;
 }) => {
+  const company = await getPortalCompany();
+  if (company?.preview) {
+    return (
+      <>
+        <div className="ph">
+          <div>
+            <h1>Report a bug</h1>
+          </div>
+        </div>
+        <p className="portal-banner" role="note">
+          Reporting is disabled in preview.
+        </p>
+      </>
+    );
+  }
   const [result, times] = await Promise.all([
     listPortalProjects({}),
     getPortalResponseTimes({}),
