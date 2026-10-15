@@ -24,7 +24,9 @@ export const BugReportItemSchema = Schema.Struct({
   environment: BugEnvironmentSchema,
   expectedBehavior: Schema.String,
   id: UUIDSchema,
+  needsReassignment: Schema.Boolean,
   os: Schema.NullOr(Schema.String),
+  pickedById: Schema.NullOr(Schema.String),
   projectId: UUIDSchema,
   projectKey: Schema.String,
   projectTaskNumber: Schema.Number.check(
@@ -71,7 +73,9 @@ export const toBugReportItem = (
     readonly environment: BugReportInput["environment"];
     readonly expectedBehavior: string;
     readonly id: string;
+    readonly needsReassignment: boolean;
     readonly os: string | null;
+    readonly pickedById: string | null;
     readonly projectId: string;
     readonly reproductionSteps: readonly string[];
     readonly reporterId: string;

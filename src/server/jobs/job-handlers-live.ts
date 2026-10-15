@@ -1,5 +1,7 @@
 import { Effect, Layer, Schema } from "effect";
 
+import { db } from "@/src/prisma/db";
+
 import { AppError } from "../core/action-result";
 import {
   PushNotifications,
@@ -9,6 +11,10 @@ import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
+import {
+  UNPICKED_REMINDER_JOB,
+  remindUnpickedClientBug,
+} from "../work/bug-workflow-pick";
 import { JobHandlers } from "./job-handlers";
 
 const EmptyPayloadSchema = Schema.Struct({});
@@ -45,6 +51,9 @@ const FileCopyPayloadSchema = Schema.Struct({
         : "Copies must target private file storage."
     )
   ),
+});
+const UnpickedReminderPayloadSchema = Schema.Struct({
+  bugId: Schema.String.check(Schema.isUUID()),
 });
 const PushDeliveryPayloadSchema = Schema.Struct({
   actorId: Schema.String,
@@ -122,6 +131,32 @@ export const JobHandlersLive = Layer.effect(
                   targetKey
                 )
             )
+          );
+        }
+        if (kind === UNPICKED_REMINDER_JOB) {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The unpicked-bug reminder payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(UnpickedReminderPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ bugId }) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The unpicked-bug reminder could not be sent.",
+                  }),
+                try: () =>
+                  db.transaction((transaction) =>
+                    remindUnpickedClientBug(transaction, bugId)
+                  ),
+              })
+            ),
+            Effect.asVoid
           );
         }
         if (kind === "notifications.deliver-push") {

@@ -7,6 +7,8 @@ import type {
   BugApprovalDecisionInput,
   BugEvidenceInput,
   BugFixAttemptInput,
+  BugPickInput,
+  BugReassignInput,
   BugPostReleaseCheckInput,
   BugRelationInput,
   BugReleaseInput,
@@ -23,6 +25,7 @@ import {
   addFixAttempt,
   recordVerification,
 } from "./bug-workflow-investigation";
+import { pickClientBug, reassignClientBug } from "./bug-workflow-pick";
 import { postReleaseCheck, recordRelease } from "./bug-workflow-release";
 import { addBugRelation, triageBug } from "./bug-workflow-triage";
 import type { Transaction } from "./work-internal";
@@ -51,6 +54,14 @@ export class BugWorkflowManagement extends Context.Service<
     readonly triage: (
       actorId: string,
       input: BugTriageInput
+    ) => Effect.Effect<BugWorkflowReceipt, AppError>;
+    readonly pick: (
+      actorId: string,
+      input: BugPickInput
+    ) => Effect.Effect<BugWorkflowReceipt, AppError>;
+    readonly reassign: (
+      actorId: string,
+      input: BugReassignInput
     ) => Effect.Effect<BugWorkflowReceipt, AppError>;
     readonly relate: (
       actorId: string,
@@ -117,7 +128,9 @@ export const BugWorkflowManagementLive = Layer.succeed(
     addFixAttempt: operation(addFixAttempt),
     archive: operation(archiveBug),
     decideApproval: operation(decideApproval),
+    pick: operation(pickClientBug),
     postReleaseCheck: operation(postReleaseCheck),
+    reassign: operation(reassignClientBug),
     recordRelease: operation(recordRelease),
     relate: operation(addBugRelation),
     reopen: operation(reopenBug),

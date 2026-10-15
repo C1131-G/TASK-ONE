@@ -76,6 +76,30 @@ const assertCommentAllowed = (
   }
 };
 
+// A client bug belongs to whoever picked it up: other employees follow along
+// but do not comment.
+const assertHandlerMayComment = async (
+  transaction: Transaction,
+  actor: { readonly id: string; readonly role: string },
+  taskId: string,
+  bug: { readonly clientCompanyId: string | null } | null
+): Promise<void> => {
+  if (!bug?.clientCompanyId || actor.role !== "employee") {
+    return;
+  }
+  const assignment = await transaction.orm.public.TaskAssignee.where({
+    taskId,
+    userId: actor.id,
+  })
+    .select("userId")
+    .first();
+  if (!assignment) {
+    throw forbidden(
+      "Only the assigned handler or an admin can comment on a client bug."
+    );
+  }
+};
+
 // Adds a comment and notifies the right people. Internal comments never reach
 // a client; public comments are the only ones a client can see or write.
 export const createCommentInTransaction = async (
@@ -130,6 +154,12 @@ export const createCommentInTransaction = async (
     .select("id", "clientCompanyId", "reporterId", "status")
     .first();
   assertCommentAllowed(actor, bug, visibility);
+  await assertHandlerMayComment(
+    transaction,
+    { id: actorId, role: actor.role },
+    taskId,
+    bug
+  );
   if (mentionIds.length > 0) {
     const mentioned = await transaction.orm.public.User.where((user) =>
       and(

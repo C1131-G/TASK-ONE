@@ -59,6 +59,17 @@ export const BugHistorySchema = Schema.Struct({
   ),
   attempts: Schema.Array(BugAttemptHistorySchema),
   bug: BugReportItemSchema,
+  // Set for client reports: who they came from and who has picked them up.
+  clientReport: Schema.NullOr(
+    Schema.Struct({
+      canPick: Schema.Boolean,
+      companyId: UUIDSchema,
+      companyName: Schema.String,
+      pickedAt: Schema.NullOr(Schema.String),
+      pickedByName: Schema.NullOr(Schema.String),
+      reopenCount: Schema.Number,
+    })
+  ),
   evidence: Schema.Array(BugEvidenceHistorySchema),
   priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
   relations: Schema.Array(

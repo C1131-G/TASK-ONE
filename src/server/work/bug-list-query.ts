@@ -8,9 +8,11 @@ import type { BugListInput } from "./bug-contracts";
 import { BugListInputSchema } from "./bug-contracts";
 import { BugListSchema, toBugReportItem } from "./bug-management-contracts";
 
-const ensureBugListAccess = async (actorId: string): Promise<void> => {
+const ensureBugListAccess = async (
+  actorId: string
+): Promise<{ readonly role: string }> => {
   const actor = await db.orm.public.User.where({ id: actorId })
-    .select("deactivatedAt", "mustChangePassword")
+    .select("deactivatedAt", "mustChangePassword", "role")
     .first();
   if (!actor || actor.deactivatedAt) {
     throw new AppError({
@@ -24,6 +26,45 @@ const ensureBugListAccess = async (actorId: string): Promise<void> => {
       message: "Change your password before continuing.",
     });
   }
+  if (actor.role === "client") {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "This area is only available to workspace members.",
+    });
+  }
+  return { role: actor.role };
+};
+
+// Tasks of client reports nobody has picked yet. A handler sees only their
+// own companies' reports; an admin sees every company's.
+const findClientQueueTaskIds = async (
+  actorId: string,
+  role: string
+): Promise<string[]> => {
+  let companyFilter: string[] | null = null;
+  if (role !== "admin") {
+    const handled = await db.orm.public.ClientCompanyHandler.where({
+      employeeId: actorId,
+    })
+      .select("companyId")
+      .all();
+    companyFilter = handled.map(({ companyId }) => companyId);
+    if (companyFilter.length === 0) {
+      return [];
+    }
+  }
+  const queued = await db.orm.public.BugReport.where((bug) =>
+    and(
+      bug.clientCompanyId.isNotNull(),
+      bug.pickedById.isNull(),
+      bug.status.eq("reported"),
+      ...(companyFilter ? [bug.clientCompanyId.in(companyFilter)] : [])
+    )
+  )
+    .select("taskId")
+    .limit(200)
+    .all();
+  return queued.map(({ taskId }) => taskId);
 };
 
 const findMatchingTaskIds = async (pattern: string): Promise<string[]> => {
@@ -263,15 +304,25 @@ export const listBugs = async (
   rawInput: BugListInput
 ): Promise<typeof BugListSchema.Type> => {
   const input = Schema.decodeUnknownSync(BugListInputSchema)(rawInput);
-  await ensureBugListAccess(actorId);
+  const actor = await ensureBugListAccess(actorId);
   const pattern = input.query?.trim()
     ? `%${input.query.trim().slice(0, 120)}%`
     : null;
   const includeArchived = input.includeArchived ?? false;
-  const [projectById, matchingTaskIds] = await Promise.all([
+  const [projectById, searchTaskIds, queueTaskIds] = await Promise.all([
     getProjectMap(includeArchived),
     pattern ? findMatchingTaskIds(pattern) : null,
+    input.view === "client_queue"
+      ? findClientQueueTaskIds(actorId, actor.role)
+      : null,
   ]);
+  let matchingTaskIds = searchTaskIds;
+  if (queueTaskIds) {
+    const queued = new Set(queueTaskIds);
+    matchingTaskIds = searchTaskIds
+      ? searchTaskIds.filter((id) => queued.has(id))
+      : queueTaskIds;
+  }
   let projectIds = [...projectById.keys()];
   if (input.projectId) {
     projectIds = projectById.has(input.projectId) ? [input.projectId] : [];

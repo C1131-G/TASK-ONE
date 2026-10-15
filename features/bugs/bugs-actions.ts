@@ -12,6 +12,8 @@ import {
   BugApprovalDecisionInputSchema,
   BugEvidenceInputSchema,
   BugFixAttemptInputSchema,
+  BugPickInputSchema,
+  BugReassignInputSchema,
   BugPostReleaseCheckInputSchema,
   BugRelationInputSchema,
   BugReleaseInputSchema,
@@ -95,6 +97,33 @@ export async function triageBugAction(input: unknown) {
         const service = yield* BugWorkflowManagement;
         return yield* service.triage(actorId, value);
       })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function pickClientBugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(input, BugPickInputSchema, (actorId, value) =>
+      Effect.gen(function* pick() {
+        const service = yield* BugWorkflowManagement;
+        return yield* service.pick(actorId, value);
+      })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function reassignClientBugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      BugReassignInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* reassign() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.reassign(actorId, value);
+        })
     )
   );
 }

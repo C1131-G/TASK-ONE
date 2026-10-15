@@ -18,6 +18,7 @@ import {
 } from "@/features/bugs/bugs-actions";
 import type { addBugFixAttemptAction } from "@/features/bugs/bugs-actions";
 import { BugApprovalReleaseSection } from "@/features/bugs/components/bug-approval-release-section";
+import { BugClientSection } from "@/features/bugs/components/bug-client-section";
 import { BugDiscoverySection } from "@/features/bugs/components/bug-discovery-section";
 import { BugEvidenceSection } from "@/features/bugs/components/bug-evidence-section";
 import { BugInvestigationSection } from "@/features/bugs/components/bug-investigation-section";
@@ -222,6 +223,11 @@ export const BugDetailWorkflow = ({
         </output>
       ) : null}
 
+      <BugClientSection
+        employees={employees}
+        history={history}
+        isAdmin={isAdmin}
+      />
       <BugDiscoverySection history={history} />
       <BugTriageSection
         employees={employees}

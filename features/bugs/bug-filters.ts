@@ -27,7 +27,7 @@ interface BugFilters {
   readonly severity: BugSeverity | undefined;
   readonly status: BugStatusFilter;
   readonly taskId: string | null;
-  readonly view: "board" | "list";
+  readonly view: "board" | "client_queue" | "list";
 }
 
 type RawSearchParams = Record<string, string | string[] | undefined>;
@@ -40,13 +40,14 @@ const parseBugFilters = (params: RawSearchParams): BugFilters => {
   const status = single(params["status"]);
   const severity = single(params["severity"]);
   const task = single(params["task"]);
+  const view = single(params["view"]);
   return {
     archived: single(params["archived"]) === "true",
     query: single(params["q"]),
     severity: BUG_SEVERITIES.find((value) => value === severity),
     status: BUG_STATUS_FILTERS.find(([value]) => value === status)?.[0] ?? "",
     taskId: task || null,
-    view: single(params["view"]) === "board" ? "board" : "list",
+    view: view === "board" || view === "client_queue" ? view : "list",
   };
 };
 

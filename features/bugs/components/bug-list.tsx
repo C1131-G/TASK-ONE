@@ -4,6 +4,7 @@ import { ArrowUpRight, Bug } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { BugPickDialog } from "@/features/bugs/components/bug-pick-dialog";
 import { useTaskDrawer } from "@/features/tasks/components/task-drawer";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
@@ -36,7 +37,31 @@ const statusLabel: Record<BugListItem["bug"]["status"], string> = {
   withdrawn: "Withdrawn",
 };
 
-export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
+const impactLabel = {
+  high: "High impact",
+  low: "Low impact",
+  medium: "Medium impact",
+  urgent: "Urgent impact",
+} as const;
+
+const DAY_MS = 86_400_000;
+
+const ageLabel = (discoveredAt: string): string => {
+  const days = Math.floor((Date.now() - Date.parse(discoveredAt)) / DAY_MS);
+  if (days < 1) {
+    return "Today";
+  }
+  return days === 1 ? "1 day old" : `${days} days old`;
+};
+
+export const BugCard = ({
+  bugEntry,
+  clientQueue,
+}: {
+  readonly bugEntry: BugListItem;
+  // Set in the client queue: handlers get Pick, admins get an Assign link.
+  readonly clientQueue?: { readonly isAdmin: boolean } | undefined;
+}) => {
   const drawer = useTaskDrawer();
   const { archived, assigneeIds, bug, priority, projectName, relatedBugIds } =
     bugEntry;
@@ -56,6 +81,13 @@ export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
             {bug.clientCompanyId ? (
               <span className="bug-client-badge">Client report</span>
             ) : null}
+            {bug.clientImpact ? (
+              <span
+                className={`bug-impact-chip bug-impact-${bug.clientImpact}`}
+              >
+                {impactLabel[bug.clientImpact]}
+              </span>
+            ) : null}
             {relatedBugIds.length > 0 ? (
               <span className="bug-related-count">
                 {relatedBugIds.length} related
@@ -74,13 +106,32 @@ export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
                 ? "1 assignee"
                 : `${assigneeIds.length} assignees`}
             </span>
+            {clientQueue ? (
+              <span suppressHydrationWarning>{ageLabel(bug.discoveredAt)}</span>
+            ) : null}
             {archived ? <span>Archived</span> : null}
             {bug.discoverySource.replaceAll("_", " ")}
           </div>
         </div>
         <ArrowUpRight aria-hidden="true" className="bug-list-arrow" size={16} />
       </Link>
-      {drawer ? (
+      {clientQueue?.isAdmin ? (
+        <Link
+          className="btn btn-outline bug-open-drawer"
+          href={`/bugs/${bug.id}`}
+        >
+          Assign
+        </Link>
+      ) : null}
+      {clientQueue && !clientQueue.isAdmin ? (
+        <BugPickDialog
+          bugId={bug.id}
+          severity={bug.severity}
+          title={bug.title}
+          version={bug.version}
+        />
+      ) : null}
+      {drawer && !clientQueue ? (
         <Button
           className="bug-open-drawer"
           onClick={() => drawer.openTask(bug.taskId)}
@@ -97,8 +148,10 @@ export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
 
 export const BugList = ({
   bugs,
+  clientQueue,
   emptyMessage = "No bug reports match these filters.",
 }: {
+  readonly clientQueue?: { readonly isAdmin: boolean } | undefined;
   readonly bugs: readonly BugListItem[];
   readonly emptyMessage?: string;
 }) => {
@@ -114,7 +167,11 @@ export const BugList = ({
   return (
     <div aria-label="Bug reports" className="bug-list">
       {bugs.map((bugEntry) => (
-        <BugCard bugEntry={bugEntry} key={bugEntry.bug.id} />
+        <BugCard
+          bugEntry={bugEntry}
+          clientQueue={clientQueue}
+          key={bugEntry.bug.id}
+        />
       ))}
     </div>
   );

@@ -19,6 +19,7 @@ import {
   updateBugStatus,
   writeActivity,
 } from "../work/bug-workflow-internal";
+import { announceClientBug } from "../work/bug-workflow-pick";
 import type { Transaction } from "../work/work-internal";
 import { databaseError, validateInput } from "../work/work-internal";
 import type {
@@ -354,6 +355,11 @@ const submitBug = (
       },
       { clientCompanyId: actor.clientCompanyId, clientImpact: input.impact }
     );
+    await announceClientBug(transaction, {
+      bugId: created.id,
+      now: new Date(),
+      reporterId: actor.id,
+    });
     return { bugId: created.id, version: created.version };
   });
 
