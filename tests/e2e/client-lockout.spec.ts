@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-import { PORTAL_ACCOUNTS } from "./auth-state";
+import { CLIENT_ONE_STATE, PORTAL_ACCOUNTS } from "./auth-state";
 
 // Each attempt comes from its own forwarded address so the per-address
 // sign-in rate limit never answers before the account lockout does.
@@ -36,4 +36,16 @@ test("five wrong passwords lock the account even for the right one", async ({
     /couldn't sign you in/iu
   );
   await expect(page).toHaveURL(/\/login/u);
+});
+
+test.describe("a signed-in client", () => {
+  test.use({ storageState: CLIENT_ONE_STATE });
+
+  for (const route of ["/", "/bugs", "/projects"]) {
+    test(`is sent to the portal from ${route}`, async ({ page }) => {
+      await page.goto(route);
+      await page.waitForURL(/\/portal/u);
+      await expect(page.locator("main h1").first()).toBeVisible();
+    });
+  }
 });

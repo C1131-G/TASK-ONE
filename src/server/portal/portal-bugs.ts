@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and } from "@prisma/orm-postgres/orm-client";
+import { and, or } from "@prisma/orm-postgres/orm-client";
 import { Effect, Layer } from "effect";
 
 import {
@@ -112,7 +112,32 @@ const loadCompanyBug = async (
   if (!task || !project || task.archivedAt) {
     throw notFound();
   }
-  return { bug, project, task };
+  // Once the project is taken off the company, its bugs stay visible but
+  // read only.
+  const link = await transaction.orm.public.ClientCompanyProject.where({
+    companyId: actor.clientCompanyId,
+    projectId: bug.projectId,
+    removedAt: null,
+  })
+    .select("id")
+    .first();
+  return { bug, project, projectLinked: Boolean(link), task };
+};
+
+const PROJECT_REMOVED_MESSAGE =
+  "This project is no longer available to your company, so its reports are read only.";
+
+// The same bug, refused when its project was removed from the company.
+const loadWritableCompanyBug = async (
+  transaction: Transaction,
+  actor: PortalActor,
+  bugId: string
+) => {
+  const loaded = await loadCompanyBug(transaction, actor, bugId);
+  if (!loaded.projectLinked) {
+    forbidden(PROJECT_REMOVED_MESSAGE);
+  }
+  return loaded;
 };
 
 const run = <Output>(
@@ -152,13 +177,20 @@ const listBugs = (
   input: ListCompanyBugsInput
 ): Effect.Effect<readonly PortalBugSummary[], AppError> =>
   run(async (transaction) => {
-    const statuses = input.status ? [...internalStatusesFor(input.status)] : [];
+    const label = input.status;
+    // "Not a bug" is a closed bug with that resolution, so both labels also
+    // look at the resolution.
+    const statuses = label ? [...internalStatusesFor(label)] : [];
     const bugs = await transaction.orm.public.BugReport.where((bug) =>
       and(
         bug.clientCompanyId.eq(actor.clientCompanyId),
         ...(input.projectId ? [bug.projectId.eq(input.projectId)] : []),
         ...(input.mine ? [bug.reporterId.eq(actor.id)] : []),
-        ...(input.status ? [bug.status.in(statuses)] : [])
+        ...(label ? [bug.status.in(statuses)] : []),
+        ...(label === "not_a_bug" ? [bug.resolution.eq("not_a_bug")] : []),
+        ...(label === "closed"
+          ? [or(bug.resolution.isNull(), bug.resolution.neq("not_a_bug"))]
+          : [])
       )
     )
       .orderBy((bug) => bug.discoveredAt.desc())
@@ -299,6 +331,7 @@ const buildLifecycle = async (
       status === "awaiting_client" && bug.awaitingClientSince
         ? {
             canReopen: reopensLeft > 0,
+            canRespond: true,
             reopensLeft,
             since: bug.awaitingClientSince.toISOString(),
           }
@@ -311,7 +344,7 @@ const getBug = (
   bugId: string
 ): Effect.Effect<PortalBugDetail, AppError> =>
   run(async (transaction) => {
-    const { bug, project, task } = await loadCompanyBug(
+    const { bug, project, projectLinked, task } = await loadCompanyBug(
       transaction,
       actor,
       bugId
@@ -376,16 +409,19 @@ const getBug = (
       if (activity.action === "bug.reported") {
         next = "submitted";
       } else if (typeof details["to"] === "string") {
-        next = clientStatusLabel(decodeBugWorkflowStatus(details["to"]), null);
+        next = clientStatusLabel(
+          decodeBugWorkflowStatus(details["to"]),
+          details["reason"] === "not_a_bug" ? "not_a_bug" : null
+        );
       }
       // Internal stages that look the same to the client are one entry.
       if (next && timeline.at(-1)?.status !== next) {
         timeline.push({ at: activity.createdAt.toISOString(), status: next });
       }
     }
-    const open = !ARCHIVED_OR_CLOSED.has(status);
+    const open = !ARCHIVED_OR_CLOSED.has(status) && projectLinked;
     const isReporter = bug.reporterId === actor.id;
-    const lifecycle = await buildLifecycle(
+    const built = await buildLifecycle(
       transaction,
       actor,
       bug,
@@ -394,14 +430,25 @@ const getBug = (
         isTeam: comment.author.role !== "client",
       }))
     );
+    // A removed project leaves the report readable but takes every action away.
+    const lifecycle = projectLinked
+      ? built
+      : {
+          ...built,
+          canRate: false,
+          canReportAgain: false,
+          verification: built.verification
+            ? { ...built.verification, canReopen: false, canRespond: false }
+            : null,
+        };
     return {
       actualBehavior: bug.actualBehavior,
       attachments,
       browser: bug.browser,
       canAttach: open,
       canComment: open,
-      canEdit: isReporter && status === "reported",
-      canWithdraw: isReporter && status === "reported",
+      canEdit: projectLinked && isReporter && status === "reported",
+      canWithdraw: projectLinked && isReporter && status === "reported",
       comments: comments.map((comment) => ({
         authorName: comment.author.name,
         body: comment.body,
@@ -429,6 +476,7 @@ const getBug = (
       pageUrl: bug.route,
       projectId: project.id,
       projectName: project.name,
+      readOnlyReason: projectLinked ? null : PROJECT_REMOVED_MESSAGE,
       reporterName: reporter?.name ?? "A colleague",
       reproductionSteps: bug.reproductionSteps,
       status: label,
@@ -550,7 +598,7 @@ const editBug = (
   input: EditClientBugInput
 ): Effect.Effect<PortalBugReceipt, AppError> =>
   run(async (transaction) => {
-    const { bug, project, task } = await loadCompanyBug(
+    const { bug, project, task } = await loadWritableCompanyBug(
       transaction,
       actor,
       input.bugId
@@ -619,7 +667,11 @@ const withdrawBug = (
   input: ClientBugVersionInput
 ): Effect.Effect<PortalBugReceipt, AppError> =>
   run(async (transaction) => {
-    const { bug } = await loadCompanyBug(transaction, actor, input.bugId);
+    const { bug } = await loadWritableCompanyBug(
+      transaction,
+      actor,
+      input.bugId
+    );
     requireReporterWhileSubmitted(actor, bug);
     if (bug.version !== input.expectedVersion) {
       conflict();
@@ -639,7 +691,11 @@ const addComment = (
   input: ClientCommentInput
 ): Effect.Effect<PortalComment, AppError> =>
   run(async (transaction) => {
-    const { bug, task } = await loadCompanyBug(transaction, actor, input.bugId);
+    const { bug, task } = await loadWritableCompanyBug(
+      transaction,
+      actor,
+      input.bugId
+    );
     if (ARCHIVED_OR_CLOSED.has(bug.status)) {
       forbidden("Closed bugs are read only.");
     }
@@ -668,6 +724,7 @@ const confirmFix = (
   input: ConfirmClientFixInput
 ): Effect.Effect<PortalBugReceipt, AppError> =>
   run(async (transaction) => {
+    await loadWritableCompanyBug(transaction, actor, input.bugId);
     const receipt = await confirmClientFix(transaction, actor, input);
     return { bugId: receipt.bugId, version: receipt.version };
   });
@@ -677,6 +734,7 @@ const reopenFix = (
   input: ReopenClientFixInput
 ): Effect.Effect<PortalBugReceipt, AppError> =>
   run(async (transaction) => {
+    await loadWritableCompanyBug(transaction, actor, input.bugId);
     const receipt = await reopenClientFix(transaction, actor, input);
     return { bugId: receipt.bugId, version: receipt.version };
   });
@@ -685,14 +743,17 @@ const rateBug = (
   actor: PortalActor,
   input: RateClientBugInput
 ): Effect.Effect<void, AppError> =>
-  run((transaction) => rateClientBug(transaction, actor, input));
+  run(async (transaction) => {
+    await loadWritableCompanyBug(transaction, actor, input.bugId);
+    await rateClientBug(transaction, actor, input);
+  });
 
 const attachFile = (
   actor: PortalActor,
   input: AttachClientFileInput
 ): Effect.Effect<void, AppError> =>
   run(async (transaction) => {
-    const { bug, project, task } = await loadCompanyBug(
+    const { bug, project, task } = await loadWritableCompanyBug(
       transaction,
       actor,
       input.bugId
@@ -749,7 +810,11 @@ const taskIdForBug = (
   bugId: string
 ): Effect.Effect<string, AppError> =>
   run(async (transaction) => {
-    const { bug, task } = await loadCompanyBug(transaction, actor, bugId);
+    const { bug, task } = await loadWritableCompanyBug(
+      transaction,
+      actor,
+      bugId
+    );
     if (ARCHIVED_OR_CLOSED.has(bug.status)) {
       forbidden("Closed bugs are read only.");
     }

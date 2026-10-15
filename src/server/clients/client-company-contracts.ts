@@ -134,6 +134,12 @@ export const ClientCompanyDetailSchema = Schema.Struct({
   users: Schema.Array(ClientCompanyUserSchema),
 });
 
+// The admin detail page also carries a short-lived signed URL for the logo.
+export const ClientCompanyAdminDetailSchema = Schema.Struct({
+  ...ClientCompanyDetailSchema.fields,
+  logoUrl: Schema.NullOr(Schema.String),
+});
+
 export const CreatedClientUserSchema = Schema.Struct({
   email: Schema.String,
   id: Schema.String,
@@ -148,6 +154,8 @@ export const ClientCompanyReceiptSchema = Schema.Struct({
 
 export type ClientCompanySummary = typeof ClientCompanySummarySchema.Type;
 export type ClientCompanyDetail = typeof ClientCompanyDetailSchema.Type;
+export type ClientCompanyAdminDetail =
+  typeof ClientCompanyAdminDetailSchema.Type;
 export type CreatedClientUser = typeof CreatedClientUserSchema.Type;
 export type ClientCompanyReceipt = typeof ClientCompanyReceiptSchema.Type;
 

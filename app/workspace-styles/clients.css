@@ -47,6 +47,33 @@
   margin: 2px 0 0;
   font-size: var(--fs-sm);
 }
+.workspace-app .clients-logo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+/* Logos keep their aspect ratio inside a fixed-height box. */
+.workspace-app .clients-logo-image {
+  width: auto;
+  max-width: min(160px, 100%);
+  height: 48px;
+  object-fit: contain;
+}
+.workspace-app .clients-logo-placeholder {
+  display: grid;
+  width: 96px;
+  height: 48px;
+  place-items: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+.workspace-app .clients-logo-acts {
+  flex-wrap: wrap;
+}
 .workspace-app .clients-panel [data-slot="table-container"] {
   max-width: 100%;
   overflow-x: auto;

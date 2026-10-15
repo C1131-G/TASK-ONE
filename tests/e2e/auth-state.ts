@@ -8,11 +8,14 @@ export const EMPLOYEE_STATE = "tests/e2e/.auth/employee.json";
 export const CLIENT_ONE_STATE = "tests/e2e/.auth/client-one.json";
 export const CLIENT_TWO_STATE = "tests/e2e/.auth/client-two.json";
 export const HANDLER_STATE = "tests/e2e/.auth/handler.json";
+export const HANDLER_TWO_STATE = "tests/e2e/.auth/handler-two.json";
 
 // Accounts created by scripts/seed-e2e-accounts.ts.
 export const PORTAL_ACCOUNTS = {
   clientOne: "client-one@acme.test",
   clientTwo: "client-two@acme.test",
   handler: "handler-one@metsys.test",
+  handlerTwo: "handler-two@metsys.test",
   lockoutClient: "lockout-client@acme.test",
+  newClient: "new-client@acme.test",
 } as const;

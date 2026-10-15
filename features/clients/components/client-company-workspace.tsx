@@ -17,12 +17,16 @@ import {
   ClientCompanyRenameForm,
   ClientCompanyStatusControl,
 } from "@/features/clients/components/client-company-forms";
+import { ClientCompanyLogo } from "@/features/clients/components/client-company-logo";
 import { ClientCompanyUsers } from "@/features/clients/components/client-company-users";
 import {
   clientStatusText,
   isOpenClientLabel,
 } from "@/features/portal/client-status";
-import type { ClientCompanyDetail } from "@/src/server/clients/client-company-contracts";
+import type {
+  ClientCompanyAdminDetail,
+  ClientCompanyDetail,
+} from "@/src/server/clients/client-company-contracts";
 
 const BugSummary = ({
   bugCounts,
@@ -189,7 +193,7 @@ const ClientCompanyWorkspace = ({
   employeeOptions,
   projectOptions,
 }: {
-  readonly detail: ClientCompanyDetail;
+  readonly detail: ClientCompanyAdminDetail;
   readonly employeeOptions: readonly {
     readonly email: string;
     readonly id: string;
@@ -247,6 +251,13 @@ const ClientCompanyWorkspace = ({
           {error}
         </p>
       ) : null}
+      <ClientCompanyLogo
+        companyId={company.id}
+        companyName={company.name}
+        logoUrl={detail.logoUrl}
+        onVersion={setLocalVersion}
+        version={version}
+      />
       <Tabs className="clients-tabs" defaultValue="users">
         <TabsList aria-label="Client company sections">
           <TabsTrigger value="users">

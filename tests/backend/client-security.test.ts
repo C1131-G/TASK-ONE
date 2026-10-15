@@ -197,6 +197,15 @@ it("locks an account after five failed sign-ins and keeps it generic", async () 
     userId: client.id,
   });
   expect(unlocked).toMatchObject({ ok: true });
+  // A second click changes nothing and adds no second audit row.
+  const again = await callAs("admin", clients.unlockUserAction, {
+    userId: client.id,
+  });
+  expect(again).toMatchObject({ ok: true });
+  const afterRepeat = await auditTypes(client.id);
+  expect(
+    afterRepeat.filter((type) => type === "account_unlocked")
+  ).toHaveLength(1);
   const success = await signIn(client.email, client.password);
   expect(success.status).toBe(200);
   const reset = await loginState(client.id);

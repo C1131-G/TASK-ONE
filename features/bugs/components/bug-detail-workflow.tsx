@@ -82,12 +82,15 @@ export const BugDetailWorkflow = ({
   const latestAttempt = history.attempts.at(-1) ?? null;
   const isReadOnly =
     history.archived ||
+    // Mirrors the server's read-only statuses in bug-workflow-internal.ts.
     [
       "closed",
       "duplicate",
       "awaiting_admin_approval",
       "approved_for_release",
       "released",
+      "awaiting_client",
+      "withdrawn",
     ].includes(history.bug.status);
 
   const finishAction = (result: BugActionResult) => {

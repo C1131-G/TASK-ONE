@@ -1,5 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
@@ -15,8 +16,20 @@ const PortalCompanyName = async () => {
   }
   return (
     <p className="portal-company">
-      <span className="sr-only">Signed in for </span>
-      {company.companyName}
+      {company.logoUrl ? (
+        <Image
+          alt={`${company.companyName} logo`}
+          className="portal-company-logo"
+          height={24}
+          src={company.logoUrl}
+          unoptimized
+          width={96}
+        />
+      ) : null}
+      <span className="portal-company-name">
+        <span className="sr-only">Signed in for </span>
+        {company.companyName}
+      </span>
     </p>
   );
 };

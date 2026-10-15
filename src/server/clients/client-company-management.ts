@@ -65,7 +65,10 @@ const conflict = (): never => {
   });
 };
 
-const loadCompany = async (transaction: DbTransaction, companyId: string) => {
+export const loadCompany = async (
+  transaction: DbTransaction,
+  companyId: string
+) => {
   const company = await transaction.orm.public.ClientCompany.where({
     id: companyId,
   }).first();
@@ -79,7 +82,7 @@ const loadCompany = async (transaction: DbTransaction, companyId: string) => {
 };
 
 // Locks the company row by bumping its version; a stale version is a conflict.
-const bumpCompany = async (
+export const bumpCompany = async (
   transaction: DbTransaction,
   company: { readonly id: string; readonly version: number },
   expectedVersion: number,

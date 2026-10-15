@@ -19,7 +19,7 @@ const WORKSPACE_PATH: Route = "/";
 const PORTAL_PATH: Route = "/portal";
 
 const INACTIVITY_NOTICE =
-  "You were signed out after 2 hours of inactivity. Sign in again to continue.";
+  "Signed out for inactivity. You were idle for 2 hours; sign in again to continue.";
 
 const LoginRedirect = async ({ notice }: { readonly notice: string }) => {
   const session = await getPageSession();

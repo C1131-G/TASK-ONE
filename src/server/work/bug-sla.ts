@@ -85,7 +85,8 @@ export const buildSlaView = (
 ): SlaView => ({
   firstResponse: clockView({
     breached: sla.breachedResponse,
-    doneAt: sla.firstRespondedAt,
+    // A bug closed or withdrawn before anyone answered stops this clock too.
+    doneAt: sla.firstRespondedAt ?? sla.resolvedAt,
     dueAt: sla.firstResponseDueAt,
     now,
     paused: false,
@@ -267,8 +268,18 @@ const warningRecipients = async (
         .select("employeeId")
         .all()
     : [];
-  return handlers.length > 0
-    ? handlers.map(({ employeeId }) => employeeId)
+  const active = handlers.length
+    ? await transaction.orm.public.User.where((user) =>
+        and(
+          user.id.in(handlers.map(({ employeeId }) => employeeId)),
+          user.deactivatedAt.isNull()
+        )
+      )
+        .select("id")
+        .all()
+    : [];
+  return active.length > 0
+    ? active.map(({ id }) => id)
     : activeAdminIds(transaction);
 };
 
@@ -383,7 +394,11 @@ export const runSlaSweep = async (
 ): Promise<number> => {
   const open = await transaction.orm.public.BugSla.where((sla) =>
     or(
-      and(sla.firstRespondedAt.isNull(), sla.breachedResponse.eq(false)),
+      and(
+        sla.firstRespondedAt.isNull(),
+        sla.resolvedAt.isNull(),
+        sla.breachedResponse.eq(false)
+      ),
       and(
         sla.resolvedAt.isNull(),
         sla.pausedAt.isNull(),
@@ -433,7 +448,9 @@ export const runSlaSweep = async (
       sla,
       title: task.title,
     };
-    if (!sla.firstRespondedAt && !sla.breachedResponse) {
+    // A bug that left the queue unanswered (withdrawn, merged, closed) no
+    // longer owes a first response.
+    if (!(sla.firstRespondedAt || sla.resolvedAt || sla.breachedResponse)) {
       // Each clock claims its own flag, so they run one after the other.
       // eslint-disable-next-line no-await-in-loop, react-doctor/async-await-in-loop
       notices += await sweepClock(transaction, context, "response");

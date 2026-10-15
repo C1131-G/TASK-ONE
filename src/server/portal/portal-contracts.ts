@@ -186,6 +186,9 @@ export const PortalLifecycleSchema = Schema.Struct({
   verification: Schema.NullOr(
     Schema.Struct({
       canReopen: Schema.Boolean,
+      // False when the report is read only; the client can neither confirm
+      // nor reopen.
+      canRespond: Schema.Boolean,
       reopensLeft: Schema.Number,
       since: Schema.String,
     })
@@ -227,6 +230,8 @@ export const PortalBugDetailSchema = Schema.Struct({
   lifecycle: PortalLifecycleSchema,
   os: Schema.NullOr(Schema.String),
   pageUrl: Schema.String,
+  // Why nothing can be changed, when the project left the company.
+  readOnlyReason: Schema.NullOr(Schema.String),
   reproductionSteps: Schema.Array(Schema.String),
   timeline: Schema.Array(PortalTimelineEntrySchema),
   version: VersionSchema,

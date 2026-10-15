@@ -10,8 +10,8 @@ model User {
   createdAt          TimestamptzJsDate @default(now())
   updatedAt          TimestamptzJsDate @default(now())
 
-  // Better Auth Admin plugin fields. The application config will set
-  // defaultRole to "employee" and expose only admin/employee roles.
+  // Better Auth Admin plugin fields. The application config sets
+  // defaultRole to "employee"; roles are admin, employee and client.
   role               String  @default("employee")
   banned             Boolean @default(false)
   banReason          String?

@@ -14,7 +14,7 @@ const excludedByDesign = new Set([
   "requestTaskUploadAction",
   "resetEmployeePasswordAction",
   "revokeSessionAction",
-  // Clearing a lockout is naturally idempotent.
+  // Clearing a lockout is naturally idempotent; a repeat records nothing.
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
@@ -25,6 +25,9 @@ const replayedMutations = new Set([
   "changeEmployeeRoleAction",
   "changeTaskColumnAction",
   "createClientCompanyAction",
+  "finalizeClientLogoUploadAction",
+  "removeClientLogoAction",
+  "requestClientLogoUploadAction",
   "updateSlaSettingsAction",
   "deactivateClientCompanyAction",
   "reactivateClientCompanyAction",

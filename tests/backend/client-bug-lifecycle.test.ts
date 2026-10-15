@@ -147,9 +147,17 @@ const portalView = async (
       } | null;
       question: { text: string | null } | null;
       rating: { satisfaction: string } | null;
-      verification: { canReopen: boolean; reopensLeft: number } | null;
+      verification: {
+        canReopen: boolean;
+        canRespond: boolean;
+        reopensLeft: number;
+      } | null;
     };
+    canAttach: boolean;
+    canComment: boolean;
+    readOnlyReason: string | null;
     status: string;
+    timeline: { status: string }[];
     version: number;
   };
 };
@@ -633,6 +641,16 @@ it("shows merged duplicates the original's status and hands them over when it sh
   expect(relation.rows[0]?.count).toBe(1);
 });
 
+// The client's company list, filtered by one client status label.
+const listIds = async (status: string) => {
+  const listed = await callAs("client", portalQueries.listPortalBugs, {
+    status,
+  });
+  return listed.ok
+    ? (listed.data as readonly { id: string }[]).map(({ id }) => id)
+    : [];
+};
+
 it("closes a client bug as not a bug with a reason the client can read", async () => {
   const bugId = await submit("Works as designed");
   const unpicked = await callAs(
@@ -684,6 +702,9 @@ it("closes a client bug as not a bug with a reason the client can read", async (
   expect(view.comments.at(-1)?.body).toBe(
     "This is how exports are meant to behave."
   );
+  expect(view.timeline.at(-1)?.status).toBe("not_a_bug");
+  expect(await listIds("not_a_bug")).toContain(bugId);
+  expect(await listIds("closed")).not.toContain(bugId);
 
   const reopened = await callAs("admin", bugActions.reopenBugAction, {
     bugId,

@@ -15,6 +15,7 @@ export const E2E_ACCOUNTS = {
   clientOne: "client-one@acme.test",
   clientTwo: "client-two@acme.test",
   lockoutClient: "lockout-client@acme.test",
+  newClient: "new-client@acme.test",
   handlerOne: "handler-one@metsys.test",
   handlerTwo: "handler-two@metsys.test",
 } as const;
@@ -33,6 +34,8 @@ const context = await auth.$context;
 interface SeedUser {
   readonly companyId?: string;
   readonly email: string;
+  // Starts the account on a temporary password that must be changed.
+  readonly mustChangePassword?: boolean;
   readonly name: string;
   readonly password: string;
   readonly role: "admin" | "client" | "employee";
@@ -47,8 +50,8 @@ const upsertUser = async (seed: SeedUser): Promise<string> => {
   let userId = existing.rows[0]?.id;
   if (userId) {
     await authPool.query(
-      'UPDATE "user" SET "deactivatedAt" = NULL, "failedLoginCount" = 0, "lockedUntil" = NULL, "mustChangePassword" = false, "clientCompanyId" = $2 WHERE id = $1',
-      [userId, seed.companyId ?? null]
+      'UPDATE "user" SET "deactivatedAt" = NULL, "failedLoginCount" = 0, "lockedUntil" = NULL, "mustChangePassword" = $3, "clientCompanyId" = $2 WHERE id = $1',
+      [userId, seed.companyId ?? null, seed.mustChangePassword ?? false]
     );
     await authPool.query(
       "UPDATE account SET password = $2, \"updatedAt\" = now() WHERE \"userId\" = $1 AND \"providerId\" = 'credential'",
@@ -58,8 +61,15 @@ const upsertUser = async (seed: SeedUser): Promise<string> => {
   }
   userId = randomUUID();
   await authPool.query(
-    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword", "clientCompanyId") VALUES ($1, $2, $3, $3, $4, false, $5)',
-    [userId, seed.name, seed.email, seed.role, seed.companyId ?? null]
+    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword", "clientCompanyId") VALUES ($1, $2, $3, $3, $4, $6, $5)',
+    [
+      userId,
+      seed.name,
+      seed.email,
+      seed.role,
+      seed.companyId ?? null,
+      seed.mustChangePassword ?? false,
+    ]
   );
   await authPool.query(
     "INSERT INTO account (id, \"accountId\", \"providerId\", \"userId\", password) VALUES ($1, $2, 'credential', $2, $3)",
@@ -150,6 +160,16 @@ await upsertUser({
   password: portalPassword,
   role: "client",
 });
+// Reset on every run, so the portal spec can walk through the first sign-in
+// and forced password change again.
+await upsertUser({
+  companyId,
+  email: E2E_ACCOUNTS.newClient,
+  mustChangePassword: true,
+  name: "Nadia New",
+  password: portalPassword,
+  role: "client",
+});
 const projectId = await ensureProject();
 
 await authPool.query(
@@ -168,6 +188,6 @@ for (const employeeId of [handlerOneId, handlerTwoId]) {
 await authPool.query("DELETE FROM \"rateLimit\"");
 
 process.stdout.write(
-  `Seeded ${COMPANY_NAME} (${companyId}) with project ${PROJECT_KEY}, 2 handlers and 3 client users.\n`
+  `Seeded ${COMPANY_NAME} (${companyId}) with project ${PROJECT_KEY}, 2 handlers and 4 client users.\n`
 );
 await authPool.end();

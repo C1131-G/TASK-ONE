@@ -73,13 +73,28 @@
   font-weight: 700;
 }
 .portal-app .portal-company {
+  display: flex;
   min-width: 0;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   overflow: hidden;
   color: var(--text-3);
   font-size: var(--fs-sm);
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.portal-app .portal-company-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* A fixed height keeps the header steady; wide logos shrink to fit. */
+.portal-app .portal-company-logo {
+  flex: none;
+  width: auto;
+  max-width: 96px;
+  height: 24px;
+  object-fit: contain;
 }
 .portal-app .portal-nav {
   margin-left: auto;
@@ -128,6 +143,9 @@
 @media (max-width: 720px) {
   .portal-app .portal-header-in {
     padding-inline: 16px;
+  }
+  .portal-app .portal-company-logo {
+    max-width: 64px;
   }
   .portal-app .portal-nav {
     position: fixed;

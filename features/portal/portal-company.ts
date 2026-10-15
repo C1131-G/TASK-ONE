@@ -1,12 +1,17 @@
 import "server-only";
-import { Effect, Exit } from "effect";
+import { Effect, Exit, Layer } from "effect";
 import { headers } from "next/headers";
 import { cache } from "react";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
+import { ClientLogosLive } from "@/src/server/clients/client-logo";
+import { ClientLogos } from "@/src/server/clients/client-logo-contracts";
+import { StorageLive } from "@/src/server/storage/storage";
 
 export interface PortalCompany {
   readonly companyName: string;
+  // A short-lived signed URL for the company logo, or null without one.
+  readonly logoUrl: string | null;
   readonly userName: string;
   // Set while an admin previews this client: the admin's name and the
   // previewed account's id (for the exit link).
@@ -25,18 +30,30 @@ export const getPortalCompany = cache(
     const exit = await Effect.runPromiseExit(
       Effect.gen(function* readPortalCompany() {
         const sessions = yield* AuthSession;
-        return yield* sessions.requirePortalView(requestHeaders);
-      }).pipe(Effect.provide(AuthSessionLive))
+        const user = yield* sessions.requirePortalView(requestHeaders);
+        const logos = yield* ClientLogos;
+        // While previewing, the viewer is the previewed client, so the logo
+        // shown is always that client's own company's.
+        const logoUrl = yield* logos
+          .signedLogo(user.id, user.clientCompanyId)
+          .pipe(Effect.orElseSucceed(() => null));
+        return { logoUrl, user };
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(Layer.provide(ClientLogosLive, StorageLive))
+      )
     );
     if (!Exit.isSuccess(exit)) {
       return null;
     }
+    const { logoUrl, user } = exit.value;
     return {
-      companyName: exit.value.clientCompanyName,
-      preview: exit.value.preview
-        ? { adminName: exit.value.preview.adminName, userId: exit.value.id }
+      companyName: user.clientCompanyName,
+      logoUrl,
+      preview: user.preview
+        ? { adminName: user.preview.adminName, userId: user.id }
         : null,
-      userName: exit.value.name,
+      userName: user.name,
     };
   }
 );

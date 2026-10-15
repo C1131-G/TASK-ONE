@@ -520,6 +520,29 @@ it("leaves paused, finished and answered clocks alone", async () => {
   expect(await slaNotices(personaId("owner"), doneTask)).toEqual([]);
 });
 
+it("never raises a response breach for a bug withdrawn before anyone answered", async () => {
+  const bugId = await submit("Sweep withdrawn");
+  const taskId = await taskOf(bugId);
+  const withdrawn = await callAs("client", portal.withdrawClientBugAction, {
+    bugId,
+    expectedVersion: await versionOf(bugId),
+    idempotencyKey: nextKey(),
+  });
+  expect(withdrawn.ok).toBe(true);
+  expect(await slaField(bugId, "resolvedAt")).not.toBeNull();
+  await pinClocks(bugId, {
+    createdAt: "2026-10-05T09:00:00Z",
+    firstResponseDueAt: "2026-10-05T10:00:00Z",
+    resolutionDueAt: "2026-10-05T12:00:00Z",
+    resolutionStartedAt: "2026-10-05T09:00:00Z",
+    resolvedAt: "2026-10-05T09:30:00Z",
+  });
+  await sweep("2026-10-05T17:00:00Z");
+  expect(await slaNotices(personaId("admin"), taskId)).toEqual([]);
+  expect(await slaNotices(personaId("owner"), taskId)).toEqual([]);
+  expect(await slaField(bugId, "breachedResponse")).toBe(false);
+});
+
 it("lets only an admin change the settings, and applies them to new bugs", async () => {
   const before = await callAs("admin", slaQueries.getSlaSettings, {});
   expect(before).toMatchObject({

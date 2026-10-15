@@ -303,6 +303,8 @@ export const reassignClientBug = async (
     version: bug.version,
   }).updateAndCount({
     needsReassignment: false,
+    // The new assignee now owns the bug, so "Picked by" names them.
+    pickedById: input.employeeId,
     updatedAt: now,
     version,
   });

@@ -205,13 +205,19 @@ export async function unlockUserAction(input: unknown) {
       Effect.gen(function* unlockUser() {
         const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
         const users = yield* UserManagement;
-        yield* users.unlockUser(administrator.id, validated.userId);
-        yield* auditEffect({
-          actorId: administrator.id,
-          headers: yield* requestHeadersOrFail,
-          subjectUserId: validated.userId,
-          type: "account_unlocked",
-        });
+        const wasLocked = yield* users.unlockUser(
+          administrator.id,
+          validated.userId
+        );
+        // A repeated unlock changes nothing, so it adds no audit row.
+        if (wasLocked) {
+          yield* auditEffect({
+            actorId: administrator.id,
+            headers: yield* requestHeadersOrFail,
+            subjectUserId: validated.userId,
+            type: "account_unlocked",
+          });
+        }
         return { done: true as const };
       }).pipe(
         Effect.provide(AuthSessionLive),

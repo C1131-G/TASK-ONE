@@ -2,7 +2,7 @@ import { AxeBuilder } from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-import { ADMIN_STATE } from "./auth-state";
+import { ADMIN_STATE, CLIENT_ONE_STATE } from "./auth-state";
 
 test.use({ storageState: ADMIN_STATE });
 
@@ -56,4 +56,35 @@ test("viewing as a client is read-only and can be exited", async ({ page }) => {
   await page.goto("/portal/new");
   await page.getByRole("link", { name: /Exit preview/u }).click();
   await page.waitForURL(/\/clients/u);
+});
+
+// A 1×1 PNG stands in for a real logo.
+const LOGO = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64"
+);
+
+test.describe("the company logo", () => {
+  test.describe.configure({ mode: "serial" });
+
+  test("an admin uploads it", async ({ page }) => {
+    await openAcme(page);
+    await page
+      .getByLabel(/Choose a logo image for Acme/u)
+      .setInputFiles({ buffer: LOGO, mimeType: "image/png", name: "acme.png" });
+    await expect(page.getByRole("img", { name: "Acme logo" })).toBeVisible({
+      timeout: 30_000,
+    });
+  });
+
+  test.describe("then a client", () => {
+    test.use({ storageState: CLIENT_ONE_STATE });
+
+    test("sees it in the portal header", async ({ page }) => {
+      await page.goto("/portal");
+      await expect(
+        page.getByRole("banner").getByRole("img", { name: "Acme logo" })
+      ).toBeVisible();
+    });
+  });
 });

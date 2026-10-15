@@ -277,6 +277,59 @@ it("lets any company user comment publicly and tells the assignee", async () => 
   expect(seen.ok && seen.data.comments).toHaveLength(1);
 });
 
+it("keeps bugs on a removed project readable but read only", async () => {
+  const bug = await submit({ title: "Project goes away" });
+  await authPool.query(
+    'UPDATE client_company_project SET "removedAt" = now() WHERE "companyId" = $1 AND "projectId" = $2',
+    [ids.clientCompanyId, ids.projectId]
+  );
+  try {
+    const view = await callAs("client", portalQueries.getPortalBug, {
+      bugId: bug.bugId,
+    });
+    expect(view).toMatchObject({
+      data: {
+        canAttach: false,
+        canComment: false,
+        canEdit: false,
+        canWithdraw: false,
+        readOnlyReason: expect.stringContaining("read only"),
+      },
+      ok: true,
+    });
+    const comment = await callAs("coworker", portal.addClientCommentAction, {
+      body: "Still seeing it",
+      bugId: bug.bugId,
+      idempotencyKey: nextKey(),
+    });
+    expect(comment).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
+    const edit = await callAs("client", portal.editClientBugAction, {
+      ...bugInput({ title: "Edited" }),
+      bugId: bug.bugId,
+      expectedVersion: bug.version,
+      idempotencyKey: nextKey(),
+    });
+    expect(edit).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
+    const withdraw = await callAs("client", portal.withdrawClientBugAction, {
+      bugId: bug.bugId,
+      expectedVersion: bug.version,
+      idempotencyKey: nextKey(),
+    });
+    expect(withdraw).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
+    // New reports on that project are refused too.
+    const fresh = await callAs("client", portal.submitClientBugAction, {
+      ...bugInput(),
+      idempotencyKey: nextKey(),
+    });
+    expect(fresh).toMatchObject({ ok: false });
+  } finally {
+    await authPool.query(
+      'UPDATE client_company_project SET "removedAt" = NULL WHERE "companyId" = $1 AND "projectId" = $2',
+      [ids.clientCompanyId, ids.projectId]
+    );
+  }
+});
+
 it("rejects public comments on ordinary tasks", async () => {
   const result = await callAs("owner", comments.createCommentAction, {
     body: "Public on an ordinary task",

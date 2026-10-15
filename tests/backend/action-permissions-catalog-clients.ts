@@ -2,6 +2,7 @@ import { entry } from "./action-permissions-shared";
 import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
+const clientLogos = await import("../../features/clients/client-logo-actions");
 const clients = await import("../../features/clients/clients-actions");
 const clientQueries = await import("../../features/clients/clients-queries");
 const slaActions = await import("../../features/company/sla-actions");
@@ -67,6 +68,31 @@ export const clientActionCatalog: readonly ActionEntry[] = [
   })),
   entry("unlockUserAction", clients.unlockUserAction, () => ({
     userId: ids.employeeId,
+  })),
+  entry(
+    "requestClientLogoUploadAction",
+    clientLogos.requestClientLogoUploadAction,
+    () => ({
+      companyId: ids.clientCompanyId,
+      contentType: "image/png",
+      idempotencyKey: nextKey(),
+      sizeBytes: 1024,
+    })
+  ),
+  entry(
+    "finalizeClientLogoUploadAction",
+    clientLogos.finalizeClientLogoUploadAction,
+    () => ({
+      companyId: ids.clientCompanyId,
+      expectedVersion: 1,
+      idempotencyKey: nextKey(),
+      uploadIntentId: ids.random,
+    })
+  ),
+  entry("removeClientLogoAction", clientLogos.removeClientLogoAction, () => ({
+    companyId: ids.clientCompanyId,
+    expectedVersion: 1,
+    idempotencyKey: nextKey(),
   })),
   entry("listAuditEvents", clientQueries.listAuditEvents, () => ({})),
   entry("listLockedAccounts", clientQueries.listLockedAccounts, () => ({})),

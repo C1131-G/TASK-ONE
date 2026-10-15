@@ -35,7 +35,9 @@
   border-color: transparent;
 }
 .workspace-app .badge.accent {
-  color: var(--accent);
+  /* Pure accent on its own tint is 4.3:1 at badge size; leaning toward the
+     text color clears 4.5:1 in both themes. */
+  color: color-mix(in srgb, var(--accent) 75%, var(--text));
   background: var(--accent-soft);
   border-color: transparent;
 }

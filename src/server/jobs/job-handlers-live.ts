@@ -39,6 +39,17 @@ const DeleteAvatarPayloadSchema = Schema.Struct({
     )
   ),
 });
+const DeleteClientLogoPayloadSchema = Schema.Struct({
+  objectKey: Schema.String.check(
+    Schema.makeFilter((objectKey) =>
+      objectKey.startsWith("company/client-logos/") &&
+      !objectKey.includes("\\") &&
+      !objectKey.split("/").some((part) => part === "." || part === "..")
+        ? undefined
+        : "Only private client logo objects can be removed by this job."
+    )
+  ),
+});
 const FileCopyPayloadSchema = Schema.Struct({
   sourceFileId: Schema.String.check(Schema.isUUID()),
   sourceKey: Schema.String.check(
@@ -127,6 +138,19 @@ export const JobHandlersLive = Layer.effect(
               }),
             try: () =>
               Schema.decodeUnknownSync(DeleteAvatarPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ objectKey }) => storage.deleteObject(objectKey))
+          );
+        }
+        if (kind === "storage.delete-client-logo") {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The client logo cleanup job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(DeleteClientLogoPayloadSchema)(payload),
           }).pipe(
             Effect.flatMap(({ objectKey }) => storage.deleteObject(objectKey))
           );

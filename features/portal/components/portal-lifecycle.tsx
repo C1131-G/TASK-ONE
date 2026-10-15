@@ -87,9 +87,10 @@ const VerifyBanner = ({
       </p>
       {isPreview ? (
         <p className="hint">Confirming is disabled in preview.</p>
-      ) : (
+      ) : null}
+      {!isPreview && verification.canRespond ? (
         <VerifyActions bug={bug} />
-      )}
+      ) : null}
       <p className="hint">
         If we don&apos;t hear back, we&apos;ll close this bug automatically
         after 7 days.

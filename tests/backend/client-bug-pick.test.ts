@@ -22,6 +22,7 @@ import {
 const portal = await import("../../features/portal/portal-actions");
 const bugActions = await import("../../features/bugs/bugs-actions");
 const comments = await import("../../features/tasks/actions/task-comments");
+const taskEditing = await import("../../features/tasks/actions/task-editing");
 const portalQueries = await import("../../features/portal/portal-queries");
 
 beforeAll(async () => {
@@ -290,6 +291,38 @@ it("shows the queue to handlers of that company and to admins only", async () =>
   expect(await listed("admin")).not.toContain(bugId);
 });
 
+it("does not let the picker unpick or hand the bug back", async () => {
+  await setHandlers(ids.clientCompanyId, [personaId("owner")]);
+  const { bugId, version } = await submit("client", "No unpick");
+  const first = await pick("owner", bugId, version);
+  expect(first._tag).toBe("Success");
+  const row = await bugRow(bugId);
+
+  // Picking again is refused: the bug is no longer waiting in the queue.
+  const again = await pick("owner", bugId, row.version);
+  expect(again._tag).toBe("Failure");
+
+  // The generic task editor cannot clear the assignee of a bug either.
+  const cleared = await callAs("owner", taskEditing.updateTaskAction, {
+    assigneeIds: [],
+    description: null,
+    dueDate: null,
+    expectedVersion: 1,
+    idempotencyKey: nextKey(),
+    priority: "high",
+    status: "progress",
+    taskId: row.taskId,
+    title: "No unpick",
+  });
+  expect(cleared).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
+  expect(await bugRow(bugId)).toMatchObject({ pickedById: personaId("owner") });
+  const assignees = await authPool.query<{ userId: string }>(
+    'SELECT "userId" FROM task_assignee WHERE "taskId" = $1',
+    [row.taskId]
+  );
+  expect(assignees.rows).toEqual([{ userId: personaId("owner") }]);
+});
+
 it("marks an unpicked client bug as picked when an admin triages it directly", async () => {
   await setHandlers(ids.clientCompanyId, [personaId("owner")]);
   const { bugId, version } = await submit("client", "Direct triage");
@@ -352,6 +385,11 @@ it("lets only an admin reassign a picked bug, to any employee", async () => {
     [row.taskId]
   );
   expect(assignees.rows).toEqual([{ userId: personaId("outsider") }]);
+  const picker = await authPool.query<{ pickedById: string }>(
+    'SELECT "pickedById" FROM bug_report WHERE id = $1',
+    [bugId]
+  );
+  expect(picker.rows[0]?.pickedById).toBe(personaId("outsider"));
   const newAssigneeNotices = await notificationsFor(
     personaId("outsider"),
     row.taskId

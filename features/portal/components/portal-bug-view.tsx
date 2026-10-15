@@ -197,7 +197,15 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           Editing, comments, attachments and replies are disabled in preview.
         </p>
       ) : null}
-      {readOnly && !isPreview && !hasLifecycleBanner(bug) ? (
+      {bug.readOnlyReason && !isPreview ? (
+        <p className="portal-banner" role="note">
+          {bug.readOnlyReason}
+        </p>
+      ) : null}
+      {readOnly &&
+      !isPreview &&
+      !bug.readOnlyReason &&
+      !hasLifecycleBanner(bug) ? (
         <p className="portal-banner" role="note">
           {readOnlyMessage(bug)}
         </p>

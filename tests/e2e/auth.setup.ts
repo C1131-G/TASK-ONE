@@ -8,6 +8,7 @@ import {
   CLIENT_TWO_STATE,
   EMPLOYEE_STATE,
   HANDLER_STATE,
+  HANDLER_TWO_STATE,
   PORTAL_ACCOUNTS,
 } from "./auth-state";
 
@@ -74,6 +75,12 @@ const portalSignIns = [
     landing: "/",
     name: "handler signs in once",
     path: HANDLER_STATE,
+  },
+  {
+    email: PORTAL_ACCOUNTS.handlerTwo,
+    landing: "/",
+    name: "handler two signs in once",
+    path: HANDLER_TWO_STATE,
   },
 ] as const;
 

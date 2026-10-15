@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { Effect } from "effect";
 
+import { authPool } from "../../src/server/auth/database";
 import { BugHistory, BugHistoryLive } from "../../src/server/work/bug-history";
 import {
   BugManagement,
@@ -261,6 +262,71 @@ it("completes report, evidence, verification, approval, release, and closure wit
       version: "3.0.1",
     });
   } finally {
+    await removeLifecycleRecords(ids, taskId, bugId);
+  }
+});
+
+// A client report takes the same internal path, but a passing post-release
+// check hands it to the client to verify instead of closing it.
+it("hands a released client report to the client instead of closing it", async () => {
+  const ids: LifecycleIds = {
+    adminId: randomUUID(),
+    employeeId: randomUUID(),
+    projectId: randomUUID(),
+  };
+  await seedLifecycleRecords(ids);
+  const companyId = randomUUID();
+  await authPool.query(
+    'INSERT INTO client_company (id, name, "createdById") VALUES ($1, $2, $3)',
+    [companyId, `Lifecycle client ${companyId}`, ids.adminId]
+  );
+
+  let taskId: string | null = null;
+  let bugId: string | null = null;
+  try {
+    const outcome = await Effect.runPromise(
+      Effect.gen(function* clientLifecycle() {
+        const { report, triage } = yield* reportAndTriage(ids);
+        ({ id: bugId, taskId } = report);
+        yield* Effect.promise(() =>
+          authPool.query(
+            'UPDATE bug_report SET "clientCompanyId" = $2, "clientImpact" = \'high\' WHERE id = $1',
+            [report.id, companyId]
+          )
+        );
+        const fix = yield* failThenPassFix(
+          ids.employeeId,
+          report.id,
+          triage.version
+        );
+        const { closed } = yield* approveReleaseAndClose(ids, report.id, fix);
+        return closed;
+      }).pipe(
+        Effect.provide(BugManagementLive),
+        Effect.provide(BugWorkflowManagementLive),
+        Effect.provide(BugHistoryLive)
+      )
+    );
+
+    expect(outcome.status).toBe("awaiting_client");
+    const row = await authPool.query<{ awaitingClientSince: Date | null }>(
+      'SELECT "awaitingClientSince" FROM bug_report WHERE id = $1',
+      [bugId]
+    );
+    expect(row.rows[0]?.awaitingClientSince).not.toBeNull();
+  } finally {
+    // Handing the bug to the client schedules its 7-day auto-close.
+    await authPool.query("DELETE FROM job WHERE payload->>'bugId' = $1", [
+      bugId,
+    ]);
+    // The company points at the admin, so it goes before the seeded users.
+    await authPool.query(
+      'UPDATE bug_report SET "clientCompanyId" = NULL WHERE "clientCompanyId" = $1',
+      [companyId]
+    );
+    await authPool.query("DELETE FROM client_company WHERE id = $1", [
+      companyId,
+    ]);
     await removeLifecycleRecords(ids, taskId, bugId);
   }
 });

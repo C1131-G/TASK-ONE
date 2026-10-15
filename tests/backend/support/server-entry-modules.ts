@@ -3,6 +3,7 @@
 // this list so a new export cannot slip past them.
 export const serverEntryModules = await Promise.all([
   import("../../../features/calendar/calendar-actions"),
+  import("../../../features/clients/client-logo-actions"),
   import("../../../features/clients/clients-actions"),
   import("../../../features/clients/clients-queries"),
   import("../../../features/company/company-actions"),

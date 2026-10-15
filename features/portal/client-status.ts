@@ -77,7 +77,8 @@ export const clientStatusText: Record<ClientStatusLabel, string> = {
   withdrawn: "Withdrawn",
 };
 
-// Internal statuses a client label covers, for filtering company bugs.
+// Internal statuses a client label covers, for filtering company bugs. "Not a
+// bug" is a closed bug with that resolution, so callers also filter on it.
 export const internalStatusesFor = (
   label: ClientStatusLabel
 ): readonly BugWorkflowStatus[] =>
@@ -97,7 +98,11 @@ export const internalStatusesFor = (
       "awaiting_client",
       "withdrawn",
     ] as const
-  ).filter((status) => clientStatusLabel(status) === label);
+  ).filter(
+    (status) =>
+      clientStatusLabel(status) === label ||
+      (label === "not_a_bug" && status === "closed")
+  );
 
 export const isOpenClientLabel = (label: ClientStatusLabel): boolean =>
   !["closed", "merged", "not_a_bug", "withdrawn"].includes(label);
