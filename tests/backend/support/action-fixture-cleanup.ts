@@ -11,12 +11,18 @@ export const cleanActionFixtures = async (
   const users = `(SELECT id FROM "user" WHERE email LIKE '%@${EMAIL_DOMAIN}')`;
   const projects = `(SELECT id FROM project WHERE name LIKE 'Harness%' OR name LIKE 'Replay%')`;
   const tasks = `(SELECT id FROM task WHERE "projectId" IN ${projects} OR "createdById" IN ${users})`;
+  const bugs = `(SELECT id FROM bug_report WHERE "taskId" IN ${tasks} OR "reporterId" IN ${users})`;
   const statements = [
     `DELETE FROM recurrence_generation WHERE "sourceTaskId" IN ${tasks} OR "successorTaskId" IN ${tasks}`,
     `DELETE FROM upload_intent WHERE "taskId" IN ${tasks} OR "projectId" IN ${projects} OR "ownerId" IN ${users}`,
+    `DELETE FROM bug_release WHERE "bugReportId" IN ${bugs}`,
+    `DELETE FROM bug_approval WHERE "bugReportId" IN ${bugs}`,
+    `DELETE FROM bug_evidence WHERE "bugReportId" IN ${bugs}`,
+    `DELETE FROM bug_relation WHERE "fromBugReportId" IN ${bugs} OR "toBugReportId" IN ${bugs}`,
+    `DELETE FROM bug_fix_attempt WHERE "bugReportId" IN ${bugs}`,
+    `DELETE FROM bug_sla WHERE "bugId" IN ${bugs}`,
+    `DELETE FROM bug_report WHERE id IN ${bugs}`,
     `DELETE FROM file_asset WHERE "projectId" IN ${projects} OR "taskId" IN ${tasks} OR "uploadedById" IN ${users} OR "deletedById" IN ${users}`,
-    `DELETE FROM bug_sla WHERE "bugId" IN (SELECT id FROM bug_report WHERE "taskId" IN ${tasks} OR "reporterId" IN ${users})`,
-    `DELETE FROM bug_report WHERE "taskId" IN ${tasks} OR "reporterId" IN ${users}`,
     `DELETE FROM comment WHERE "taskId" IN ${tasks} OR "authorId" IN ${users} OR "deletedById" IN ${users}`,
     `DELETE FROM comment_reaction WHERE "userId" IN ${users}`,
     `DELETE FROM task_subtask WHERE "taskId" IN ${tasks} OR "assigneeId" IN ${users}`,

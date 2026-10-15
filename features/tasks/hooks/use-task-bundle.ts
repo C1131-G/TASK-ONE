@@ -15,18 +15,24 @@ import type {
 // error so the reads and the comment actions report into one place. A deep link
 // hands in the server's read as initialBundle, so the first load skips a round trip.
 export const useTaskBundle = ({
+  allowPublicReplies = false,
   initialBundle,
   isOpen,
   projectId,
   taskId,
 }: {
+  readonly allowPublicReplies?: boolean | undefined;
   readonly initialBundle: Promise<TaskBundle> | null;
   readonly isOpen: boolean;
   readonly projectId: string;
   readonly taskId: string;
 }) => {
   const [error, setError] = useState<string | null>(null);
-  const comments = useTaskComments({ onError: setError, taskId });
+  const comments = useTaskComments({
+    allowPublicReplies,
+    onError: setError,
+    taskId,
+  });
   const { setComments } = comments;
   const [task, setTask] = useState<EditableTask | null>(null);
   const [subtasks, setSubtasks] = useState<readonly TaskSubtaskView[]>([]);

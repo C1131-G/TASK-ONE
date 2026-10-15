@@ -32,6 +32,8 @@ export type Persona =
   | "admin"
   | "anonymous"
   | "client"
+  | "coworker"
+  | "otherClient"
   | "deactivated"
   | "forced"
   | "outsider"
@@ -50,6 +52,7 @@ export interface Ids {
   archivedProjectId: string;
   archivedTaskId: string;
   clientCompanyId: string;
+  otherClientCompanyId: string;
   employeeId: string;
   fileId: string;
   projectId: string;
@@ -77,6 +80,7 @@ export const ids: Ids = {
   clientCompanyId: "",
   employeeId: "",
   fileId: "",
+  otherClientCompanyId: "",
   projectId: "",
   random: "",
   taskId: "",
@@ -228,6 +232,28 @@ export const setupHarness = async (): Promise<void> => {
     [client.id, clientCompanyId]
   );
   personas.set("client", client);
+  // A colleague in the same company, and a client of a different company.
+  const coworker = await createPersona("employee", "coworker");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [coworker.id, clientCompanyId]
+  );
+  personas.set("coworker", coworker);
+  const otherClientCompanyId = randomUUID();
+  await authPool.query(
+    'INSERT INTO client_company (id, name, "createdById") VALUES ($1, $2, $3)',
+    [
+      otherClientCompanyId,
+      `Harness other client ${otherClientCompanyId}`,
+      bootstrapAdminId,
+    ]
+  );
+  const otherClient = await createPersona("employee", "otherclient");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [otherClient.id, otherClientCompanyId]
+  );
+  personas.set("otherClient", otherClient);
   personas.set("anonymous", { headers: new Headers(), id: "" });
 
   const projectId = randomUUID();
@@ -276,6 +302,7 @@ export const setupHarness = async (): Promise<void> => {
     clientCompanyId,
     employeeId: owner.id,
     fileId,
+    otherClientCompanyId,
     projectId,
     random: randomUUID(),
     taskId,

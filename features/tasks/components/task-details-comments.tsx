@@ -9,6 +9,7 @@ import type { KeyboardEvent } from "react";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
+import type { CommentVisibility } from "@/src/server/collaboration/contracts";
 
 import {
   findMentionQuery,
@@ -23,6 +24,7 @@ export interface TaskCommentView {
   readonly authorName: string;
   readonly body: string;
   readonly createdAt: string;
+  readonly visibility?: CommentVisibility;
   readonly reactions: readonly {
     readonly emoji: string;
     readonly count: number;
@@ -64,12 +66,16 @@ export const TaskCommentsSection = ({
   currentUserId,
   employees,
   isAdmin,
+  allowPublicReplies = false,
   onBodyChange,
   onReact,
   onRemove,
   onSubmit,
+  onVisibilityChange,
   pending,
+  visibility = "internal",
 }: {
+  readonly allowPublicReplies?: boolean;
   readonly body: string;
   readonly comments: readonly TaskCommentView[];
   readonly currentUserId: string | null;
@@ -79,7 +85,9 @@ export const TaskCommentsSection = ({
   readonly onReact: (comment: TaskCommentView, emoji: string) => void;
   readonly onRemove: (commentId: string) => void;
   readonly onSubmit: () => void;
+  readonly onVisibilityChange?: (visibility: CommentVisibility) => void;
   readonly pending: boolean;
+  readonly visibility?: CommentVisibility;
 }) => {
   const fieldId = useId();
   const listboxId = `${fieldId}-mentions`;
@@ -151,6 +159,8 @@ export const TaskCommentsSection = ({
   };
 
   const listOpen = options.length > 0;
+  const showToggle = allowPublicReplies && onVisibilityChange !== undefined;
+  const helperId = `${fieldId}-visibility-help`;
 
   return (
     <section className="stack">
@@ -159,6 +169,9 @@ export const TaskCommentsSection = ({
         <article className="panel panel-b comment" key={comment.id}>
           <div className="row">
             <strong>{comment.authorName}</strong>
+            {comment.visibility === "public" ? (
+              <span className="badge accent">Public</span>
+            ) : null}
             <time className="muted" dateTime={comment.createdAt}>
               {comment.createdAt.slice(0, 10)}
             </time>
@@ -203,7 +216,13 @@ export const TaskCommentsSection = ({
           </div>
         </article>
       ))}
-      <div className="field task-mention-field">
+      <div
+        className={`field task-mention-field${
+          showToggle && visibility === "public"
+            ? " comment-composer-public"
+            : ""
+        }`}
+      >
         <label htmlFor={fieldId}>
           <span>Add a comment</span>
         </label>
@@ -226,6 +245,43 @@ export const TaskCommentsSection = ({
           ref={textareaRef}
           value={body}
         />
+        {showToggle ? (
+          <div className="comment-visibility">
+            <div
+              aria-describedby={helperId}
+              aria-label="Comment visibility"
+              className="comment-visibility-options"
+              role="radiogroup"
+            >
+              {(
+                [
+                  ["internal", "Internal note"],
+                  ["public", "Public reply"],
+                ] as const
+              ).map(([value, label]) => (
+                <label
+                  className="comment-visibility-option"
+                  data-checked={visibility === value}
+                  key={value}
+                >
+                  <input
+                    checked={visibility === value}
+                    name={`${fieldId}-visibility`}
+                    onChange={() => onVisibilityChange(value)}
+                    type="radio"
+                    value={value}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+            <p className="muted" id={helperId}>
+              {visibility === "public"
+                ? "Visible to the client and their colleagues"
+                : "Only your team sees this"}
+            </p>
+          </div>
+        ) : null}
         {listOpen ? (
           // Focus stays in the textarea, which owns the keyboard handling, so
           // Command only renders the list and reports the pointer selection.
@@ -263,7 +319,9 @@ export const TaskCommentsSection = ({
         onClick={onSubmit}
         type="button"
       >
-        Comment
+        {showToggle && visibility === "public"
+          ? "Post public reply"
+          : "Comment"}
       </WorkspaceButton>
     </section>
   );

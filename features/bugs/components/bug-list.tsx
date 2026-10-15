@@ -53,6 +53,9 @@ export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {
               {bug.projectKey}-{bug.projectTaskNumber}
             </span>
             <h2>{bug.title}</h2>
+            {bug.clientCompanyId ? (
+              <span className="bug-client-badge">Client report</span>
+            ) : null}
             {relatedBugIds.length > 0 ? (
               <span className="bug-related-count">
                 {relatedBugIds.length} related

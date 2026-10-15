@@ -6,6 +6,7 @@ import {
   BugDiscoverySourceSchema,
   BugEnvironmentSchema,
   BugSeveritySchema,
+  ClientImpactSchema,
   BugWorkflowStatusSchema,
 } from "./bug-contracts";
 
@@ -13,6 +14,8 @@ export const BugReportItemSchema = Schema.Struct({
   actualBehavior: Schema.String,
   appVersion: Schema.NullOr(Schema.String),
   browser: Schema.NullOr(Schema.String),
+  clientCompanyId: Schema.NullOr(UUIDSchema),
+  clientImpact: Schema.NullOr(ClientImpactSchema),
   component: Schema.String,
   description: Schema.NullOr(Schema.String),
   device: Schema.NullOr(Schema.String),
@@ -58,6 +61,8 @@ export const toBugReportItem = (
     readonly actualBehavior: string;
     readonly appVersion: string | null;
     readonly browser: string | null;
+    readonly clientCompanyId: string | null;
+    readonly clientImpact: typeof ClientImpactSchema.Type | null;
     readonly component: string;
     readonly description: string | null;
     readonly device: string | null;

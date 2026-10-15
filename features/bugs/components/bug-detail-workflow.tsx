@@ -147,6 +147,9 @@ export const BugDetailWorkflow = ({
           </p>
         </div>
         <div className="bug-detail-header-actions">
+          {history.bug.clientCompanyId ? (
+            <span className="bug-client-badge">Client report</span>
+          ) : null}
           <span
             className={`bug-workflow-status bug-status-${history.bug.status}`}
           >

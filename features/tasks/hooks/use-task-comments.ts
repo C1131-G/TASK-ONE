@@ -12,13 +12,16 @@ import {
   toggleCommentReactionAction,
   undoCommentRemovalAction,
 } from "@/features/tasks/tasks-actions";
+import type { CommentVisibility } from "@/src/server/collaboration/contracts";
 
 // Comment state and actions for one task. A removal is undone from the global
 // Undo stack, so it works after the drawer has closed.
 export const useTaskComments = ({
+  allowPublicReplies = false,
   onError,
   taskId,
 }: {
+  readonly allowPublicReplies?: boolean;
   readonly onError: (message: string | null) => void;
   readonly taskId: string;
 }) => {
@@ -27,6 +30,7 @@ export const useTaskComments = ({
   const [pending, startTransition] = useTransition();
   const [comments, setComments] = useState<readonly TaskCommentView[]>([]);
   const [body, setBody] = useState("");
+  const [visibility, setVisibility] = useState<CommentVisibility>("internal");
 
   const refresh = useCallback(async () => {
     const result = await listTaskCommentsAction({ taskId });
@@ -41,6 +45,9 @@ export const useTaskComments = ({
         body: body.trim(),
         idempotencyKey: crypto.randomUUID(),
         taskId,
+        ...(allowPublicReplies && visibility === "public"
+          ? { visibility }
+          : {}),
       });
       if (!result.ok) {
         onError(result.error.message);
@@ -48,6 +55,7 @@ export const useTaskComments = ({
       }
       onError(null);
       setBody("");
+      setVisibility("internal");
       await refresh();
       router.refresh();
     });
@@ -107,6 +115,8 @@ export const useTaskComments = ({
     remove,
     setBody,
     setComments,
+    setVisibility,
     submit,
+    visibility,
   };
 };

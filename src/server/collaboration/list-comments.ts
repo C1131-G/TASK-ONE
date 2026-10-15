@@ -84,6 +84,7 @@ export const listComments = (
             reacted: summary.reacted,
           })),
           taskId: record.taskId,
+          visibility: record.visibility,
         };
       });
     },

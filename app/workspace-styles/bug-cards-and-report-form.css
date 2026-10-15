@@ -158,3 +158,15 @@
   font-size: var(--fs-xs);
   text-transform: capitalize;
 }
+
+.workspace-app .bug-client-badge {
+  align-self: center;
+  background: var(--accent-soft);
+  border-radius: var(--r-full);
+  color: var(--accent);
+  flex: 0 0 auto;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 3px 7px;
+  white-space: nowrap;
+}

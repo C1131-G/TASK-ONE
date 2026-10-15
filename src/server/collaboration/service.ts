@@ -11,12 +11,18 @@ export {
   Collaboration,
   CommentListSchema,
   CommentReactionResultSchema,
+  CommentVisibilitySchema,
   CommentUndoneResultSchema,
   CommentViewSchema,
   CreatedCommentSchema,
   UndoReceiptSchema,
 } from "./contracts";
-export type { CommentView, CreatedComment, UndoReceipt } from "./contracts";
+export type {
+  CommentView,
+  CommentVisibility,
+  CreatedComment,
+  UndoReceipt,
+} from "./contracts";
 
 export const CollaborationLive = Layer.succeed(
   Collaboration,

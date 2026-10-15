@@ -6,7 +6,11 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
-import type { BugListInput, BugReportInput } from "./bug-contracts";
+import type {
+  BugListInput,
+  BugReportInput,
+  ClientImpactSchema,
+} from "./bug-contracts";
 import { BugReportInputSchema } from "./bug-contracts";
 import { listBugs } from "./bug-list-query";
 import type { BugReportItem, BugListSchema } from "./bug-management-contracts";
@@ -78,10 +82,18 @@ const getBugInTransaction = async (
   );
 };
 
-const reportBug = async (
+export interface ClientReportDetails {
+  readonly clientCompanyId: string;
+  readonly clientImpact: typeof ClientImpactSchema.Type;
+}
+
+// Creates the bug and its task. Client reports carry their company and impact
+// so the portal and the handlers' queue can find them.
+export const createBugReport = async (
   transaction: Transaction,
   actorId: string,
-  rawInput: BugReportInput
+  rawInput: BugReportInput,
+  client?: ClientReportDetails
 ): Promise<BugReportItem> => {
   const input = Schema.decodeUnknownSync(BugReportInputSchema)(rawInput);
   const title = input.title.trim();
@@ -118,6 +130,8 @@ const reportBug = async (
     actualBehavior: input.actualBehavior.trim(),
     appVersion: input.appVersion,
     browser: input.browser,
+    clientCompanyId: client?.clientCompanyId ?? null,
+    clientImpact: client?.clientImpact ?? null,
     component,
     createdAt: now,
     description: input.description,
@@ -142,7 +156,12 @@ const reportBug = async (
     action: "bug.reported",
     actorId,
     createdAt: now,
-    details: { bugId: id, projectId: input.projectId, taskId: task.id },
+    details: {
+      bugId: id,
+      projectId: input.projectId,
+      taskId: task.id,
+      ...(client ? { clientCompanyId: client.clientCompanyId } : {}),
+    },
     id: randomUUID(),
     projectId: input.projectId,
     taskId: task.id,
@@ -200,7 +219,7 @@ export const BugManagementLive = Layer.succeed(
         try: () =>
           db.transaction(async (transaction) => {
             await getActiveActor(transaction, actorId);
-            return reportBug(transaction, actorId, input);
+            return createBugReport(transaction, actorId, input);
           }),
       }),
   })
