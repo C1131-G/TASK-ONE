@@ -1,5 +1,7 @@
 import { Effect, Layer, Schema } from "effect";
 
+import { db } from "@/src/prisma/db";
+
 import { AppError } from "../core/action-result";
 import {
   PushNotifications,
@@ -9,6 +11,19 @@ import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
+import { SLA_SWEEP_JOB, runSlaSweep } from "../work/bug-sla";
+import {
+  AWAITING_CLIENT_AUTOCLOSE_JOB,
+  NEEDS_INFO_AUTOCLOSE_JOB,
+  NEEDS_INFO_REMINDER_JOB,
+  autoCloseAwaitingClient,
+  autoCloseNeedsInfo,
+  remindNeedsInfo,
+} from "../work/bug-workflow-client";
+import {
+  UNPICKED_REMINDER_JOB,
+  remindUnpickedClientBug,
+} from "../work/bug-workflow-pick";
 import { JobHandlers } from "./job-handlers";
 
 const EmptyPayloadSchema = Schema.Struct({});
@@ -21,6 +36,17 @@ const DeleteAvatarPayloadSchema = Schema.Struct({
       objectKey.startsWith("company/avatars/")
         ? undefined
         : "Only private avatar objects can be removed by this job."
+    )
+  ),
+});
+const DeleteClientLogoPayloadSchema = Schema.Struct({
+  objectKey: Schema.String.check(
+    Schema.makeFilter((objectKey) =>
+      objectKey.startsWith("company/client-logos/") &&
+      !objectKey.includes("\\") &&
+      !objectKey.split("/").some((part) => part === "." || part === "..")
+        ? undefined
+        : "Only private client logo objects can be removed by this job."
     )
   ),
 });
@@ -46,6 +72,18 @@ const FileCopyPayloadSchema = Schema.Struct({
     )
   ),
 });
+const ClientWaitPayloadSchema = Schema.Struct({
+  bugId: Schema.String.check(Schema.isUUID()),
+  since: Schema.DateFromString,
+});
+const clientWaitJobs = {
+  [AWAITING_CLIENT_AUTOCLOSE_JOB]: autoCloseAwaitingClient,
+  [NEEDS_INFO_AUTOCLOSE_JOB]: autoCloseNeedsInfo,
+  [NEEDS_INFO_REMINDER_JOB]: remindNeedsInfo,
+} as const;
+const UnpickedReminderPayloadSchema = Schema.Struct({
+  bugId: Schema.String.check(Schema.isUUID()),
+});
 const PushDeliveryPayloadSchema = Schema.Struct({
   actorId: Schema.String,
   body: Schema.String,
@@ -55,6 +93,9 @@ const PushDeliveryPayloadSchema = Schema.Struct({
     "comment",
     "update",
     "due",
+    "client_bug",
+    "status",
+    "sla",
   ]),
   notificationId: Schema.String.check(Schema.isUUID()),
   title: Schema.String,
@@ -101,6 +142,19 @@ export const JobHandlersLive = Layer.effect(
             Effect.flatMap(({ objectKey }) => storage.deleteObject(objectKey))
           );
         }
+        if (kind === "storage.delete-client-logo") {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The client logo cleanup job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(DeleteClientLogoPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ objectKey }) => storage.deleteObject(objectKey))
+          );
+        }
         if (kind === "storage.copy-file") {
           return Effect.try({
             catch: () =>
@@ -119,6 +173,72 @@ export const JobHandlersLive = Layer.effect(
                   targetKey
                 )
             )
+          );
+        }
+        if (kind in clientWaitJobs) {
+          const run = clientWaitJobs[kind as keyof typeof clientWaitJobs];
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The client follow-up job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(ClientWaitPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ bugId, since }) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The client follow-up could not be completed.",
+                  }),
+                try: () =>
+                  db.transaction((transaction) =>
+                    run(transaction, bugId, since)
+                  ),
+              })
+            ),
+            Effect.asVoid
+          );
+        }
+        if (kind === SLA_SWEEP_JOB) {
+          return Effect.tryPromise({
+            catch: () =>
+              new AppError({
+                code: "UNAVAILABLE",
+                message: "The SLA sweep could not be completed.",
+              }),
+            try: () =>
+              db.transaction((transaction) =>
+                runSlaSweep(transaction, new Date())
+              ),
+          }).pipe(Effect.asVoid);
+        }
+        if (kind === UNPICKED_REMINDER_JOB) {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The unpicked-bug reminder payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(UnpickedReminderPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ bugId }) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The unpicked-bug reminder could not be sent.",
+                  }),
+                try: () =>
+                  db.transaction((transaction) =>
+                    remindUnpickedClientBug(transaction, bugId)
+                  ),
+              })
+            ),
+            Effect.asVoid
           );
         }
         if (kind === "notifications.deliver-push") {

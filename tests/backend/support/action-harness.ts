@@ -31,6 +31,9 @@ export { authPool };
 export type Persona =
   | "admin"
   | "anonymous"
+  | "client"
+  | "coworker"
+  | "otherClient"
   | "deactivated"
   | "forced"
   | "outsider"
@@ -48,6 +51,8 @@ export type ActionFunction = (input: unknown) => Promise<ActionResultLike>;
 export interface Ids {
   archivedProjectId: string;
   archivedTaskId: string;
+  clientCompanyId: string;
+  otherClientCompanyId: string;
   employeeId: string;
   fileId: string;
   projectId: string;
@@ -72,8 +77,10 @@ let startedAt = new Date();
 export const ids: Ids = {
   archivedProjectId: "",
   archivedTaskId: "",
+  clientCompanyId: "",
   employeeId: "",
   fileId: "",
+  otherClientCompanyId: "",
   projectId: "",
   random: "",
   taskId: "",
@@ -87,12 +94,32 @@ export const nextKey = (): string => {
 export const personaId = (persona: Persona): string =>
   personas.get(persona)?.id ?? "";
 
+export const personaHeaders = (persona: Persona): Headers =>
+  personas.get(persona)?.headers ?? new Headers();
+
 export const callAs = async <Result extends ActionResultLike>(
   persona: Persona,
   action: (input: unknown) => Promise<Result>,
   input: unknown
 ): Promise<Result> => {
   currentHeaders = personas.get(persona)?.headers ?? new Headers();
+  return await action(input);
+};
+
+// Runs an action as a persona whose browser also carries one extra cookie.
+export const callAsWithCookie = async <Result extends ActionResultLike>(
+  persona: Persona,
+  cookie: string,
+  action: (input: unknown) => Promise<Result>,
+  input: unknown
+): Promise<Result> => {
+  const base = personas.get(persona)?.headers ?? new Headers();
+  const headers = new Headers(base);
+  headers.set(
+    "cookie",
+    [base.get("cookie"), cookie].filter(Boolean).join("; ")
+  );
+  currentHeaders = headers;
   return await action(input);
 };
 
@@ -208,6 +235,42 @@ export const setupHarness = async (): Promise<void> => {
   personas.set("outsider", outsider);
   personas.set("forced", forced);
   personas.set("deactivated", deactivated);
+
+  // A client portal account. It signs in like everyone else, then becomes a
+  // client of a harness company.
+  const clientCompanyId = randomUUID();
+  await authPool.query(
+    'INSERT INTO client_company (id, name, "createdById") VALUES ($1, $2, $3)',
+    [clientCompanyId, `Harness client ${clientCompanyId}`, bootstrapAdminId]
+  );
+  const client = await createPersona("employee", "client");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [client.id, clientCompanyId]
+  );
+  personas.set("client", client);
+  // A colleague in the same company, and a client of a different company.
+  const coworker = await createPersona("employee", "coworker");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [coworker.id, clientCompanyId]
+  );
+  personas.set("coworker", coworker);
+  const otherClientCompanyId = randomUUID();
+  await authPool.query(
+    'INSERT INTO client_company (id, name, "createdById") VALUES ($1, $2, $3)',
+    [
+      otherClientCompanyId,
+      `Harness other client ${otherClientCompanyId}`,
+      bootstrapAdminId,
+    ]
+  );
+  const otherClient = await createPersona("employee", "otherclient");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [otherClient.id, otherClientCompanyId]
+  );
+  personas.set("otherClient", otherClient);
   personas.set("anonymous", { headers: new Headers(), id: "" });
 
   const projectId = randomUUID();
@@ -253,8 +316,10 @@ export const setupHarness = async (): Promise<void> => {
   Object.assign(ids, {
     archivedProjectId,
     archivedTaskId,
+    clientCompanyId,
     employeeId: owner.id,
     fileId,
+    otherClientCompanyId,
     projectId,
     random: randomUUID(),
     taskId,

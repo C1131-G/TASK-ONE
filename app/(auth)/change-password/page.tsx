@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 
 const LOGIN_PATH: Route = "/login";
 const WORKSPACE_PATH: Route = "/";
+const PORTAL_PATH: Route = "/portal";
 
 const PasswordChangeGate = async () => {
   const session = await getPageSession();
@@ -24,7 +25,7 @@ const PasswordChangeGate = async () => {
     redirect(LOGIN_PATH);
   }
   if (!session.user.mustChangePassword) {
-    redirect(WORKSPACE_PATH);
+    redirect(session.user.role === "client" ? PORTAL_PATH : WORKSPACE_PATH);
   }
   return <ChangePasswordForm />;
 };

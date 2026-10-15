@@ -138,8 +138,8 @@ const claimUploadIntent = (actorId: string, uploadIntentId: string) =>
 
 // Shared by download and preview: the file must be ready, and standalone project files are admin-only.
 const findReadableFile = async (actorId: string, fileId: string) => {
-  const [actorRole, file] = await Promise.all([
-    internal.activeRole(actorId),
+  const [actor, file] = await Promise.all([
+    internal.activeActor(actorId),
     db.orm.public.FileAsset.where({ deletedAt: null, id: fileId }).first(),
   ]);
   if (!file) {
@@ -147,6 +147,10 @@ const findReadableFile = async (actorId: string, fileId: string) => {
       code: "NOT_FOUND",
       message: "The file was not found.",
     });
+  }
+  const actorRole = actor.role;
+  if (actorRole === "client") {
+    await internal.assertClientCanReadFile(actor, file);
   }
   if (file.copyState !== "ready") {
     throw new AppError({

@@ -102,7 +102,13 @@ const listTaskFiles = (
   Effect.tryPromise({
     catch: internal.mapError,
     try: async () => {
-      await internal.activeRole(actorId);
+      // Clients see attachments only through the portal's own safe lists.
+      if ((await internal.activeRole(actorId)) === "client") {
+        throw new AppError({
+          code: "FORBIDDEN",
+          message: "This area is only available to workspace members.",
+        });
+      }
       const task = await db.orm.public.Task.where({ id: taskId })
         .select("id")
         .first();
@@ -161,6 +167,13 @@ export const makeUploadRequestOperations = (storage: StorageApi) => {
               actor,
               input.taskId
             );
+            if (actor.role === "client") {
+              await internal.assertClientUploadAllowed(
+                transaction,
+                task.id,
+                input
+              );
+            }
             return createUploadIntent(transaction, actorId, {
               contentType: input.contentType,
               fileName: input.fileName,

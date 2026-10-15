@@ -89,7 +89,9 @@ const ChangePasswordForm = () => {
         newPassword,
       });
       if (result.ok) {
-        router.replace("/");
+        // The password page routes a finished account to its own home
+        // (workspace or client portal) on the server.
+        router.replace("/change-password");
         router.refresh();
         return;
       }

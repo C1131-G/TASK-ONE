@@ -2,6 +2,7 @@ import {
   Archive,
   Bell,
   Bug,
+  Buildings,
   CalendarBlank,
   ChartLineUp,
   CheckCircle,
@@ -20,6 +21,8 @@ import type { Icon } from "@phosphor-icons/react";
 import type { Route } from "next";
 
 interface NavigationItem {
+  // Admin-only pages are hidden from other roles; the pages also gate access.
+  readonly adminOnly?: boolean;
   readonly Icon: Icon;
   readonly href: Route;
   readonly label: string;
@@ -46,13 +49,19 @@ export const sections: readonly NavigationSection[] = [
       { Icon: FolderOpen, href: "/projects", label: "Projects" },
       { Icon: ListChecks, href: "/tasks", label: "Tasks" },
       { Icon: Bug, href: "/bugs", label: "Bugs" },
-      { Icon: CheckCircle, href: "/bug-approvals", label: "Bug approvals" },
+      {
+        Icon: CheckCircle,
+        adminOnly: true,
+        href: "/bug-approvals",
+        label: "Bug approvals",
+      },
       { Icon: CalendarBlank, href: "/calendar", label: "Calendar" },
       { Icon: ChartLineUp, href: "/timeline", label: "Timeline" },
       { Icon: Files, href: "/files", label: "Files" },
       { Icon: UsersThree, href: "/members", label: "Members" },
       { Icon: Activity, href: "/activity", label: "Activity" },
       { Icon: UsersThree, href: "/teams", label: "Teams" },
+      { Icon: Buildings, adminOnly: true, href: "/clients", label: "Clients" },
       { Icon: Archive, href: "/archive", label: "Archive" },
       { Icon: GearSix, href: "/settings", label: "Settings" },
     ],

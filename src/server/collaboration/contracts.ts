@@ -3,7 +3,10 @@ import { Context, Schema } from "effect";
 
 import type { AppError } from "../core/action-result";
 
+export type CommentVisibility = "public" | "internal";
+
 export interface CreatedComment {
+  readonly visibility: CommentVisibility;
   readonly id: string;
   readonly taskId: string;
   readonly authorId: string;
@@ -25,12 +28,15 @@ export interface UndoReceipt {
   readonly undoId: string;
 }
 
+export const CommentVisibilitySchema = Schema.Literals(["public", "internal"]);
+
 export const CreatedCommentSchema = Schema.Struct({
   authorId: Schema.String,
   body: Schema.String,
   createdAt: Schema.String,
   id: Schema.String,
   taskId: Schema.String,
+  visibility: CommentVisibilitySchema,
 });
 
 export const CommentViewSchema = Schema.Struct({
@@ -69,7 +75,8 @@ export class Collaboration extends Context.Service<
     readonly createComment: (
       actorId: string,
       taskId: string,
-      body: string
+      body: string,
+      visibility?: CommentVisibility
     ) => Effect.Effect<CreatedComment, AppError>;
     readonly removeComment: (
       actorId: string,

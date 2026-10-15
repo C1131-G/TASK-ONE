@@ -1,0 +1,50 @@
+.workspace-app .sla-fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+  padding: 12px;
+}
+.workspace-app .sla-fieldset > legend {
+  font-size: var(--fs-sm);
+  font-weight: 550;
+  padding: 0 6px;
+}
+.workspace-app .sla-help {
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+.workspace-app .sla-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.workspace-app .sla-day {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+}
+.workspace-app .sla-table-wrap {
+  overflow-x: auto;
+}
+.workspace-app .sla-table {
+  min-width: 520px;
+  table-layout: auto;
+}
+.workspace-app .sla-target {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(70px, 1fr) minmax(110px, 1.4fr);
+}
+.workspace-app .sla-saved {
+  color: var(--text);
+  margin: 0;
+}

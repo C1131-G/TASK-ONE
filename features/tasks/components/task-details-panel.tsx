@@ -68,8 +68,26 @@ export const TaskDetailsPanel = ({
   const setDetailsDirty = useCallback((dirty: boolean) => {
     detailsDirtyRef.current = dirty;
   }, []);
+  // Only a bug reported by a client company can take public replies.
+  const [clientBug, setClientBug] = useState<{
+    readonly bugId: string;
+    readonly isClient: boolean;
+  } | null>(null);
+  const handleClientReportChange = useCallback(
+    (isClient: boolean) => {
+      if (bugId !== undefined) {
+        setClientBug({ bugId, isClient });
+      }
+    },
+    [bugId]
+  );
+  const allowPublicReplies =
+    taskType === "bug" && bugId !== undefined && clientBug?.bugId === bugId
+      ? clientBug.isClient
+      : false;
   const { comments, error, files, refresh, setSubtasks, subtasks, task } =
     useTaskBundle({
+      allowPublicReplies,
       initialBundle: initialBundlePromise,
       isOpen,
       projectId,
@@ -87,6 +105,7 @@ export const TaskDetailsPanel = ({
     react: handleReact,
     remove: handleRemoveComment,
     setBody: handleCommentBodyChange,
+    setVisibility: handleVisibilityChange,
     submit: handleSubmitComment,
   } = comments;
   const handleSaved = useTaskPanelSave({
@@ -117,6 +136,7 @@ export const TaskDetailsPanel = ({
   const discardAndClose = () => {
     setDiscardOpen(false);
     comments.setBody("");
+    comments.setVisibility("internal");
     detailsDirtyRef.current = false;
     setOpen(false);
   };
@@ -147,6 +167,7 @@ export const TaskDetailsPanel = ({
                 bugId={bugId}
                 employees={employees}
                 isAdmin={isAdmin}
+                onClientReportChange={handleClientReportChange}
                 userId={currentUserId ?? ""}
               />
             ) : (
@@ -170,12 +191,15 @@ export const TaskDetailsPanel = ({
               comments={comments.comments}
               currentUserId={currentUserId}
               employees={employees}
+              allowPublicReplies={allowPublicReplies}
               isAdmin={isAdmin}
               onBodyChange={handleCommentBodyChange}
               onReact={handleReact}
               onRemove={handleRemoveComment}
               onSubmit={handleSubmitComment}
+              onVisibilityChange={handleVisibilityChange}
               pending={comments.pending}
+              visibility={comments.visibility}
             />
             <section className="stack">
               <h3>Attachments</h3>

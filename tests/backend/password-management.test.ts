@@ -84,11 +84,18 @@ it("lets a forced-change account replace its temporary password and access the w
     expect(user.id).toBe(created.id);
     expect(user.mustChangePassword).toBe(false);
   } finally {
+    await authPool.query(
+      'DELETE FROM audit_event WHERE "actorId" = $1 OR "subjectUserId" = $1 OR "subjectUserId" = $2',
+      [administratorId, userId ?? administratorId]
+    );
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       administratorId,
     ]);
     if (userId) {
       await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
+        userId,
+      ]);
+      await authPool.query('DELETE FROM audit_event WHERE "actorId" = $1', [
         userId,
       ]);
       await authPool.query('DELETE FROM "user" WHERE id = $1', [userId]);

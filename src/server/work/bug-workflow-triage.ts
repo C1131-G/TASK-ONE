@@ -4,6 +4,7 @@ import { Schema } from "effect";
 
 import type { BugRelationInput, BugTriageInput } from "./bug-contracts";
 import { BugRelationInputSchema, BugTriageInputSchema } from "./bug-contracts";
+import { markFirstResponse } from "./bug-sla";
 import { transitionBugStatus } from "./bug-workflow";
 import {
   decodeBugWorkflowStatus,
@@ -22,24 +23,26 @@ import type { BugWorkflowReceipt } from "./bug-workflow-internal";
 import type { Transaction } from "./work-internal";
 import { notifyTaskAssignees } from "./work-notifications";
 
-export const triageBug = async (
+export interface TriageDecision {
+  readonly assigneeIds: readonly string[];
+  readonly priority: BugTriageInput["priority"];
+  readonly severity: BugTriageInput["severity"];
+}
+
+// The triage itself, shared by admin triage and a handler picking a client
+// bug. It trusts the caller to have checked who may triage.
+export const applyTriage = async (
   transaction: Transaction,
-  actorId: string,
-  rawInput: BugTriageInput
+  actor: { readonly id: string; readonly name: string },
+  context: {
+    readonly bug: Awaited<ReturnType<typeof loadBug>>["bug"];
+    readonly project: Awaited<ReturnType<typeof loadBug>>["project"];
+    readonly task: Awaited<ReturnType<typeof loadBug>>["task"];
+  },
+  decision: TriageDecision
 ): Promise<BugWorkflowReceipt> => {
-  const input = Schema.decodeUnknownSync(BugTriageInputSchema)(rawInput);
-  const actor = await workspaceActor(transaction, actorId);
-  if (actor.role !== "admin") {
-    forbidden("Only admins can triage bug reports.");
-  }
-  const { bug, project, task } = await loadBug(transaction, input.bugId);
-  assertWritable(bug, task, project);
-  if (
-    bug.version !== input.expectedVersion ||
-    !["reported", "triaged"].includes(bug.status)
-  ) {
-    conflict();
-  }
+  const { bug, project, task } = context;
+  const { assigneeIds } = decision;
   if (bug.status === "reported") {
     transitionBugStatus({
       actorRole: "admin",
@@ -48,12 +51,12 @@ export const triageBug = async (
     });
   }
   const assignees = await transaction.orm.public.User.where((user) =>
-    user.id.in(input.assigneeIds)
+    user.id.in([...assigneeIds])
   )
     .select("id", "deactivatedAt", "role")
     .all();
   if (
-    assignees.length !== new Set(input.assigneeIds).size ||
+    assignees.length !== new Set(assigneeIds).size ||
     assignees.some(
       ({ deactivatedAt, role }) => deactivatedAt || role !== "employee"
     )
@@ -62,17 +65,17 @@ export const triageBug = async (
   }
   const now = new Date();
   await transaction.orm.public.Task.where({ id: task.id }).update({
-    priority: input.priority,
+    priority: decision.priority,
     updatedAt: now,
   });
   await transaction.orm.public.TaskAssignee.where({
     taskId: task.id,
   }).deleteAll();
   await Promise.all(
-    input.assigneeIds.map((userId) =>
+    assigneeIds.map((userId) =>
       transaction.orm.public.TaskAssignee.create({
         assignedAt: now,
-        assignedById: actorId,
+        assignedById: actor.id,
         taskId: task.id,
         userId,
       })
@@ -81,12 +84,12 @@ export const triageBug = async (
   const result =
     bug.status === "reported"
       ? await updateBugStatus(transaction, {
-          actorId,
+          actorId: actor.id,
           bug,
           details: {
-            assigneeIds: input.assigneeIds,
-            priority: input.priority,
-            severity: input.severity,
+            assigneeIds,
+            priority: decision.priority,
+            severity: decision.severity,
           },
           nextStatus: "triaged",
           now,
@@ -97,7 +100,7 @@ export const triageBug = async (
             id: bug.id,
             version: bug.version,
           }).updateAndCount({
-            severity: input.severity,
+            severity: decision.severity,
             updatedAt: now,
             version,
           });
@@ -106,33 +109,75 @@ export const triageBug = async (
           }
           await writeActivity(transaction, {
             action: "bug.triaged",
-            actorId,
+            actorId: actor.id,
             bugId: bug.id,
-            details: {
-              assigneeIds: input.assigneeIds,
-              priority: input.priority,
-            },
+            details: { assigneeIds, priority: decision.priority },
             now,
             projectId: project.id,
             taskId: task.id,
           });
           return { bugId: bug.id, status: "triaged" as const, version };
         })();
-  if (input.severity !== bug.severity) {
+  if (decision.severity !== bug.severity) {
     await transaction.orm.public.BugReport.where({ id: bug.id }).update({
-      severity: input.severity,
+      severity: decision.severity,
     });
+  }
+  if (bug.clientCompanyId) {
+    await markFirstResponse(transaction, bug.id, now);
+    // Whoever gets a client bug now owns it: an unpicked report counts as
+    // picked by its first assignee, and a reassignment flag is resolved.
+    const [firstAssignee] = assigneeIds;
+    await transaction.orm.public.BugReport.where({
+      id: bug.id,
+      pickedById: null,
+    }).updateAll(
+      firstAssignee
+        ? { pickedAt: now, pickedById: firstAssignee }
+        : { updatedAt: now }
+    );
+    if (bug.needsReassignment) {
+      await transaction.orm.public.BugReport.where({ id: bug.id }).update({
+        needsReassignment: false,
+      });
+    }
   }
   await notifyTaskAssignees(
     transaction,
     { id: actor.id, name: actor.name },
     { id: task.id, projectId: project.id, title: task.title },
-    input.assigneeIds,
+    [...assigneeIds],
     now,
     "assignment",
     `/bugs/${bug.id}`
   );
   return result;
+};
+
+export const triageBug = async (
+  transaction: Transaction,
+  actorId: string,
+  rawInput: BugTriageInput
+): Promise<BugWorkflowReceipt> => {
+  const input = Schema.decodeUnknownSync(BugTriageInputSchema)(rawInput);
+  const actor = await workspaceActor(transaction, actorId);
+  if (actor.role !== "admin") {
+    forbidden("Only admins can triage bug reports.");
+  }
+  const context = await loadBug(transaction, input.bugId);
+  const { bug, project, task } = context;
+  assertWritable(bug, task, project);
+  if (
+    bug.version !== input.expectedVersion ||
+    !["reported", "triaged"].includes(bug.status)
+  ) {
+    conflict();
+  }
+  return applyTriage(transaction, actor, context, {
+    assigneeIds: input.assigneeIds,
+    priority: input.priority,
+    severity: input.severity,
+  });
 };
 
 export const addBugRelation = async (

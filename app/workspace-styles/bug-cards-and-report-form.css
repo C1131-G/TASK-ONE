@@ -158,3 +158,116 @@
   font-size: var(--fs-xs);
   text-transform: capitalize;
 }
+
+.workspace-app .bug-client-badge {
+  align-self: center;
+  background: var(--accent-soft);
+  border-radius: var(--r-full);
+  color: var(--accent);
+  flex: 0 0 auto;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.workspace-app .bug-impact-chip {
+  align-self: center;
+  background: var(--bg-muted, var(--muted));
+  border-radius: var(--r-full);
+  color: var(--muted-foreground);
+  flex: 0 0 auto;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 3px 7px;
+}
+.workspace-app .bug-impact-high {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.workspace-app .bug-impact-urgent {
+  background: var(--red-soft);
+  color: var(--red);
+}
+.workspace-app .bug-client-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin: 0 0 12px;
+}
+.workspace-app .bug-client-facts dt {
+  color: var(--muted-foreground);
+  font-size: var(--fs-xs);
+}
+.workspace-app .bug-client-facts dd {
+  font-weight: 600;
+  margin: 2px 0 0;
+}
+.workspace-app .bug-client-warning {
+  background: var(--red-soft);
+  border: 1px solid var(--red);
+  border-radius: var(--r);
+  color: var(--red);
+  font-weight: 600;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+}
+.workspace-app .bug-client-banner {
+  background: var(--accent-soft);
+  border-radius: var(--r);
+  color: var(--accent);
+  display: block;
+  font-size: var(--fs-sm);
+  padding: 10px 12px;
+}
+.workspace-app .bug-client-waiting {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.workspace-app .bug-client-success {
+  color: var(--green, var(--accent));
+  font-size: var(--fs-sm);
+}
+.workspace-app .bug-client-action {
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+.workspace-app .bug-client-action h3 {
+  margin: 0 0 4px;
+}
+.workspace-app .bug-client-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.workspace-app .bug-client-banner + .bug-client-banner {
+  margin-top: 8px;
+}
+.workspace-app .bug-sla-chip {
+  align-self: center;
+  background: var(--bg-muted, var(--muted));
+  border-radius: var(--r-full);
+  color: var(--muted-foreground);
+  flex: 0 0 auto;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+.workspace-app .bug-sla-chip.bug-sla-warning {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.workspace-app .bug-sla-chip.bug-sla-breached {
+  background: var(--red-soft);
+  color: var(--red);
+}
+.workspace-app .bug-sla-text.bug-sla-warning {
+  color: var(--amber);
+}
+.workspace-app .bug-sla-text.bug-sla-breached,
+.workspace-app .bug-sla-text.bug-sla-missed {
+  color: var(--red);
+}

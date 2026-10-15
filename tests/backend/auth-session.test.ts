@@ -28,3 +28,19 @@ it("rejects requests that have no authenticated session", async () => {
     ok: false,
   });
 });
+
+// Client sessions themselves (company resolution, workspace refusal) are
+// covered with real accounts in client-access.test.ts.
+it("rejects portal requests that have no authenticated session", async () => {
+  const program = Effect.gen(function* program() {
+    const session = yield* AuthSession;
+    return yield* session.requirePortalAccess(new Headers());
+  });
+
+  expect(
+    await runEffectResult(
+      Effect.provide(program, AuthSessionLive),
+      "req-auth-session-portal-anonymous"
+    )
+  ).toMatchObject({ error: { code: "UNAUTHENTICATED" }, ok: false });
+});

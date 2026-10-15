@@ -182,3 +182,47 @@
   place-items: center;
   color: var(--text-4);
 }
+
+/* Comment composer: internal note / public reply toggle */
+.workspace-app .comment-visibility {
+  display: grid;
+  gap: 4px;
+}
+.workspace-app .comment-visibility-options {
+  display: inline-flex;
+  width: fit-content;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+}
+.workspace-app .comment-visibility-option {
+  position: relative;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  cursor: pointer;
+}
+.workspace-app .comment-visibility-option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.workspace-app .comment-visibility-option[data-checked="true"] {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+.workspace-app .comment-visibility-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.workspace-app .comment-composer-public {
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  outline: 1px solid var(--accent);
+}

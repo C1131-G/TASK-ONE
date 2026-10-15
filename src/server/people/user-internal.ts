@@ -100,23 +100,27 @@ export const validatePerson = (
   return { email, jobTitle, name };
 };
 
-export const createCredentialUser = async (
+export const createCredentialUser = async <
+  Role extends CreateEmployeeInput["role"] | "client",
+>(
   transaction: DbTransaction,
   values: {
     readonly email: string;
     readonly name: string;
     readonly jobTitle: string | null;
-    readonly role: CreateEmployeeInput["role"];
+    readonly role: Role;
+    readonly clientCompanyId?: string;
     readonly teamId: string | null;
     readonly temporaryPassword: string;
     readonly passwordHash: string;
     readonly actorId?: string;
     readonly activityAction: string;
   }
-): Promise<CreatedEmployee> => {
+): Promise<Omit<CreatedEmployee, "role"> & { readonly role: Role }> => {
   const userId = randomUUID();
   const user = await transaction.orm.public.User.create({
     banned: false,
+    clientCompanyId: values.clientCompanyId ?? null,
     createdAt: new Date(),
     deactivatedAt: null,
     deactivatedById: null,

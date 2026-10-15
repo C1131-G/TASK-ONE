@@ -1,0 +1,26 @@
+// use prisma-8
+
+model ClientCompany {
+  id              Uuid @id @default(uuid())
+  name            String @unique
+  logoAssetId     Uuid?
+  deactivatedAt   TimestamptzJsDate?
+  deactivatedById String?
+  createdById     String
+  createdAt       TimestamptzJsDate @default(now())
+  updatedAt       TimestamptzJsDate @default(now())
+  version         Int @default(1)
+
+  createdBy     User  @relation("ClientCompanyCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  deactivatedBy User? @relation("ClientCompanyDeactivatedBy", fields: [deactivatedById], references: [id], onDelete: Restrict)
+  users         User[] @relation("ClientCompanyUsers")
+  projects      ClientCompanyProject[]
+  handlers      ClientCompanyHandler[]
+  bugReports    BugReport[]
+
+  @@check(expression: "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)", name: "client_company_deactivation_fields_paired")
+  @@index([deactivatedAt])
+  @@index([createdById])
+  @@index([deactivatedById])
+  @@map("client_company")
+}

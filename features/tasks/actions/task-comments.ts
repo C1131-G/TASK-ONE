@@ -10,6 +10,7 @@ import {
   CommentListSchema,
   CommentReactionResultSchema,
   CommentUndoneResultSchema,
+  CommentVisibilitySchema,
   CreatedCommentSchema,
   UndoReceiptSchema,
 } from "@/src/server/collaboration/service";
@@ -77,19 +78,27 @@ export async function createCommentAction(input: unknown) {
       body: Schema.String,
       idempotencyKey: IdempotencyKeySchema,
       taskId: UUIDSchema,
+      // Comments stay internal unless the author chooses a public reply.
+      visibility: Schema.optional(CommentVisibilitySchema),
     }),
     (actorId, validated) =>
       Effect.gen(function* createComment() {
         const collaboration = yield* Collaboration;
         const idempotency = yield* Idempotency;
-        const commentInput = { body: validated.body, taskId: validated.taskId };
+        const visibility = validated.visibility ?? "internal";
+        const commentInput = {
+          body: validated.body,
+          taskId: validated.taskId,
+          visibility,
+        };
         return yield* idempotency.run({
           actorId,
           execute: () =>
             collaboration.createComment(
               actorId,
               validated.taskId,
-              validated.body
+              validated.body,
+              visibility
             ),
           input: commentInput,
           key: validated.idempotencyKey,

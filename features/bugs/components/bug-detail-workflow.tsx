@@ -18,6 +18,7 @@ import {
 } from "@/features/bugs/bugs-actions";
 import type { addBugFixAttemptAction } from "@/features/bugs/bugs-actions";
 import { BugApprovalReleaseSection } from "@/features/bugs/components/bug-approval-release-section";
+import { BugClientSection } from "@/features/bugs/components/bug-client-section";
 import { BugDiscoverySection } from "@/features/bugs/components/bug-discovery-section";
 import { BugEvidenceSection } from "@/features/bugs/components/bug-evidence-section";
 import { BugInvestigationSection } from "@/features/bugs/components/bug-investigation-section";
@@ -37,14 +38,17 @@ type BugActionResult = Awaited<ReturnType<typeof addBugFixAttemptAction>>;
 const statusLabels: Record<BugHistory["bug"]["status"], string> = {
   approved_for_release: "Approved for release",
   awaiting_admin_approval: "Awaiting admin approval",
+  awaiting_client: "Awaiting client",
   closed: "Closed",
   duplicate: "Duplicate",
   in_progress: "In progress",
   in_verification: "In verification",
+  needs_info: "Needs info",
   rejected: "Changes requested",
   released: "Released",
   reported: "Reported",
   triaged: "Triaged",
+  withdrawn: "Withdrawn",
 };
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -78,12 +82,15 @@ export const BugDetailWorkflow = ({
   const latestAttempt = history.attempts.at(-1) ?? null;
   const isReadOnly =
     history.archived ||
+    // Mirrors the server's read-only statuses in bug-workflow-internal.ts.
     [
       "closed",
       "duplicate",
       "awaiting_admin_approval",
       "approved_for_release",
       "released",
+      "awaiting_client",
+      "withdrawn",
     ].includes(history.bug.status);
 
   const finishAction = (result: BugActionResult) => {
@@ -144,6 +151,9 @@ export const BugDetailWorkflow = ({
           </p>
         </div>
         <div className="bug-detail-header-actions">
+          {history.bug.clientCompanyId ? (
+            <span className="bug-client-badge">Client report</span>
+          ) : null}
           <span
             className={`bug-workflow-status bug-status-${history.bug.status}`}
           >
@@ -167,7 +177,11 @@ export const BugDetailWorkflow = ({
               Restore
             </Button>
           ) : null}
-          {isAdmin && !history.archived && history.bug.status === "closed" ? (
+          {isAdmin &&
+          !history.archived &&
+          ["closed", "awaiting_client", "needs_info"].includes(
+            history.bug.status
+          ) ? (
             <Button
               disabled={pending}
               onClick={() =>
@@ -216,6 +230,11 @@ export const BugDetailWorkflow = ({
         </output>
       ) : null}
 
+      <BugClientSection
+        employees={employees}
+        history={history}
+        isAdmin={isAdmin}
+      />
       <BugDiscoverySection history={history} />
       <BugTriageSection
         employees={employees}

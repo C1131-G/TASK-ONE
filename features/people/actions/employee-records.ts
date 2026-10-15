@@ -3,6 +3,7 @@
 import { Effect, Schema } from "effect";
 import { revalidatePath, updateTag } from "next/cache";
 
+import { auditEffect } from "@/src/server/audit/audit-log";
 import { AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import {
@@ -80,7 +81,17 @@ export async function deactivateEmployeeAction(input: unknown) {
           execute: () =>
             management
               .deactivateEmployee(administrator.id, validated.employeeId)
-              .pipe(Effect.map(() => ({ done: true as const }))),
+              .pipe(
+                Effect.tap(() =>
+                  auditEffect({
+                    actorId: administrator.id,
+                    headers: requestHeaders,
+                    subjectUserId: validated.employeeId,
+                    type: "user_deactivated",
+                  })
+                ),
+                Effect.map(() => ({ done: true as const }))
+              ),
           input: { employeeId: validated.employeeId },
           key: validated.idempotencyKey,
           operation: "employee.deactivate",
@@ -125,7 +136,17 @@ export async function reactivateEmployeeAction(input: unknown) {
           execute: () =>
             management
               .reactivateEmployee(administrator.id, validated.employeeId)
-              .pipe(Effect.map(() => ({ done: true as const }))),
+              .pipe(
+                Effect.tap(() =>
+                  auditEffect({
+                    actorId: administrator.id,
+                    headers: requestHeaders,
+                    subjectUserId: validated.employeeId,
+                    type: "user_reactivated",
+                  })
+                ),
+                Effect.map(() => ({ done: true as const }))
+              ),
           input: { employeeId: validated.employeeId },
           key: validated.idempotencyKey,
           operation: "employee.reactivate",

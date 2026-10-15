@@ -5,6 +5,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
+import { loadClientReport } from "./bug-client-report";
 import { BugHistorySchema } from "./bug-history-contracts";
 import { toBugReportItem } from "./bug-management";
 import { databaseError } from "./work-internal";
@@ -33,7 +34,7 @@ const getBugHistory = (
   }
   return db.transaction(async (transaction) => {
     const actor = await transaction.orm.public.User.where({ id: actorId })
-      .select("deactivatedAt", "mustChangePassword")
+      .select("deactivatedAt", "mustChangePassword", "role")
       .first();
     if (!actor || actor.deactivatedAt) {
       throw new AppError({
@@ -104,7 +105,7 @@ const getBugHistory = (
     const relatedIds = relations.map(({ fromBugReportId, toBugReportId }) =>
       fromBugReportId === bug.id ? toBugReportId : fromBugReportId
     );
-    const [files, relatedReports] = await Promise.all([
+    const [files, relatedReports, clientReport] = await Promise.all([
       fileIds.length
         ? transaction.orm.public.FileAsset.where((file) =>
             file.id.in(fileIds)
@@ -115,6 +116,7 @@ const getBugHistory = (
             other.id.in([...new Set(relatedIds)])
           ).all()
         : [],
+      loadClientReport(transaction, { id: actorId, role: actor.role }, bug),
     ]);
     const [relatedTasks, relatedProjects] = await Promise.all([
       relatedReports.length
@@ -204,6 +206,7 @@ const getBugHistory = (
         project.key,
         task.projectTaskNumber
       ),
+      clientReport,
       evidence: evidence.map((evidenceRow) => {
         const file = evidenceRow.fileAssetId
           ? fileById.get(evidenceRow.fileAssetId)

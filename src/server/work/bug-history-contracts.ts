@@ -3,6 +3,7 @@ import { Schema } from "effect";
 import { UUIDSchema } from "../core/input-schemas";
 import { BugEnvironmentSchema } from "./bug-contracts";
 import { BugReportItemSchema } from "./bug-management";
+import { SlaViewSchema } from "./bug-management-contracts";
 
 const BugEvidenceHistorySchema = Schema.Struct({
   caption: Schema.String,
@@ -59,6 +60,25 @@ export const BugHistorySchema = Schema.Struct({
   ),
   attempts: Schema.Array(BugAttemptHistorySchema),
   bug: BugReportItemSchema,
+  // Set for client reports: who they came from and who has picked them up.
+  clientReport: Schema.NullOr(
+    Schema.Struct({
+      awaitingClientSince: Schema.NullOr(Schema.String),
+      canAskClient: Schema.Boolean,
+      canCloseNotABug: Schema.Boolean,
+      canPick: Schema.Boolean,
+      companyId: UUIDSchema,
+      companyName: Schema.String,
+      needsInfoSince: Schema.NullOr(Schema.String),
+      pickedAt: Schema.NullOr(Schema.String),
+      pickedByName: Schema.NullOr(Schema.String),
+      reopenCount: Schema.Number,
+      resolution: Schema.NullOr(Schema.String),
+      satisfaction: Schema.NullOr(Schema.Literals(["up", "down"])),
+      satisfactionComment: Schema.NullOr(Schema.String),
+      sla: Schema.NullOr(SlaViewSchema),
+    })
+  ),
   evidence: Schema.Array(BugEvidenceHistorySchema),
   priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
   relations: Schema.Array(

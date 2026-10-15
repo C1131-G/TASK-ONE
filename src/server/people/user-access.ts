@@ -40,6 +40,12 @@ export const changeEmployeeRole = (
             message: "The active account was not found.",
           });
         }
+        if (target.role === "client") {
+          throw new AppError({
+            code: "FORBIDDEN",
+            message: "Client accounts keep the client role.",
+          });
+        }
         if (target.role === role) {
           throw new AppError({
             code: "CONFLICT",
@@ -132,4 +138,41 @@ export const resetEmployeePassword = (
         return { employeeId, temporaryPassword };
       });
     },
+  });
+
+// Clears a sign-in lockout so the person can try again immediately. Returns
+// whether there was anything to clear, so a repeated unlock (a retry or a
+// double click) records nothing new.
+export const unlockUser = (
+  administratorId: string,
+  userId: string
+): Effect.Effect<boolean, AppError> =>
+  Effect.tryPromise({
+    catch: databaseError,
+    try: () =>
+      db.transaction(async (transaction) => {
+        await serializeAdminChanges(transaction);
+        await requireAdmin(transaction, administratorId);
+        const user = await transaction.orm.public.User.where({ id: userId })
+          .select("failedLoginCount", "lockedUntil")
+          .first();
+        if (!user) {
+          throw new AppError({
+            code: "NOT_FOUND",
+            message: "The account was not found.",
+          });
+        }
+        if (user.failedLoginCount === 0 && !user.lockedUntil) {
+          return false;
+        }
+        await transaction.orm.public.User.where({ id: userId }).update({
+          failedLoginCount: 0,
+          lockedUntil: null,
+          updatedAt: new Date(),
+        });
+        await addActivity(transaction, administratorId, "user.unlocked", {
+          userId,
+        });
+        return true;
+      }),
   });

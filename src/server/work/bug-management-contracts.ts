@@ -6,6 +6,7 @@ import {
   BugDiscoverySourceSchema,
   BugEnvironmentSchema,
   BugSeveritySchema,
+  ClientImpactSchema,
   BugWorkflowStatusSchema,
 } from "./bug-contracts";
 
@@ -13,6 +14,8 @@ export const BugReportItemSchema = Schema.Struct({
   actualBehavior: Schema.String,
   appVersion: Schema.NullOr(Schema.String),
   browser: Schema.NullOr(Schema.String),
+  clientCompanyId: Schema.NullOr(UUIDSchema),
+  clientImpact: Schema.NullOr(ClientImpactSchema),
   component: Schema.String,
   description: Schema.NullOr(Schema.String),
   device: Schema.NullOr(Schema.String),
@@ -21,7 +24,9 @@ export const BugReportItemSchema = Schema.Struct({
   environment: BugEnvironmentSchema,
   expectedBehavior: Schema.String,
   id: UUIDSchema,
+  needsReassignment: Schema.Boolean,
   os: Schema.NullOr(Schema.String),
+  pickedById: Schema.NullOr(Schema.String),
   projectId: UUIDSchema,
   projectKey: Schema.String,
   projectTaskNumber: Schema.Number.check(
@@ -40,6 +45,25 @@ export const BugReportItemSchema = Schema.Struct({
 
 export type BugReportItem = typeof BugReportItemSchema.Type;
 
+export const SlaClockViewSchema = Schema.Struct({
+  dueAt: Schema.String,
+  // Business minutes to the due time; negative once overdue, null when done.
+  minutesLeft: Schema.NullOr(Schema.Number),
+  state: Schema.Literals([
+    "ok",
+    "warning",
+    "breached",
+    "met",
+    "missed",
+    "paused",
+  ]),
+});
+
+export const SlaViewSchema = Schema.Struct({
+  firstResponse: SlaClockViewSchema,
+  resolution: SlaClockViewSchema,
+});
+
 export const BugListItemSchema = Schema.Struct({
   archived: Schema.Boolean,
   assigneeIds: Schema.Array(UUIDSchema),
@@ -49,6 +73,7 @@ export const BugListItemSchema = Schema.Struct({
   priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
   projectName: Schema.String,
   relatedBugIds: Schema.Array(UUIDSchema),
+  sla: Schema.NullOr(SlaViewSchema),
 });
 
 export const BugListSchema = Schema.Array(BugListItemSchema);
@@ -58,6 +83,8 @@ export const toBugReportItem = (
     readonly actualBehavior: string;
     readonly appVersion: string | null;
     readonly browser: string | null;
+    readonly clientCompanyId: string | null;
+    readonly clientImpact: typeof ClientImpactSchema.Type | null;
     readonly component: string;
     readonly description: string | null;
     readonly device: string | null;
@@ -66,7 +93,9 @@ export const toBugReportItem = (
     readonly environment: BugReportInput["environment"];
     readonly expectedBehavior: string;
     readonly id: string;
+    readonly needsReassignment: boolean;
     readonly os: string | null;
+    readonly pickedById: string | null;
     readonly projectId: string;
     readonly reproductionSteps: readonly string[];
     readonly reporterId: string;

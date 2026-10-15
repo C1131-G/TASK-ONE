@@ -8,8 +8,14 @@ model CompanySettings {
   brandEnabled Boolean @default(true)
   timeZone    String  @default("Asia/Kolkata")
   settings    Jsonb   @default(json`{}`)
+  businessDays        Int[]   @default([1, 2, 3, 4, 5])
+  businessStartMinute Int     @default(540)
+  businessEndMinute   Int     @default(1080)
+  businessTimeZone    String?
+  slaTargets          Jsonb   @default(json`{"low":{"firstResponseMinutes":1440,"resolutionMinutes":14400},"medium":{"firstResponseMinutes":480,"resolutionMinutes":4800},"high":{"firstResponseMinutes":240,"resolutionMinutes":1440},"urgent":{"firstResponseMinutes":60,"resolutionMinutes":480}}`)
   updatedAt   TimestamptzJsDate @default(now())
 
   @@check(expression: "id = 'company'", name: "company_settings_singleton_id")
+  @@check(expression: "\"businessStartMinute\" >= 0 AND \"businessEndMinute\" <= 1440 AND \"businessStartMinute\" < \"businessEndMinute\"", name: "company_settings_business_hours_valid")
   @@map("company_settings")
 }

@@ -51,13 +51,39 @@ const drawerData = (
   return { editableTaskIds, tasks };
 };
 
+const BugViewContent = ({
+  bugs,
+  isAdmin,
+  view,
+}: {
+  readonly bugs: readonly (typeof BugListItemSchema.Type)[];
+  readonly isAdmin: boolean;
+  readonly view: BugFilters["view"];
+}) => {
+  if (view === "board") {
+    return <BugBoard bugs={bugs} />;
+  }
+  if (view === "client_queue") {
+    return (
+      <BugList
+        bugs={bugs}
+        clientQueue={{ isAdmin }}
+        emptyMessage="No client bugs are waiting to be picked up."
+      />
+    );
+  }
+  return <BugList bugs={bugs} />;
+};
+
 const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
+  const isQueue = filters.view === "client_queue";
   const [projectsResult, employeeResult, session, bugsResult] =
     await Promise.all([
       listProjects({}),
       listAllEmployees(),
       getPageSession(),
       listBugs({
+        ...(isQueue ? { view: "client_queue" } : {}),
         includeArchived: filters.archived,
         ...(filters.query ? { query: filters.query } : {}),
         ...(filters.severity ? { severity: filters.severity } : {}),
@@ -109,35 +135,37 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           </Link>
         </form>
       </search>
-      <nav aria-label="Filter bugs by status" className="bug-status-filters">
-        {BUG_STATUS_FILTERS.map(([value, label]) => {
-          const query = new URLSearchParams();
-          if (value) {
-            query.set("status", value);
-          }
-          if (filters.query) {
-            query.set("q", filters.query);
-          }
-          if (filters.archived) {
-            query.set("archived", "true");
-          }
-          return (
-            <Link
-              aria-current={filters.status === value ? "page" : undefined}
-              className={`bug-status-filter${filters.status === value ? " selected" : ""}`}
-              href={query.size ? `/bugs?${query.toString()}` : "/bugs"}
-              key={value || "all"}
-            >
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
+      {isQueue ? null : (
+        <nav aria-label="Filter bugs by status" className="bug-status-filters">
+          {BUG_STATUS_FILTERS.map(([value, label]) => {
+            const query = new URLSearchParams();
+            if (value) {
+              query.set("status", value);
+            }
+            if (filters.query) {
+              query.set("q", filters.query);
+            }
+            if (filters.archived) {
+              query.set("archived", "true");
+            }
+            return (
+              <Link
+                aria-current={filters.status === value ? "page" : undefined}
+                className={`bug-status-filter${filters.status === value ? " selected" : ""}`}
+                href={query.size ? `/bugs?${query.toString()}` : "/bugs"}
+                key={value || "all"}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
       <nav aria-label="Bug display" className="bug-view-switch">
         <Link
-          aria-current={filters.view === "board" ? undefined : "page"}
+          aria-current={filters.view === "list" ? "page" : undefined}
           href="/bugs"
-          className={filters.view === "board" ? "" : "selected"}
+          className={filters.view === "list" ? "selected" : ""}
         >
           List
         </Link>
@@ -147,6 +175,13 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           className={filters.view === "board" ? "selected" : ""}
         >
           Board
+        </Link>
+        <Link
+          aria-current={isQueue ? "page" : undefined}
+          href="/bugs?view=client_queue"
+          className={isQueue ? "selected" : ""}
+        >
+          Client queue
         </Link>
       </nav>
       {bugsResult.ok ? (
@@ -158,11 +193,7 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           isAdmin={isAdmin}
           tasks={drawer.tasks}
         >
-          {filters.view === "board" ? (
-            <BugBoard bugs={bugs} />
-          ) : (
-            <BugList bugs={bugs} />
-          )}
+          <BugViewContent bugs={bugs} isAdmin={isAdmin} view={filters.view} />
         </TaskDrawerHost>
       ) : (
         <section className="panel panel-b" role="alert">

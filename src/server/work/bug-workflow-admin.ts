@@ -139,20 +139,34 @@ export const reopenBug = async (
     forbidden("Only admins can reopen closed bugs.");
   }
   const { bug, project, task } = await loadBug(transaction, input.bugId);
-  if (bug.version !== input.expectedVersion || bug.status !== "closed") {
+  if (
+    bug.version !== input.expectedVersion ||
+    !["closed", "awaiting_client", "needs_info"].includes(bug.status)
+  ) {
     conflict();
   }
   assertWritable({ status: "in_progress" }, task, project);
-  const nextStatus = transitionBugStatus({
-    actorRole: "admin",
-    currentStatus: "closed",
-    nextStatus: "in_progress",
-  });
+  // Only a closed bug follows the ordinary reopen rule; waiting-on-client
+  // states are an admin's to override.
+  const nextStatus =
+    bug.status === "closed"
+      ? transitionBugStatus({
+          actorRole: "admin",
+          currentStatus: "closed",
+          nextStatus: "in_progress",
+        })
+      : "in_progress";
   const now = new Date();
   const result = await updateBugStatus(transaction, {
     actorId,
     bug,
     details: { reopened: true },
+    fields: {
+      awaitingClientSince: null,
+      needsInfoSince: null,
+      resolution: null,
+      statusBeforeNeedsInfo: null,
+    },
     nextStatus,
     now,
   });

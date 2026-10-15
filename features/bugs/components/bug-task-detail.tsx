@@ -14,11 +14,13 @@ export const BugTaskDetail = ({
   bugId,
   employees,
   isAdmin,
+  onClientReportChange,
   userId,
 }: {
   readonly bugId: string;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
   readonly isAdmin: boolean;
+  readonly onClientReportChange?: (isClientReport: boolean) => void;
   readonly userId: string;
 }) => {
   const [history, setHistory] = useState<BugHistory | null>(null);
@@ -38,6 +40,7 @@ export const BugTaskDetail = ({
       }
       if (result.ok) {
         setHistory(result.data);
+        onClientReportChange?.(result.data.bug.clientCompanyId !== null);
         setError(null);
       } else {
         setError(result.error.message);
@@ -47,7 +50,7 @@ export const BugTaskDetail = ({
     return () => {
       current = false;
     };
-  }, [bugId]);
+  }, [bugId, onClientReportChange]);
 
   if (error) {
     return (

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 
+import { and } from "@prisma/orm-postgres/orm-client";
 import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
@@ -69,7 +70,10 @@ export const updateTask = (
           transaction.orm.public.TaskAssignee.where({ taskId })
             .select("userId")
             .all(),
-          transaction.orm.public.User.where((user) => user.id.in(assigneeIds))
+          // Client accounts are never task assignees, so they read as missing.
+          transaction.orm.public.User.where((user) =>
+            and(user.id.in(assigneeIds), user.role.neq("client"))
+          )
             .select("id", "deactivatedAt")
             .all(),
           transaction.orm.public.TaskRecurrence.where({ taskId }).first(),

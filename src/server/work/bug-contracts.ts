@@ -49,6 +49,16 @@ export const BugWorkflowStatusSchema = Schema.Literals([
   "closed",
   "duplicate",
   "rejected",
+  "needs_info",
+  "awaiting_client",
+  "withdrawn",
+]);
+
+export const ClientImpactSchema = Schema.Literals([
+  "low",
+  "medium",
+  "high",
+  "urgent",
 ]);
 
 export const BugReportInputSchema = Schema.Struct({
@@ -78,6 +88,8 @@ export const BugListInputSchema = Schema.Struct({
   query: Schema.optional(Schema.String.check(Schema.isMaxLength(300))),
   severity: Schema.optional(BugSeveritySchema),
   status: Schema.optional(BugWorkflowStatusSchema),
+  // "client_queue" lists unpicked client reports a handler can pick.
+  view: Schema.optional(Schema.Literal("client_queue")),
 });
 
 export const BugIdInputSchema = Schema.Struct({ bugId: UUIDSchema });
@@ -88,6 +100,19 @@ export const BugTriageInputSchema = Schema.Struct({
   expectedVersion: Schema.Number.check(Schema.isInt(), Schema.isGreaterThan(0)),
   priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
   severity: BugSeveritySchema,
+});
+
+export const BugPickInputSchema = Schema.Struct({
+  bugId: UUIDSchema,
+  expectedVersion: Schema.Number.check(Schema.isInt(), Schema.isGreaterThan(0)),
+  priority: Schema.Literals(["urgent", "high", "medium", "low", "none"]),
+  severity: BugSeveritySchema,
+});
+
+export const BugReassignInputSchema = Schema.Struct({
+  bugId: UUIDSchema,
+  employeeId: UUIDSchema,
+  expectedVersion: Schema.Number.check(Schema.isInt(), Schema.isGreaterThan(0)),
 });
 
 export const BugRelationInputSchema = Schema.Struct({
@@ -175,6 +200,8 @@ export const BugApprovalInboxInputSchema = Schema.Struct({
 export type BugReportInput = typeof BugReportInputSchema.Type;
 export type BugListInput = typeof BugListInputSchema.Type;
 export type BugTriageInput = typeof BugTriageInputSchema.Type;
+export type BugPickInput = typeof BugPickInputSchema.Type;
+export type BugReassignInput = typeof BugReassignInputSchema.Type;
 export type BugRelationInput = typeof BugRelationInputSchema.Type;
 export type BugFixAttemptInput = typeof BugFixAttemptInputSchema.Type;
 export type BugVerificationInput = typeof BugVerificationInputSchema.Type;

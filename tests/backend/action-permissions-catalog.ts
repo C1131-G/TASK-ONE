@@ -1,3 +1,7 @@
+import {
+  clientActionCatalog,
+  clientAdminOnlyNames,
+} from "./action-permissions-catalog-clients";
 import { personalProjectActionCatalog } from "./action-permissions-catalog-personal-projects";
 import { teamFileActionCatalog } from "./action-permissions-catalog-teams-files";
 import { workspaceActionCatalog } from "./action-permissions-catalog-workspace";
@@ -6,6 +10,7 @@ export const allActions = [
   ...workspaceActionCatalog,
   ...personalProjectActionCatalog,
   ...teamFileActionCatalog,
+  ...clientActionCatalog,
 ] as const;
 
 export const adminOnlyNames: readonly string[] = [
@@ -40,4 +45,5 @@ export const adminOnlyNames: readonly string[] = [
   "requestProjectUploadAction",
   "listProjectFilesAction",
   "listProjectFiles",
+  ...clientAdminOnlyNames,
 ];

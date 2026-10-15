@@ -55,7 +55,11 @@ const assertRequester = async (
       message: "Sign in to manage sessions.",
     });
   }
-  if (requester.role !== "admin" && requester.role !== "employee") {
+  if (
+    requester.role !== "admin" &&
+    requester.role !== "employee" &&
+    requester.role !== "client"
+  ) {
     throw toUnavailable();
   }
   return requester;

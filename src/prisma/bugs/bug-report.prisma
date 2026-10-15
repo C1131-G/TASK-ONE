@@ -19,6 +19,18 @@ model BugReport {
   reproductionSteps  String[]
   expectedBehavior   String
   actualBehavior     String
+  clientCompanyId    Uuid?
+  clientImpact       ClientImpact?
+  pickedById         String?
+  pickedAt           TimestamptzJsDate?
+  needsReassignment  Boolean @default(false)
+  clientReopenCount  Int @default(0)
+  statusBeforeNeedsInfo BugWorkflowStatus?
+  needsInfoSince     TimestamptzJsDate?
+  awaitingClientSince TimestamptzJsDate?
+  satisfaction       BugSatisfaction?
+  satisfactionComment String?
+  resolution         BugResolution?
   discoveredAt       TimestamptzJsDate @default(now())
   createdAt          TimestamptzJsDate @default(now())
   updatedAt          TimestamptzJsDate @default(now())
@@ -33,9 +45,16 @@ model BugReport {
   relationsTo BugRelation[] @relation("BugRelationTo")
   approvals BugApproval[]
   releases BugRelease[]
+  clientCompany ClientCompany? @relation(fields: [clientCompanyId], references: [id], onDelete: Restrict)
+  pickedBy User? @relation("BugPicker", fields: [pickedById], references: [id], onDelete: Restrict)
+  sla BugSla?
 
   @@index([projectId, status, severity, discoveredAt])
   @@index([reporterId, discoveredAt])
   @@index([status, discoveredAt])
+  @@index([clientCompanyId, status, discoveredAt])
+  @@index([pickedById])
+  @@check(expression: "\"clientReopenCount\" >= 0", name: "bug_report_client_reopen_count_nonnegative")
+  @@check(expression: "(\"pickedById\" IS NULL AND \"pickedAt\" IS NULL) OR (\"pickedById\" IS NOT NULL AND \"pickedAt\" IS NOT NULL)", name: "bug_report_pick_fields_paired")
   @@map("bug_report")
 }

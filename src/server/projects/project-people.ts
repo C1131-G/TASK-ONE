@@ -63,11 +63,11 @@ export const setProjectPeople = (
         const users = await transaction.orm.public.User.where((user) =>
           user.id.in(memberIds)
         )
-          .select("id", "deactivatedAt")
+          .select("id", "deactivatedAt", "role")
           .all();
         if (
           users.length !== memberIds.length ||
-          users.some((user) => user.deactivatedAt)
+          users.some((user) => user.deactivatedAt || user.role === "client")
         ) {
           throw new AppError({
             code: "VALIDATION_FAILED",

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "column.public.bug_report.resolution",
+    "label": "Add column \"resolution\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolution",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolution\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "resolution"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolution\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"resolution\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolution\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "resolution"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_resolution_check_8950df78",
+    "label": "Add check constraint \"bug_report_resolution_check_8950df78\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_resolution_check_8950df78",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_resolution_check_8950df78\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_resolution_check_8950df78",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_resolution_check_8950df78\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_resolution_check_8950df78\" CHECK (\"resolution\" IN ('fixed', 'confirmed', 'no_response', 'unconfirmed', 'not_a_bug'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_resolution_check_8950df78\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_resolution_check_8950df78",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  }
+]
