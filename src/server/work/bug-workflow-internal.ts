@@ -229,6 +229,8 @@ export const updateBugStatus = async (
     readonly nextStatus: typeof BugWorkflowStatusSchema.Type;
     readonly now: Date;
     readonly details?: object;
+    // Other bug columns that change together with the status.
+    readonly fields?: Record<string, unknown>;
   }
 ): Promise<BugWorkflowReceipt> => {
   const version = input.bug.version + 1;
@@ -245,6 +247,7 @@ export const updateBugStatus = async (
     id: input.bug.id,
     version: input.bug.version,
   }).updateAndCount({
+    ...input.fields,
     status: input.nextStatus,
     updatedAt: input.now,
     version,

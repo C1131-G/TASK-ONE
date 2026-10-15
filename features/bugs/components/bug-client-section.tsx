@@ -16,6 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { reassignClientBugAction } from "@/features/bugs/bugs-actions";
+import {
+  AskClientDialog,
+  CloseNotABugDialog,
+} from "@/features/bugs/components/bug-client-dialogs";
 import { BugPickForm } from "@/features/bugs/components/bug-pick-form";
 
 import { formatBugDate } from "../bug-workflow-ui-shared";
@@ -29,6 +33,76 @@ const IMPACT_LABELS = {
   medium: "Medium impact",
   urgent: "Urgent impact",
 } as const;
+
+const RESOLUTION_TEXT: Record<string, string> = {
+  confirmed: "Client confirmed the fix",
+  no_response: "Auto-closed: no response from the client",
+  not_a_bug: "Closed as not a bug",
+  unconfirmed: "Auto-closed: client did not verify within 7 days",
+};
+
+const DAY_MS = 86_400_000;
+const MAX_CLIENT_REOPENS = 3;
+
+const addDays = (value: string, days: number): string =>
+  formatBugDate(
+    new Date(new Date(value).getTime() + days * DAY_MS).toISOString()
+  );
+
+const waitingText = (
+  status: string,
+  report: NonNullable<BugHistory["clientReport"]>
+): string | null => {
+  if (status === "needs_info" && report.needsInfoSince) {
+    return `Waiting for the client since ${formatBugDate(report.needsInfoSince)} (auto-closes ${addDays(report.needsInfoSince, 14)})`;
+  }
+  if (status === "awaiting_client" && report.awaitingClientSince) {
+    return `Waiting for the client to verify since ${formatBugDate(report.awaitingClientSince)} (auto-closes ${addDays(report.awaitingClientSince, 7)})`;
+  }
+  return null;
+};
+
+const ClientOutcomeFacts = ({
+  report,
+  resolutionText,
+}: {
+  readonly report: NonNullable<BugHistory["clientReport"]>;
+  readonly resolutionText: string | null;
+}) => (
+  <>
+    {report.reopenCount > 0 ? (
+      <div>
+        <dt>Reopened by the client</dt>
+        <dd>
+          {report.reopenCount} of {MAX_CLIENT_REOPENS} times
+          {report.reopenCount >= MAX_CLIENT_REOPENS ? " (now admin-only)" : ""}
+        </dd>
+      </div>
+    ) : null}
+    {report.satisfaction ? (
+      <div>
+        <dt>Client rating</dt>
+        <dd>
+          <span aria-hidden="true">
+            {report.satisfaction === "up" ? "👍" : "👎"}
+          </span>{" "}
+          <span className="sr-only">
+            {report.satisfaction === "up" ? "Thumbs up" : "Thumbs down"}
+          </span>
+          {report.satisfactionComment ? (
+            <span className="muted"> “{report.satisfactionComment}”</span>
+          ) : null}
+        </dd>
+      </div>
+    ) : null}
+    {resolutionText ? (
+      <div>
+        <dt>Closed</dt>
+        <dd>{resolutionText}</dd>
+      </div>
+    ) : null}
+  </>
+);
 
 const ReassignForm = ({
   employees,
@@ -118,6 +192,11 @@ export const BugClientSection = ({
   }
   const { bug } = history;
   const picked = bug.pickedById !== null;
+  const waiting = waitingText(bug.status, report);
+  const resolutionText =
+    CLOSED_STATUSES.has(bug.status) && report.resolution
+      ? (RESOLUTION_TEXT[report.resolution] ?? report.resolution)
+      : null;
   const canReassign =
     isAdmin && !history.archived && picked && !CLOSED_STATUSES.has(bug.status);
   return (
@@ -143,16 +222,7 @@ export const BugClientSection = ({
             </dd>
           </div>
         ) : null}
-        {report.reopenCount > 0 ? (
-          <div>
-            <dt>Reopened</dt>
-            <dd>
-              {report.reopenCount === 1
-                ? "1 time"
-                : `${report.reopenCount} times`}
-            </dd>
-          </div>
-        ) : null}
+        <ClientOutcomeFacts report={report} resolutionText={resolutionText} />
       </dl>
       {bug.needsReassignment ? (
         <p className="bug-client-warning" role="alert">
@@ -169,6 +239,24 @@ export const BugClientSection = ({
           Waiting for a handler to pick it up
         </output>
       )}
+      {waiting ? (
+        <output className="bug-client-banner bug-client-waiting">
+          {waiting}
+        </output>
+      ) : null}
+      {!history.archived && (report.canAskClient || report.canCloseNotABug) ? (
+        <div className="bug-client-action">
+          <h3>Client communication</h3>
+          <div className="bug-client-buttons">
+            {report.canAskClient ? (
+              <AskClientDialog bugId={bug.id} version={bug.version} />
+            ) : null}
+            {report.canCloseNotABug ? (
+              <CloseNotABugDialog bugId={bug.id} version={bug.version} />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
       {report.canPick && !history.archived ? (
         <div className="bug-client-action">
           <h3>Pick this bug</h3>

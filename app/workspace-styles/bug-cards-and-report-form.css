@@ -236,3 +236,12 @@
 .workspace-app .bug-client-action h3 {
   margin: 0 0 4px;
 }
+.workspace-app .bug-client-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.workspace-app .bug-client-banner + .bug-client-banner {
+  margin-top: 8px;
+}

@@ -19,6 +19,14 @@ import type {
 } from "./bug-contracts";
 import { archiveBug, reopenBug, restoreBug } from "./bug-workflow-admin";
 import { decideApproval, submitApproval } from "./bug-workflow-approval";
+import type {
+  CloseNotABugInput,
+  RequestClientInfoInput,
+} from "./bug-workflow-client";
+import {
+  closeClientBugAsNotABug,
+  requestClientInfo,
+} from "./bug-workflow-client";
 import type { BugWorkflowReceipt } from "./bug-workflow-internal";
 import {
   addEvidence,
@@ -54,6 +62,14 @@ export class BugWorkflowManagement extends Context.Service<
     readonly triage: (
       actorId: string,
       input: BugTriageInput
+    ) => Effect.Effect<BugWorkflowReceipt, AppError>;
+    readonly requestInfo: (
+      actorId: string,
+      input: RequestClientInfoInput
+    ) => Effect.Effect<BugWorkflowReceipt, AppError>;
+    readonly closeNotABug: (
+      actorId: string,
+      input: CloseNotABugInput
     ) => Effect.Effect<BugWorkflowReceipt, AppError>;
     readonly pick: (
       actorId: string,
@@ -127,6 +143,7 @@ export const BugWorkflowManagementLive = Layer.succeed(
     addEvidence: operation(addEvidence),
     addFixAttempt: operation(addFixAttempt),
     archive: operation(archiveBug),
+    closeNotABug: operation(closeClientBugAsNotABug),
     decideApproval: operation(decideApproval),
     pick: operation(pickClientBug),
     postReleaseCheck: operation(postReleaseCheck),
@@ -134,6 +151,7 @@ export const BugWorkflowManagementLive = Layer.succeed(
     recordRelease: operation(recordRelease),
     relate: operation(addBugRelation),
     reopen: operation(reopenBug),
+    requestInfo: operation(requestClientInfo),
     restore: operation(restoreBug),
     submitApproval: operation(submitApproval),
     triage: operation(triageBug),

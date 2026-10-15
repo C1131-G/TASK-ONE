@@ -117,6 +117,7 @@ export const ClientCompanyDetailSchema = Schema.Struct({
       name: Schema.String,
     })
   ),
+  satisfaction: Schema.Struct({ down: Schema.Number, up: Schema.Number }),
   users: Schema.Array(ClientCompanyUserSchema),
 });
 

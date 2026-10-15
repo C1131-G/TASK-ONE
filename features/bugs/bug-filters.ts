@@ -3,6 +3,8 @@ const BUG_STATUS_FILTERS = [
   ["reported", "Reported"],
   ["triaged", "Triaged"],
   ["in_progress", "In progress"],
+  ["needs_info", "Needs info"],
+  ["awaiting_client", "Awaiting client"],
   ["in_verification", "Verification"],
   ["awaiting_admin_approval", "Approval"],
   ["approved_for_release", "Approved"],

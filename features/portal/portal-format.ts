@@ -28,7 +28,7 @@ export const statusTone: Record<ClientStatusLabel, BadgeTone> = {
   merged: "gray",
   not_a_bug: "gray",
   submitted: "gray",
-  waiting_for_reply: "amber",
+  waiting_for_reply: "accent",
   withdrawn: "gray",
 };
 

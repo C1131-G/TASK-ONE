@@ -11,6 +11,10 @@ import {
   BugReleaseInputSchema,
 } from "./bug-contracts";
 import {
+  handOverClientDuplicates,
+  handOverToClient,
+} from "./bug-workflow-client";
+import {
   conflict,
   forbidden,
   loadBug,
@@ -142,6 +146,17 @@ export const postReleaseCheck = async (
     });
     return { bugId: bug.id, status: "released", version: nextVersion };
   }
+  // Reports from clients end with the client verifying the fix, not with an
+  // internal close; so do client reports merged into this bug.
+  if (bug.clientCompanyId) {
+    const handedOver = await handOverToClient(transaction, {
+      actorId,
+      bugId: bug.id,
+      now,
+    });
+    await handOverClientDuplicates(transaction, bug.id, actorId, now);
+    return handedOver;
+  }
   const result = await updateBugStatus(transaction, {
     actorId,
     bug,
@@ -149,6 +164,7 @@ export const postReleaseCheck = async (
     nextStatus: "closed",
     now,
   });
+  await handOverClientDuplicates(transaction, bug.id, actorId, now);
   await writeActivity(transaction, {
     action: "bug.closed",
     actorId,

@@ -222,7 +222,7 @@ const getCompany = (
         companyId,
       }).all(),
       transaction.orm.public.BugReport.where({ clientCompanyId: companyId })
-        .select("status", "resolution")
+        .select("status", "resolution", "satisfaction")
         .all(),
     ]);
     const [projects, employees] = await Promise.all([
@@ -281,6 +281,10 @@ const getCompany = (
         key: project.key,
         name: project.name,
       })),
+      satisfaction: {
+        down: bugs.filter(({ satisfaction }) => satisfaction === "down").length,
+        up: bugs.filter(({ satisfaction }) => satisfaction === "up").length,
+      },
       users: users.map((user) => ({
         active: user.deactivatedAt === null,
         email: user.email,

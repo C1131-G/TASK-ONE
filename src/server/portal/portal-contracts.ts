@@ -40,9 +40,32 @@ const ClientBugFields = {
   title: RequiredTextSchema.check(Schema.isMaxLength(300)),
 } as const;
 
+export const SatisfactionSchema = Schema.Literals(["up", "down"]);
+
 export const SubmitClientBugInputSchema = Schema.Struct({
   ...ClientBugFields,
   projectId: UUIDSchema,
+  // Set when reporting a closed bug again; links the new bug as a recurrence.
+  recurrenceOfBugId: Schema.optional(UUIDSchema),
+});
+
+export const ConfirmClientFixInputSchema = Schema.Struct({
+  bugId: UUIDSchema,
+  comment: Schema.optional(Schema.String.check(Schema.isMaxLength(2000))),
+  expectedVersion: VersionSchema,
+  satisfaction: Schema.optional(SatisfactionSchema),
+});
+
+export const ReopenClientFixInputSchema = Schema.Struct({
+  bugId: UUIDSchema,
+  expectedVersion: VersionSchema,
+  reason: RequiredTextSchema,
+});
+
+export const RateClientBugInputSchema = Schema.Struct({
+  bugId: UUIDSchema,
+  comment: Schema.optional(Schema.String.check(Schema.isMaxLength(2000))),
+  satisfaction: SatisfactionSchema,
 });
 
 export const EditClientBugInputSchema = Schema.Struct({
@@ -74,6 +97,9 @@ export const ListCompanyBugsInputSchema = Schema.Struct({
   status: Schema.optional(ClientStatusLabelSchema),
 });
 
+export type ConfirmClientFixInput = typeof ConfirmClientFixInputSchema.Type;
+export type ReopenClientFixInput = typeof ReopenClientFixInputSchema.Type;
+export type RateClientBugInput = typeof RateClientBugInputSchema.Type;
 export type SubmitClientBugInput = typeof SubmitClientBugInputSchema.Type;
 export type EditClientBugInput = typeof EditClientBugInputSchema.Type;
 export type ClientBugVersionInput = typeof ClientBugVersionInputSchema.Type;
@@ -127,6 +153,45 @@ export const PortalAttachmentSchema = Schema.Struct({
   uploaderName: Schema.String,
 });
 
+export const PortalLifecycleSchema = Schema.Struct({
+  canRate: Schema.Boolean,
+  canReportAgain: Schema.Boolean,
+  // Why a closed bug was closed.
+  closedReason: Schema.NullOr(
+    Schema.Literals(["confirmed", "unconfirmed", "no_response", "not_a_bug"])
+  ),
+  // Set when the bug was merged into another one the team is tracking. The
+  // original's title is only given when it is also this company's bug.
+  duplicateOf: Schema.NullOr(
+    Schema.Struct({
+      key: Schema.NullOr(Schema.String),
+      status: ClientStatusLabelSchema,
+      title: Schema.NullOr(Schema.String),
+    })
+  ),
+  // Set while the team waits on the client for an answer.
+  question: Schema.NullOr(
+    Schema.Struct({
+      askedAt: Schema.String,
+      text: Schema.NullOr(Schema.String),
+    })
+  ),
+  rating: Schema.NullOr(
+    Schema.Struct({
+      comment: Schema.NullOr(Schema.String),
+      satisfaction: SatisfactionSchema,
+    })
+  ),
+  // Set while the client is asked to verify a fix.
+  verification: Schema.NullOr(
+    Schema.Struct({
+      canReopen: Schema.Boolean,
+      reopensLeft: Schema.Number,
+      since: Schema.String,
+    })
+  ),
+});
+
 export const PortalBugDetailSchema = Schema.Struct({
   ...PortalBugSummarySchema.fields,
   actualBehavior: Schema.String,
@@ -140,6 +205,7 @@ export const PortalBugDetailSchema = Schema.Struct({
   description: Schema.NullOr(Schema.String),
   device: Schema.NullOr(Schema.String),
   expectedBehavior: Schema.String,
+  lifecycle: PortalLifecycleSchema,
   os: Schema.NullOr(Schema.String),
   pageUrl: Schema.String,
   reproductionSteps: Schema.Array(Schema.String),
@@ -203,6 +269,18 @@ export class PortalBugs extends Context.Service<
       actor: PortalActor,
       input: EditClientBugInput
     ) => Effect.Effect<PortalBugReceipt, AppError>;
+    readonly confirmFix: (
+      actor: PortalActor,
+      input: ConfirmClientFixInput
+    ) => Effect.Effect<PortalBugReceipt, AppError>;
+    readonly reopenFix: (
+      actor: PortalActor,
+      input: ReopenClientFixInput
+    ) => Effect.Effect<PortalBugReceipt, AppError>;
+    readonly rateBug: (
+      actor: PortalActor,
+      input: RateClientBugInput
+    ) => Effect.Effect<void, AppError>;
     readonly withdrawBug: (
       actor: PortalActor,
       input: ClientBugVersionInput

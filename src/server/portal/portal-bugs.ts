@@ -13,6 +13,13 @@ import { createCommentInTransaction } from "../collaboration/create-comment";
 import { AppError } from "../core/action-result";
 import { createBugReport } from "../work/bug-management";
 import {
+  CLIENT_REOPEN_LIMIT,
+  confirmClientFix,
+  rateClientBug,
+  reopenClientFix,
+  resumeAfterClientReply,
+} from "../work/bug-workflow-client";
+import {
   conflict,
   decodeBugWorkflowStatus,
   forbidden,
@@ -26,6 +33,7 @@ import type {
   AttachClientFileInput,
   ClientBugVersionInput,
   ClientCommentInput,
+  ConfirmClientFixInput,
   EditClientBugInput,
   ListCompanyBugsInput,
   PortalActor,
@@ -35,6 +43,8 @@ import type {
   PortalComment,
   PortalNotificationList,
   PortalProject,
+  RateClientBugInput,
+  ReopenClientFixInput,
   SubmitClientBugInput,
 } from "./portal-contracts";
 import { PortalBugs } from "./portal-contracts";
@@ -201,6 +211,98 @@ const listBugs = (
 
 const timelineActions = ["bug.reported", "bug.status_changed"];
 
+const CLOSED_REASONS = new Set([
+  "confirmed",
+  "unconfirmed",
+  "no_response",
+  "not_a_bug",
+]);
+
+// What the client can do next, and why a finished bug is finished.
+const buildLifecycle = async (
+  transaction: Transaction,
+  actor: PortalActor,
+  bug: Awaited<ReturnType<typeof loadCompanyBug>>["bug"],
+  teamComments: readonly { readonly body: string; readonly isTeam: boolean }[]
+): Promise<PortalBugDetail["lifecycle"]> => {
+  const status = decodeBugWorkflowStatus(bug.status);
+  const relation = await transaction.orm.public.BugRelation.where({
+    fromBugReportId: bug.id,
+    type: "duplicate",
+  }).first();
+  let duplicateOf: PortalBugDetail["lifecycle"]["duplicateOf"] = null;
+  if (relation) {
+    const original = await transaction.orm.public.BugReport.where({
+      id: relation.toBugReportId,
+    }).first();
+    if (original) {
+      const label = clientStatusLabel(
+        decodeBugWorkflowStatus(original.status),
+        original.resolution
+      );
+      // Only a bug from the same company shows its title; anything else is
+      // reported by status alone.
+      let key: string | null = null;
+      let title: string | null = null;
+      if (original.clientCompanyId === actor.clientCompanyId) {
+        const [task, project] = await Promise.all([
+          transaction.orm.public.Task.where({ id: original.taskId }).first(),
+          transaction.orm.public.Project.where({
+            id: original.projectId,
+          }).first(),
+        ]);
+        if (task && project) {
+          key = `${project.key}-${task.projectTaskNumber}`;
+          ({ title } = task);
+        }
+      }
+      duplicateOf = { key, status: label, title };
+    }
+  }
+  const { needsInfoSince: askedAt } = bug;
+  const lastTeamReply = teamComments.findLast(({ isTeam }) => isTeam);
+  const reopensLeft = Math.max(0, CLIENT_REOPEN_LIMIT - bug.clientReopenCount);
+  return {
+    canRate:
+      status === "closed" &&
+      bug.resolution === "confirmed" &&
+      bug.satisfaction === null,
+    canReportAgain: status === "closed",
+    closedReason:
+      status === "closed" &&
+      bug.resolution &&
+      CLOSED_REASONS.has(bug.resolution)
+        ? (bug.resolution as
+            | "confirmed"
+            | "unconfirmed"
+            | "no_response"
+            | "not_a_bug")
+        : null,
+    duplicateOf,
+    question:
+      status === "needs_info" && askedAt
+        ? {
+            askedAt: askedAt.toISOString(),
+            text: lastTeamReply?.body ?? null,
+          }
+        : null,
+    rating: bug.satisfaction
+      ? {
+          comment: bug.satisfactionComment,
+          satisfaction: bug.satisfaction,
+        }
+      : null,
+    verification:
+      status === "awaiting_client" && bug.awaitingClientSince
+        ? {
+            canReopen: reopensLeft > 0,
+            reopensLeft,
+            since: bug.awaitingClientSince.toISOString(),
+          }
+        : null,
+  };
+};
+
 const getBug = (
   actor: PortalActor,
   bugId: string
@@ -277,6 +379,15 @@ const getBug = (
     }
     const open = !ARCHIVED_OR_CLOSED.has(status);
     const isReporter = bug.reporterId === actor.id;
+    const lifecycle = await buildLifecycle(
+      transaction,
+      actor,
+      bug,
+      comments.map((comment) => ({
+        body: comment.body,
+        isTeam: comment.author.role !== "client",
+      }))
+    );
     return {
       actualBehavior: bug.actualBehavior,
       attachments,
@@ -301,6 +412,7 @@ const getBug = (
       impact: bug.clientImpact,
       isMine: isReporter,
       key: `${project.key}-${task.projectTaskNumber}`,
+      lifecycle,
       os: bug.os,
       pageUrl: bug.route,
       projectId: project.id,
@@ -355,6 +467,27 @@ const submitBug = (
       },
       { clientCompanyId: actor.clientCompanyId, clientImpact: input.impact }
     );
+    if (input.recurrenceOfBugId) {
+      const earlier = await loadCompanyBug(
+        transaction,
+        actor,
+        input.recurrenceOfBugId
+      );
+      if (earlier.bug.status !== "closed") {
+        throw new AppError({
+          code: "VALIDATION_FAILED",
+          message: "Only a closed bug can be reported again.",
+        });
+      }
+      await transaction.orm.public.BugRelation.create({
+        createdAt: new Date(),
+        createdById: actor.id,
+        fromBugReportId: created.id,
+        id: randomUUID(),
+        toBugReportId: earlier.bug.id,
+        type: "recurrence",
+      });
+    }
     await announceClientBug(transaction, {
       bugId: created.id,
       now: new Date(),
@@ -479,6 +612,10 @@ const addComment = (
       taskId: task.id,
       visibility: "public",
     });
+    // Answering the team's question puts the bug back to work.
+    if (bug.status === "needs_info") {
+      await resumeAfterClientReply(transaction, actor.id, bug.id);
+    }
     return {
       authorName: actor.name,
       body: created.body,
@@ -488,6 +625,30 @@ const addComment = (
       isTeam: false,
     };
   });
+
+const confirmFix = (
+  actor: PortalActor,
+  input: ConfirmClientFixInput
+): Effect.Effect<PortalBugReceipt, AppError> =>
+  run(async (transaction) => {
+    const receipt = await confirmClientFix(transaction, actor, input);
+    return { bugId: receipt.bugId, version: receipt.version };
+  });
+
+const reopenFix = (
+  actor: PortalActor,
+  input: ReopenClientFixInput
+): Effect.Effect<PortalBugReceipt, AppError> =>
+  run(async (transaction) => {
+    const receipt = await reopenClientFix(transaction, actor, input);
+    return { bugId: receipt.bugId, version: receipt.version };
+  });
+
+const rateBug = (
+  actor: PortalActor,
+  input: RateClientBugInput
+): Effect.Effect<void, AppError> =>
+  run((transaction) => rateClientBug(transaction, actor, input));
 
 const attachFile = (
   actor: PortalActor,
@@ -619,11 +780,14 @@ export const PortalBugsLive = Layer.succeed(
   PortalBugs.of({
     addComment,
     attachFile,
+    confirmFix,
     editBug,
     getBug,
     listBugs,
     listNotifications,
     listProjects,
+    rateBug,
+    reopenFix,
     submitBug,
     taskIdForBug,
     withdrawBug,

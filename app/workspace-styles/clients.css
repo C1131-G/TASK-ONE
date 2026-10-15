@@ -360,3 +360,8 @@
     padding-inline: 12px;
   }
 }
+.workspace-app .clients-ratings {
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  margin: 0;
+}

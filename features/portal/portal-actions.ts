@@ -16,7 +16,10 @@ import {
   AttachClientFileInputSchema,
   ClientBugVersionInputSchema,
   ClientCommentInputSchema,
+  ConfirmClientFixInputSchema,
   EditClientBugInputSchema,
+  RateClientBugInputSchema,
+  ReopenClientFixInputSchema,
   PortalBugReceiptSchema,
   PortalBugs,
   PortalCommentSchema,
@@ -125,6 +128,87 @@ export async function withdrawClientBugAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePortal(result.data.bugId);
+  }
+  return result;
+}
+
+export async function confirmClientFixAction(input: unknown) {
+  const result = await runPortalAction(
+    input,
+    withKey(ConfirmClientFixInputSchema),
+    (user, validated) =>
+      Effect.gen(function* confirmClientFix() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...fixInput } = validated;
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => bugs.confirmFix(toPortalActor(user), fixInput),
+          input: fixInput,
+          key: idempotencyKey,
+          operation: "portal.bug.confirm",
+          resultSchema: PortalBugReceiptSchema,
+        });
+      }),
+    PortalBugReceiptSchema
+  );
+  if (result.ok) {
+    revalidatePortal(result.data.bugId);
+  }
+  return result;
+}
+
+export async function reopenClientFixAction(input: unknown) {
+  const result = await runPortalAction(
+    input,
+    withKey(ReopenClientFixInputSchema),
+    (user, validated) =>
+      Effect.gen(function* reopenClientFix() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...fixInput } = validated;
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => bugs.reopenFix(toPortalActor(user), fixInput),
+          input: fixInput,
+          key: idempotencyKey,
+          operation: "portal.bug.reopen",
+          resultSchema: PortalBugReceiptSchema,
+        });
+      }),
+    PortalBugReceiptSchema
+  );
+  if (result.ok) {
+    revalidatePortal(result.data.bugId);
+  }
+  return result;
+}
+
+export async function rateClientBugAction(input: unknown) {
+  const result = await runPortalAction(
+    input,
+    withKey(RateClientBugInputSchema),
+    (user, validated) =>
+      Effect.gen(function* rateClientBug() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...ratingInput } = validated;
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () =>
+            bugs
+              .rateBug(toPortalActor(user), ratingInput)
+              .pipe(Effect.map(() => ({ done: true as const }))),
+          input: ratingInput,
+          key: idempotencyKey,
+          operation: "portal.bug.rate",
+          resultSchema: DoneResultSchema,
+        });
+      }),
+    DoneResultSchema
+  );
+  if (result.ok) {
+    revalidatePortal(bugIdOf(input));
   }
   return result;
 }

@@ -56,6 +56,22 @@ const portalActions: readonly ActionEntry[] = [
     expectedVersion: 1,
     idempotencyKey: nextKey(),
   })),
+  entry("confirmClientFixAction", portal.confirmClientFixAction, () => ({
+    ...bug(),
+    expectedVersion: 1,
+    idempotencyKey: nextKey(),
+  })),
+  entry("reopenClientFixAction", portal.reopenClientFixAction, () => ({
+    ...bug(),
+    expectedVersion: 1,
+    idempotencyKey: nextKey(),
+    reason: "Still broken",
+  })),
+  entry("rateClientBugAction", portal.rateClientBugAction, () => ({
+    ...bug(),
+    idempotencyKey: nextKey(),
+    satisfaction: "up",
+  })),
   entry("addClientCommentAction", portal.addClientCommentAction, () => ({
     ...bug(),
     body: "Hello",

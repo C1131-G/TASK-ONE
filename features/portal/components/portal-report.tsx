@@ -3,13 +3,44 @@
 import { FolderSimple } from "@phosphor-icons/react/dist/ssr";
 
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
-import { listPortalProjects } from "@/features/portal/portal-queries";
-import type { PortalProject } from "@/src/server/portal/portal-contracts";
+import {
+  getPortalBug,
+  listPortalProjects,
+} from "@/features/portal/portal-queries";
+import type {
+  PortalBugDetail,
+  PortalProject,
+} from "@/src/server/portal/portal-contracts";
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+// The closed bug being reported again, or null for a missing, invalid or
+// not-closed `from` value.
+const loadRecurrence = async (
+  from: string | undefined,
+  projects: readonly PortalProject[]
+): Promise<PortalBugDetail | null> => {
+  if (!from || !UUID_PATTERN.test(from)) {
+    return null;
+  }
+  const result = await getPortalBug({ bugId: from });
+  if (
+    !result.ok ||
+    !result.data.lifecycle.canReportAgain ||
+    !projects.some(({ id }) => id === result.data.projectId)
+  ) {
+    return null;
+  }
+  return result.data;
+};
 
 const PortalReportBody = ({
   projects,
+  recurrenceOf,
 }: {
   readonly projects: readonly PortalProject[];
+  readonly recurrenceOf: PortalBugDetail | null;
 }) => {
   if (projects.length === 0) {
     return (
@@ -26,14 +57,35 @@ const PortalReportBody = ({
     );
   }
   return (
-    <section aria-label="Bug report" className="panel portal-panel">
-      <PortalBugForm mode={{ kind: "create", projects }} />
-    </section>
+    <>
+      {recurrenceOf ? (
+        <output className="portal-notice">
+          Reporting again: <strong>{recurrenceOf.key}</strong>{" "}
+          {recurrenceOf.title}
+        </output>
+      ) : null}
+      <section aria-label="Bug report" className="panel portal-panel">
+        <PortalBugForm
+          mode={{
+            kind: "create",
+            projects,
+            ...(recurrenceOf ? { recurrenceOf } : {}),
+          }}
+        />
+      </section>
+    </>
   );
 };
 
-const PortalReport = async () => {
+const PortalReport = async ({
+  from,
+}: {
+  readonly from: string | undefined;
+}) => {
   const result = await listPortalProjects({});
+  const recurrenceOf = result.ok
+    ? await loadRecurrence(from, result.data)
+    : null;
   return (
     <>
       <div className="ph">
@@ -46,7 +98,7 @@ const PortalReport = async () => {
         </div>
       </div>
       {result.ok ? (
-        <PortalReportBody projects={result.data} />
+        <PortalReportBody projects={result.data} recurrenceOf={recurrenceOf} />
       ) : (
         <div className="panel portal-alert" role="alert">
           Projects could not be loaded. Refresh to try again.

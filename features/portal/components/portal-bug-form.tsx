@@ -47,7 +47,12 @@ import type {
 } from "@/src/server/portal/portal-contracts";
 
 type Mode =
-  | { readonly kind: "create"; readonly projects: readonly PortalProject[] }
+  | {
+      readonly kind: "create";
+      readonly projects: readonly PortalProject[];
+      // A closed bug being reported again; its fields prefill the form.
+      readonly recurrenceOf?: PortalBugDetail;
+    }
   | {
       readonly kind: "edit";
       readonly bug: PortalBugDetail;
@@ -63,6 +68,16 @@ const noSubscription = () => unsubscribe;
 const initialValues = (mode: Mode): Values => {
   if (mode.kind === "edit") {
     return valuesFromBug(mode.bug);
+  }
+  const { recurrenceOf } = mode;
+  if (recurrenceOf) {
+    // Environment is left to the current browser; screenshots start empty.
+    return {
+      ...valuesFromBug(recurrenceOf),
+      browser: null,
+      device: null,
+      os: null,
+    };
   }
   return emptyValues(
     mode.projects.length === 1 ? (mode.projects[0]?.id ?? "") : ""
@@ -158,6 +173,9 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       ...toPayload(values, detected),
       idempotencyKey,
       projectId: values.projectId,
+      ...(mode.kind === "create" && mode.recurrenceOf
+        ? { recurrenceOfBugId: mode.recurrenceOf.id }
+        : {}),
     });
     if (!result.ok) {
       setFormError(result.error.message);

@@ -26,9 +26,12 @@ import type { ClientCompanyDetail } from "@/src/server/clients/client-company-co
 
 const BugSummary = ({
   bugCounts,
+  satisfaction,
 }: {
   readonly bugCounts: ClientCompanyDetail["bugCounts"];
+  readonly satisfaction: ClientCompanyDetail["satisfaction"];
 }) => {
+  const rated = satisfaction.up + satisfaction.down;
   const total = bugCounts.reduce((sum, { count }) => sum + count, 0);
   const groups = [
     {
@@ -73,6 +76,18 @@ const BugSummary = ({
           </div>
         ))}
       </div>
+      <p className="panel-b clients-ratings">
+        <span className="sub">Client ratings</span>{" "}
+        <span aria-hidden="true">
+          👍 {satisfaction.up} · 👎 {satisfaction.down}
+        </span>
+        <span className="sr-only">
+          {satisfaction.up} thumbs up, {satisfaction.down} thumbs down
+        </span>
+        {rated > 0
+          ? ` · ${Math.round((satisfaction.up / rated) * 100)}% positive`
+          : ""}
+      </p>
     </section>
   );
 };
@@ -180,7 +195,10 @@ const ClientCompanyWorkspace = ({
           />
         </TabsContent>
         <TabsContent value="bugs">
-          <BugSummary bugCounts={detail.bugCounts} />
+          <BugSummary
+            bugCounts={detail.bugCounts}
+            satisfaction={detail.satisfaction}
+          />
         </TabsContent>
       </Tabs>
     </div>

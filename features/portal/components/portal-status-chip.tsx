@@ -9,7 +9,12 @@ const PortalStatusChip = ({
 }: {
   readonly status: ClientStatusLabel;
 }) => (
-  <span className={`badge ${statusTone[status]}`}>
+  <span
+    className={`badge ${statusTone[status]}`}
+    data-attention={
+      status === "waiting_for_reply" || status === "fix_ready" || undefined
+    }
+  >
     <span aria-hidden="true" className="dot" />
     {clientStatusText[status]}
   </span>

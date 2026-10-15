@@ -11,10 +11,13 @@ export const metadata: Metadata = {
   title: "Report a bug | Metsys",
 };
 
-const Page = () => (
+const Page = ({ searchParams }: PageProps<"/portal/new">) => (
   <div className="page portal-narrow">
     <Suspense fallback={<PortalListSkeleton label="Loading bug form" />}>
-      <PortalReport />
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+      {searchParams.then(({ from }) => (
+        <PortalReport from={Array.isArray(from) ? from[0] : from} />
+      ))}
     </Suspense>
   </div>
 );

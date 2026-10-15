@@ -8,8 +8,10 @@ import { clientStatusText } from "@/features/portal/client-status";
 import { PortalAttachments } from "@/features/portal/components/portal-attachments";
 import { PortalBugManage } from "@/features/portal/components/portal-bug-manage";
 import { PortalComments } from "@/features/portal/components/portal-comments";
+import { PortalLifecycleBanner } from "@/features/portal/components/portal-lifecycle";
 import { PortalStatusChip } from "@/features/portal/components/portal-status-chip";
 import { PortalTime } from "@/features/portal/components/portal-time";
+import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
 import { impactText } from "@/features/portal/portal-format";
 import { getPortalBug } from "@/features/portal/portal-queries";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
@@ -153,7 +155,8 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           </span>
         </div>
       </header>
-      {readOnly ? (
+      <PortalLifecycleBanner bug={bug} />
+      {readOnly && !hasLifecycleBanner(bug) ? (
         <p className="portal-banner" role="note">
           {readOnlyMessage(bug)}
         </p>

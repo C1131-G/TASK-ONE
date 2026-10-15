@@ -6,18 +6,24 @@ export const loadClientReport = async (
   transaction: Transaction,
   actor: { readonly id: string; readonly role: string },
   bug: {
+    readonly awaitingClientSince: Date | null;
     readonly clientCompanyId: string | null;
     readonly clientReopenCount: number;
+    readonly needsInfoSince: Date | null;
     readonly pickedAt: Date | null;
     readonly pickedById: string | null;
+    readonly resolution: string | null;
+    readonly satisfaction: "up" | "down" | null;
+    readonly satisfactionComment: string | null;
     readonly status: string;
+    readonly taskId: string;
   }
 ) => {
   if (!bug.clientCompanyId) {
     return null;
   }
   const companyId = bug.clientCompanyId;
-  const [company, picker, handler] = await Promise.all([
+  const [company, picker, handler, assignment] = await Promise.all([
     transaction.orm.public.ClientCompany.where({ id: companyId })
       .select("name", "deactivatedAt")
       .first(),
@@ -34,8 +40,24 @@ export const loadClientReport = async (
           .select("id")
           .first()
       : null,
+    actor.role === "employee"
+      ? transaction.orm.public.TaskAssignee.where({
+          taskId: bug.taskId,
+          userId: actor.id,
+        })
+          .select("userId")
+          .first()
+      : null,
   ]);
+  const canWork = actor.role === "admin" || Boolean(assignment);
   return {
+    awaitingClientSince: bug.awaitingClientSince?.toISOString() ?? null,
+    canAskClient:
+      canWork &&
+      ["triaged", "in_progress", "in_verification"].includes(bug.status),
+    canCloseNotABug:
+      canWork &&
+      ["reported", "triaged", "in_progress", "needs_info"].includes(bug.status),
     canPick:
       bug.status === "reported" &&
       bug.pickedById === null &&
@@ -43,8 +65,12 @@ export const loadClientReport = async (
       company?.deactivatedAt === null,
     companyId,
     companyName: company?.name ?? "Unknown company",
+    needsInfoSince: bug.needsInfoSince?.toISOString() ?? null,
     pickedAt: bug.pickedAt?.toISOString() ?? null,
     pickedByName: picker?.name ?? null,
     reopenCount: bug.clientReopenCount,
+    resolution: bug.resolution,
+    satisfaction: bug.satisfaction,
+    satisfactionComment: bug.satisfactionComment,
   };
 };

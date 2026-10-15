@@ -62,12 +62,19 @@ export const BugHistorySchema = Schema.Struct({
   // Set for client reports: who they came from and who has picked them up.
   clientReport: Schema.NullOr(
     Schema.Struct({
+      awaitingClientSince: Schema.NullOr(Schema.String),
+      canAskClient: Schema.Boolean,
+      canCloseNotABug: Schema.Boolean,
       canPick: Schema.Boolean,
       companyId: UUIDSchema,
       companyName: Schema.String,
+      needsInfoSince: Schema.NullOr(Schema.String),
       pickedAt: Schema.NullOr(Schema.String),
       pickedByName: Schema.NullOr(Schema.String),
       reopenCount: Schema.Number,
+      resolution: Schema.NullOr(Schema.String),
+      satisfaction: Schema.NullOr(Schema.Literals(["up", "down"])),
+      satisfactionComment: Schema.NullOr(Schema.String),
     })
   ),
   evidence: Schema.Array(BugEvidenceHistorySchema),

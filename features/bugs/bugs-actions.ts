@@ -28,6 +28,10 @@ import {
   BugManagementLive,
   BugReportItemSchema,
 } from "@/src/server/work/bug-management";
+import {
+  CloseNotABugInputSchema,
+  RequestClientInfoInputSchema,
+} from "@/src/server/work/bug-workflow-client";
 import { BugWorkflowManagement } from "@/src/server/work/bug-workflow-management";
 
 import {
@@ -109,6 +113,36 @@ export async function pickClientBugAction(input: unknown) {
         const service = yield* BugWorkflowManagement;
         return yield* service.pick(actorId, value);
       })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function requestClientInfoAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      RequestClientInfoInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* requestInfo() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.requestInfo(actorId, value);
+        })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function closeClientBugNotABugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      CloseNotABugInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* closeNotABug() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.closeNotABug(actorId, value);
+        })
     )
   );
 }

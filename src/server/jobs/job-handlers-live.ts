@@ -12,6 +12,14 @@ import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
 import {
+  AWAITING_CLIENT_AUTOCLOSE_JOB,
+  NEEDS_INFO_AUTOCLOSE_JOB,
+  NEEDS_INFO_REMINDER_JOB,
+  autoCloseAwaitingClient,
+  autoCloseNeedsInfo,
+  remindNeedsInfo,
+} from "../work/bug-workflow-client";
+import {
   UNPICKED_REMINDER_JOB,
   remindUnpickedClientBug,
 } from "../work/bug-workflow-pick";
@@ -52,6 +60,15 @@ const FileCopyPayloadSchema = Schema.Struct({
     )
   ),
 });
+const ClientWaitPayloadSchema = Schema.Struct({
+  bugId: Schema.String.check(Schema.isUUID()),
+  since: Schema.DateFromString,
+});
+const clientWaitJobs = {
+  [AWAITING_CLIENT_AUTOCLOSE_JOB]: autoCloseAwaitingClient,
+  [NEEDS_INFO_AUTOCLOSE_JOB]: autoCloseNeedsInfo,
+  [NEEDS_INFO_REMINDER_JOB]: remindNeedsInfo,
+} as const;
 const UnpickedReminderPayloadSchema = Schema.Struct({
   bugId: Schema.String.check(Schema.isUUID()),
 });
@@ -131,6 +148,33 @@ export const JobHandlersLive = Layer.effect(
                   targetKey
                 )
             )
+          );
+        }
+        if (kind in clientWaitJobs) {
+          const run = clientWaitJobs[kind as keyof typeof clientWaitJobs];
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The client follow-up job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(ClientWaitPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ bugId, since }) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The client follow-up could not be completed.",
+                  }),
+                try: () =>
+                  db.transaction((transaction) =>
+                    run(transaction, bugId, since)
+                  ),
+              })
+            ),
+            Effect.asVoid
           );
         }
         if (kind === UNPICKED_REMINDER_JOB) {

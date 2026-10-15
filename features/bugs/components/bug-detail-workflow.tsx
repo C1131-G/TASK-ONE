@@ -174,7 +174,11 @@ export const BugDetailWorkflow = ({
               Restore
             </Button>
           ) : null}
-          {isAdmin && !history.archived && history.bug.status === "closed" ? (
+          {isAdmin &&
+          !history.archived &&
+          ["closed", "awaiting_client", "needs_info"].includes(
+            history.bug.status
+          ) ? (
             <Button
               disabled={pending}
               onClick={() =>

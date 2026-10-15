@@ -17,7 +17,7 @@ const forbidden = (message: string) =>
 
 // Client users who should hear about a public reply: the reporter and anyone
 // else from the company who has already joined the conversation.
-const clientParticipantIds = async (
+export const clientParticipantIds = async (
   transaction: Transaction,
   bug: { readonly reporterId: string; readonly taskId: string }
 ): Promise<string[]> => {
@@ -109,6 +109,8 @@ export const createCommentInTransaction = async (
     readonly taskId: string;
     readonly body: string;
     readonly visibility: CommentVisibility;
+    // Replaces the usual "replied to your bug report" client notice.
+    readonly clientNotice?: string;
   }
 ): Promise<CreatedComment> => {
   const { actorId, taskId, visibility } = input;
@@ -253,7 +255,7 @@ export const createCommentInTransaction = async (
       recipientIds: clientRecipients,
       snippet,
       taskId,
-      text: `${actor.name} replied to your bug report`,
+      text: input.clientNotice ?? `${actor.name} replied to your bug report`,
       type: "comment",
       url: `/portal/bugs/${bug.id}`,
     });
