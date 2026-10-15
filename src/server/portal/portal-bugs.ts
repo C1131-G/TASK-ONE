@@ -91,6 +91,75 @@ const notFound = () =>
 const trimmedOrNull = (value: string | null): string | null =>
   value?.trim() ? value.trim() : null;
 
+const clientVisibleAttachments = <
+  FileRow extends {
+    readonly contentType: string | null;
+    readonly copyState: string;
+    readonly createdAt: Date;
+    readonly id: string;
+    readonly originalName: string;
+    readonly sizeBytes: number | bigint | { readonly toString: () => string };
+    readonly uploadedBy: {
+      readonly clientCompanyId: string | null;
+      readonly name: string;
+    };
+  },
+>(
+  files: readonly FileRow[],
+  companyId: string
+) =>
+  files.flatMap((file) => {
+    if (
+      file.copyState !== "ready" ||
+      file.uploadedBy.clientCompanyId !== companyId
+    ) {
+      return [];
+    }
+    return [
+      {
+        contentType: file.contentType ?? "application/octet-stream",
+        createdAt: file.createdAt.toISOString(),
+        fileId: file.id,
+        fileName: file.originalName,
+        previewable: PREVIEW_TYPES.has(file.contentType ?? ""),
+        sizeBytes: Number(file.sizeBytes),
+        uploaderName: file.uploadedBy.name,
+      },
+    ];
+  });
+
+const clientTimeline = <
+  ActivityRow extends {
+    readonly action: string;
+    readonly createdAt: Date;
+    readonly details: unknown;
+  },
+>(
+  activities: readonly ActivityRow[]
+) => {
+  const timeline: {
+    at: string;
+    status: ReturnType<typeof clientStatusLabel>;
+  }[] = [];
+  for (const activity of activities) {
+    const details = (activity.details ?? {}) as Record<string, unknown>;
+    let next: ReturnType<typeof clientStatusLabel> | null = null;
+    if (activity.action === "bug.reported") {
+      next = "submitted";
+    } else if (typeof details["to"] === "string") {
+      next = clientStatusLabel(
+        decodeBugWorkflowStatus(details["to"]),
+        details["reason"] === "not_a_bug" ? "not_a_bug" : null
+      );
+    }
+    // Internal stages that look the same to the client are one entry.
+    if (next && timeline.at(-1)?.status !== next) {
+      timeline.push({ at: activity.createdAt.toISOString(), status: next });
+    }
+  }
+  return timeline;
+};
+
 // A bug of the actor's own company. Another company's bug is reported as
 // missing so its existence is never confirmed.
 const loadCompanyBug = async (
@@ -384,41 +453,10 @@ const getBug = (
             .all();
     // Only what client-company users attached is shown; staff evidence stays
     // internal.
-    const attachments = files.flatMap((file) =>
-      file.copyState === "ready" &&
-      file.uploadedBy.clientCompanyId === actor.clientCompanyId
-        ? [
-            {
-              contentType: file.contentType ?? "application/octet-stream",
-              createdAt: file.createdAt.toISOString(),
-              fileId: file.id,
-              fileName: file.originalName,
-              previewable: PREVIEW_TYPES.has(file.contentType ?? ""),
-              sizeBytes: Number(file.sizeBytes),
-              uploaderName: file.uploadedBy.name,
-            },
-          ]
-        : []
-    );
+    const attachments = clientVisibleAttachments(files, actor.clientCompanyId);
     const status = decodeBugWorkflowStatus(bug.status);
     const label = clientStatusLabel(status, bug.resolution);
-    const timeline: { at: string; status: typeof label }[] = [];
-    for (const activity of activities) {
-      const details = (activity.details ?? {}) as Record<string, unknown>;
-      let next: typeof label | null = null;
-      if (activity.action === "bug.reported") {
-        next = "submitted";
-      } else if (typeof details["to"] === "string") {
-        next = clientStatusLabel(
-          decodeBugWorkflowStatus(details["to"]),
-          details["reason"] === "not_a_bug" ? "not_a_bug" : null
-        );
-      }
-      // Internal stages that look the same to the client are one entry.
-      if (next && timeline.at(-1)?.status !== next) {
-        timeline.push({ at: activity.createdAt.toISOString(), status: next });
-      }
-    }
+    const timeline = clientTimeline(activities);
     const open = !ARCHIVED_OR_CLOSED.has(status) && projectLinked;
     const isReporter = bug.reporterId === actor.id;
     const built = await buildLifecycle(

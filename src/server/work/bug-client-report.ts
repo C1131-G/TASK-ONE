@@ -2,6 +2,29 @@ import { loadSlaSettings } from "../company/sla-settings";
 import { buildSlaView } from "./bug-sla";
 import type { Transaction } from "./work-internal";
 
+const CAN_ASK_CLIENT_STATUSES = new Set([
+  "triaged",
+  "in_progress",
+  "in_verification",
+]);
+const CAN_CLOSE_NOT_A_BUG_STATUSES = new Set([
+  "reported",
+  "triaged",
+  "in_progress",
+  "needs_info",
+]);
+
+const canWorkInStatus = (
+  canWork: boolean,
+  status: string,
+  allowedStatuses: ReadonlySet<string>
+) => canWork && allowedStatuses.has(status);
+
+const optionalRecord = <Record>(
+  enabled: boolean,
+  query: () => Promise<Record | null>
+) => (enabled ? query() : Promise.resolve(null));
+
 // The client-report facts the team sees on a bug: where it came from, who
 // picked it up, and whether the viewer can pick it.
 export const loadClientReport = async (
@@ -31,39 +54,39 @@ export const loadClientReport = async (
       transaction.orm.public.ClientCompany.where({ id: companyId })
         .select("name", "deactivatedAt")
         .first(),
-      bug.pickedById
-        ? transaction.orm.public.User.where({ id: bug.pickedById })
-            .select("name")
-            .first()
-        : null,
-      actor.role === "employee"
-        ? transaction.orm.public.ClientCompanyHandler.where({
-            companyId,
-            employeeId: actor.id,
-          })
-            .select("id")
-            .first()
-        : null,
-      actor.role === "employee"
-        ? transaction.orm.public.TaskAssignee.where({
-            taskId: bug.taskId,
-            userId: actor.id,
-          })
-            .select("userId")
-            .first()
-        : null,
+      optionalRecord(Boolean(bug.pickedById), () =>
+        transaction.orm.public.User.where({ id: bug.pickedById ?? "" })
+          .select("name")
+          .first()
+      ),
+      optionalRecord(actor.role === "employee", () =>
+        transaction.orm.public.ClientCompanyHandler.where({
+          companyId,
+          employeeId: actor.id,
+        })
+          .select("id")
+          .first()
+      ),
+      optionalRecord(actor.role === "employee", () =>
+        transaction.orm.public.TaskAssignee.where({
+          taskId: bug.taskId,
+          userId: actor.id,
+        })
+          .select("userId")
+          .first()
+      ),
       transaction.orm.public.BugSla.where({ bugId: bug.id }).first(),
       loadSlaSettings(transaction),
     ]);
   const canWork = actor.role === "admin" || Boolean(assignment);
   return {
     awaitingClientSince: bug.awaitingClientSince?.toISOString() ?? null,
-    canAskClient:
-      canWork &&
-      ["triaged", "in_progress", "in_verification"].includes(bug.status),
-    canCloseNotABug:
-      canWork &&
-      ["reported", "triaged", "in_progress", "needs_info"].includes(bug.status),
+    canAskClient: canWorkInStatus(canWork, bug.status, CAN_ASK_CLIENT_STATUSES),
+    canCloseNotABug: canWorkInStatus(
+      canWork,
+      bug.status,
+      CAN_CLOSE_NOT_A_BUG_STATUSES
+    ),
     canPick:
       bug.status === "reported" &&
       bug.pickedById === null &&

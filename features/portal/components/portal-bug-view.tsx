@@ -120,6 +120,64 @@ const BugSections = ({ bug }: { readonly bug: PortalBugDetail }) => {
   );
 };
 
+const PortalResponseNotice = async ({
+  bug,
+}: {
+  readonly bug: PortalBugDetail;
+}) => {
+  if (bug.firstResponse.targetMinutes === null) {
+    return null;
+  }
+  const times = await getPortalResponseTimes({});
+  if (!times.ok) {
+    return null;
+  }
+  return (
+    <output className="portal-notice portal-response-note">
+      {usuallyRespondText(bug.firstResponse.targetMinutes, times.data)}
+    </output>
+  );
+};
+
+const PortalBugNotices = ({
+  bug,
+  isPreview,
+}: {
+  readonly bug: PortalBugDetail;
+  readonly isPreview: boolean;
+}) => {
+  const showReadOnlyNotice =
+    !bug.canEdit &&
+    !isPreview &&
+    !bug.readOnlyReason &&
+    !hasLifecycleBanner(bug);
+  const awaitingResponse =
+    (bug.status === "submitted" || bug.status === "acknowledged") &&
+    bug.firstResponse.respondedAt === null &&
+    bug.firstResponse.targetMinutes !== null;
+  return (
+    <>
+      {bug.readOnlyReason && !isPreview ? (
+        <p className="portal-banner" role="note">
+          {bug.readOnlyReason}
+        </p>
+      ) : null}
+      {showReadOnlyNotice ? (
+        <p className="portal-banner" role="note">
+          {readOnlyMessage(bug)}
+        </p>
+      ) : null}
+      {isPreview ? (
+        <p className="portal-banner" role="note">
+          Editing, comments, attachments and replies are disabled in preview.
+        </p>
+      ) : null}
+      <PortalLifecycleBanner bug={bug} isPreview={isPreview} />
+      {awaitingResponse ? <PortalResponseNotice bug={bug} /> : null}
+    </>
+  );
+};
+
 const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
   const [result, company] = await Promise.all([
     getPortalBug({ bugId }),
@@ -156,12 +214,6 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
         },
       }
     : result.data;
-  const readOnly = !bug.canEdit;
-  const awaitingResponse =
-    (bug.status === "submitted" || bug.status === "acknowledged") &&
-    bug.firstResponse.respondedAt === null &&
-    bug.firstResponse.targetMinutes !== null;
-  const times = awaitingResponse ? await getPortalResponseTimes({}) : null;
   return (
     <div className="portal-detail">
       <Link className="portal-back" href="/portal">
@@ -184,32 +236,7 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           </span>
         </div>
       </header>
-      {awaitingResponse &&
-      times?.ok &&
-      bug.firstResponse.targetMinutes !== null ? (
-        <output className="portal-notice portal-response-note">
-          {usuallyRespondText(bug.firstResponse.targetMinutes, times.data)}
-        </output>
-      ) : null}
-      <PortalLifecycleBanner bug={bug} isPreview={isPreview} />
-      {isPreview ? (
-        <p className="portal-banner" role="note">
-          Editing, comments, attachments and replies are disabled in preview.
-        </p>
-      ) : null}
-      {bug.readOnlyReason && !isPreview ? (
-        <p className="portal-banner" role="note">
-          {bug.readOnlyReason}
-        </p>
-      ) : null}
-      {readOnly &&
-      !isPreview &&
-      !bug.readOnlyReason &&
-      !hasLifecycleBanner(bug) ? (
-        <p className="portal-banner" role="note">
-          {readOnlyMessage(bug)}
-        </p>
-      ) : null}
+      <PortalBugNotices bug={bug} isPreview={isPreview} />
       <div className="portal-detail-grid">
         <div className="portal-detail-main">
           <PortalBugManage bug={bug}>

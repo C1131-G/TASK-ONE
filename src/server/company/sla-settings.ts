@@ -106,7 +106,9 @@ const parseTargets = (value: unknown): SlaTargets => {
 export const toSlaSettingsValues = (row: SettingsRow) => {
   const businessTimeZone = row.businessTimeZone ?? null;
   return {
-    businessDays: [...row.businessDays].toSorted((a, b) => a - b),
+    businessDays: [...row.businessDays].toSorted(
+      (day, otherDay) => day - otherDay
+    ),
     businessEndMinute: row.businessEndMinute,
     businessStartMinute: row.businessStartMinute,
     businessTimeZone,
@@ -225,7 +227,7 @@ export const SlaSettingsManagementLive = Layer.succeed(
               update: {},
             });
             const days = [...new Set(input.businessDays)].toSorted(
-              (a, b) => a - b
+              (day, otherDay) => day - otherDay
             );
             const updated = await transaction.orm.public.CompanySettings.where({
               id: "company",

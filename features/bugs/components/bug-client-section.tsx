@@ -202,6 +202,90 @@ const ReassignForm = ({
   );
 };
 
+const ClientReportStatus = ({
+  bug,
+  picked,
+  report,
+  waiting,
+}: {
+  readonly bug: BugHistory["bug"];
+  readonly picked: boolean;
+  readonly report: NonNullable<BugHistory["clientReport"]>;
+  readonly waiting: string | null;
+}) => (
+  <>
+    {bug.needsReassignment ? (
+      <p className="bug-client-warning" role="alert">
+        Needs reassignment — its handler is no longer available.
+      </p>
+    ) : null}
+    {picked ? (
+      <output className="bug-client-banner">
+        Picked by {report.pickedByName ?? "a handler"}
+        {report.pickedAt ? ` on ${formatBugDate(report.pickedAt)}` : ""}
+      </output>
+    ) : (
+      <output className="bug-client-banner bug-client-waiting">
+        Waiting for a handler to pick it up
+      </output>
+    )}
+    {waiting ? (
+      <output className="bug-client-banner bug-client-waiting">
+        {waiting}
+      </output>
+    ) : null}
+  </>
+);
+
+const ClientReportActions = ({
+  bug,
+  canReassign,
+  employees,
+  history,
+  report,
+}: {
+  readonly bug: BugHistory["bug"];
+  readonly canReassign: boolean;
+  readonly employees: readonly { readonly id: string; readonly name: string }[];
+  readonly history: BugHistory;
+  readonly report: NonNullable<BugHistory["clientReport"]>;
+}) => (
+  <>
+    {!history.archived && (report.canAskClient || report.canCloseNotABug) ? (
+      <div className="bug-client-action">
+        <h3>Client communication</h3>
+        <div className="bug-client-buttons">
+          {report.canAskClient ? (
+            <AskClientDialog bugId={bug.id} version={bug.version} />
+          ) : null}
+          {report.canCloseNotABug ? (
+            <CloseNotABugDialog bugId={bug.id} version={bug.version} />
+          ) : null}
+        </div>
+      </div>
+    ) : null}
+    {report.canPick && !history.archived ? (
+      <div className="bug-client-action">
+        <h3>Pick this bug</h3>
+        <p className="muted">
+          Picking makes you the only assignee. Others can view but not act.
+        </p>
+        <BugPickForm
+          bugId={bug.id}
+          defaultSeverity={bug.severity}
+          expectedVersion={bug.version}
+        />
+      </div>
+    ) : null}
+    {canReassign ? (
+      <div className="bug-client-action">
+        <h3>Reassign</h3>
+        <ReassignForm employees={employees} history={history} />
+      </div>
+    ) : null}
+  </>
+);
+
 export const BugClientSection = ({
   employees,
   history,
@@ -250,58 +334,19 @@ export const BugClientSection = ({
         {report.sla ? <SlaFacts sla={report.sla} /> : null}
         <ClientOutcomeFacts report={report} resolutionText={resolutionText} />
       </dl>
-      {bug.needsReassignment ? (
-        <p className="bug-client-warning" role="alert">
-          Needs reassignment — its handler is no longer available.
-        </p>
-      ) : null}
-      {picked ? (
-        <output className="bug-client-banner">
-          Picked by {report.pickedByName ?? "a handler"}
-          {report.pickedAt ? ` on ${formatBugDate(report.pickedAt)}` : ""}
-        </output>
-      ) : (
-        <output className="bug-client-banner bug-client-waiting">
-          Waiting for a handler to pick it up
-        </output>
-      )}
-      {waiting ? (
-        <output className="bug-client-banner bug-client-waiting">
-          {waiting}
-        </output>
-      ) : null}
-      {!history.archived && (report.canAskClient || report.canCloseNotABug) ? (
-        <div className="bug-client-action">
-          <h3>Client communication</h3>
-          <div className="bug-client-buttons">
-            {report.canAskClient ? (
-              <AskClientDialog bugId={bug.id} version={bug.version} />
-            ) : null}
-            {report.canCloseNotABug ? (
-              <CloseNotABugDialog bugId={bug.id} version={bug.version} />
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-      {report.canPick && !history.archived ? (
-        <div className="bug-client-action">
-          <h3>Pick this bug</h3>
-          <p className="muted">
-            Picking makes you the only assignee. Others can view but not act.
-          </p>
-          <BugPickForm
-            bugId={bug.id}
-            defaultSeverity={bug.severity}
-            expectedVersion={bug.version}
-          />
-        </div>
-      ) : null}
-      {canReassign ? (
-        <div className="bug-client-action">
-          <h3>Reassign</h3>
-          <ReassignForm employees={employees} history={history} />
-        </div>
-      ) : null}
+      <ClientReportStatus
+        bug={bug}
+        report={report}
+        picked={picked}
+        waiting={waiting}
+      />
+      <ClientReportActions
+        bug={bug}
+        canReassign={canReassign}
+        employees={employees}
+        history={history}
+        report={report}
+      />
     </section>
   );
 };
