@@ -3,6 +3,7 @@ import { Context, Effect, Layer } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { recordAuditEvent } from "../audit/audit-log";
 import { auth } from "../auth/auth";
 import { AppError } from "../core/action-result";
 
@@ -91,6 +92,12 @@ const changeOwnPassword = (
             activeSession.token.neq(session.session.token)
           )
         ).deleteAll();
+        await recordAuditEvent(transaction, {
+          actorId: session.user.id,
+          headers,
+          subjectUserId: session.user.id,
+          type: "password_changed",
+        });
         await transaction.orm.public.Activity.create({
           action: "user.password_changed",
           actorId: session.user.id,

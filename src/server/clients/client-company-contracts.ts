@@ -109,6 +109,14 @@ export const ClientCompanyDetailSchema = Schema.Struct({
       name: Schema.String,
     })
   ),
+  insight: Schema.Struct({
+    // Business minutes from report to first response, averaged.
+    averageFirstResponseMinutes: Schema.NullOr(Schema.Number),
+    // Shares between 0 and 1; null when there is nothing to divide by.
+    reopenRate: Schema.NullOr(Schema.Number),
+    slaBreachRate: Schema.NullOr(Schema.Number),
+    thumbsUpRate: Schema.NullOr(Schema.Number),
+  }),
   projects: Schema.Array(
     Schema.Struct({
       archived: Schema.Boolean,

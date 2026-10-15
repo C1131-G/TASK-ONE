@@ -68,6 +68,8 @@ export const clientActionCatalog: readonly ActionEntry[] = [
   entry("unlockUserAction", clients.unlockUserAction, () => ({
     userId: ids.employeeId,
   })),
+  entry("listAuditEvents", clientQueries.listAuditEvents, () => ({})),
+  entry("listLockedAccounts", clientQueries.listLockedAccounts, () => ({})),
   entry("getSlaSettings", slaQueries.getSlaSettings, () => ({})),
   entry("updateSlaSettingsAction", slaActions.updateSlaSettingsAction, () => ({
     businessDays: [1, 2, 3, 4, 5],

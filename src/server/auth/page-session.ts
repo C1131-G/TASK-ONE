@@ -8,7 +8,8 @@ import { AuthSession, AuthSessionLive } from "./session";
 import type { AuthenticatedUser } from "./session";
 
 export type PageSession =
-  | { readonly kind: "anonymous" }
+  // `reason` is set when the visitor was signed out rather than never in.
+  | { readonly kind: "anonymous"; readonly reason?: "inactivity" }
   | { readonly kind: "authenticated"; readonly user: AuthenticatedUser };
 
 // The workspace gate, shell and page sections all ask for the session; one
@@ -32,7 +33,15 @@ export const getPageSession = cache(async (): Promise<PageSession> => {
     failure.value instanceof AppError &&
     failure.value.code === "UNAUTHENTICATED"
   ) {
-    return { kind: "anonymous" };
+    const { details } = failure.value;
+    const inactive =
+      typeof details === "object" &&
+      details !== null &&
+      "reason" in details &&
+      details.reason === "inactivity";
+    return inactive
+      ? { kind: "anonymous", reason: "inactivity" }
+      : { kind: "anonymous" };
   }
 
   throw failure._tag === "Some"

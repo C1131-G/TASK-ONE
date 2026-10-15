@@ -3,6 +3,7 @@
 import { Effect, Schema } from "effect";
 import { revalidatePath, updateTag } from "next/cache";
 
+import { auditEffect } from "@/src/server/audit/audit-log";
 import { AuthSessionLive } from "@/src/server/auth/session";
 import { requireAdmin } from "@/src/server/core/admin-action";
 import {
@@ -91,10 +92,18 @@ export async function resetEmployeePasswordAction(input: unknown) {
         const requestHeaders = yield* requestHeadersOrFail;
         const administrator = yield* requireAdmin(requestHeaders);
         const management = yield* UserManagement;
-        return yield* management.resetEmployeePassword(
-          administrator.id,
-          validated.employeeId
-        );
+        return yield* management
+          .resetEmployeePassword(administrator.id, validated.employeeId)
+          .pipe(
+            Effect.tap(() =>
+              auditEffect({
+                actorId: administrator.id,
+                headers: requestHeaders,
+                subjectUserId: validated.employeeId,
+                type: "password_reset",
+              })
+            )
+          );
       }).pipe(
         Effect.provide(AuthSessionLive),
         Effect.provide(UserManagementLive)

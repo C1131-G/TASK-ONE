@@ -23,7 +23,8 @@ export const listPortalProjects = async (input: unknown) =>
         const bugs = yield* PortalBugs;
         return yield* bugs.listProjects(toPortalActor(user));
       }),
-    Schema.Array(PortalProjectSchema)
+    Schema.Array(PortalProjectSchema),
+    { preview: true }
   );
 
 export const listPortalBugs = async (input: unknown) =>
@@ -35,7 +36,8 @@ export const listPortalBugs = async (input: unknown) =>
         const bugs = yield* PortalBugs;
         return yield* bugs.listBugs(toPortalActor(user), validated);
       }),
-    PortalBugListSchema
+    PortalBugListSchema,
+    { preview: true }
   );
 
 export const getPortalBug = async (input: unknown) =>
@@ -47,7 +49,8 @@ export const getPortalBug = async (input: unknown) =>
         const bugs = yield* PortalBugs;
         return yield* bugs.getBug(toPortalActor(user), validated.bugId);
       }),
-    PortalBugDetailSchema
+    PortalBugDetailSchema,
+    { preview: true }
   );
 
 export const listPortalNotifications = async (input: unknown) =>
@@ -59,7 +62,8 @@ export const listPortalNotifications = async (input: unknown) =>
         const bugs = yield* PortalBugs;
         return yield* bugs.listNotifications(toPortalActor(user));
       }),
-    PortalNotificationListSchema
+    PortalNotificationListSchema,
+    { preview: true }
   );
 
 export const getPortalResponseTimes = async (input: unknown) =>
@@ -71,5 +75,6 @@ export const getPortalResponseTimes = async (input: unknown) =>
         const bugs = yield* PortalBugs;
         return yield* bugs.responseTimes(toPortalActor(user));
       }),
-    PortalResponseTimesSchema
+    PortalResponseTimesSchema,
+    { preview: true }
   );

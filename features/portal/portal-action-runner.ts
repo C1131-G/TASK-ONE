@@ -39,7 +39,9 @@ export const runPortalAction = <
     user: PortalUser,
     validated: InputSchema["Type"]
   ) => Effect.Effect<OutputSchema["Type"], AppError, PortalServices>,
-  outputSchema: OutputSchema
+  outputSchema: OutputSchema,
+  // Reads may also run for an admin previewing the portal; changes never do.
+  options: { readonly preview?: boolean } = {}
 ): Promise<ActionResult<OutputSchema["Type"]>> =>
   runServerAction(
     input,
@@ -48,7 +50,9 @@ export const runPortalAction = <
       Effect.gen(function* authorizePortalAction() {
         const requestHeaders = yield* requestHeadersOrFail;
         const sessions = yield* AuthSession;
-        const user = yield* sessions.requirePortalAccess(requestHeaders);
+        const user = yield* options.preview
+          ? sessions.requirePortalView(requestHeaders)
+          : sessions.requirePortalAccess(requestHeaders);
         return yield* execute(user, validated).pipe(
           Effect.provide(PortalBugsLive),
           Effect.provide(NotificationsLive),

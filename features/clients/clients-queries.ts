@@ -1,6 +1,13 @@
 import "server-only";
 import { Effect, Schema } from "effect";
 
+import {
+  AuditFilterSchema,
+  AuditListSchema,
+  AuditLog,
+  AuditLogLive,
+  LockedAccountListSchema,
+} from "@/src/server/audit/audit-log";
 import { AuthSessionLive } from "@/src/server/auth/session";
 import {
   ClientCompanyDetailSchema,
@@ -48,4 +55,32 @@ export const getClientCompany = async (input: unknown) =>
       ),
     undefined,
     ClientCompanyDetailSchema
+  );
+
+export const listAuditEvents = async (input: unknown) =>
+  await runServerAction(
+    input,
+    AuditFilterSchema,
+    (validated) =>
+      Effect.gen(function* listAuditEventsProgram() {
+        const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
+        const audit = yield* AuditLog;
+        return yield* audit.list(administrator.id, validated);
+      }).pipe(Effect.provide(AuthSessionLive), Effect.provide(AuditLogLive)),
+    undefined,
+    AuditListSchema
+  );
+
+export const listLockedAccounts = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listLockedAccountsProgram() {
+        const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
+        const audit = yield* AuditLog;
+        return yield* audit.lockedAccounts(administrator.id);
+      }).pipe(Effect.provide(AuthSessionLive), Effect.provide(AuditLogLive)),
+    undefined,
+    LockedAccountListSchema
   );

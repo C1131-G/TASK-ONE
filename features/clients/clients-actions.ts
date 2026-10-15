@@ -3,6 +3,7 @@
 import { Effect, Schema } from "effect";
 import { revalidatePath } from "next/cache";
 
+import { auditEffect } from "@/src/server/audit/audit-log";
 import { AuthSessionLive } from "@/src/server/auth/session";
 import type { ClientCompanyReceipt } from "@/src/server/clients/client-company-contracts";
 import {
@@ -33,6 +34,14 @@ import {
   UserManagementLive,
 } from "@/src/server/people/user-management";
 
+const companyAuditTypes: Record<
+  string,
+  "company_deactivated" | "company_reactivated"
+> = {
+  "client_company.deactivate": "company_deactivated",
+  "client_company.reactivate": "company_reactivated",
+};
+
 const withKey = <Fields extends Schema.Struct.Fields>(
   schema: Schema.Struct<Fields>
 ) => Schema.Struct({ ...schema.fields, idempotencyKey: IdempotencyKeySchema });
@@ -56,7 +65,8 @@ const runCompanyAction = async <
     schema,
     (validated) =>
       Effect.gen(function* runClientCompanyAction() {
-        const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
+        const requestHeaders = yield* requestHeadersOrFail;
+        const administrator = yield* requireAdmin(requestHeaders);
         const service = yield* ClientCompanyManagement;
         const idempotency = yield* Idempotency;
         const { idempotencyKey, ...companyInput } = validated as {
@@ -64,7 +74,20 @@ const runCompanyAction = async <
         } & Omit<InputSchema["Type"], "idempotencyKey">;
         return yield* idempotency.run({
           actorId: administrator.id,
-          execute: () => execute(service, administrator.id, companyInput),
+          execute: () =>
+            execute(service, administrator.id, companyInput).pipe(
+              Effect.tap((receipt) => {
+                const type = companyAuditTypes[operation];
+                return type
+                  ? auditEffect({
+                      actorId: administrator.id,
+                      details: { companyId: receipt.companyId },
+                      headers: requestHeaders,
+                      type,
+                    })
+                  : Effect.void;
+              })
+            ),
           input: companyInput,
           key: idempotencyKey,
           operation,
@@ -183,6 +206,12 @@ export async function unlockUserAction(input: unknown) {
         const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
         const users = yield* UserManagement;
         yield* users.unlockUser(administrator.id, validated.userId);
+        yield* auditEffect({
+          actorId: administrator.id,
+          headers: yield* requestHeadersOrFail,
+          subjectUserId: validated.userId,
+          type: "account_unlocked",
+        });
         return { done: true as const };
       }).pipe(
         Effect.provide(AuthSessionLive),

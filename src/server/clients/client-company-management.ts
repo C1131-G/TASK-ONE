@@ -11,6 +11,7 @@ import {
 import { db } from "@/src/prisma/db";
 
 import { auth } from "../auth/auth";
+import { loadSlaSettings } from "../company/sla-settings";
 import { AppError } from "../core/action-result";
 import type { DbTransaction } from "../people/user-internal";
 import {
@@ -38,6 +39,7 @@ import {
   ClientCompanyDetailSchema,
   ClientCompanyManagement,
 } from "./client-company-contracts";
+import { companyInsight } from "./client-company-insight";
 import { flagHandlerBugsForReassignment } from "./client-handler-reassignment";
 
 const companyError = (error: unknown): AppError => {
@@ -222,17 +224,29 @@ const getCompany = (
         companyId,
       }).all(),
       transaction.orm.public.BugReport.where({ clientCompanyId: companyId })
-        .select("id", "status", "resolution", "satisfaction")
+        .select(
+          "id",
+          "status",
+          "resolution",
+          "satisfaction",
+          "clientReopenCount"
+        )
         .all(),
     ]);
-    const [slas, projects, employees] = await Promise.all([
+    const [slas, slaSettings, projects, employees] = await Promise.all([
       bugs.length === 0
         ? []
         : transaction.orm.public.BugSla.where((sla) =>
             sla.bugId.in(bugs.map(({ id }) => id))
           )
-            .select("breachedResolution", "breachedResponse")
+            .select(
+              "breachedResolution",
+              "breachedResponse",
+              "createdAt",
+              "firstRespondedAt"
+            )
             .all(),
+      loadSlaSettings(transaction),
       links.length === 0
         ? []
         : transaction.orm.public.Project.where((project) =>
@@ -282,6 +296,7 @@ const getCompany = (
         id: employee.id,
         name: employee.name,
       })),
+      insight: companyInsight(bugs, slas, slaSettings),
       projects: projects.map((project) => ({
         archived: project.archivedAt !== null,
         id: project.id,

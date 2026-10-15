@@ -8,6 +8,12 @@ import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 export interface PortalCompany {
   readonly companyName: string;
   readonly userName: string;
+  // Set while an admin previews this client: the admin's name and the
+  // previewed account's id (for the exit link).
+  readonly preview: {
+    readonly adminName: string;
+    readonly userId: string;
+  } | null;
 }
 
 // The signed-in client's company and name for the portal header and account
@@ -19,7 +25,7 @@ export const getPortalCompany = cache(
     const exit = await Effect.runPromiseExit(
       Effect.gen(function* readPortalCompany() {
         const sessions = yield* AuthSession;
-        return yield* sessions.requirePortalAccess(requestHeaders);
+        return yield* sessions.requirePortalView(requestHeaders);
       }).pipe(Effect.provide(AuthSessionLive))
     );
     if (!Exit.isSuccess(exit)) {
@@ -27,6 +33,9 @@ export const getPortalCompany = cache(
     }
     return {
       companyName: exit.value.clientCompanyName,
+      preview: exit.value.preview
+        ? { adminName: exit.value.preview.adminName, userId: exit.value.id }
+        : null,
       userName: exit.value.name,
     };
   }

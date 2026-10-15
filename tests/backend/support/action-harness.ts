@@ -106,6 +106,23 @@ export const callAs = async <Result extends ActionResultLike>(
   return await action(input);
 };
 
+// Runs an action as a persona whose browser also carries one extra cookie.
+export const callAsWithCookie = async <Result extends ActionResultLike>(
+  persona: Persona,
+  cookie: string,
+  action: (input: unknown) => Promise<Result>,
+  input: unknown
+): Promise<Result> => {
+  const base = personas.get(persona)?.headers ?? new Headers();
+  const headers = new Headers(base);
+  headers.set(
+    "cookie",
+    [base.get("cookie"), cookie].filter(Boolean).join("; ")
+  );
+  currentHeaders = headers;
+  return await action(input);
+};
+
 /**
  * Runs an action twice with the same idempotency key and checks that the
  * second call replays the first result exactly instead of acting again.

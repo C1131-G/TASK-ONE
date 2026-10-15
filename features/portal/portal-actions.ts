@@ -346,7 +346,9 @@ export async function getPortalFileUrlAction(input: unknown) {
           ? yield* uploads.signedPreview(user.id, validated.fileId)
           : yield* uploads.signedDownload(user.id, validated.fileId);
       }),
-    Schema.String
+    Schema.String,
+    // Reading an attachment is safe in an admin's read-only preview.
+    { preview: true }
   );
 }
 
