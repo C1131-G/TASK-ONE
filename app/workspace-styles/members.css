@@ -54,11 +54,19 @@
 .workspace-app .members-role-filter {
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  padding: 2px;
+  gap: 2px;
+  flex-wrap: wrap;
+  padding: 3px;
 }
 .workspace-app .members-role-filter [data-active="true"] {
+  border-color: var(--border);
   background: var(--surface-2);
   color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.workspace-app .members-role-filter [data-slot="button"] {
+  height: 26px;
+  min-height: 26px;
 }
 .workspace-app .members-panel [data-slot="table-container"] {
   max-width: 100%;

@@ -5,7 +5,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
@@ -24,28 +24,39 @@ const SearchForm = ({
   const [results, setResults] = useState<WorkspaceSearchResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const requestGeneration = useRef(0);
 
   useEffect(() => {
     if (!initialQuery.trim()) {
       return;
     }
-    let cancelled = false;
+    requestGeneration.current += 1;
+    const generation = requestGeneration.current;
     const loadInitialResults = async () => {
-      const result = await searchWorkspaceAction({ query: initialQuery });
-      if (cancelled) {
-        return;
+      try {
+        const result = await searchWorkspaceAction({ query: initialQuery });
+        if (generation !== requestGeneration.current) {
+          return;
+        }
+        if (!result.ok) {
+          setError(result.error.message);
+          setResults(null);
+          return;
+        }
+        setError(null);
+        setResults(result.data);
+      } catch {
+        if (generation === requestGeneration.current) {
+          setError("Search is temporarily unavailable. Try again.");
+          setResults(null);
+        }
       }
-      if (!result.ok) {
-        setError(result.error.message);
-        setResults(null);
-        return;
-      }
-      setError(null);
-      setResults(result.data);
     };
     void loadInitialResults();
     return () => {
-      cancelled = true;
+      if (generation === requestGeneration.current) {
+        requestGeneration.current += 1;
+      }
     };
   }, [initialQuery]);
 
@@ -54,17 +65,29 @@ const SearchForm = ({
     if (!trimmedQuery) {
       return;
     }
+    requestGeneration.current += 1;
+    const generation = requestGeneration.current;
     setQuery(searchQuery);
     startTransition(async () => {
-      const result = await searchWorkspaceAction({ query: trimmedQuery });
-      if (!result.ok) {
-        setError(result.error.message);
-        setResults(null);
-        return;
+      try {
+        const result = await searchWorkspaceAction({ query: trimmedQuery });
+        if (generation !== requestGeneration.current) {
+          return;
+        }
+        if (!result.ok) {
+          setError(result.error.message);
+          setResults(null);
+          return;
+        }
+        setError(null);
+        setResults(result.data);
+        router.refresh();
+      } catch {
+        if (generation === requestGeneration.current) {
+          setError("Search is temporarily unavailable. Try again.");
+          setResults(null);
+        }
       }
-      setError(null);
-      setResults(result.data);
-      router.refresh();
     });
   };
 

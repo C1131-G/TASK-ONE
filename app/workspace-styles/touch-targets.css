@@ -1,0 +1,61 @@
+@media (pointer: coarse) {
+  .workspace-app button:not([data-slot="switch"]),
+  .workspace-app a.btn,
+  .workspace-app a[role="button"],
+  .workspace-app [role="tab"],
+  .workspace-app [data-workspace-button][data-size],
+  .workspace-app [data-workspace-button],
+  .workspace-app [data-slot="select-trigger"]:not(:disabled),
+  .workspace-app .sidebar a {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  [data-slot="dialog-content"][data-workspace] button:not([data-slot="switch"]),
+  [data-slot="dialog-content"][data-workspace]
+    [data-workspace-button][data-size],
+  [data-slot="dialog-content"][data-workspace] [data-slot="select-trigger"],
+  [data-workspace-menu] [role="menuitem"],
+  [data-workspace-menu] [role="menuitemcheckbox"],
+  [data-workspace-menu] [role="option"],
+  [data-workspace-select] [role="option"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  [data-slot="dialog-content"][data-workspace]
+    [data-workspace-button][data-size="xs"],
+  [data-slot="dialog-content"][data-workspace]
+    [data-workspace-button][data-size="sm"],
+  [data-slot="dialog-content"][data-workspace]
+    [data-workspace-button][data-size^="icon"] {
+    height: 44px;
+  }
+
+  [data-slot="dialog-content"][data-workspace]
+    [data-workspace-button][data-size^="icon"] {
+    width: 44px;
+  }
+
+  .workspace-app input:not([type="checkbox"]):not([type="radio"]),
+  .workspace-app textarea,
+  [data-slot="dialog-content"][data-workspace]
+    input:not([type="checkbox"]):not([type="radio"]),
+  [data-slot="dialog-content"][data-workspace] textarea {
+    min-height: 44px;
+  }
+
+  .workspace-app [data-slot="tabs-list"][data-variant] {
+    height: auto;
+    min-height: 44px;
+  }
+
+  .workspace-app [data-slot="tabs-trigger"][data-state] {
+    height: auto;
+    min-height: 44px;
+  }
+
+  .workspace-app [data-slot="switch"]::after {
+    inset-block: -12px;
+  }
+}

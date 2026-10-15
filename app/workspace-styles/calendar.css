@@ -62,6 +62,12 @@
   min-width: 0;
   color: var(--text-2);
   font-size: var(--fs-xs);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.workspace-app .calendar-project-legend {
+  column-gap: 16px;
+  row-gap: 8px;
 }
 .workspace-app .calendar-project-legend-item .pdot {
   background: var(--c);

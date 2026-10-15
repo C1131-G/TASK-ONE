@@ -3,7 +3,40 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: 12px 0;
+  margin: 8px 0 12px;
+  padding-inline: var(--gutter);
+}
+.workspace-app .project-board-wrap {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+.workspace-app .project-task-create-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: 8px;
+  padding-inline: var(--gutter);
+}
+.workspace-app .saved-view-tabs {
+  max-width: 100%;
+  min-height: 36px;
+  align-items: center;
+  gap: 4px;
+  margin-block: 8px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.workspace-app .saved-view-tabs .tab-wrap,
+.workspace-app .saved-view-tabs .tab {
+  flex: 0 0 auto;
+}
+.workspace-app .saved-view-tabs .tab-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .workspace-app .project-task-filter {
   display: grid;

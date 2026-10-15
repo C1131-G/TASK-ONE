@@ -125,7 +125,7 @@
 .workspace-app .inbox-item-copy {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
   min-width: 0;
 }
 .workspace-app .inbox-item-title,
@@ -142,6 +142,11 @@
 .workspace-app .inbox-item-time {
   color: var(--text-3);
   font-size: var(--fs-xs);
+}
+.workspace-app .inbox-item-snippet {
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 .workspace-app .inbox-item-meta {
   align-items: center;

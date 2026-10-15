@@ -11,8 +11,9 @@
   align-items: center;
   justify-content: flex-start;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   gap: 4px;
   border-bottom: 1px solid var(--border);
   border-radius: 0;
@@ -39,6 +40,15 @@
 }
 .workspace-app .settings-content [data-slot="tabs-content"] {
   margin: 0;
+}
+.workspace-app .settings-content .panel > .panel-h {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+.workspace-app .settings-theme-choice:has([data-state="checked"]) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 .workspace-app .settings-section-title {
   margin: 0 0 5px;
@@ -160,6 +170,31 @@
 }
 .workspace-app .settings-password-link {
   border-top: 1px solid var(--divider);
+}
+.workspace-app
+  .notification-preferences-grid
+  [data-slot="switch"][data-state="unchecked"] {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+.workspace-app
+  .notification-preferences-grid
+  [data-slot="switch"][data-state="checked"] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.workspace-app
+  .notification-preferences-grid
+  [data-slot="switch"]
+  [data-slot="switch-thumb"] {
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+}
+.workspace-app
+  .notification-preferences-grid
+  [data-slot="switch"][data-state="unchecked"]
+  [data-slot="switch-thumb"] {
+  background: var(--text-3);
 }
 
 @media (max-width: 700px) {

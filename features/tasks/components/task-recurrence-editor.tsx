@@ -40,6 +40,7 @@ export const TaskRecurrenceEditor = ({
   version,
   onVersionChange,
   editable,
+  onReload,
 }: {
   readonly taskId: string;
   readonly dueDate: string | null;
@@ -47,6 +48,7 @@ export const TaskRecurrenceEditor = ({
   readonly version: number;
   readonly onVersionChange: (version: number) => void;
   readonly editable: boolean;
+  readonly onReload: () => Promise<void>;
 }) => {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +75,7 @@ export const TaskRecurrenceEditor = ({
       }
       onVersionChange(result.data.version);
       setError(null);
+      await onReload();
     });
   };
 
@@ -93,6 +96,7 @@ export const TaskRecurrenceEditor = ({
       }
       onVersionChange(result.data.version);
       setError(null);
+      await onReload();
     });
   };
 

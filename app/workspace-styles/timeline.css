@@ -24,6 +24,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  row-gap: 10px;
   margin: 0;
   min-width: 0;
   padding: 0;
@@ -37,6 +38,10 @@
 .workspace-app .timeline-toolbar .timeline-search {
   flex: 1 1 200px;
 }
+.workspace-app .timeline-toolbar .field,
+.workspace-app .timeline-toolbar [data-slot="select-trigger"] {
+  min-height: 36px;
+}
 .workspace-app .timeline-scale {
   align-items: center;
   border: 1px solid var(--border);
@@ -46,7 +51,7 @@
   padding: 2px;
 }
 .workspace-app .timeline-scale button {
-  min-height: 32px;
+  min-height: 26px;
   padding-inline: 10px;
 }
 .workspace-app .timeline-panel .tl {

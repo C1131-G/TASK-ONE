@@ -68,7 +68,7 @@ const ProjectCreateForm = () => {
       open={open}
       title="New project"
       trigger={
-        <WorkspaceButton className="btn btn-primary btn-sm" type="button">
+        <WorkspaceButton className="btn btn-primary" type="button">
           New project
         </WorkspaceButton>
       }
@@ -144,7 +144,9 @@ const ProjectCreateForm = () => {
           <WorkspaceButton
             className="btn btn-primary"
             disabled={pending}
+            size="sm"
             type="submit"
+            variant="default"
           >
             {pending ? "Creating…" : "Create project"}
           </WorkspaceButton>

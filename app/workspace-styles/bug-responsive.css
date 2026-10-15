@@ -4,7 +4,8 @@
     flex-direction: column;
   }
   .workspace-app .bug-page-header > :last-child {
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
   }
   .workspace-app .bug-report-dialog {
     max-height: calc(100dvh - 24px);

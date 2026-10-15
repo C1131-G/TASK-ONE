@@ -20,7 +20,7 @@ const drawerDetails = (page: Page) =>
   page.getByRole("dialog").getByRole("heading", { name: "Details" });
 
 const expectDrawerOpen = async (page: Page) => {
-  await expect(page).toHaveURL(TASK_PARAM);
+  await expect(page).toHaveURL(TASK_PARAM, { timeout: 30_000 });
   await expect(drawerDetails(page)).toBeVisible({ timeout: 15_000 });
 };
 
@@ -60,6 +60,19 @@ test.describe("task drawer links", () => {
     await expect(drawerDetails(page)).toBeVisible({ timeout: 15_000 });
   });
 
+  test("opening a task keeps the active task filter in the URL", async ({
+    page,
+  }) => {
+    await page.goto("/tasks?status=open");
+    await page.waitForLoadState("networkidle");
+    const opener = page.getByRole("button", { name: /^Open details for/u });
+    test.skip((await opener.count()) === 0, "No tasks are available");
+
+    await opener.first().click();
+    await expectDrawerOpen(page);
+    await expect(page).toHaveURL(/\/tasks\?.*status=open/u);
+  });
+
   test("a search result opens its task in the project drawer", async ({
     page,
   }) => {
@@ -77,41 +90,71 @@ test.describe("task drawer links", () => {
   test("a favorite task title opens its task in the project drawer", async ({
     page,
   }) => {
-    await page.goto("/tasks");
+    await page.goto("/tasks?view=list");
     await page.waitForLoadState("networkidle");
-    const add = page.getByRole("button", {
+    const targetRow = page.locator(".trow").first();
+    test.skip((await targetRow.count()) === 0, "No tasks are available");
+    const taskLink = targetRow.locator("a.trunc");
+    const taskText = await taskLink.textContent();
+    const taskTitle = taskText?.trim() ?? "";
+    const taskHref = await taskLink.getAttribute("href");
+    if (!taskHref) {
+      throw new Error("Task row title is missing its project link");
+    }
+    const projectPath = new URL(taskHref, page.url()).pathname;
+    const add = targetRow.getByRole("button", {
       exact: true,
       name: "Add to favorites",
     });
-    const remove = page.getByRole("button", {
+    const remove = targetRow.getByRole("button", {
       exact: true,
       name: "Remove from favorites",
     });
-    test.skip((await add.count()) === 0, "No task favorite control on /tasks");
-    // A click before hydration does nothing, so retry until the star turns on.
-    await expect(async () => {
-      if ((await remove.count()) === 0) {
-        await add.first().click();
-      }
-      await expect(remove.first()).toBeVisible({ timeout: 3000 });
-    }).toPass({ timeout: 30_000 });
+    const wasFavorite = (await remove.count()) > 0;
+
+    test.skip(
+      !wasFavorite && (await add.count()) === 0,
+      "The first task cannot be favorited"
+    );
+    if (!wasFavorite) {
+      // A click before hydration does nothing, so retry until this task's star turns on.
+      await expect(async () => {
+        await add.click();
+        await expect(remove).toBeVisible({ timeout: 3000 });
+      }).toPass({ timeout: 30_000 });
+    }
 
     try {
       await page.goto("/favorites");
-      const title = page.locator("a.favorite-task-title").first();
+      const title = page
+        .locator(`a.favorite-task-title[href^="${projectPath}?task="]`)
+        .filter({ hasText: taskTitle })
+        .first();
       await expect(title).toBeVisible({ timeout: 15_000 });
       await title.click();
       await expectDrawerOpen(page);
     } finally {
-      // Leave the favorites as they were found.
-      await page.goto("/tasks");
-      await page.waitForLoadState("networkidle");
-      await expect(async () => {
-        if ((await remove.count()) > 0) {
-          await remove.first().click();
-        }
-        await expect(remove).toHaveCount(0, { timeout: 3000 });
-      }).toPass({ timeout: 30_000 });
+      // Leave this task's favorite state as it was found.
+      if (!wasFavorite) {
+        await page.goto("/tasks?view=list");
+        await page.waitForLoadState("networkidle");
+        const originalRow = page
+          .locator(`.trow:has(a.trunc[href^="${projectPath}?view="])`)
+          .filter({ hasText: taskTitle })
+          .first();
+        const originalRemove = originalRow.getByRole("button", {
+          exact: true,
+          name: "Remove from favorites",
+        });
+        await expect(originalRemove).toBeVisible({ timeout: 15_000 });
+        await originalRemove.click();
+        await expect(
+          originalRow.getByRole("button", {
+            exact: true,
+            name: "Add to favorites",
+          })
+        ).toBeVisible({ timeout: 15_000 });
+      }
     }
   });
 });

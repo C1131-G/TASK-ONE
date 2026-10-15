@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useHydrated } from "@/components/workspace/use-hydrated";
 
 const ThemeChoice = ({
   description,
@@ -61,6 +62,7 @@ const SettingsWorkspace = ({
   readonly workspace: ReactNode;
 }) => {
   const { setTheme, theme } = useTheme();
+  const themeHydrated = useHydrated();
 
   return (
     <Tabs
@@ -96,7 +98,7 @@ const SettingsWorkspace = ({
                 aria-label="Theme"
                 className="settings-theme-options"
                 onValueChange={setTheme}
-                value={theme ?? "system"}
+                value={themeHydrated ? (theme ?? "system") : "system"}
               >
                 <ThemeChoice
                   description="Use your device appearance setting."

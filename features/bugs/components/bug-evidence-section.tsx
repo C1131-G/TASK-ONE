@@ -35,6 +35,7 @@ export const BugEvidenceSection = ({
   isReadOnly,
   latestAttempt,
   onError,
+  onRefresh,
   openFile,
   pending,
   submit,
@@ -44,6 +45,7 @@ export const BugEvidenceSection = ({
   readonly isReadOnly: boolean;
   readonly latestAttempt: BugHistory["attempts"][number] | null;
   readonly onError: (message: string) => void;
+  readonly onRefresh?: () => Promise<void>;
   readonly openFile: (fileId: string, preview: boolean) => Promise<void>;
   readonly pending: boolean;
   readonly submit: BugSubmit;
@@ -105,7 +107,11 @@ export const BugEvidenceSection = ({
         setFileBusy(false);
         return;
       }
-      router.refresh();
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        router.refresh();
+      }
       setFileInputKey((value) => value + 1);
     } catch {
       onError("Upload failed. Check the storage configuration and try again.");

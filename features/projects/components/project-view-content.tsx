@@ -150,7 +150,9 @@ const renderProjectBoard = ({
   }
   return (
     <>
-      <TaskCreateForm projectId={project.id} />
+      <div className="project-task-create-action">
+        <TaskCreateForm projectId={project.id} />
+      </div>
       <ProjectBoard
         currentUserId={currentUserId}
         employees={employees}

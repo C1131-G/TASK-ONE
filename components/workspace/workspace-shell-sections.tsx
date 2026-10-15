@@ -145,7 +145,9 @@ export const WorkspaceTopbar = ({ frame }: SectionProps) => {
           </div>
         </SheetContent>
       </Sheet>
-      <span className="crumbs">{title}</span>
+      <span className="crumbs">
+        <span className="topbar-title">{title}</span>
+      </span>
       <span className="sp" />
       <WorkspaceSearchPalette projects={projects} />
       <Link

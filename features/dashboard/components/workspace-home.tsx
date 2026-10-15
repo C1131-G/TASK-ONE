@@ -213,7 +213,11 @@ const WorkspaceHome = async ({
           <Link className="btn btn-secondary hide-m" href="/members">
             Invite member
           </Link>
-          {isAdmin ? <ProjectCreateForm /> : null}
+          {isAdmin ? (
+            <div className="hide-m">
+              <ProjectCreateForm />
+            </div>
+          ) : null}
           {projectResult.data.length ? (
             <QuickTaskForm
               projects={projectResult.data.map(({ id, name }) => ({

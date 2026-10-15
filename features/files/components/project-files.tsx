@@ -19,11 +19,14 @@ import type {
   FileSort,
   ProjectFile,
 } from "@/features/files/types/project-file-types";
+import type { TaskFile } from "@/features/tasks/task-details-panel-data";
 
 const ProjectFiles = ({
   projectId,
   taskId,
   initialFiles,
+  controlledFiles,
+  setControlledFiles,
   canUpload,
   currentUserId,
   isAdmin,
@@ -31,6 +34,8 @@ const ProjectFiles = ({
   readonly projectId: string;
   readonly taskId?: string;
   readonly initialFiles: readonly ProjectFile[];
+  readonly controlledFiles?: readonly TaskFile[];
+  readonly setControlledFiles?: (files: readonly TaskFile[]) => void;
   readonly canUpload: boolean;
   readonly currentUserId: string | null;
   readonly isAdmin: boolean;
@@ -55,7 +60,13 @@ const ProjectFiles = ({
     undo,
     undoRemoval,
     upload,
-  } = useProjectFiles({ initialFiles, projectId, taskId });
+  } = useProjectFiles({
+    initialFiles,
+    projectId,
+    taskId,
+    ...(controlledFiles ? { controlledFiles } : {}),
+    ...(setControlledFiles ? { setControlledFiles } : {}),
+  });
 
   const { fileTypes, filteredFiles } = filterProjectFiles(
     files,

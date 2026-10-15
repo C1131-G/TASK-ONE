@@ -124,7 +124,7 @@ const ProjectFilesToolbar = ({
         <>
           <WorkspaceButton
             onClick={() => uploadInput.current?.click()}
-            size="sm"
+            size="default"
             type="button"
             variant="default"
             workspace

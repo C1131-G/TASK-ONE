@@ -54,24 +54,33 @@
   justify-content: center;
   padding: 0 6px;
 }
-.workspace-app [data-workspace-create] {
-  border-radius: var(--r);
-  background: #4b5bd6;
-  color: #fff;
+.workspace-app [data-workspace-create][data-variant="default"] {
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
 }
-.workspace-app [data-workspace-create]:hover {
-  background: #404fc4;
+.workspace-app [data-workspace-create][data-variant="default"]:hover {
+  background: color-mix(in srgb, var(--accent) 88%, var(--text));
+}
+.workspace-app [data-workspace-create][data-variant="outline"] {
+  border-color: var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+.workspace-app [data-workspace-create][data-variant="outline"]:hover {
+  background: var(--surface-2);
 }
 [data-workspace-menu] {
-  --popover: #fff;
-  --popover-foreground: #1d1c1a;
-  --accent: #eeede9;
-  --accent-foreground: #1d1c1a;
-  --border: #e9e7e2;
+  --popover: var(--workspace-portal-surface);
+  --popover-foreground: var(--workspace-portal-text);
+  --accent: var(--workspace-portal-muted);
+  --accent-foreground: var(--workspace-portal-text);
+  --border: var(--workspace-portal-border);
   min-width: 184px;
-  border: 1px solid #e9e7e2;
-  background: #fff;
-  color: #1d1c1a;
+  border: 1px solid var(--workspace-portal-border);
+  background: var(--workspace-portal-surface);
+  color: var(--workspace-portal-text);
 }
 [data-workspace-sheet][data-side="right"] {
   width: min(520px, 100vw);
@@ -109,26 +118,26 @@
   font-weight: 450;
 }
 [data-workspace-confirm] {
-  --background: #fbfaf8;
-  --foreground: #1d1c1a;
-  --popover: #fbfaf8;
-  --popover-foreground: #1d1c1a;
-  --border: #e9e7e2;
-  border: 1px solid #e9e7e2;
+  --background: var(--workspace-portal-bg);
+  --foreground: var(--workspace-portal-text);
+  --popover: var(--workspace-portal-surface);
+  --popover-foreground: var(--workspace-portal-text);
+  --border: var(--workspace-portal-border);
+  border: 1px solid var(--workspace-portal-border);
   border-radius: 10px;
-  background: #fbfaf8;
-  color: #1d1c1a;
+  background: var(--workspace-portal-bg);
+  color: var(--workspace-portal-text);
 }
 [data-workspace-select] {
-  --popover: #ffffff;
-  --popover-foreground: #1d1c1a;
-  --accent: #eeede9;
-  --accent-foreground: #1d1c1a;
-  --border: #e9e7e2;
-  border: 1px solid #e9e7e2;
+  --popover: var(--workspace-portal-surface);
+  --popover-foreground: var(--workspace-portal-text);
+  --accent: var(--workspace-portal-muted);
+  --accent-foreground: var(--workspace-portal-text);
+  --border: var(--workspace-portal-border);
+  border: 1px solid var(--workspace-portal-border);
   border-radius: 8px;
-  background: #ffffff;
-  color: #1d1c1a;
+  background: var(--workspace-portal-surface);
+  color: var(--workspace-portal-text);
   box-shadow:
     0 12px 32px -8px rgb(28 25 20 / 16%),
     0 2px 6px -2px rgb(28 25 20 / 6%);
@@ -139,35 +148,12 @@
   font-size: 12.5px;
   font-weight: 450;
 }
-.dark [data-workspace-confirm] {
-  --background: #1a1a19;
-  --foreground: #eceae5;
-  --popover: #1d1d1c;
-  --popover-foreground: #eceae5;
-  --border: #2c2b29;
-  border-color: #2c2b29;
-  background: #1a1a19;
-  color: #eceae5;
-}
-.dark [data-workspace-menu] {
-  --popover: #1d1d1c;
-  --popover-foreground: #eceae5;
-  --accent: #2d2d2b;
-  --accent-foreground: #eceae5;
-  --border: #2c2b29;
-  border-color: #2c2b29;
-  background: #1d1d1c;
-  color: #eceae5;
+[data-workspace-select] {
+  box-shadow:
+    0 12px 32px -8px rgb(28 25 20 / 16%),
+    0 2px 6px -2px rgb(28 25 20 / 6%);
 }
 .dark [data-workspace-select] {
-  --popover: #1d1d1c;
-  --popover-foreground: #eceae5;
-  --accent: #2d2d2b;
-  --accent-foreground: #eceae5;
-  --border: #2c2b29;
-  border-color: #2c2b29;
-  background: #1d1d1c;
-  color: #eceae5;
   box-shadow: 0 16px 40px -10px rgb(0 0 0 / 60%);
 }
 [data-workspace-menu][data-workspace-account-menu] {
@@ -208,9 +194,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 1 auto;
   min-width: 0;
   font-size: var(--fs-sm);
   color: var(--text-2);
+}
+.workspace-app .topbar-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* No padding or hover fill: the first crumb starts exactly on the content gutter; hover is shown with colour only. */
 .workspace-app .crumbs button {

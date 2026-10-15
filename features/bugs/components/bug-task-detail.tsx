@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getBugHistoryAction } from "@/features/bugs/bugs-actions";
 import { BugDetailWorkflow } from "@/features/bugs/components/bug-detail-workflow";
@@ -24,16 +24,21 @@ export const BugTaskDetail = ({
   const [history, setHistory] = useState<BugHistory | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const refresh = useCallback(async () => {
+    const result = await getBugHistoryAction({ bugId });
+    if (result.ok) {
+      setHistory(result.data);
+      setError(null);
+    } else {
+      setError(result.error.message);
+    }
+  }, [bugId]);
+
   useEffect(() => {
-    let current = true;
+    let active = true;
     const load = async () => {
-      if (!current) {
-        return;
-      }
-      // Keep the second guard so a late response cannot update a closed drawer.
-      // eslint-disable-next-line react-doctor/async-defer-await
       const result = await getBugHistoryAction({ bugId });
-      if (!current) {
+      if (!active) {
         return;
       }
       if (result.ok) {
@@ -45,7 +50,7 @@ export const BugTaskDetail = ({
     };
     void load();
     return () => {
-      current = false;
+      active = false;
     };
   }, [bugId]);
 
@@ -66,6 +71,7 @@ export const BugTaskDetail = ({
       history={history}
       isAdmin={isAdmin}
       userId={userId}
+      onRefresh={refresh}
     />
   );
 };

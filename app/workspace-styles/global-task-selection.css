@@ -11,6 +11,16 @@
       1fr
     ) 100px 105px minmax(120px, 1fr) minmax(150px, auto);
 }
+.workspace-app .task-table-global .trow > .ttl {
+  grid-column: span 2;
+  overflow: hidden;
+}
+.workspace-app .task-table-global .trow > .ttl > a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .workspace-app .global-task-selection-bar {
   align-items: center;
   flex-wrap: wrap;
@@ -21,6 +31,43 @@
   align-items: center;
   display: inline-flex;
   gap: 8px;
+}
+@media (max-width: 700px) {
+  .workspace-app .task-table-global .thead {
+    display: none;
+  }
+  .workspace-app .task-table-global .trow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 8px 0;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--surface);
+  }
+  .workspace-app .task-table-global .trow > .ttl {
+    grid-column: 1 / -1;
+    padding: 2px 0 6px;
+  }
+  .workspace-app .task-table-global .trow > .c-meta {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .workspace-app .task-table-global .trow > .c-meta.row {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+  .workspace-app .task-table-global .trow > .c-meta:nth-child(6) {
+    display: none;
+  }
+  .workspace-app .task-table-global .trow > .c-meta:nth-child(7) {
+    grid-column: 1 / -1;
+    color: var(--text-2);
+    font-size: var(--fs-xs);
+  }
+  .workspace-app .task-table-global .trow > .c-meta:nth-child(7) a {
+    overflow-wrap: anywhere;
+  }
 }
 .workspace-app .global-task-bulk-form {
   max-height: min(72dvh, 680px);

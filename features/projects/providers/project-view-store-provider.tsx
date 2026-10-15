@@ -79,7 +79,19 @@ export const ProjectViewStoreProvider = ({
     projectViewStore,
     (state) => state.columnWidths
   );
-  usePersistColumnWidths(columnWidths);
+  const columnWidthPersistence = usePersistColumnWidths(columnWidths);
 
-  return <StoreProvider value={{ projectViewStore }}>{children}</StoreProvider>;
+  return (
+    <StoreProvider value={{ projectViewStore }}>
+      {columnWidthPersistence.error ? (
+        <p role="alert">
+          {columnWidthPersistence.error}{" "}
+          <button onClick={columnWidthPersistence.handleRetry} type="button">
+            Retry
+          </button>
+        </p>
+      ) : null}
+      {children}
+    </StoreProvider>
+  );
 };

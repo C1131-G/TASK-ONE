@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -22,6 +21,7 @@ export const TaskRelationsEditor = ({
   taskId,
   projectId,
   version,
+  onReload,
   labelIds,
   dependencyIds,
   editable,
@@ -34,8 +34,8 @@ export const TaskRelationsEditor = ({
   readonly dependencyIds: readonly string[];
   readonly editable: boolean;
   readonly onVersionChange: (version: number) => void;
+  readonly onReload: () => Promise<void>;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [loaded, setLoaded] = useState(false);
   const [labels, setLabels] = useState<readonly TaskLabelOption[]>([]);
@@ -95,7 +95,7 @@ export const TaskRelationsEditor = ({
       }
       onVersionChange(result.data.version);
       setError(null);
-      router.refresh();
+      await onReload();
     });
   };
 

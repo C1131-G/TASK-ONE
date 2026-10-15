@@ -82,6 +82,17 @@
   padding: 4px 8px 12px;
   scrollbar-width: none;
 }
+.workspace-app .sgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.workspace-app .sitem {
+  height: max(var(--side-row), 32px);
+}
+.workspace-app .side-scroll {
+  padding-inline: 9px;
+}
 .workspace-app .side-scroll::-webkit-scrollbar {
   display: none;
 }

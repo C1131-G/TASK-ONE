@@ -3,6 +3,7 @@
   align-items: end;
   flex-wrap: wrap;
   gap: var(--s-2);
+  margin-block: 4px 16px;
 }
 .workspace-app .project-toolbar .field {
   min-width: 138px;
@@ -15,6 +16,11 @@
 .workspace-app .project-view-tabs {
   align-self: flex-start;
   margin: 4px 0 0;
+}
+.workspace-app .project-toolbar .field,
+.workspace-app .project-toolbar input,
+.workspace-app .project-toolbar [data-slot="select-trigger"] {
+  min-height: 36px;
 }
 .workspace-app .project-list-view {
   display: grid;

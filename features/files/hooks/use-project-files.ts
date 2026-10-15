@@ -17,20 +17,35 @@ import {
 import { useUploadQueue } from "@/features/files/hooks/use-upload-queue";
 import { uploadRunner } from "@/features/files/project-upload-runner";
 import type { ProjectFile } from "@/features/files/types/project-file-types";
+import type { TaskFile } from "@/features/tasks/task-details-panel-data";
 
 // The file list of one project or task, with its uploads, file actions, rename and undo.
 export const useProjectFiles = ({
   initialFiles,
+  controlledFiles,
+  setControlledFiles,
   projectId,
   taskId,
 }: {
   readonly initialFiles: readonly ProjectFile[];
+  readonly controlledFiles?: readonly TaskFile[];
+  readonly setControlledFiles?: (files: readonly TaskFile[]) => void;
   readonly projectId: string;
   readonly taskId: string | undefined;
 }) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [files, setFiles] = useState(initialFiles);
+  const [localFiles, setLocalFiles] = useState(initialFiles);
+  const files = controlledFiles ?? localFiles;
+  const updateFiles = (
+    update: (files: readonly ProjectFile[]) => readonly ProjectFile[]
+  ) => {
+    if (controlledFiles && setControlledFiles) {
+      setControlledFiles(update(controlledFiles));
+      return;
+    }
+    setLocalFiles(update);
+  };
   const [error, setError] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
   const [renamingFile, setRenamingFile] = useState<ProjectFile | null>(null);
@@ -41,7 +56,11 @@ export const useProjectFiles = ({
       ? await listTaskFilesAction({ taskId })
       : await listProjectFilesAction({ projectId });
     if (result.ok) {
-      setFiles(result.data);
+      if (controlledFiles && setControlledFiles) {
+        setControlledFiles(result.data);
+      } else {
+        setLocalFiles(result.data);
+      }
     }
   };
 
@@ -101,7 +120,7 @@ export const useProjectFiles = ({
         return;
       }
       setUndo(result.data.undoId);
-      setFiles((current) => current.filter((file) => file.id !== fileId));
+      updateFiles((current) => current.filter((file) => file.id !== fileId));
     });
 
   const openRename = (file: ProjectFile) => {
@@ -132,7 +151,7 @@ export const useProjectFiles = ({
         setError(result.error.message);
         return;
       }
-      setFiles((current) =>
+      updateFiles((current) =>
         current.map((file) => (file.id === currentFile.id ? result.data : file))
       );
       setRenamingFile(null);
