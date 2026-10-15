@@ -152,10 +152,6 @@ export const PortalBugReceiptSchema = Schema.Struct({
   version: VersionSchema,
 });
 
-export const PortalCommentReceiptSchema = Schema.Struct({
-  comment: PortalCommentSchema,
-});
-
 export const PortalNotificationSchema = Schema.Struct({
   bugId: Schema.NullOr(UUIDSchema),
   createdAt: Schema.String,

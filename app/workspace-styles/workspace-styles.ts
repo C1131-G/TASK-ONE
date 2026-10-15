@@ -66,3 +66,4 @@ import "./bug-responsive.css";
 import "./temporary-password.css";
 import "./panel-skeleton.css";
 import "./clients.css";
+import "./portal.css";

@@ -34,6 +34,15 @@ const withKey = <Fields extends Schema.Struct.Fields>(
   schema: Schema.Struct<Fields>
 ) => Schema.Struct({ ...schema.fields, idempotencyKey: IdempotencyKeySchema });
 
+// The bug an action was aimed at, read from the raw input only to refresh
+// its page; the action itself validates the input.
+const bugIdOf = (input: unknown): string | undefined => {
+  if (typeof input !== "object" || input === null || !("bugId" in input)) {
+    return undefined;
+  }
+  return typeof input.bugId === "string" ? input.bugId : undefined;
+};
+
 const revalidatePortal = (bugId?: string) => {
   revalidatePath("/portal");
   revalidatePath("/bugs");
@@ -141,7 +150,7 @@ export async function addClientCommentAction(input: unknown) {
     PortalCommentSchema
   );
   if (result.ok) {
-    revalidatePortal();
+    revalidatePortal(bugIdOf(input));
   }
   return result;
 }
@@ -215,7 +224,7 @@ export async function finalizePortalUploadAction(input: unknown) {
     FinalizedFileSchema
   );
   if (result.ok) {
-    revalidatePortal();
+    revalidatePortal(bugIdOf(input));
   }
   return result;
 }
@@ -233,7 +242,7 @@ export async function attachClientFileAction(input: unknown) {
     DoneResultSchema
   );
   if (result.ok) {
-    revalidatePortal();
+    revalidatePortal(bugIdOf(input));
   }
   return result;
 }
