@@ -306,6 +306,31 @@
               }
             ]
           },
+          "BugResolution": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Fixed",
+                "value": "fixed"
+              },
+              {
+                "name": "Confirmed",
+                "value": "confirmed"
+              },
+              {
+                "name": "NoResponse",
+                "value": "no_response"
+              },
+              {
+                "name": "Unconfirmed",
+                "value": "unconfirmed"
+              },
+              {
+                "name": "NotABug",
+                "value": "not_a_bug"
+              }
+            ]
+          },
           "BugSatisfaction": {
             "codecId": "pg/text@1",
             "members": [
@@ -2185,6 +2210,19 @@
                   "kind": "scalar"
                 }
               },
+              "resolution": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugResolution",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "route": {
                 "nullable": false,
                 "type": {
@@ -2534,6 +2572,9 @@
                 },
                 "reproductionSteps": {
                   "column": "reproductionSteps"
+                },
+                "resolution": {
+                  "column": "resolution"
                 },
                 "route": {
                   "column": "route"
@@ -9459,6 +9500,11 @@
                   "prefix": "bug_report_reproductionSteps_elem_not_null"
                 },
                 {
+                  "expression": "\"resolution\" IN ('fixed', 'confirmed', 'no_response', 'unconfirmed', 'not_a_bug')",
+                  "name": "bug_report_resolution_check_8950df78",
+                  "prefix": "bug_report_resolution_check"
+                },
+                {
                   "expression": "\"satisfaction\" IN ('up', 'down')",
                   "name": "bug_report_satisfaction_check_d407e712",
                   "prefix": "bug_report_satisfaction_check"
@@ -9636,6 +9682,17 @@
                     "elementNullable": false
                   },
                   "nullable": false
+                },
+                "resolution": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugResolution",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "route": {
                   "codecId": "pg/text@1",
@@ -14832,6 +14889,16 @@
                 "duplicate"
               ]
             },
+            "BugResolution": {
+              "kind": "valueSet",
+              "values": [
+                "fixed",
+                "confirmed",
+                "no_response",
+                "unconfirmed",
+                "not_a_bug"
+              ]
+            },
             "BugSatisfaction": {
               "kind": "valueSet",
               "values": [
@@ -14965,7 +15032,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "8f40d527d8de3612647281d0ab83da9e2e4f4f1b0ec566a04c54fe753856ad66"
+    "storageHash": "8314e79f5bf578c3f197f6956169c1816915afffd19b0d8c13ccdb6effb49296"
   },
   "execution": {
     "executionHash": "eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651",

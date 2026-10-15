@@ -40,6 +40,12 @@ export const changeEmployeeRole = (
             message: "The active account was not found.",
           });
         }
+        if (target.role === "client") {
+          throw new AppError({
+            code: "FORBIDDEN",
+            message: "Client accounts keep the client role.",
+          });
+        }
         if (target.role === role) {
           throw new AppError({
             code: "CONFLICT",
@@ -130,6 +136,37 @@ export const resetEmployeePassword = (
           userId: employeeId,
         });
         return { employeeId, temporaryPassword };
+      });
+    },
+  });
+
+// Clears a sign-in lockout so the person can try again immediately.
+export const unlockUser = (
+  administratorId: string,
+  userId: string
+): Effect.Effect<void, AppError> =>
+  Effect.tryPromise({
+    catch: databaseError,
+    try: async () => {
+      await db.transaction(async (transaction) => {
+        await serializeAdminChanges(transaction);
+        await requireAdmin(transaction, administratorId);
+        const updated = await transaction.orm.public.User.where({
+          id: userId,
+        }).updateAndCount({
+          failedLoginCount: 0,
+          lockedUntil: null,
+          updatedAt: new Date(),
+        });
+        if (!updated) {
+          throw new AppError({
+            code: "NOT_FOUND",
+            message: "The account was not found.",
+          });
+        }
+        await addActivity(transaction, administratorId, "user.unlocked", {
+          userId,
+        });
       });
     },
   });

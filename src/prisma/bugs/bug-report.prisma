@@ -30,6 +30,7 @@ model BugReport {
   awaitingClientSince TimestamptzJsDate?
   satisfaction       BugSatisfaction?
   satisfactionComment String?
+  resolution         BugResolution?
   discoveredAt       TimestamptzJsDate @default(now())
   createdAt          TimestamptzJsDate @default(now())
   updatedAt          TimestamptzJsDate @default(now())

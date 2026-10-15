@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'8f40d527d8de3612647281d0ab83da9e2e4f4f1b0ec566a04c54fe753856ad66'>;
+  StorageHashBase<'8314e79f5bf578c3f197f6956169c1816915afffd19b0d8c13ccdb6effb49296'>;
 export type ExecutionHash =
   ExecutionHashBase<'eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651'>;
 export type ProfileHash =
@@ -366,6 +366,8 @@ export type FieldOutputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
       readonly reporterId: CodecTypes['pg/text@1']['output'];
       readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly resolution:
+        'fixed' | 'confirmed' | 'no_response' | 'unconfirmed' | 'not_a_bug' | null;
       readonly route: CodecTypes['pg/text@1']['output'];
       readonly satisfaction: 'up' | 'down' | null;
       readonly satisfactionComment: CodecTypes['pg/text@1']['output'] | null;
@@ -940,6 +942,8 @@ export type FieldInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
       readonly reporterId: CodecTypes['pg/text@1']['input'];
       readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly resolution:
+        'fixed' | 'confirmed' | 'no_response' | 'unconfirmed' | 'not_a_bug' | null;
       readonly route: CodecTypes['pg/text@1']['input'];
       readonly satisfaction: 'up' | 'down' | null;
       readonly satisfactionComment: CodecTypes['pg/text@1']['input'] | null;
@@ -1514,6 +1518,8 @@ export type StorageColumnTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
       readonly reporterId: CodecTypes['pg/text@1']['output'];
       readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+      readonly resolution:
+        'fixed' | 'confirmed' | 'no_response' | 'unconfirmed' | 'not_a_bug' | null;
       readonly route: CodecTypes['pg/text@1']['output'];
       readonly satisfaction: 'up' | 'down' | null;
       readonly satisfactionComment: CodecTypes['pg/text@1']['output'] | null;
@@ -2088,6 +2094,8 @@ export type StorageColumnInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
       readonly reporterId: CodecTypes['pg/text@1']['input'];
       readonly reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
+      readonly resolution:
+        'fixed' | 'confirmed' | 'no_response' | 'unconfirmed' | 'not_a_bug' | null;
       readonly route: CodecTypes['pg/text@1']['input'];
       readonly satisfaction: 'up' | 'down' | null;
       readonly satisfactionComment: CodecTypes['pg/text@1']['input'] | null;
@@ -2694,6 +2702,7 @@ export namespace Models {
     projectId: CodecTypes['pg/uuid@1']['output'];
     reporterId: CodecTypes['pg/text@1']['output'];
     reproductionSteps: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
+    resolution: 'fixed' | 'confirmed' | 'no_response' | 'unconfirmed' | 'not_a_bug' | null;
     route: CodecTypes['pg/text@1']['output'];
     satisfaction: 'up' | 'down' | null;
     satisfactionComment: CodecTypes['pg/text@1']['output'] | null;
@@ -4723,6 +4732,12 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                   readonly many: { readonly elementNullable: false };
+                };
+                readonly resolution: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
                 };
                 readonly route: {
                   readonly dataType: 'pg/text';
@@ -8904,6 +8919,16 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['recurrence', 'duplicate'];
             };
+            readonly BugResolution: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'fixed',
+                'confirmed',
+                'no_response',
+                'unconfirmed',
+                'not_a_bug',
+              ];
+            };
             readonly BugSatisfaction: {
               readonly kind: 'valueSet';
               readonly values: readonly ['up', 'down'];
@@ -10096,6 +10121,10 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
                 readonly many: { readonly elementNullable: false };
               };
+              readonly resolution: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly route: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -10295,6 +10324,7 @@ type ContractBase = Omit<
                 readonly projectId: { readonly column: 'projectId' };
                 readonly reporterId: { readonly column: 'reporterId' };
                 readonly reproductionSteps: { readonly column: 'reproductionSteps' };
+                readonly resolution: { readonly column: 'resolution' };
                 readonly route: { readonly column: 'route' };
                 readonly satisfaction: { readonly column: 'satisfaction' };
                 readonly satisfactionComment: { readonly column: 'satisfactionComment' };
@@ -13748,6 +13778,16 @@ type ContractBase = Omit<
             readonly members: readonly [
               { readonly name: 'Recurrence'; readonly value: 'recurrence' },
               { readonly name: 'Duplicate'; readonly value: 'duplicate' },
+            ];
+          };
+          readonly BugResolution: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Fixed'; readonly value: 'fixed' },
+              { readonly name: 'Confirmed'; readonly value: 'confirmed' },
+              { readonly name: 'NoResponse'; readonly value: 'no_response' },
+              { readonly name: 'Unconfirmed'; readonly value: 'unconfirmed' },
+              { readonly name: 'NotABug'; readonly value: 'not_a_bug' },
             ];
           };
           readonly BugSatisfaction: {

@@ -132,5 +132,9 @@ export class UserManagement extends Context.Service<
       administratorId: string,
       employeeId: string
     ) => Effect.Effect<TemporaryPasswordResult, AppError>;
+    readonly unlockUser: (
+      administratorId: string,
+      userId: string
+    ) => Effect.Effect<void, AppError>;
   }
 >()("metsys/server/UserManagement") {}

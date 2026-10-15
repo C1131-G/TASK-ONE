@@ -3,11 +3,12 @@ import { sendNotification, WebPushError } from "web-push";
 import type { PushSubscription as WebPushSubscription } from "web-push";
 
 import { AppError } from "../core/action-result";
+import type { NotificationEventType } from "./notify-users";
 
 export interface PushMessage {
   readonly notificationId: string;
   readonly actorId: string;
-  readonly eventType: "mention" | "assignment" | "comment" | "update" | "due";
+  readonly eventType: NotificationEventType;
   readonly title: string;
   readonly body: string;
   readonly url: string;

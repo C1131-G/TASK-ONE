@@ -54,6 +54,16 @@ enum ClientImpact {
   Urgent = "urgent"
 }
 
+enum BugResolution {
+  @@type("pg/text@1")
+
+  Fixed       = "fixed"
+  Confirmed   = "confirmed"
+  NoResponse  = "no_response"
+  Unconfirmed = "unconfirmed"
+  NotABug     = "not_a_bug"
+}
+
 enum BugSatisfaction {
   @@type("pg/text@1")
 

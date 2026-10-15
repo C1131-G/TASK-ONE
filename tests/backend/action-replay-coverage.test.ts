@@ -6,12 +6,16 @@ import { serverEntryModules } from "./support/server-entry-modules";
 const READ_ACTION_PREFIX = /^(?:get|list|search)/u;
 const excludedByDesign = new Set([
   "changeOwnPasswordAction",
+  // Returns a one-time temporary password, like createEmployeeAction.
+  "createClientUserAction",
   "createEmployeeAction",
   "requestAvatarUploadAction",
   "requestProjectUploadAction",
   "requestTaskUploadAction",
   "resetEmployeePasswordAction",
   "revokeSessionAction",
+  // Clearing a lockout is naturally idempotent.
+  "unlockUserAction",
 ]);
 const replayedMutations = new Set([
   "saveTaskTableColumnWidthsAction",
@@ -20,6 +24,12 @@ const replayedMutations = new Set([
   "bulkUpdateTasksAction",
   "changeEmployeeRoleAction",
   "changeTaskColumnAction",
+  "createClientCompanyAction",
+  "deactivateClientCompanyAction",
+  "reactivateClientCompanyAction",
+  "setClientCompanyHandlersAction",
+  "setClientCompanyProjectsAction",
+  "updateClientCompanyAction",
   "createCalendarEventAction",
   "createCommentAction",
   "createLabelAction",

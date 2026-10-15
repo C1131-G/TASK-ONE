@@ -1,6 +1,10 @@
 import { Layer } from "effect";
 
-import { changeEmployeeRole, resetEmployeePassword } from "./user-access";
+import {
+  changeEmployeeRole,
+  resetEmployeePassword,
+  unlockUser,
+} from "./user-access";
 import { deactivateEmployee, reactivateEmployee } from "./user-activation";
 import { UserManagement } from "./user-contracts";
 import { createEmployee, createFirstAdmin } from "./user-create";
@@ -36,6 +40,7 @@ export const UserManagementLive = Layer.succeed(
     listEmployees,
     reactivateEmployee,
     resetEmployeePassword,
+    unlockUser,
     updateEmployeeDetails,
     updateOwnProfile,
   })

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { flagHandlerBugsForReassignment } from "../clients/client-handler-reassignment";
 import { AppError } from "../core/action-result";
 import {
   databaseError,
@@ -62,6 +63,13 @@ export const deactivateEmployee = (
         await addActivity(transaction, administratorId, "user.deactivated", {
           userId: employeeId,
         });
+        // A departing handler's open client bugs need a new owner.
+        await flagHandlerBugsForReassignment(transaction, {
+          actorId: administratorId,
+          companyId: null,
+          employeeId,
+          now: new Date(),
+        });
       });
     },
   });
@@ -79,13 +87,26 @@ export const reactivateEmployee = (
         const target = await transaction.orm.public.User.where({
           id: employeeId,
         })
-          .select("deactivatedAt")
+          .select("deactivatedAt", "clientCompanyId")
           .first();
         if (!target) {
           throw new AppError({
             code: "NOT_FOUND",
             message: "The account was not found.",
           });
+        }
+        if (target.clientCompanyId) {
+          const company = await transaction.orm.public.ClientCompany.where({
+            id: target.clientCompanyId,
+          })
+            .select("deactivatedAt")
+            .first();
+          if (!company || company.deactivatedAt) {
+            throw new AppError({
+              code: "CONFLICT",
+              message: "Reactivate the client company before its users.",
+            });
+          }
         }
         if (!target.deactivatedAt) {
           throw new AppError({
