@@ -73,14 +73,17 @@ export const transitionBugStatus = (
   > = {
     approved_for_release: ["released"],
     awaiting_admin_approval: ["approved_for_release", "rejected"],
+    awaiting_client: ["closed", "triaged"],
     closed: ["in_progress"],
     duplicate: [],
     in_progress: ["in_verification", "awaiting_admin_approval"],
     in_verification: ["in_progress", "awaiting_admin_approval"],
+    needs_info: [],
     rejected: ["in_progress"],
     released: ["closed"],
     reported: ["triaged", "duplicate"],
     triaged: ["in_progress", "duplicate"],
+    withdrawn: [],
   };
 
   if (!allowedTransitions[currentStatus].includes(nextStatus)) {

@@ -31,6 +31,7 @@ export { authPool };
 export type Persona =
   | "admin"
   | "anonymous"
+  | "client"
   | "deactivated"
   | "forced"
   | "outsider"
@@ -48,6 +49,7 @@ export type ActionFunction = (input: unknown) => Promise<ActionResultLike>;
 export interface Ids {
   archivedProjectId: string;
   archivedTaskId: string;
+  clientCompanyId: string;
   employeeId: string;
   fileId: string;
   projectId: string;
@@ -72,6 +74,7 @@ let startedAt = new Date();
 export const ids: Ids = {
   archivedProjectId: "",
   archivedTaskId: "",
+  clientCompanyId: "",
   employeeId: "",
   fileId: "",
   projectId: "",
@@ -86,6 +89,9 @@ export const nextKey = (): string => {
 
 export const personaId = (persona: Persona): string =>
   personas.get(persona)?.id ?? "";
+
+export const personaHeaders = (persona: Persona): Headers =>
+  personas.get(persona)?.headers ?? new Headers();
 
 export const callAs = async <Result extends ActionResultLike>(
   persona: Persona,
@@ -208,6 +214,20 @@ export const setupHarness = async (): Promise<void> => {
   personas.set("outsider", outsider);
   personas.set("forced", forced);
   personas.set("deactivated", deactivated);
+
+  // A client portal account. It signs in like everyone else, then becomes a
+  // client of a harness company.
+  const clientCompanyId = randomUUID();
+  await authPool.query(
+    'INSERT INTO client_company (id, name, "createdById") VALUES ($1, $2, $3)',
+    [clientCompanyId, `Harness client ${clientCompanyId}`, bootstrapAdminId]
+  );
+  const client = await createPersona("employee", "client");
+  await authPool.query(
+    'UPDATE "user" SET role = \'client\', "clientCompanyId" = $2, "mustChangePassword" = false WHERE id = $1',
+    [client.id, clientCompanyId]
+  );
+  personas.set("client", client);
   personas.set("anonymous", { headers: new Headers(), id: "" });
 
   const projectId = randomUUID();
@@ -253,6 +273,7 @@ export const setupHarness = async (): Promise<void> => {
   Object.assign(ids, {
     archivedProjectId,
     archivedTaskId,
+    clientCompanyId,
     employeeId: owner.id,
     fileId,
     projectId,

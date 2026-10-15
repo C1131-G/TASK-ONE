@@ -26,6 +26,12 @@ model User {
   deactivatedAt      TimestamptzJsDate?
   deactivatedById    String?
 
+  // Client portal accounts belong to exactly one client company.
+  clientCompanyId    Uuid?
+  failedLoginCount   Int     @default(0)
+  lockedUntil        TimestamptzJsDate?
+  lastActiveAt       TimestamptzJsDate?
+
   team             Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
   deactivatedBy    User?  @relation("UserDeactivatedBy", fields: [deactivatedById], references: [id], onDelete: Restrict)
   deactivatedUsers User[] @relation("UserDeactivatedBy")
@@ -43,12 +49,23 @@ model User {
   createdBugRelations BugRelation[]
   pushSubscriptions PushSubscription[]
   pushDeliveries PushDelivery[]
+  clientCompany ClientCompany? @relation("ClientCompanyUsers", fields: [clientCompanyId], references: [id], onDelete: Restrict)
+  createdClientCompanies ClientCompany[] @relation("ClientCompanyCreator")
+  deactivatedClientCompanies ClientCompany[] @relation("ClientCompanyDeactivatedBy")
+  clientCompanyHandlerships ClientCompanyHandler[] @relation("ClientCompanyHandlerEmployee")
+  assignedClientCompanyHandlers ClientCompanyHandler[] @relation("ClientCompanyHandlerAssigner")
+  pickedBugs BugReport[] @relation("BugPicker")
+  auditEventsAsActor AuditEvent[] @relation("AuditEventActor")
+  auditEventsAsSubject AuditEvent[] @relation("AuditEventSubject")
 
-  @@check(expression: "role IN ('admin', 'employee')", name: "user_role_valid")
+  @@check(expression: "role IN ('admin', 'employee', 'client')", name: "user_role_valid")
+  @@check(expression: "(role = 'client') = (\"clientCompanyId\" IS NOT NULL)", name: "user_client_company_matches_role")
+  @@check(expression: "\"failedLoginCount\" >= 0", name: "user_failed_login_count_nonnegative")
   @@check(expression: "\"employeeNumber\" > 0", name: "user_employee_number_positive")
   @@check(expression: "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)", name: "user_deactivation_fields_paired")
   @@index([teamId])
   @@index([deactivatedAt])
   @@index([deactivatedById])
+  @@index([clientCompanyId])
   @@map("user")
 }

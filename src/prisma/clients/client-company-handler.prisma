@@ -1,0 +1,18 @@
+// use prisma-8
+
+model ClientCompanyHandler {
+  id           Uuid @id @default(uuid())
+  companyId    Uuid
+  employeeId   String
+  assignedById String
+  createdAt    TimestamptzJsDate @default(now())
+
+  company    ClientCompany @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  employee   User @relation("ClientCompanyHandlerEmployee", fields: [employeeId], references: [id], onDelete: Restrict)
+  assignedBy User @relation("ClientCompanyHandlerAssigner", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@unique([companyId, employeeId])
+  @@index([employeeId])
+  @@index([assignedById])
+  @@map("client_company_handler")
+}

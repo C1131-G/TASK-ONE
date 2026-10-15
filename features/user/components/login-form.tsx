@@ -60,7 +60,9 @@ const LoginForm = () => {
         );
         passwordRef.current?.focus();
       } else {
-        router.replace("/");
+        // The sign-in page routes a signed-in account to its own home
+        // (password change, workspace, or client portal) on the server.
+        router.replace("/login");
         router.refresh();
         return;
       }

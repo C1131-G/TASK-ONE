@@ -21,6 +21,7 @@ const statement = {
 const accessControl = createAccessControl(statement);
 const adminRole = accessControl.newRole({ session: [], user: [] });
 const employeeRole = accessControl.newRole({ session: [], user: [] });
+const clientRole = accessControl.newRole({ session: [], user: [] });
 
 const unrestrictedAuthPaths = new Set([
   "/change-password",
@@ -99,7 +100,7 @@ export const auth = betterAuth({
       ac: accessControl,
       adminRoles: ["admin"],
       defaultRole: "employee",
-      roles: { admin: adminRole, employee: employeeRole },
+      roles: { admin: adminRole, client: clientRole, employee: employeeRole },
     }),
   ],
   rateLimit: {
@@ -124,6 +125,7 @@ export const auth = betterAuth({
     .filter(Boolean),
   user: {
     additionalFields: {
+      clientCompanyId: { input: false, required: false, type: "string" },
       deactivatedAt: {
         input: false,
         required: false,

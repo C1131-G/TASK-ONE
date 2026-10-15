@@ -16,13 +16,15 @@ export const metadata: Metadata = {
 
 const CHANGE_PASSWORD_PATH: Route<"/change-password"> = "/change-password";
 const WORKSPACE_PATH: Route = "/";
+const PORTAL_PATH: Route = "/portal";
 
 const LoginRedirect = async () => {
   const session = await getPageSession();
   if (session.kind === "authenticated") {
-    redirect(
-      session.user.mustChangePassword ? CHANGE_PASSWORD_PATH : WORKSPACE_PATH
-    );
+    if (session.user.mustChangePassword) {
+      redirect(CHANGE_PASSWORD_PATH);
+    }
+    redirect(session.user.role === "client" ? PORTAL_PATH : WORKSPACE_PATH);
   }
   return <LoginForm />;
 };

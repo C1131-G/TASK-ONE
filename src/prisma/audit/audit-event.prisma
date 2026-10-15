@@ -1,0 +1,21 @@
+// use prisma-8
+
+model AuditEvent {
+  id            Uuid @id @default(uuid())
+  type          String
+  actorId       String?
+  subjectUserId String?
+  ip            String?
+  userAgent     String?
+  details       Jsonb @default(json`{}`)
+  createdAt     TimestamptzJsDate @default(now())
+
+  actor       User? @relation("AuditEventActor", fields: [actorId], references: [id], onDelete: SetNull)
+  subjectUser User? @relation("AuditEventSubject", fields: [subjectUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([type, createdAt])
+  @@index([actorId, createdAt])
+  @@index([subjectUserId, createdAt])
+  @@map("audit_event")
+}

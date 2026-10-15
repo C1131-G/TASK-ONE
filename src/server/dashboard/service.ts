@@ -133,7 +133,11 @@ const getOverview = (
           .select("id", "status", "dueDate")
           .all(),
         db.orm.public.User.where((user) =>
-          and(user.deactivatedAt.isNull(), user.mustChangePassword.eq(false))
+          and(
+            user.deactivatedAt.isNull(),
+            user.mustChangePassword.eq(false),
+            user.role.neq("client")
+          )
         )
           .select("id", "name")
           .all(),

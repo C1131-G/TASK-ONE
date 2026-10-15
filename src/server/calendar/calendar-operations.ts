@@ -37,7 +37,8 @@ export const CalendarManagementLive = Layer.succeed(CalendarManagement, {
                 and(
                   user.id.in([...input.attendeeIds]),
                   user.deactivatedAt.isNull(),
-                  user.mustChangePassword.eq(false)
+                  user.mustChangePassword.eq(false),
+                  user.role.neq("client")
                 )
             )
               .select("id")
@@ -195,7 +196,8 @@ export const CalendarManagementLive = Layer.succeed(CalendarManagement, {
               and(
                 user.id.in([...input.attendeeIds]),
                 user.deactivatedAt.isNull(),
-                user.mustChangePassword.eq(false)
+                user.mustChangePassword.eq(false),
+                user.role.neq("client")
               )
             )
               .select("id")

@@ -1,0 +1,24 @@
+// use prisma-8
+
+model BugSla {
+  bugId               Uuid @id
+  firstResponseDueAt  TimestamptzJsDate
+  firstRespondedAt    TimestamptzJsDate?
+  resolutionDueAt     TimestamptzJsDate
+  resolvedAt          TimestamptzJsDate?
+  pausedAt            TimestamptzJsDate?
+  pausedBusinessMs    Int @default(0)
+  warnedResponse      Boolean @default(false)
+  warnedResolution    Boolean @default(false)
+  breachedResponse    Boolean @default(false)
+  breachedResolution  Boolean @default(false)
+  createdAt           TimestamptzJsDate @default(now())
+  updatedAt           TimestamptzJsDate @default(now())
+
+  bug BugReport @relation(fields: [bugId], references: [id], onDelete: Restrict)
+
+  @@check(expression: "\"pausedBusinessMs\" >= 0", name: "bug_sla_paused_nonnegative")
+  @@index([resolvedAt, resolutionDueAt])
+  @@index([firstRespondedAt, firstResponseDueAt])
+  @@map("bug_sla")
+}

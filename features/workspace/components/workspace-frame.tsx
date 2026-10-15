@@ -9,15 +9,21 @@ import { listNotificationInbox } from "@/features/notifications/notifications-qu
 import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
+import { isWorkspaceUser } from "@/src/server/auth/session";
 
 const LOGIN_PATH: Route = "/login";
 const CHANGE_PASSWORD_PATH: Route = "/change-password";
+const PORTAL_PATH: Route = "/portal";
 
 // Resolves the session and navigation data for the shell chrome. It returns
 // null for visitors the gate below redirects, so no data loads for them.
 const loadWorkspaceFrame = async (): Promise<WorkspaceFrameData | null> => {
   const session = await getPageSession();
-  if (session.kind === "anonymous" || session.user.mustChangePassword) {
+  if (
+    session.kind === "anonymous" ||
+    session.user.mustChangePassword ||
+    !isWorkspaceUser(session.user)
+  ) {
     return null;
   }
 
@@ -61,6 +67,10 @@ const WorkspaceAccessGate = async () => {
   }
   if (session.user.mustChangePassword) {
     redirect(CHANGE_PASSWORD_PATH);
+  }
+  // Client accounts have their own portal and never see the workspace.
+  if (!isWorkspaceUser(session.user)) {
+    redirect(PORTAL_PATH);
   }
   return null;
 };

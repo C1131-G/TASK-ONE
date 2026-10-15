@@ -23,6 +23,7 @@ model Project {
   uploadIntents UploadIntent[]
   bugReports BugReport[]
   files FileAsset[]
+  clientCompanies ClientCompanyProject[]
 
   team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
   lead       User? @relation("ProjectLead", fields: [leadId], references: [id], onDelete: Restrict)

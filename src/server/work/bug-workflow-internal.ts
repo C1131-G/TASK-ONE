@@ -62,6 +62,9 @@ export const workspaceActor = async (
   if (actor.mustChangePassword) {
     forbidden("Change your password before continuing.");
   }
+  if (actor.role === "client") {
+    forbidden("This area is only available to workspace members.");
+  }
   return actor;
 };
 
@@ -121,6 +124,8 @@ export const assertWritable = (
       "awaiting_admin_approval",
       "approved_for_release",
       "released",
+      "awaiting_client",
+      "withdrawn",
     ].includes(bug.status)
   ) {
     forbidden(
@@ -185,6 +190,31 @@ export const writeActivity = async (
   });
 };
 
+export const taskStatusByBugStage = {
+  approved_for_release: "review",
+  awaiting_admin_approval: "review",
+  awaiting_client: "review",
+  closed: "done",
+  duplicate: "done",
+  in_progress: "progress",
+  in_verification: "review",
+  needs_info: "progress",
+  rejected: "progress",
+  released: "review",
+  reported: "backlog",
+  triaged: "backlog",
+  withdrawn: "done",
+} as const satisfies Record<
+  typeof BugWorkflowStatusSchema.Type,
+  "backlog" | "progress" | "review" | "done"
+>;
+
+const completedBugStatuses: ReadonlySet<string> = new Set([
+  "closed",
+  "duplicate",
+  "withdrawn",
+]);
+
 export const updateBugStatus = async (
   transaction: Transaction,
   input: {
@@ -222,27 +252,12 @@ export const updateBugStatus = async (
   if (!updated) {
     conflict();
   }
-  const taskStatusByBugStage = {
-    approved_for_release: "review",
-    awaiting_admin_approval: "review",
-    closed: "done",
-    duplicate: "done",
-    in_progress: "progress",
-    in_verification: "review",
-    rejected: "progress",
-    released: "review",
-    reported: "backlog",
-    triaged: "backlog",
-  } as const;
   const taskStatus = taskStatusByBugStage[input.nextStatus];
   const taskUpdated = await transaction.orm.public.Task.where({
     id: task.id,
     version: task.version,
   }).updateAndCount({
-    completedAt:
-      input.nextStatus === "closed" || input.nextStatus === "duplicate"
-        ? input.now
-        : null,
+    completedAt: completedBugStatuses.has(input.nextStatus) ? input.now : null,
     status: taskStatus,
     updatedAt: input.now,
     version: task.version + 1,

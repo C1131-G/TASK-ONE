@@ -5,6 +5,7 @@ model Comment {
   taskId      Uuid
   authorId    String
   body        String
+  visibility  CommentVisibility @default(Internal)
   createdAt   TimestamptzJsDate @default(now())
   updatedAt   TimestamptzJsDate @default(now())
   deletedAt   TimestamptzJsDate?

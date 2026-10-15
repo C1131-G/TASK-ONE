@@ -23,14 +23,17 @@ const severityLabel: Record<BugListItem["bug"]["severity"], string> = {
 const statusLabel: Record<BugListItem["bug"]["status"], string> = {
   approved_for_release: "Approved for release",
   awaiting_admin_approval: "Awaiting approval",
+  awaiting_client: "Awaiting client",
   closed: "Closed",
   duplicate: "Duplicate",
   in_progress: "In progress",
   in_verification: "In verification",
+  needs_info: "Needs info",
   rejected: "Changes requested",
   released: "Released",
   reported: "Reported",
   triaged: "Triaged",
+  withdrawn: "Withdrawn",
 };
 
 export const BugCard = ({ bugEntry }: { readonly bugEntry: BugListItem }) => {

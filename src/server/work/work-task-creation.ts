@@ -77,11 +77,13 @@ export const createTaskInTransaction = async (
   const assignees = await transaction.orm.public.User.where((user) =>
     user.id.in(input.assigneeIds)
   )
-    .select("id", "deactivatedAt")
+    .select("id", "deactivatedAt", "role")
     .all();
   if (
     assignees.length !== input.assigneeIds.length ||
-    assignees.some(({ deactivatedAt }) => deactivatedAt)
+    assignees.some(
+      ({ deactivatedAt, role }) => deactivatedAt || role === "client"
+    )
   ) {
     throw new AppError({
       code: "VALIDATION_FAILED",

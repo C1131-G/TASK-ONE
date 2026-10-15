@@ -47,13 +47,14 @@ export const listEmployees = (
           normalizedSearch
             ? and(
                 user.deactivatedAt.isNull(),
+                user.role.neq("client"),
                 or(
                   user.name.ilike(`%${normalizedSearch}%`),
                   user.email.ilike(`%${normalizedSearch}%`),
                   user.jobTitle.ilike(`%${normalizedSearch}%`)
                 )
               )
-            : user.deactivatedAt.isNull()
+            : and(user.deactivatedAt.isNull(), user.role.neq("client"))
         )
         .orderBy((user) => user.employeeNumber.asc())
         .limit(500)

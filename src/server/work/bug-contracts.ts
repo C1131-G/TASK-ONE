@@ -49,6 +49,16 @@ export const BugWorkflowStatusSchema = Schema.Literals([
   "closed",
   "duplicate",
   "rejected",
+  "needs_info",
+  "awaiting_client",
+  "withdrawn",
+]);
+
+export const ClientImpactSchema = Schema.Literals([
+  "low",
+  "medium",
+  "high",
+  "urgent",
 ]);
 
 export const BugReportInputSchema = Schema.Struct({

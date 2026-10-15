@@ -1,3 +1,4 @@
+import { and } from "@prisma/orm-postgres/orm-client";
 import { Context, Effect, Layer, Schema } from "effect";
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -117,9 +118,11 @@ const teamSummary = (input: {
 
 const countActiveMembers = async (teamId: string): Promise<number> => {
   const members = await db.orm.public.User.where({ teamId })
-    .select("deactivatedAt")
+    .select("deactivatedAt", "role")
     .all();
-  return members.filter((member) => member.deactivatedAt === null).length;
+  return members.filter(
+    (member) => member.deactivatedAt === null && member.role !== "client"
+  ).length;
 };
 
 // Team rows and active-member counts change only through the team and employee
@@ -130,7 +133,11 @@ const readTeamSummaries = async (): Promise<readonly TeamSummary[]> => {
   cacheLife("moderate");
   const [teams, members] = await Promise.all([
     db.orm.public.Team.orderBy((team) => team.name.asc()).all(),
-    db.orm.public.User.where({ deactivatedAt: null }).select("teamId").all(),
+    db.orm.public.User.where((user) =>
+      and(user.deactivatedAt.isNull(), user.role.neq("client"))
+    )
+      .select("teamId")
+      .all(),
   ]);
   const memberCounts = new Map<string, number>();
   for (const member of members) {

@@ -1,0 +1,3203 @@
+[
+  {
+    "id": "dropCheckConstraint.bug_report.bug_report_status_check_c394d412",
+    "label": "Drop check constraint \"bug_report_status_check_c394d412\" on \"bug_report\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_status_check_c394d412",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_status_check_c394d412\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_status_check_c394d412",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"bug_report_status_check_c394d412\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" DROP CONSTRAINT \"bug_report_status_check_c394d412\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_status_check_c394d412\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_status_check_c394d412",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.notification.notification_type_check_cac43c93",
+    "label": "Drop check constraint \"notification_type_check_cac43c93\" on \"notification\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "notification_type_check_cac43c93",
+        "table": "notification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"notification_type_check_cac43c93\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_type_check_cac43c93",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"notification_type_check_cac43c93\"",
+        "sql": "ALTER TABLE \"public\".\"notification\" DROP CONSTRAINT \"notification_type_check_cac43c93\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"notification_type_check_cac43c93\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_type_check_cac43c93",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.user.user_role_valid_2461e6a1",
+    "label": "Drop check constraint \"user_role_valid_2461e6a1\" on \"user\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_role_valid_2461e6a1",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_role_valid_2461e6a1\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_valid_2461e6a1",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"user_role_valid_2461e6a1\"",
+        "sql": "ALTER TABLE \"public\".\"user\" DROP CONSTRAINT \"user_role_valid_2461e6a1\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_role_valid_2461e6a1\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_valid_2461e6a1",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.audit_event",
+    "label": "Create table \"audit_event\"",
+    "summary": "Creates table \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"audit_event\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"audit_event\"",
+        "sql": "CREATE TABLE \"public\".\"audit_event\" (\n  \"actorId\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"details\" jsonb DEFAULT '{}'::jsonb NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"ip\" text,\n  \"subjectUserId\" text,\n  \"type\" text NOT NULL,\n  \"userAgent\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"audit_event\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.bug_sla",
+    "label": "Create table \"bug_sla\"",
+    "summary": "Creates table \"bug_sla\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "bug_sla"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"bug_sla\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"bug_sla\"",
+        "sql": "CREATE TABLE \"public\".\"bug_sla\" (\n  \"breachedResolution\" bool DEFAULT false NOT NULL,\n  \"breachedResponse\" bool DEFAULT false NOT NULL,\n  \"bugId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"firstRespondedAt\" timestamptz,\n  \"firstResponseDueAt\" timestamptz NOT NULL,\n  \"pausedAt\" timestamptz,\n  \"pausedBusinessMs\" int4 DEFAULT 0 NOT NULL,\n  \"resolutionDueAt\" timestamptz NOT NULL,\n  \"resolvedAt\" timestamptz,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"warnedResolution\" bool DEFAULT false NOT NULL,\n  \"warnedResponse\" bool DEFAULT false NOT NULL,\n  PRIMARY KEY (\"bugId\"),\n  CONSTRAINT \"bug_sla_paused_nonnegative_50d1a49c\" CHECK (\"pausedBusinessMs\" >= 0)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"bug_sla\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.client_company",
+    "label": "Create table \"client_company\"",
+    "summary": "Creates table \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"client_company\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"client_company\"",
+        "sql": "CREATE TABLE \"public\".\"client_company\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" text NOT NULL,\n  \"deactivatedAt\" timestamptz,\n  \"deactivatedById\" text,\n  \"id\" uuid NOT NULL,\n  \"logoAssetId\" uuid,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"version\" int4 DEFAULT 1 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"client_company_deactivation_fields_paired_68ebd7ec\" CHECK ((\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"client_company\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.client_company_handler",
+    "label": "Create table \"client_company_handler\"",
+    "summary": "Creates table \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"client_company_handler\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"client_company_handler\"",
+        "sql": "CREATE TABLE \"public\".\"client_company_handler\" (\n  \"assignedById\" text NOT NULL,\n  \"companyId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"employeeId\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"client_company_handler\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.client_company_project",
+    "label": "Create table \"client_company_project\"",
+    "summary": "Creates table \"client_company_project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"client_company_project\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"client_company_project\"",
+        "sql": "CREATE TABLE \"public\".\"client_company_project\" (\n  \"addedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"companyId\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"removedAt\" timestamptz,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"client_company_project\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.awaitingClientSince",
+    "label": "Add column \"awaitingClientSince\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "awaitingClientSince",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"awaitingClientSince\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "awaitingClientSince"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"awaitingClientSince\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"awaitingClientSince\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"awaitingClientSince\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "awaitingClientSince"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.clientCompanyId",
+    "label": "Add column \"clientCompanyId\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientCompanyId",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientCompanyId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientCompanyId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientCompanyId\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"clientCompanyId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientCompanyId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientCompanyId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.clientImpact",
+    "label": "Add column \"clientImpact\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientImpact",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientImpact\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientImpact"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientImpact\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"clientImpact\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientImpact\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientImpact"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.clientReopenCount",
+    "label": "Add column \"clientReopenCount\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientReopenCount",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientReopenCount\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientReopenCount"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientReopenCount\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"clientReopenCount\" int4 DEFAULT 0 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientReopenCount\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "clientReopenCount"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.needsInfoSince",
+    "label": "Add column \"needsInfoSince\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "needsInfoSince",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"needsInfoSince\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "needsInfoSince"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"needsInfoSince\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"needsInfoSince\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"needsInfoSince\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "needsInfoSince"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.needsReassignment",
+    "label": "Add column \"needsReassignment\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "needsReassignment",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"needsReassignment\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "needsReassignment"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"needsReassignment\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"needsReassignment\" bool DEFAULT false NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"needsReassignment\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "needsReassignment"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.pickedAt",
+    "label": "Add column \"pickedAt\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "pickedAt",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"pickedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "pickedAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"pickedAt\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"pickedAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"pickedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "pickedAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.pickedById",
+    "label": "Add column \"pickedById\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "pickedById",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"pickedById\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "pickedById"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"pickedById\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"pickedById\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"pickedById\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "pickedById"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.satisfaction",
+    "label": "Add column \"satisfaction\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "satisfaction",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"satisfaction\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "satisfaction"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"satisfaction\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"satisfaction\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"satisfaction\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "satisfaction"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.satisfactionComment",
+    "label": "Add column \"satisfactionComment\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "satisfactionComment",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"satisfactionComment\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "satisfactionComment"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"satisfactionComment\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"satisfactionComment\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"satisfactionComment\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "satisfactionComment"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.bug_report.statusBeforeNeedsInfo",
+    "label": "Add column \"statusBeforeNeedsInfo\" to \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "statusBeforeNeedsInfo",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"statusBeforeNeedsInfo\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "statusBeforeNeedsInfo"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"statusBeforeNeedsInfo\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD COLUMN \"statusBeforeNeedsInfo\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"statusBeforeNeedsInfo\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "bug_report",
+          "statusBeforeNeedsInfo"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.comment.visibility",
+    "label": "Add column \"visibility\" to \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "visibility",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"visibility\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "comment",
+          "visibility"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"visibility\"",
+        "sql": "ALTER TABLE \"public\".\"comment\" ADD COLUMN \"visibility\" text DEFAULT 'internal' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"visibility\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "comment",
+          "visibility"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.businessDays",
+    "label": "Add column \"businessDays\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "businessDays",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"businessDays\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessDays"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"businessDays\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"businessDays\" int4[] DEFAULT ARRAY[1, 2, 3, 4, 5]::int4[] NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"businessDays\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessDays"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.businessEndMinute",
+    "label": "Add column \"businessEndMinute\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "businessEndMinute",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"businessEndMinute\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessEndMinute"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"businessEndMinute\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"businessEndMinute\" int4 DEFAULT 1080 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"businessEndMinute\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessEndMinute"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.businessStartMinute",
+    "label": "Add column \"businessStartMinute\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "businessStartMinute",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"businessStartMinute\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessStartMinute"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"businessStartMinute\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"businessStartMinute\" int4 DEFAULT 540 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"businessStartMinute\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessStartMinute"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.businessTimeZone",
+    "label": "Add column \"businessTimeZone\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "businessTimeZone",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"businessTimeZone\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessTimeZone"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"businessTimeZone\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"businessTimeZone\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"businessTimeZone\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "businessTimeZone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.company_settings.slaTargets",
+    "label": "Add column \"slaTargets\" to \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "slaTargets",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"slaTargets\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "slaTargets"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"slaTargets\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD COLUMN \"slaTargets\" jsonb DEFAULT '{\"high\":{\"firstResponseMinutes\":240,\"resolutionMinutes\":1440},\"low\":{\"firstResponseMinutes\":1440,\"resolutionMinutes\":14400},\"medium\":{\"firstResponseMinutes\":480,\"resolutionMinutes\":4800},\"urgent\":{\"firstResponseMinutes\":60,\"resolutionMinutes\":480}}'::jsonb NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"slaTargets\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "company_settings",
+          "slaTargets"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.clientCompanyId",
+    "label": "Add column \"clientCompanyId\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientCompanyId",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientCompanyId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "clientCompanyId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientCompanyId\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"clientCompanyId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientCompanyId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "clientCompanyId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.failedLoginCount",
+    "label": "Add column \"failedLoginCount\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "failedLoginCount",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"failedLoginCount\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "failedLoginCount"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"failedLoginCount\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"failedLoginCount\" int4 DEFAULT 0 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"failedLoginCount\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "failedLoginCount"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.lastActiveAt",
+    "label": "Add column \"lastActiveAt\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "lastActiveAt",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"lastActiveAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "lastActiveAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"lastActiveAt\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"lastActiveAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"lastActiveAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "lastActiveAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.lockedUntil",
+    "label": "Add column \"lockedUntil\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "lockedUntil",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"lockedUntil\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "lockedUntil"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"lockedUntil\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"lockedUntil\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"lockedUntil\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "lockedUntil"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_clientImpact_check_b835bb9b",
+    "label": "Add check constraint \"bug_report_clientImpact_check_b835bb9b\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_clientImpact_check_b835bb9b",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_clientImpact_check_b835bb9b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_clientImpact_check_b835bb9b",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_clientImpact_check_b835bb9b\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_clientImpact_check_b835bb9b\" CHECK (\"clientImpact\" IN ('low', 'medium', 'high', 'urgent'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_clientImpact_check_b835bb9b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_clientImpact_check_b835bb9b",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_client_reopen_count_nonnegative_dc549469",
+    "label": "Add check constraint \"bug_report_client_reopen_count_nonnegative_dc549469\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_client_reopen_count_nonnegative_dc549469",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_client_reopen_count_nonnegative_dc549469\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_client_reopen_count_nonnegative_dc549469",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_client_reopen_count_nonnegative_dc549469\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_client_reopen_count_nonnegative_dc549469\" CHECK (\"clientReopenCount\" >= 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_client_reopen_count_nonnegative_dc549469\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_client_reopen_count_nonnegative_dc549469",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_pick_fields_paired_2ed2462b",
+    "label": "Add check constraint \"bug_report_pick_fields_paired_2ed2462b\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_pick_fields_paired_2ed2462b",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_pick_fields_paired_2ed2462b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_pick_fields_paired_2ed2462b",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_pick_fields_paired_2ed2462b\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_pick_fields_paired_2ed2462b\" CHECK ((\"pickedById\" IS NULL AND \"pickedAt\" IS NULL) OR (\"pickedById\" IS NOT NULL AND \"pickedAt\" IS NOT NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_pick_fields_paired_2ed2462b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_pick_fields_paired_2ed2462b",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_satisfaction_check_d407e712",
+    "label": "Add check constraint \"bug_report_satisfaction_check_d407e712\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_satisfaction_check_d407e712",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_satisfaction_check_d407e712\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_satisfaction_check_d407e712",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_satisfaction_check_d407e712\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_satisfaction_check_d407e712\" CHECK (\"satisfaction\" IN ('up', 'down'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_satisfaction_check_d407e712\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_satisfaction_check_d407e712",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_statusBeforeNeedsInfo_check_39cbe58a",
+    "label": "Add check constraint \"bug_report_statusBeforeNeedsInfo_check_39cbe58a\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_statusBeforeNeedsInfo_check_39cbe58a",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_statusBeforeNeedsInfo_check_39cbe58a\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_statusBeforeNeedsInfo_check_39cbe58a",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_statusBeforeNeedsInfo_check_39cbe58a\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_statusBeforeNeedsInfo_check_39cbe58a\" CHECK (\"statusBeforeNeedsInfo\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected', 'needs_info', 'awaiting_client', 'withdrawn'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_statusBeforeNeedsInfo_check_39cbe58a\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_statusBeforeNeedsInfo_check_39cbe58a",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.bug_report.bug_report_status_check_57f24d78",
+    "label": "Add check constraint \"bug_report_status_check_57f24d78\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_report_status_check_57f24d78",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_report_status_check_57f24d78\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_status_check_57f24d78",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_report_status_check_57f24d78\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\" ADD CONSTRAINT \"bug_report_status_check_57f24d78\" CHECK (\"status\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected', 'needs_info', 'awaiting_client', 'withdrawn'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_report_status_check_57f24d78\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_status_check_57f24d78",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.client_company.client_company_name_key",
+    "label": "Add unique constraint on \"client_company\" (name)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "client_company_name_key",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"client_company_name_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_name_key",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"client_company_name_key\"",
+        "sql": "ALTER TABLE \"public\".\"client_company\" ADD CONSTRAINT \"client_company_name_key\" UNIQUE (\"name\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"client_company_name_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_name_key",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.client_company_handler.client_company_handler_companyId_employeeId_key",
+    "label": "Add unique constraint on \"client_company_handler\" (companyId, employeeId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "client_company_handler_companyId_employeeId_key",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"client_company_handler_companyId_employeeId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_companyId_employeeId_key",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"client_company_handler_companyId_employeeId_key\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_handler\" ADD CONSTRAINT \"client_company_handler_companyId_employeeId_key\" UNIQUE (\"companyId\", \"employeeId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"client_company_handler_companyId_employeeId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_companyId_employeeId_key",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.client_company_project.client_company_project_companyId_projectId_key",
+    "label": "Add unique constraint on \"client_company_project\" (companyId, projectId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "client_company_project_companyId_projectId_key",
+        "table": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"client_company_project_companyId_projectId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_companyId_projectId_key",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"client_company_project_companyId_projectId_key\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_project\" ADD CONSTRAINT \"client_company_project_companyId_projectId_key\" UNIQUE (\"companyId\", \"projectId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"client_company_project_companyId_projectId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_companyId_projectId_key",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.comment.comment_visibility_check_4dc990d4",
+    "label": "Add check constraint \"comment_visibility_check_4dc990d4\" on \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "comment_visibility_check_4dc990d4",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"comment_visibility_check_4dc990d4\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_visibility_check_4dc990d4",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"comment_visibility_check_4dc990d4\"",
+        "sql": "ALTER TABLE \"public\".\"comment\" ADD CONSTRAINT \"comment_visibility_check_4dc990d4\" CHECK (\"visibility\" IN ('public', 'internal'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"comment_visibility_check_4dc990d4\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_visibility_check_4dc990d4",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.company_settings.company_settings_businessDays_elem_not_null_12212d77",
+    "label": "Add check constraint \"company_settings_businessDays_elem_not_null_12212d77\" on \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "company_settings_businessDays_elem_not_null_12212d77",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"company_settings_businessDays_elem_not_null_12212d77\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_businessDays_elem_not_null_12212d77",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"company_settings_businessDays_elem_not_null_12212d77\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD CONSTRAINT \"company_settings_businessDays_elem_not_null_12212d77\" CHECK (array_position(\"businessDays\", NULL) IS NULL)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"company_settings_businessDays_elem_not_null_12212d77\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_businessDays_elem_not_null_12212d77",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.company_settings.company_settings_business_hours_valid_c2cea7ba",
+    "label": "Add check constraint \"company_settings_business_hours_valid_c2cea7ba\" on \"company_settings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "company_settings_business_hours_valid_c2cea7ba",
+        "table": "company_settings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"company_settings_business_hours_valid_c2cea7ba\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_business_hours_valid_c2cea7ba",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"company_settings_business_hours_valid_c2cea7ba\"",
+        "sql": "ALTER TABLE \"public\".\"company_settings\" ADD CONSTRAINT \"company_settings_business_hours_valid_c2cea7ba\" CHECK (\"businessStartMinute\" >= 0 AND \"businessEndMinute\" <= 1440 AND \"businessStartMinute\" < \"businessEndMinute\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"company_settings_business_hours_valid_c2cea7ba\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "company_settings_business_hours_valid_c2cea7ba",
+          "public",
+          "\"public\".\"company_settings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.notification.notification_type_check_5a30586b",
+    "label": "Add check constraint \"notification_type_check_5a30586b\" on \"notification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "notification_type_check_5a30586b",
+        "table": "notification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"notification_type_check_5a30586b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_type_check_5a30586b",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"notification_type_check_5a30586b\"",
+        "sql": "ALTER TABLE \"public\".\"notification\" ADD CONSTRAINT \"notification_type_check_5a30586b\" CHECK (\"type\" IN ('mention', 'assignment', 'comment', 'update', 'due', 'client_bug', 'status', 'sla'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"notification_type_check_5a30586b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_type_check_5a30586b",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_client_company_matches_role_b6027f33",
+    "label": "Add check constraint \"user_client_company_matches_role_b6027f33\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_client_company_matches_role_b6027f33",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_client_company_matches_role_b6027f33\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_client_company_matches_role_b6027f33",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_client_company_matches_role_b6027f33\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_client_company_matches_role_b6027f33\" CHECK ((role = 'client') = (\"clientCompanyId\" IS NOT NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_client_company_matches_role_b6027f33\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_client_company_matches_role_b6027f33",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_failed_login_count_nonnegative_d4c930d0",
+    "label": "Add check constraint \"user_failed_login_count_nonnegative_d4c930d0\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_failed_login_count_nonnegative_d4c930d0",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_failed_login_count_nonnegative_d4c930d0\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_failed_login_count_nonnegative_d4c930d0",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_failed_login_count_nonnegative_d4c930d0\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_failed_login_count_nonnegative_d4c930d0\" CHECK (\"failedLoginCount\" >= 0)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_failed_login_count_nonnegative_d4c930d0\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_failed_login_count_nonnegative_d4c930d0",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_role_valid_28c73bc5",
+    "label": "Add check constraint \"user_role_valid_28c73bc5\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_role_valid_28c73bc5",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_role_valid_28c73bc5\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_valid_28c73bc5",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_role_valid_28c73bc5\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_role_valid_28c73bc5\" CHECK (role IN ('admin', 'employee', 'client'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_role_valid_28c73bc5\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_valid_28c73bc5",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_actorId_createdAt_idx_0e9f1adf",
+    "label": "Create index \"audit_event_actorId_createdAt_idx_0e9f1adf\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_actorId_createdAt_idx_0e9f1adf",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_actorId_createdAt_idx_0e9f1adf\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_actorId_createdAt_idx_0e9f1adf\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_actorId_createdAt_idx_0e9f1adf\"",
+        "sql": "CREATE INDEX \"audit_event_actorId_createdAt_idx_0e9f1adf\" ON \"public\".\"audit_event\" (\"actorId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_actorId_createdAt_idx_0e9f1adf\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_actorId_createdAt_idx_0e9f1adf\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_actorId_idx_a58f6b4b",
+    "label": "Create index \"audit_event_actorId_idx_a58f6b4b\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_actorId_idx_a58f6b4b",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_actorId_idx_a58f6b4b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_actorId_idx_a58f6b4b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_actorId_idx_a58f6b4b\"",
+        "sql": "CREATE INDEX \"audit_event_actorId_idx_a58f6b4b\" ON \"public\".\"audit_event\" (\"actorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_actorId_idx_a58f6b4b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_actorId_idx_a58f6b4b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_createdAt_idx_9575dbd7",
+    "label": "Create index \"audit_event_createdAt_idx_9575dbd7\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_createdAt_idx_9575dbd7",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_createdAt_idx_9575dbd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_createdAt_idx_9575dbd7\"",
+        "sql": "CREATE INDEX \"audit_event_createdAt_idx_9575dbd7\" ON \"public\".\"audit_event\" (\"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_createdAt_idx_9575dbd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_subjectUserId_createdAt_idx_c8b7019e",
+    "label": "Create index \"audit_event_subjectUserId_createdAt_idx_c8b7019e\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_subjectUserId_createdAt_idx_c8b7019e",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_subjectUserId_createdAt_idx_c8b7019e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_subjectUserId_createdAt_idx_c8b7019e\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_subjectUserId_createdAt_idx_c8b7019e\"",
+        "sql": "CREATE INDEX \"audit_event_subjectUserId_createdAt_idx_c8b7019e\" ON \"public\".\"audit_event\" (\"subjectUserId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_subjectUserId_createdAt_idx_c8b7019e\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_subjectUserId_createdAt_idx_c8b7019e\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_subjectUserId_idx_60714ffd",
+    "label": "Create index \"audit_event_subjectUserId_idx_60714ffd\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_subjectUserId_idx_60714ffd",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_subjectUserId_idx_60714ffd\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_subjectUserId_idx_60714ffd\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_subjectUserId_idx_60714ffd\"",
+        "sql": "CREATE INDEX \"audit_event_subjectUserId_idx_60714ffd\" ON \"public\".\"audit_event\" (\"subjectUserId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_subjectUserId_idx_60714ffd\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_subjectUserId_idx_60714ffd\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.audit_event.audit_event_type_createdAt_idx_00d94001",
+    "label": "Create index \"audit_event_type_createdAt_idx_00d94001\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "audit_event_type_createdAt_idx_00d94001",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"audit_event_type_createdAt_idx_00d94001\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_type_createdAt_idx_00d94001\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"audit_event_type_createdAt_idx_00d94001\"",
+        "sql": "CREATE INDEX \"audit_event_type_createdAt_idx_00d94001\" ON \"public\".\"audit_event\" (\"type\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"audit_event_type_createdAt_idx_00d94001\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"audit_event_type_createdAt_idx_00d94001\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_clientCompanyId_idx_157c8ca5",
+    "label": "Create index \"bug_report_clientCompanyId_idx_157c8ca5\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_clientCompanyId_idx_157c8ca5",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_clientCompanyId_idx_157c8ca5\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_clientCompanyId_idx_157c8ca5\"",
+        "sql": "CREATE INDEX \"bug_report_clientCompanyId_idx_157c8ca5\" ON \"public\".\"bug_report\" (\"clientCompanyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_clientCompanyId_idx_157c8ca5\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_clientCompanyId_status_discoveredAt_idx_4230304e",
+    "label": "Create index \"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_clientCompanyId_status_discoveredAt_idx_4230304e",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\"",
+        "sql": "CREATE INDEX \"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\" ON \"public\".\"bug_report\" (\"clientCompanyId\", \"status\", \"discoveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_clientCompanyId_status_discoveredAt_idx_4230304e\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_report.bug_report_pickedById_idx_1578802c",
+    "label": "Create index \"bug_report_pickedById_idx_1578802c\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_report_pickedById_idx_1578802c",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_report_pickedById_idx_1578802c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_pickedById_idx_1578802c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_report_pickedById_idx_1578802c\"",
+        "sql": "CREATE INDEX \"bug_report_pickedById_idx_1578802c\" ON \"public\".\"bug_report\" (\"pickedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_report_pickedById_idx_1578802c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_report_pickedById_idx_1578802c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_sla.bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610",
+    "label": "Create index \"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\" on \"bug_sla\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610",
+        "table": "bug_sla"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\"",
+        "sql": "CREATE INDEX \"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\" ON \"public\".\"bug_sla\" (\"firstRespondedAt\", \"firstResponseDueAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bug_sla.bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1",
+    "label": "Create index \"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\" on \"bug_sla\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1",
+        "table": "bug_sla"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\"",
+        "sql": "CREATE INDEX \"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\" ON \"public\".\"bug_sla\" (\"resolvedAt\", \"resolutionDueAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company.client_company_createdById_idx_8bf640ed",
+    "label": "Create index \"client_company_createdById_idx_8bf640ed\" on \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_createdById_idx_8bf640ed",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"client_company_createdById_idx_8bf640ed\" ON \"public\".\"client_company\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company.client_company_deactivatedAt_idx_61cfa815",
+    "label": "Create index \"client_company_deactivatedAt_idx_61cfa815\" on \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_deactivatedAt_idx_61cfa815",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_deactivatedAt_idx_61cfa815\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_deactivatedAt_idx_61cfa815\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_deactivatedAt_idx_61cfa815\"",
+        "sql": "CREATE INDEX \"client_company_deactivatedAt_idx_61cfa815\" ON \"public\".\"client_company\" (\"deactivatedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_deactivatedAt_idx_61cfa815\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_deactivatedAt_idx_61cfa815\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company.client_company_deactivatedById_idx_12fe95fd",
+    "label": "Create index \"client_company_deactivatedById_idx_12fe95fd\" on \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_deactivatedById_idx_12fe95fd",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_deactivatedById_idx_12fe95fd\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_deactivatedById_idx_12fe95fd\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_deactivatedById_idx_12fe95fd\"",
+        "sql": "CREATE INDEX \"client_company_deactivatedById_idx_12fe95fd\" ON \"public\".\"client_company\" (\"deactivatedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_deactivatedById_idx_12fe95fd\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_deactivatedById_idx_12fe95fd\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company_handler.client_company_handler_assignedById_idx_f5db02c3",
+    "label": "Create index \"client_company_handler_assignedById_idx_f5db02c3\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_handler_assignedById_idx_f5db02c3",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_handler_assignedById_idx_f5db02c3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_assignedById_idx_f5db02c3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_handler_assignedById_idx_f5db02c3\"",
+        "sql": "CREATE INDEX \"client_company_handler_assignedById_idx_f5db02c3\" ON \"public\".\"client_company_handler\" (\"assignedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_handler_assignedById_idx_f5db02c3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_assignedById_idx_f5db02c3\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company_handler.client_company_handler_companyId_idx_33acc5ed",
+    "label": "Create index \"client_company_handler_companyId_idx_33acc5ed\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_handler_companyId_idx_33acc5ed",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_handler_companyId_idx_33acc5ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_companyId_idx_33acc5ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_handler_companyId_idx_33acc5ed\"",
+        "sql": "CREATE INDEX \"client_company_handler_companyId_idx_33acc5ed\" ON \"public\".\"client_company_handler\" (\"companyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_handler_companyId_idx_33acc5ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_companyId_idx_33acc5ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company_handler.client_company_handler_employeeId_idx_087dd4a6",
+    "label": "Create index \"client_company_handler_employeeId_idx_087dd4a6\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_handler_employeeId_idx_087dd4a6",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_handler_employeeId_idx_087dd4a6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_handler_employeeId_idx_087dd4a6\"",
+        "sql": "CREATE INDEX \"client_company_handler_employeeId_idx_087dd4a6\" ON \"public\".\"client_company_handler\" (\"employeeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_handler_employeeId_idx_087dd4a6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_handler_employeeId_idx_087dd4a6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company_project.client_company_project_companyId_idx_33acc5ed",
+    "label": "Create index \"client_company_project_companyId_idx_33acc5ed\" on \"client_company_project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_project_companyId_idx_33acc5ed",
+        "table": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_project_companyId_idx_33acc5ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project_companyId_idx_33acc5ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_project_companyId_idx_33acc5ed\"",
+        "sql": "CREATE INDEX \"client_company_project_companyId_idx_33acc5ed\" ON \"public\".\"client_company_project\" (\"companyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_project_companyId_idx_33acc5ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project_companyId_idx_33acc5ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.client_company_project.client_company_project_projectId_idx_a96e4d92",
+    "label": "Create index \"client_company_project_projectId_idx_a96e4d92\" on \"client_company_project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "client_company_project_projectId_idx_a96e4d92",
+        "table": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"client_company_project_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"client_company_project_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"client_company_project_projectId_idx_a96e4d92\" ON \"public\".\"client_company_project\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"client_company_project_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"client_company_project_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.user.user_clientCompanyId_idx_157c8ca5",
+    "label": "Create index \"user_clientCompanyId_idx_157c8ca5\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_clientCompanyId_idx_157c8ca5",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_clientCompanyId_idx_157c8ca5\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_clientCompanyId_idx_157c8ca5\"",
+        "sql": "CREATE INDEX \"user_clientCompanyId_idx_157c8ca5\" ON \"public\".\"user\" (\"clientCompanyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_clientCompanyId_idx_157c8ca5\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.audit_event.audit_event_actorId_fkey",
+    "label": "Add foreign key \"audit_event_actorId_fkey\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "audit_event_actorId_fkey",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"audit_event_actorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "audit_event_actorId_fkey",
+          "public",
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"audit_event_actorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"audit_event\"\nADD CONSTRAINT \"audit_event_actorId_fkey\"\nFOREIGN KEY (\"actorId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"audit_event_actorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "audit_event_actorId_fkey",
+          "public",
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.audit_event.audit_event_subjectUserId_fkey",
+    "label": "Add foreign key \"audit_event_subjectUserId_fkey\" on \"audit_event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "audit_event_subjectUserId_fkey",
+        "table": "audit_event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"audit_event_subjectUserId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "audit_event_subjectUserId_fkey",
+          "public",
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"audit_event_subjectUserId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"audit_event\"\nADD CONSTRAINT \"audit_event_subjectUserId_fkey\"\nFOREIGN KEY (\"subjectUserId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"audit_event_subjectUserId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "audit_event_subjectUserId_fkey",
+          "public",
+          "\"public\".\"audit_event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_report.bug_report_pickedById_fkey",
+    "label": "Add foreign key \"bug_report_pickedById_fkey\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_report_pickedById_fkey",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_report_pickedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_pickedById_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_report_pickedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\"\nADD CONSTRAINT \"bug_report_pickedById_fkey\"\nFOREIGN KEY (\"pickedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_report_pickedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_pickedById_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_sla.bug_sla_bugId_fkey",
+    "label": "Add foreign key \"bug_sla_bugId_fkey\" on \"bug_sla\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_sla_bugId_fkey",
+        "table": "bug_sla"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_sla_bugId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_sla_bugId_fkey",
+          "public",
+          "\"public\".\"bug_sla\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_sla_bugId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_sla\"\nADD CONSTRAINT \"bug_sla_bugId_fkey\"\nFOREIGN KEY (\"bugId\")\nREFERENCES \"public\".\"bug_report\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_sla_bugId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_sla_bugId_fkey",
+          "public",
+          "\"public\".\"bug_sla\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company.client_company_createdById_fkey",
+    "label": "Add foreign key \"client_company_createdById_fkey\" on \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_createdById_fkey",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_createdById_fkey",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company\"\nADD CONSTRAINT \"client_company_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_createdById_fkey",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company.client_company_deactivatedById_fkey",
+    "label": "Add foreign key \"client_company_deactivatedById_fkey\" on \"client_company\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_deactivatedById_fkey",
+        "table": "client_company"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_deactivatedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_deactivatedById_fkey",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_deactivatedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company\"\nADD CONSTRAINT \"client_company_deactivatedById_fkey\"\nFOREIGN KEY (\"deactivatedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_deactivatedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_deactivatedById_fkey",
+          "public",
+          "\"public\".\"client_company\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bug_report.bug_report_clientCompanyId_fkey",
+    "label": "Add foreign key \"bug_report_clientCompanyId_fkey\" on \"bug_report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bug_report_clientCompanyId_fkey",
+        "table": "bug_report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bug_report_clientCompanyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bug_report_clientCompanyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bug_report\"\nADD CONSTRAINT \"bug_report_clientCompanyId_fkey\"\nFOREIGN KEY (\"clientCompanyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bug_report_clientCompanyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_report_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"bug_report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company_handler.client_company_handler_companyId_fkey",
+    "label": "Add foreign key \"client_company_handler_companyId_fkey\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_handler_companyId_fkey",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_handler_companyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_companyId_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_handler_companyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_handler\"\nADD CONSTRAINT \"client_company_handler_companyId_fkey\"\nFOREIGN KEY (\"companyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_handler_companyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_companyId_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company_handler.client_company_handler_employeeId_fkey",
+    "label": "Add foreign key \"client_company_handler_employeeId_fkey\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_handler_employeeId_fkey",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_handler_employeeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_employeeId_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_handler_employeeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_handler\"\nADD CONSTRAINT \"client_company_handler_employeeId_fkey\"\nFOREIGN KEY (\"employeeId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_handler_employeeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_employeeId_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company_handler.client_company_handler_assignedById_fkey",
+    "label": "Add foreign key \"client_company_handler_assignedById_fkey\" on \"client_company_handler\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_handler_assignedById_fkey",
+        "table": "client_company_handler"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_handler_assignedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_assignedById_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_handler_assignedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_handler\"\nADD CONSTRAINT \"client_company_handler_assignedById_fkey\"\nFOREIGN KEY (\"assignedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_handler_assignedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_handler_assignedById_fkey",
+          "public",
+          "\"public\".\"client_company_handler\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company_project.client_company_project_companyId_fkey",
+    "label": "Add foreign key \"client_company_project_companyId_fkey\" on \"client_company_project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_project_companyId_fkey",
+        "table": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_project_companyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_companyId_fkey",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_project_companyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_project\"\nADD CONSTRAINT \"client_company_project_companyId_fkey\"\nFOREIGN KEY (\"companyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_project_companyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_companyId_fkey",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.client_company_project.client_company_project_projectId_fkey",
+    "label": "Add foreign key \"client_company_project_projectId_fkey\" on \"client_company_project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "client_company_project_projectId_fkey",
+        "table": "client_company_project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"client_company_project_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_projectId_fkey",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"client_company_project_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"client_company_project\"\nADD CONSTRAINT \"client_company_project_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"client_company_project_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "client_company_project_projectId_fkey",
+          "public",
+          "\"public\".\"client_company_project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.user.user_clientCompanyId_fkey",
+    "label": "Add foreign key \"user_clientCompanyId_fkey\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "user_clientCompanyId_fkey",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"user_clientCompanyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"user_clientCompanyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"user\"\nADD CONSTRAINT \"user_clientCompanyId_fkey\"\nFOREIGN KEY (\"clientCompanyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"user_clientCompanyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  }
+]

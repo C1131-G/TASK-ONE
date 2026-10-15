@@ -12,6 +12,10 @@
       "model": "Activity",
       "namespace": "public"
     },
+    "audit_event": {
+      "model": "AuditEvent",
+      "namespace": "public"
+    },
     "bug_approval": {
       "model": "BugApproval",
       "namespace": "public"
@@ -36,12 +40,28 @@
       "model": "BugReport",
       "namespace": "public"
     },
+    "bug_sla": {
+      "model": "BugSla",
+      "namespace": "public"
+    },
     "calendar_event": {
       "model": "CalendarEvent",
       "namespace": "public"
     },
     "calendar_event_attendee": {
       "model": "CalendarEventAttendee",
+      "namespace": "public"
+    },
+    "client_company": {
+      "model": "ClientCompany",
+      "namespace": "public"
+    },
+    "client_company_handler": {
+      "model": "ClientCompanyHandler",
+      "namespace": "public"
+    },
+    "client_company_project": {
+      "model": "ClientCompanyProject",
       "namespace": "public"
     },
     "comment": {
@@ -286,6 +306,19 @@
               }
             ]
           },
+          "BugSatisfaction": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Up",
+                "value": "up"
+              },
+              {
+                "name": "Down",
+                "value": "down"
+              }
+            ]
+          },
           "BugSeverity": {
             "codecId": "pg/text@1",
             "members": [
@@ -366,6 +399,52 @@
               {
                 "name": "Rejected",
                 "value": "rejected"
+              },
+              {
+                "name": "NeedsInfo",
+                "value": "needs_info"
+              },
+              {
+                "name": "AwaitingClient",
+                "value": "awaiting_client"
+              },
+              {
+                "name": "Withdrawn",
+                "value": "withdrawn"
+              }
+            ]
+          },
+          "ClientImpact": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Low",
+                "value": "low"
+              },
+              {
+                "name": "Medium",
+                "value": "medium"
+              },
+              {
+                "name": "High",
+                "value": "high"
+              },
+              {
+                "name": "Urgent",
+                "value": "urgent"
+              }
+            ]
+          },
+          "CommentVisibility": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Public",
+                "value": "public"
+              },
+              {
+                "name": "Internal",
+                "value": "internal"
               }
             ]
           },
@@ -391,6 +470,18 @@
               {
                 "name": "Due",
                 "value": "due"
+              },
+              {
+                "name": "ClientBug",
+                "value": "client_bug"
+              },
+              {
+                "name": "Status",
+                "value": "status"
+              },
+              {
+                "name": "Sla",
+                "value": "sla"
               }
             ]
           },
@@ -816,6 +907,130 @@
               },
               "namespaceId": "public",
               "table": "activity"
+            }
+          },
+          "AuditEvent": {
+            "fields": {
+              "actorId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "details": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "ip": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "subjectUserId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "userAgent": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "subjectUser": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "subjectUserId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actorId": {
+                  "column": "actorId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "details": {
+                  "column": "details"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "ip": {
+                  "column": "ip"
+                },
+                "subjectUserId": {
+                  "column": "subjectUserId"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "userAgent": {
+                  "column": "userAgent"
+                }
+              },
+              "namespaceId": "public",
+              "table": "audit_event"
             }
           },
           "BugApproval": {
@@ -1795,10 +2010,44 @@
                   "kind": "scalar"
                 }
               },
+              "awaitingClientSince": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
               "browser": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "clientCompanyId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "clientImpact": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ClientImpact",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "clientReopenCount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -1877,7 +2126,35 @@
                   "kind": "scalar"
                 }
               },
+              "needsInfoSince": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "needsReassignment": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "os": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "pickedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "pickedById": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1915,6 +2192,26 @@
                   "kind": "scalar"
                 }
               },
+              "satisfaction": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugSatisfaction",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "satisfactionComment": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "severity": {
                 "nullable": false,
                 "type": {
@@ -1930,6 +2227,19 @@
               },
               "status": {
                 "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "BugWorkflowStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "statusBeforeNeedsInfo": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -1979,6 +2289,22 @@
                   "namespace": "public"
                 }
               },
+              "clientCompany": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "clientCompanyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
               "evidence": {
                 "cardinality": "1:N",
                 "on": {
@@ -2006,6 +2332,22 @@
                 },
                 "to": {
                   "model": "BugFixAttempt",
+                  "namespace": "public"
+                }
+              },
+              "pickedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "pickedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
                   "namespace": "public"
                 }
               },
@@ -2086,6 +2428,22 @@
                   "namespace": "public"
                 }
               },
+              "sla": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugId"
+                  ]
+                },
+                "to": {
+                  "model": "BugSla",
+                  "namespace": "public"
+                }
+              },
               "task": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -2111,8 +2469,20 @@
                 "appVersion": {
                   "column": "appVersion"
                 },
+                "awaitingClientSince": {
+                  "column": "awaitingClientSince"
+                },
                 "browser": {
                   "column": "browser"
+                },
+                "clientCompanyId": {
+                  "column": "clientCompanyId"
+                },
+                "clientImpact": {
+                  "column": "clientImpact"
+                },
+                "clientReopenCount": {
+                  "column": "clientReopenCount"
                 },
                 "component": {
                   "column": "component"
@@ -2141,8 +2511,20 @@
                 "id": {
                   "column": "id"
                 },
+                "needsInfoSince": {
+                  "column": "needsInfoSince"
+                },
+                "needsReassignment": {
+                  "column": "needsReassignment"
+                },
                 "os": {
                   "column": "os"
+                },
+                "pickedAt": {
+                  "column": "pickedAt"
+                },
+                "pickedById": {
+                  "column": "pickedById"
                 },
                 "projectId": {
                   "column": "projectId"
@@ -2156,11 +2538,20 @@
                 "route": {
                   "column": "route"
                 },
+                "satisfaction": {
+                  "column": "satisfaction"
+                },
+                "satisfactionComment": {
+                  "column": "satisfactionComment"
+                },
                 "severity": {
                   "column": "severity"
                 },
                 "status": {
                   "column": "status"
+                },
+                "statusBeforeNeedsInfo": {
+                  "column": "statusBeforeNeedsInfo"
                 },
                 "taskId": {
                   "column": "taskId"
@@ -2174,6 +2565,164 @@
               },
               "namespaceId": "public",
               "table": "bug_report"
+            }
+          },
+          "BugSla": {
+            "fields": {
+              "breachedResolution": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "breachedResponse": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "bugId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "firstRespondedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "firstResponseDueAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "pausedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "pausedBusinessMs": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolutionDueAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolvedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "warnedResolution": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "warnedResponse": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "bug": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "breachedResolution": {
+                  "column": "breachedResolution"
+                },
+                "breachedResponse": {
+                  "column": "breachedResponse"
+                },
+                "bugId": {
+                  "column": "bugId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "firstRespondedAt": {
+                  "column": "firstRespondedAt"
+                },
+                "firstResponseDueAt": {
+                  "column": "firstResponseDueAt"
+                },
+                "pausedAt": {
+                  "column": "pausedAt"
+                },
+                "pausedBusinessMs": {
+                  "column": "pausedBusinessMs"
+                },
+                "resolutionDueAt": {
+                  "column": "resolutionDueAt"
+                },
+                "resolvedAt": {
+                  "column": "resolvedAt"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "warnedResolution": {
+                  "column": "warnedResolution"
+                },
+                "warnedResponse": {
+                  "column": "warnedResponse"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bug_sla"
             }
           },
           "CalendarEvent": {
@@ -2394,6 +2943,404 @@
               "table": "calendar_event_attendee"
             }
           },
+          "ClientCompany": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "deactivatedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "deactivatedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "logoAssetId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "bugReports": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "clientCompanyId"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "createdBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "deactivatedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "deactivatedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "handlers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "companyId"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompanyHandler",
+                  "namespace": "public"
+                }
+              },
+              "projects": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "companyId"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompanyProject",
+                  "namespace": "public"
+                }
+              },
+              "users": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "clientCompanyId"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "createdById": {
+                  "column": "createdById"
+                },
+                "deactivatedAt": {
+                  "column": "deactivatedAt"
+                },
+                "deactivatedById": {
+                  "column": "deactivatedById"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "logoAssetId": {
+                  "column": "logoAssetId"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "client_company"
+            }
+          },
+          "ClientCompanyHandler": {
+            "fields": {
+              "assignedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "companyId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "employeeId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "assignedBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "assignedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "company": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "companyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "employee": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "employeeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "assignedById": {
+                  "column": "assignedById"
+                },
+                "companyId": {
+                  "column": "companyId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "employeeId": {
+                  "column": "employeeId"
+                },
+                "id": {
+                  "column": "id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "client_company_handler"
+            }
+          },
+          "ClientCompanyProject": {
+            "fields": {
+              "addedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "companyId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "projectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "removedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "company": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "companyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "project": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Project",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "addedAt": {
+                  "column": "addedAt"
+                },
+                "companyId": {
+                  "column": "companyId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "projectId": {
+                  "column": "projectId"
+                },
+                "removedAt": {
+                  "column": "removedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "client_company_project"
+            }
+          },
           "Comment": {
             "fields": {
               "authorId": {
@@ -2450,6 +3397,19 @@
                 "type": {
                   "codecId": "pg/timestamptz-date@1",
                   "kind": "scalar"
+                }
+              },
+              "visibility": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CommentVisibility",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               }
             },
@@ -2528,6 +3488,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "visibility": {
+                  "column": "visibility"
                 }
               },
               "namespaceId": "public",
@@ -2634,6 +3597,37 @@
                   "kind": "scalar"
                 }
               },
+              "businessDays": {
+                "many": {
+                  "elementNullable": false
+                },
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "businessEndMinute": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "businessStartMinute": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "businessTimeZone": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -2649,6 +3643,13 @@
                 }
               },
               "settings": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
+              },
+              "slaTargets": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/jsonb@1",
@@ -2686,6 +3687,18 @@
                 "brandEnabled": {
                   "column": "brandEnabled"
                 },
+                "businessDays": {
+                  "column": "businessDays"
+                },
+                "businessEndMinute": {
+                  "column": "businessEndMinute"
+                },
+                "businessStartMinute": {
+                  "column": "businessStartMinute"
+                },
+                "businessTimeZone": {
+                  "column": "businessTimeZone"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -2694,6 +3707,9 @@
                 },
                 "settings": {
                   "column": "settings"
+                },
+                "slaTargets": {
+                  "column": "slaTargets"
                 },
                 "slug": {
                   "column": "slug"
@@ -3815,6 +4831,21 @@
                 },
                 "to": {
                   "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "clientCompanies": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompanyProject",
                   "namespace": "public"
                 }
               },
@@ -6145,6 +7176,13 @@
                   "kind": "scalar"
                 }
               },
+              "clientCompanyId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -6194,6 +7232,13 @@
                   "kind": "scalar"
                 }
               },
+              "failedLoginCount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -6212,6 +7257,20 @@
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastActiveAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "lockedUntil": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
                   "kind": "scalar"
                 }
               },
@@ -6259,6 +7318,21 @@
               }
             },
             "relations": {
+              "assignedClientCompanyHandlers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "assignedById"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompanyHandler",
+                  "namespace": "public"
+                }
+              },
               "assignedSubtasks": {
                 "cardinality": "1:N",
                 "on": {
@@ -6271,6 +7345,36 @@
                 },
                 "to": {
                   "model": "TaskSubtask",
+                  "namespace": "public"
+                }
+              },
+              "auditEventsAsActor": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
+                },
+                "to": {
+                  "model": "AuditEvent",
+                  "namespace": "public"
+                }
+              },
+              "auditEventsAsSubject": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "subjectUserId"
+                  ]
+                },
+                "to": {
+                  "model": "AuditEvent",
                   "namespace": "public"
                 }
               },
@@ -6364,6 +7468,37 @@
                   "namespace": "public"
                 }
               },
+              "clientCompany": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "clientCompanyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "clientCompanyHandlerships": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "employeeId"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompanyHandler",
+                  "namespace": "public"
+                }
+              },
               "createdBugRelations": {
                 "cardinality": "1:N",
                 "on": {
@@ -6376,6 +7511,21 @@
                 },
                 "to": {
                   "model": "BugRelation",
+                  "namespace": "public"
+                }
+              },
+              "createdClientCompanies": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
                   "namespace": "public"
                 }
               },
@@ -6392,6 +7542,21 @@
                 },
                 "to": {
                   "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "deactivatedClientCompanies": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "deactivatedById"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
                   "namespace": "public"
                 }
               },
@@ -6422,6 +7587,21 @@
                 },
                 "to": {
                   "model": "IdempotencyKey",
+                  "namespace": "public"
+                }
+              },
+              "pickedBugs": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "pickedById"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
                   "namespace": "public"
                 }
               },
@@ -6528,6 +7708,9 @@
                 "banned": {
                   "column": "banned"
                 },
+                "clientCompanyId": {
+                  "column": "clientCompanyId"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -6549,6 +7732,9 @@
                 "employeeNumber": {
                   "column": "employeeNumber"
                 },
+                "failedLoginCount": {
+                  "column": "failedLoginCount"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -6557,6 +7743,12 @@
                 },
                 "jobTitle": {
                   "column": "jobTitle"
+                },
+                "lastActiveAt": {
+                  "column": "lastActiveAt"
+                },
+                "lockedUntil": {
+                  "column": "lockedUntil"
                 },
                 "mustChangePassword": {
                   "column": "mustChangePassword"
@@ -7011,6 +8203,153 @@
                   ],
                   "name": "activity_taskId_idx_4965c936",
                   "prefix": "activity_taskId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "audit_event": {
+              "columns": {
+                "actorId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "details": {
+                  "codecId": "pg/jsonb@1",
+                  "dataType": "pg/jsonb",
+                  "default": {
+                    "kind": "literal",
+                    "value": {}
+                  },
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "ip": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "subjectUserId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "userAgent": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "audit_event"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "subjectUserId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "audit_event"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId",
+                    "createdAt"
+                  ],
+                  "name": "audit_event_actorId_createdAt_idx_0e9f1adf",
+                  "prefix": "audit_event_actorId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "audit_event_actorId_idx_a58f6b4b",
+                  "prefix": "audit_event_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "createdAt"
+                  ],
+                  "name": "audit_event_createdAt_idx_9575dbd7",
+                  "prefix": "audit_event_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "subjectUserId",
+                    "createdAt"
+                  ],
+                  "name": "audit_event_subjectUserId_createdAt_idx_c8b7019e",
+                  "prefix": "audit_event_subjectUserId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "subjectUserId"
+                  ],
+                  "name": "audit_event_subjectUserId_idx_60714ffd",
+                  "prefix": "audit_event_subjectUserId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "type",
+                    "createdAt"
+                  ],
+                  "name": "audit_event_type_createdAt_idx_00d94001",
+                  "prefix": "audit_event_type_createdAt_idx",
                   "unique": false
                 }
               ],
@@ -8090,6 +9429,16 @@
             "bug_report": {
               "checks": [
                 {
+                  "expression": "\"clientImpact\" IN ('low', 'medium', 'high', 'urgent')",
+                  "name": "bug_report_clientImpact_check_b835bb9b",
+                  "prefix": "bug_report_clientImpact_check"
+                },
+                {
+                  "expression": "\"clientReopenCount\" >= 0",
+                  "name": "bug_report_client_reopen_count_nonnegative_dc549469",
+                  "prefix": "bug_report_client_reopen_count_nonnegative"
+                },
+                {
                   "expression": "\"discoverySource\" IN ('internal_qa', 'customer_report', 'support', 'automated_test', 'monitoring', 'employee_report')",
                   "name": "bug_report_discoverySource_check_3697728e",
                   "prefix": "bug_report_discoverySource_check"
@@ -8100,9 +9449,19 @@
                   "prefix": "bug_report_environment_check"
                 },
                 {
+                  "expression": "(\"pickedById\" IS NULL AND \"pickedAt\" IS NULL) OR (\"pickedById\" IS NOT NULL AND \"pickedAt\" IS NOT NULL)",
+                  "name": "bug_report_pick_fields_paired_2ed2462b",
+                  "prefix": "bug_report_pick_fields_paired"
+                },
+                {
                   "expression": "array_position(\"reproductionSteps\", NULL) IS NULL",
                   "name": "bug_report_reproductionSteps_elem_not_null_5718606e",
                   "prefix": "bug_report_reproductionSteps_elem_not_null"
+                },
+                {
+                  "expression": "\"satisfaction\" IN ('up', 'down')",
+                  "name": "bug_report_satisfaction_check_d407e712",
+                  "prefix": "bug_report_satisfaction_check"
                 },
                 {
                   "expression": "\"severity\" IN ('blocker', 'critical', 'major', 'minor', 'trivial')",
@@ -8110,8 +9469,13 @@
                   "prefix": "bug_report_severity_check"
                 },
                 {
-                  "expression": "\"status\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected')",
-                  "name": "bug_report_status_check_c394d412",
+                  "expression": "\"statusBeforeNeedsInfo\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected', 'needs_info', 'awaiting_client', 'withdrawn')",
+                  "name": "bug_report_statusBeforeNeedsInfo_check_39cbe58a",
+                  "prefix": "bug_report_statusBeforeNeedsInfo_check"
+                },
+                {
+                  "expression": "\"status\" IN ('reported', 'triaged', 'in_progress', 'in_verification', 'awaiting_admin_approval', 'approved_for_release', 'released', 'closed', 'duplicate', 'rejected', 'needs_info', 'awaiting_client', 'withdrawn')",
+                  "name": "bug_report_status_check_57f24d78",
                   "prefix": "bug_report_status_check"
                 }
               ],
@@ -8126,10 +9490,40 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
+                "awaitingClientSince": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
                 "browser": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "clientCompanyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "clientImpact": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ClientImpact",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "clientReopenCount": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nullable": false
                 },
                 "component": {
                   "codecId": "pg/text@1",
@@ -8196,7 +9590,31 @@
                   "dataType": "pg/uuid",
                   "nullable": false
                 },
+                "needsInfoSince": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "needsReassignment": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
                 "os": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "pickedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "pickedById": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
@@ -8224,6 +9642,22 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "satisfaction": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugSatisfaction",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "satisfactionComment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "severity": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -8243,6 +9677,17 @@
                     "value": "reported"
                   },
                   "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "BugWorkflowStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "statusBeforeNeedsInfo": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true,
                   "valueSet": {
                     "entityKind": "valueSet",
                     "entityName": "BugWorkflowStatus",
@@ -8325,9 +9770,69 @@
                     "namespaceId": "public",
                     "tableName": "user"
                   }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "clientCompanyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "pickedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "clientCompanyId"
+                  ],
+                  "name": "bug_report_clientCompanyId_idx_157c8ca5",
+                  "prefix": "bug_report_clientCompanyId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "clientCompanyId",
+                    "status",
+                    "discoveredAt"
+                  ],
+                  "name": "bug_report_clientCompanyId_status_discoveredAt_idx_4230304e",
+                  "prefix": "bug_report_clientCompanyId_status_discoveredAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "pickedById"
+                  ],
+                  "name": "bug_report_pickedById_idx_1578802c",
+                  "prefix": "bug_report_pickedById_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "projectId"
@@ -8386,6 +9891,155 @@
                   ]
                 }
               ]
+            },
+            "bug_sla": {
+              "checks": [
+                {
+                  "expression": "\"pausedBusinessMs\" >= 0",
+                  "name": "bug_sla_paused_nonnegative_50d1a49c",
+                  "prefix": "bug_sla_paused_nonnegative"
+                }
+              ],
+              "columns": {
+                "breachedResolution": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "breachedResponse": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "bugId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "firstRespondedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "firstResponseDueAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "pausedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "pausedBusinessMs": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nullable": false
+                },
+                "resolutionDueAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "resolvedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "warnedResolution": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "warnedResponse": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_sla"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "firstRespondedAt",
+                    "firstResponseDueAt"
+                  ],
+                  "name": "bug_sla_firstRespondedAt_firstResponseDueAt_idx_47055610",
+                  "prefix": "bug_sla_firstRespondedAt_firstResponseDueAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "resolvedAt",
+                    "resolutionDueAt"
+                  ],
+                  "name": "bug_sla_resolvedAt_resolutionDueAt_idx_f6514db1",
+                  "prefix": "bug_sla_resolvedAt_resolutionDueAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "bugId"
+                ]
+              },
+              "uniques": []
             },
             "calendar_event": {
               "checks": [
@@ -8617,7 +10271,381 @@
               },
               "uniques": []
             },
+            "client_company": {
+              "checks": [
+                {
+                  "expression": "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)",
+                  "name": "client_company_deactivation_fields_paired_68ebd7ec",
+                  "prefix": "client_company_deactivation_fields_paired"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "createdById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "deactivatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "deactivatedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "logoAssetId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "deactivatedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "createdById"
+                  ],
+                  "name": "client_company_createdById_idx_8bf640ed",
+                  "prefix": "client_company_createdById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "deactivatedAt"
+                  ],
+                  "name": "client_company_deactivatedAt_idx_61cfa815",
+                  "prefix": "client_company_deactivatedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "deactivatedById"
+                  ],
+                  "name": "client_company_deactivatedById_idx_12fe95fd",
+                  "prefix": "client_company_deactivatedById_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "client_company_handler": {
+              "columns": {
+                "assignedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "companyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "employeeId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "companyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company_handler"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "employeeId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company_handler"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "assignedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company_handler"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "assignedById"
+                  ],
+                  "name": "client_company_handler_assignedById_idx_f5db02c3",
+                  "prefix": "client_company_handler_assignedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "companyId"
+                  ],
+                  "name": "client_company_handler_companyId_idx_33acc5ed",
+                  "prefix": "client_company_handler_companyId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "employeeId"
+                  ],
+                  "name": "client_company_handler_employeeId_idx_087dd4a6",
+                  "prefix": "client_company_handler_employeeId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "companyId",
+                    "employeeId"
+                  ]
+                }
+              ]
+            },
+            "client_company_project": {
+              "columns": {
+                "addedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "companyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "projectId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "removedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "companyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company_project"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "projectId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company_project"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "project"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "companyId"
+                  ],
+                  "name": "client_company_project_companyId_idx_33acc5ed",
+                  "prefix": "client_company_project_companyId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "projectId"
+                  ],
+                  "name": "client_company_project_projectId_idx_a96e4d92",
+                  "prefix": "client_company_project_projectId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "companyId",
+                    "projectId"
+                  ]
+                }
+              ]
+            },
             "comment": {
+              "checks": [
+                {
+                  "expression": "\"visibility\" IN ('public', 'internal')",
+                  "name": "comment_visibility_check_4dc990d4",
+                  "prefix": "comment_visibility_check"
+                }
+              ],
               "columns": {
                 "authorId": {
                   "codecId": "pg/text@1",
@@ -8666,6 +10694,21 @@
                     "kind": "function"
                   },
                   "nullable": false
+                },
+                "visibility": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "internal"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CommentVisibility",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 }
               },
               "foreignKeys": [
@@ -8856,6 +10899,16 @@
             "company_settings": {
               "checks": [
                 {
+                  "expression": "array_position(\"businessDays\", NULL) IS NULL",
+                  "name": "company_settings_businessDays_elem_not_null_12212d77",
+                  "prefix": "company_settings_businessDays_elem_not_null"
+                },
+                {
+                  "expression": "\"businessStartMinute\" >= 0 AND \"businessEndMinute\" <= 1440 AND \"businessStartMinute\" < \"businessEndMinute\"",
+                  "name": "company_settings_business_hours_valid_c2cea7ba",
+                  "prefix": "company_settings_business_hours_valid"
+                },
+                {
                   "expression": "id = 'company'",
                   "name": "company_settings_singleton_id_52a8a17b",
                   "prefix": "company_settings_singleton_id"
@@ -8879,6 +10932,47 @@
                     "value": true
                   },
                   "nullable": false
+                },
+                "businessDays": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
+                    ]
+                  },
+                  "many": {
+                    "elementNullable": false
+                  },
+                  "nullable": false
+                },
+                "businessEndMinute": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1080
+                  },
+                  "nullable": false
+                },
+                "businessStartMinute": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 540
+                  },
+                  "nullable": false
+                },
+                "businessTimeZone": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
                 },
                 "id": {
                   "codecId": "pg/text@1",
@@ -8904,6 +10998,32 @@
                   "default": {
                     "kind": "literal",
                     "value": {}
+                  },
+                  "nullable": false
+                },
+                "slaTargets": {
+                  "codecId": "pg/jsonb@1",
+                  "dataType": "pg/jsonb",
+                  "default": {
+                    "kind": "literal",
+                    "value": {
+                      "high": {
+                        "firstResponseMinutes": 240,
+                        "resolutionMinutes": 1440
+                      },
+                      "low": {
+                        "firstResponseMinutes": 1440,
+                        "resolutionMinutes": 14400
+                      },
+                      "medium": {
+                        "firstResponseMinutes": 480,
+                        "resolutionMinutes": 4800
+                      },
+                      "urgent": {
+                        "firstResponseMinutes": 60,
+                        "resolutionMinutes": 480
+                      }
+                    }
                   },
                   "nullable": false
                 },
@@ -9604,8 +11724,8 @@
             "notification": {
               "checks": [
                 {
-                  "expression": "\"type\" IN ('mention', 'assignment', 'comment', 'update', 'due')",
-                  "name": "notification_type_check_cac43c93",
+                  "expression": "\"type\" IN ('mention', 'assignment', 'comment', 'update', 'due', 'client_bug', 'status', 'sla')",
+                  "name": "notification_type_check_5a30586b",
                   "prefix": "notification_type_check"
                 }
               ],
@@ -12248,6 +14368,11 @@
             "user": {
               "checks": [
                 {
+                  "expression": "(role = 'client') = (\"clientCompanyId\" IS NOT NULL)",
+                  "name": "user_client_company_matches_role_b6027f33",
+                  "prefix": "user_client_company_matches_role"
+                },
+                {
                   "expression": "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)",
                   "name": "user_deactivation_fields_paired_68ebd7ec",
                   "prefix": "user_deactivation_fields_paired"
@@ -12258,8 +14383,13 @@
                   "prefix": "user_employee_number_positive"
                 },
                 {
-                  "expression": "role IN ('admin', 'employee')",
-                  "name": "user_role_valid_2461e6a1",
+                  "expression": "\"failedLoginCount\" >= 0",
+                  "name": "user_failed_login_count_nonnegative_d4c930d0",
+                  "prefix": "user_failed_login_count_nonnegative"
+                },
+                {
+                  "expression": "role IN ('admin', 'employee', 'client')",
+                  "name": "user_role_valid_28c73bc5",
                   "prefix": "user_role_valid"
                 }
               ],
@@ -12282,6 +14412,11 @@
                     "value": false
                   },
                   "nullable": false
+                },
+                "clientCompanyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
                 },
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
@@ -12330,6 +14465,15 @@
                   },
                   "nullable": false
                 },
+                "failedLoginCount": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -12343,6 +14487,16 @@
                 "jobTitle": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
+                  "nullable": true
+                },
+                "lastActiveAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "lockedUntil": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
                   "nullable": true
                 },
                 "mustChangePassword": {
@@ -12422,9 +14576,34 @@
                     "namespaceId": "public",
                     "tableName": "user"
                   }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "clientCompanyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "clientCompanyId"
+                  ],
+                  "name": "user_clientCompanyId_idx_157c8ca5",
+                  "prefix": "user_clientCompanyId_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "deactivatedAt"
@@ -12653,6 +14832,13 @@
                 "duplicate"
               ]
             },
+            "BugSatisfaction": {
+              "kind": "valueSet",
+              "values": [
+                "up",
+                "down"
+              ]
+            },
             "BugSeverity": {
               "kind": "valueSet",
               "values": [
@@ -12682,7 +14868,26 @@
                 "released",
                 "closed",
                 "duplicate",
-                "rejected"
+                "rejected",
+                "needs_info",
+                "awaiting_client",
+                "withdrawn"
+              ]
+            },
+            "ClientImpact": {
+              "kind": "valueSet",
+              "values": [
+                "low",
+                "medium",
+                "high",
+                "urgent"
+              ]
+            },
+            "CommentVisibility": {
+              "kind": "valueSet",
+              "values": [
+                "public",
+                "internal"
               ]
             },
             "NotificationType": {
@@ -12692,7 +14897,10 @@
                 "assignment",
                 "comment",
                 "update",
-                "due"
+                "due",
+                "client_bug",
+                "status",
+                "sla"
               ]
             },
             "ProjectStatus": {
@@ -12757,10 +14965,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "355cc70312fab7ba7944feadfb00a98a58e6f0fce3cc7aeb0bbd4910b49f0058"
+    "storageHash": "8f40d527d8de3612647281d0ab83da9e2e4f4f1b0ec566a04c54fe753856ad66"
   },
   "execution": {
-    "executionHash": "ab4815de7fa8d8bd30cbb0d59ef5d5e3ca04050cd5239406ba5593672109b2f2",
+    "executionHash": "eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651",
     "mutations": {
       "defaults": [
         {
@@ -12770,6 +14978,17 @@
           },
           "ref": {
             "entry": "activity",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "audit_event",
             "field": "id",
             "namespace": "public"
           }
@@ -12847,6 +15066,39 @@
           },
           "ref": {
             "entry": "calendar_event",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "client_company",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "client_company_handler",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "client_company_project",
             "field": "id",
             "namespace": "public"
           }

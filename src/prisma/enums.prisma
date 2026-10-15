@@ -40,6 +40,32 @@ enum BugWorkflowStatus {
   Closed              = "closed"
   Duplicate           = "duplicate"
   Rejected            = "rejected"
+  NeedsInfo           = "needs_info"
+  AwaitingClient      = "awaiting_client"
+  Withdrawn           = "withdrawn"
+}
+
+enum ClientImpact {
+  @@type("pg/text@1")
+
+  Low    = "low"
+  Medium = "medium"
+  High   = "high"
+  Urgent = "urgent"
+}
+
+enum BugSatisfaction {
+  @@type("pg/text@1")
+
+  Up   = "up"
+  Down = "down"
+}
+
+enum CommentVisibility {
+  @@type("pg/text@1")
+
+  Public   = "public"
+  Internal = "internal"
 }
 
 enum BugSeverity {
@@ -140,4 +166,7 @@ enum NotificationType {
   Comment    = "comment"
   Update     = "update"
   Due        = "due"
+  ClientBug  = "client_bug"
+  Status     = "status"
+  Sla        = "sla"
 }

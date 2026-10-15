@@ -55,7 +55,11 @@ export const createComment = (
         }
         if (mentionIds.length > 0) {
           const mentioned = await transaction.orm.public.User.where((user) =>
-            and(user.id.in([...mentionIds]), user.deactivatedAt.isNull())
+            and(
+              user.id.in([...mentionIds]),
+              user.deactivatedAt.isNull(),
+              user.role.neq("client")
+            )
           )
             .select("id")
             .all();
