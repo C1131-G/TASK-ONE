@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import {
@@ -8,6 +9,11 @@ import {
 import { parseProjectDetailQuery } from "@/features/projects/project-detail-params";
 import { projectMetadata } from "@/features/projects/project-metadata";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
+
+const DynamicMetadataMarker = async () => {
+  await connection();
+  return null;
+};
 
 export const generateMetadata = async ({
   params,
@@ -20,16 +26,21 @@ const ProjectPage = ({
   params,
   searchParams,
 }: PageProps<"/projects/[projectId]">) => (
-  <Suspense fallback={<ProjectDetailSkeleton />}>
-    {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-    {Promise.all([params, searchParams]).then(([{ projectId }, query]) => (
-      <ProjectDetail
-        initialTaskId={parseTaskIdParam(query["task"])}
-        projectId={projectId}
-        query={parseProjectDetailQuery(query)}
-      />
-    ))}
-  </Suspense>
+  <>
+    <Suspense fallback={null}>
+      <DynamicMetadataMarker />
+    </Suspense>
+    <Suspense fallback={<ProjectDetailSkeleton />}>
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+      {Promise.all([params, searchParams]).then(([{ projectId }, query]) => (
+        <ProjectDetail
+          initialTaskId={parseTaskIdParam(query["task"])}
+          projectId={projectId}
+          query={parseProjectDetailQuery(query)}
+        />
+      ))}
+    </Suspense>
+  </>
 );
 
 export default ProjectPage;
