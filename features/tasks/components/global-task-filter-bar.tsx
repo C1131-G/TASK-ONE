@@ -11,6 +11,44 @@ import {
 
 import type { GlobalTaskSearch } from "../global-task-view-state";
 
+const STATUS_LABELS: Readonly<Record<string, string>> = {
+  all: "All statuses",
+  backlog: "Backlog",
+  done: "Done",
+  progress: "In Progress",
+  review: "Review",
+  todo: "To Do",
+};
+
+const PRIORITY_LABELS: Readonly<Record<string, string>> = {
+  all: "All priorities",
+  high: "High",
+  low: "Low",
+  medium: "Medium",
+  none: "No priority",
+  urgent: "Urgent",
+};
+
+const SORT_LABELS: Readonly<Record<string, string>> = {
+  due: "Sort: Due date",
+  priority: "Sort: Priority",
+  title: "Sort: Name",
+};
+
+const GROUP_LABELS: Readonly<Record<string, string>> = {
+  assignee: "Group: Assignee",
+  none: "No grouping",
+  priority: "Group: Priority",
+  project: "Group: Project",
+  status: "Group: Status",
+};
+
+const labelFor = (
+  labels: Readonly<Record<string, string>>,
+  value: string,
+  fallback: string
+) => labels[value] ?? fallback;
+
 // Filters write to the store as the user changes them: no Apply step, and no
 // server round trip, because the rows are already loaded.
 export const GlobalTaskFilterBar = ({
@@ -44,8 +82,9 @@ export const GlobalTaskFilterBar = ({
     <label className="field" htmlFor={`${idPrefix}-status`}>
       <span className="sr-only">Filter status</span>
       <WorkspaceSelect
-        ariaLabel="Filter by status"
+        ariaLabel={`Filter by status: ${labelFor(STATUS_LABELS, raw.status, "All statuses")}`}
         className="input"
+        displayValue={labelFor(STATUS_LABELS, raw.status, "All statuses")}
         id={`${idPrefix}-status`}
         onValueChange={(status) => onChange({ status })}
         value={raw.status}
@@ -61,8 +100,9 @@ export const GlobalTaskFilterBar = ({
     <label className="field" htmlFor={`${idPrefix}-priority`}>
       <span className="sr-only">Filter priority</span>
       <WorkspaceSelect
-        ariaLabel="Filter by priority"
+        ariaLabel={`Filter by priority: ${labelFor(PRIORITY_LABELS, raw.priority, "All priorities")}`}
         className="input"
+        displayValue={labelFor(PRIORITY_LABELS, raw.priority, "All priorities")}
         id={`${idPrefix}-priority`}
         onValueChange={(priority) => onChange({ priority })}
         value={raw.priority}
@@ -78,8 +118,9 @@ export const GlobalTaskFilterBar = ({
     <label className="field" htmlFor={`${idPrefix}-sort`}>
       <span className="sr-only">Sort tasks</span>
       <WorkspaceSelect
-        ariaLabel="Sort tasks"
+        ariaLabel={`Sort tasks: ${labelFor(SORT_LABELS, raw.sort, "Sort: Due date")}`}
         className="input"
+        displayValue={labelFor(SORT_LABELS, raw.sort, "Sort: Due date")}
         id={`${idPrefix}-sort`}
         onValueChange={(sort) => onChange({ sort })}
         value={raw.sort}
@@ -95,8 +136,9 @@ export const GlobalTaskFilterBar = ({
       <label className="field" htmlFor={`${idPrefix}-group`}>
         <span className="sr-only">Group tasks</span>
         <WorkspaceSelect
-          ariaLabel="Group tasks"
+          ariaLabel={`Group tasks: ${labelFor(GROUP_LABELS, raw.group, "Group: Status")}`}
           className="input"
+          displayValue={labelFor(GROUP_LABELS, raw.group, "Group: Status")}
           id={`${idPrefix}-group`}
           onValueChange={(group) => onChange({ group })}
           value={raw.group}

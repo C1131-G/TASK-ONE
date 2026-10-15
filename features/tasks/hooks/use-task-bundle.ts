@@ -86,5 +86,14 @@ export const useTaskBundle = ({
     };
   }, [applyBundle, initialBundle, isOpen, projectId, taskId]);
 
-  return { comments, error, files, refresh, setSubtasks, subtasks, task };
+  return {
+    comments,
+    error,
+    files,
+    refresh,
+    setFiles,
+    setSubtasks,
+    subtasks,
+    task,
+  };
 };

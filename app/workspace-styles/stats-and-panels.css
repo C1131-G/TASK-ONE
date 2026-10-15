@@ -56,6 +56,38 @@
   flex-direction: column;
   gap: 16px;
 }
+.workspace-app .home-progress-table {
+  table-layout: fixed;
+}
+.workspace-app .home-progress-table th:nth-child(1),
+.workspace-app .home-progress-table td:nth-child(1) {
+  width: 37%;
+}
+.workspace-app .home-progress-table th:nth-child(2),
+.workspace-app .home-progress-table td:nth-child(2) {
+  width: 17%;
+}
+.workspace-app .home-progress-table th:nth-child(3),
+.workspace-app .home-progress-table td:nth-child(3) {
+  width: 21%;
+}
+.workspace-app .home-progress-table th:nth-child(4),
+.workspace-app .home-progress-table td:nth-child(4) {
+  width: 12%;
+}
+.workspace-app .home-progress-table th:nth-child(5),
+.workspace-app .home-progress-table td:nth-child(5) {
+  width: 13%;
+}
+.workspace-app .home-progress-table td:first-child > .row {
+  min-width: 0;
+  white-space: normal;
+}
+.workspace-app .home-progress-table td:first-child strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 /* rows inside a bordered panel draw separators between themselves only, never against the panel edge */
 .workspace-app .panel > .mini:first-child {
   border-top: 0;

@@ -85,14 +85,22 @@ export const TaskDetailsPanel = ({
     taskType === "bug" && bugId !== undefined && clientBug?.bugId === bugId
       ? clientBug.isClient
       : false;
-  const { comments, error, files, refresh, setSubtasks, subtasks, task } =
-    useTaskBundle({
-      allowPublicReplies,
-      initialBundle: initialBundlePromise,
-      isOpen,
-      projectId,
-      taskId,
-    });
+  const {
+    comments,
+    error,
+    files,
+    refresh,
+    setFiles,
+    setSubtasks,
+    subtasks,
+    task,
+  } = useTaskBundle({
+    allowPublicReplies,
+    initialBundle: initialBundlePromise,
+    isOpen,
+    projectId,
+    taskId,
+  });
   const subtaskActions = useTaskSubtaskActions({
     onVersionChange,
     setSubtasks,
@@ -207,6 +215,8 @@ export const TaskDetailsPanel = ({
                 canUpload={editable}
                 currentUserId={currentUserId}
                 initialFiles={files}
+                controlledFiles={files}
+                setControlledFiles={setFiles}
                 isAdmin={isAdmin}
                 projectId={projectId}
                 taskId={taskId}

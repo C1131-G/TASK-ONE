@@ -5,6 +5,20 @@
 .workspace-app .notification-tabs {
   width: max-content;
 }
+.workspace-app .notification-page-actions [data-slot="tabs-list"] {
+  height: 30px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  padding: 2px;
+}
+.workspace-app .notification-page-actions [data-slot="tabs-trigger"] {
+  height: 26px;
+  min-height: 26px;
+  border-radius: 4px;
+  padding-inline: 8px;
+}
 .workspace-app .notification-page {
   width: min(100%, 820px);
 }

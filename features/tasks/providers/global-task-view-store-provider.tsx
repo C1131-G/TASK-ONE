@@ -76,9 +76,19 @@ export const GlobalTaskViewStoreProvider = ({
     globalTaskViewStore,
     (state) => state.columnWidths
   );
-  usePersistColumnWidths(columnWidths);
+  const columnWidthPersistence = usePersistColumnWidths(columnWidths);
 
   return (
-    <StoreProvider value={{ globalTaskViewStore }}>{children}</StoreProvider>
+    <StoreProvider value={{ globalTaskViewStore }}>
+      {columnWidthPersistence.error ? (
+        <p role="alert">
+          {columnWidthPersistence.error}{" "}
+          <button onClick={columnWidthPersistence.handleRetry} type="button">
+            Retry
+          </button>
+        </p>
+      ) : null}
+      {children}
+    </StoreProvider>
   );
 };

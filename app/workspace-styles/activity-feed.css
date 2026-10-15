@@ -3,8 +3,19 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+.workspace-app .activity-filters > [data-slot="tabs"] {
+  flex: 0 1 auto;
+  width: fit-content;
+  min-width: 0;
+}
+.workspace-app .activity-filters > [data-workspace-button] {
+  flex: 0 1 180px;
+  width: auto;
+  min-width: 130px;
+}
 
 .workspace-app .activity-tabs {
+  width: max-content;
   max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
@@ -12,6 +23,26 @@
 .workspace-app .activity-tabs [data-slot="tabs-list"] {
   width: max-content;
   max-width: none;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+}
+
+.workspace-app .activity-tabs [data-slot="tabs-trigger"] {
+  flex: 0 0 auto;
+  height: 30px;
+  min-height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-2);
+  padding-inline: 8px;
+}
+
+.workspace-app .activity-tabs [data-slot="tabs-trigger"][data-state="active"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .workspace-app .activity-tabs::-webkit-scrollbar {
@@ -24,12 +55,15 @@
 
 .workspace-app .activity-entry {
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
+  row-gap: 4px;
+  padding-block: 10px;
 }
 
 .workspace-app .activity-copy {
   min-width: 0;
   overflow-wrap: anywhere;
+  line-height: 1.55;
 }
 
 .workspace-app .activity-link,
@@ -59,17 +93,31 @@
 @media (max-width: 640px) {
   .workspace-app .activity-filters {
     align-items: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
 
   .workspace-app .activity-tabs {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 100%;
+    min-width: 100%;
+    overflow: visible;
   }
 
-  .workspace-app .activity-filters [data-slot="select-trigger"] {
-    flex: 0 0 130px;
-    width: 130px;
+  .workspace-app .activity-tabs [data-slot="tabs-list"] {
+    flex-wrap: wrap;
+    gap: 4px;
+    height: auto;
+    justify-content: flex-start;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .workspace-app .activity-tabs [data-slot="tabs-trigger"] {
+    padding-inline: 6px;
+  }
+
+  .workspace-app .activity-filters > [data-workspace-button] {
+    flex: 1 1 100%;
+    width: 100%;
   }
 
   .workspace-app .activity-entry time {

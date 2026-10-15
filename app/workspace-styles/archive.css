@@ -74,7 +74,7 @@
 .workspace-app .archive-row {
   display: flex;
   min-height: 64px;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   border-bottom: 1px solid var(--divider);
@@ -90,9 +90,9 @@
 }
 .workspace-app .archive-row-main strong,
 .workspace-app .archive-row-main span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.45;
 }
 .workspace-app .archive-row-main strong {
   color: var(--text);

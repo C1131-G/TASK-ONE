@@ -2,6 +2,32 @@
    QUIRE — DESIGN TOKENS
    Light palette on bare :root; dark redefined (not inverted).
    ============================================================ */
+:root {
+  --workspace-portal-bg: #fbfaf8;
+  --workspace-portal-surface: #ffffff;
+  --workspace-portal-muted: #eeede9;
+  --workspace-portal-border: #e9e7e2;
+  --workspace-portal-input: #dad7d0;
+  --workspace-portal-text: #1d1c1a;
+  --workspace-portal-text-muted: #57544e;
+  --workspace-portal-accent: #4b5bd6;
+  --workspace-portal-on-accent: #ffffff;
+  --workspace-portal-danger: #b23c30;
+  --workspace-portal-danger-soft: #f7e9e7;
+}
+.dark {
+  --workspace-portal-bg: #1a1a19;
+  --workspace-portal-surface: #1d1d1c;
+  --workspace-portal-muted: #2d2d2b;
+  --workspace-portal-border: #2c2b29;
+  --workspace-portal-input: #41403d;
+  --workspace-portal-text: #eceae5;
+  --workspace-portal-text-muted: #b2aea5;
+  --workspace-portal-accent: #8e9af3;
+  --workspace-portal-on-accent: #12131c;
+  --workspace-portal-danger: #e57d70;
+  --workspace-portal-danger-soft: #38211f;
+}
 .workspace-app {
   /* surfaces */
   --bg: #fbfaf8;

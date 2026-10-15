@@ -12,7 +12,50 @@
 .workspace-app .bcol-b {
   min-height: 90px;
 }
+.workspace-app .task-view-tabs {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 8px 12px;
+  padding-inline: var(--gutter);
+}
+.workspace-app .page.flush > .ph,
+.workspace-app .page.flush > .task-filter {
+  flex: 0 0 auto;
+}
+.workspace-app .task-filter {
+  position: relative;
+  min-height: 0;
+}
+.workspace-app .task-filter .field {
+  flex: 0 1 140px;
+  min-width: 120px;
+}
+.workspace-app .task-filter .field:first-child {
+  flex: 1 1 190px;
+}
+.workspace-app .my-tasks-header > nav {
+  flex-wrap: wrap;
+  gap: 8px;
+}
 @media (max-width: 640px) {
+  .workspace-app .task-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .workspace-app .task-filter .field:first-child {
+    flex: 1 1 100%;
+  }
+  .workspace-app .task-filter .field {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+  .workspace-app .task-filter [data-slot="select-trigger"] {
+    width: 100%;
+    min-width: 0;
+  }
   .workspace-app .project-task-filter {
     grid-template-columns: 1fr 1fr;
   }
@@ -98,6 +141,7 @@
     padding: 0;
   }
   .workspace-app .project-task-data-table .project-task-name-cell,
+  .workspace-app .project-task-data-table td[data-label="Task"],
   .workspace-app .project-task-data-table .project-task-assignees,
   .workspace-app .project-task-data-table td[data-label="Labels"],
   .workspace-app .project-task-data-table td[data-label="Actions"] {

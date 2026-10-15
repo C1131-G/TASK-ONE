@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
+import { useHydrated } from "@/components/workspace/use-hydrated";
 import { TaskDetailsPanel } from "@/features/tasks/components/task-details-panel";
 import type { TaskBundle } from "@/features/tasks/task-details-panel-data";
 
@@ -58,7 +60,7 @@ const writeTaskParam = (taskId: string | null) => {
     next !==
     `${window.location.pathname}${window.location.search}${window.location.hash}`
   ) {
-    window.history.replaceState(window.history.state, "", next);
+    window.history.replaceState(null, "", next);
   }
 };
 
@@ -74,9 +76,12 @@ export const TaskDrawerProvider = ({
   isAdmin,
   tasks,
 }: TaskDrawerProviderProps) => {
-  // Kept in state rather than read from useSearchParams, which does not follow
-  // history.replaceState. Back and forward are handled by popstate.
-  const [selectedId, setSelectedId] = useState<string | null>(initialTaskId);
+  const hydrated = useHydrated();
+  // The modal portal hides sibling navigation, so mount it after React has
+  // reconciled the server-rendered workspace shell.
+  // Next.js syncs native history changes with useSearchParams when its router
+  // state is copied into the replacement entry.
+  const selectedId = useSearchParams().get("task");
   const selected = tasks.find((task) => task.id === selectedId) ?? null;
   // Used once: after the deep-linked task closes, or another task opens, the
   // panel reads fresh data itself. Held in state so a server refresh's new
@@ -93,28 +98,12 @@ export const TaskDrawerProvider = ({
     () => ({
       openTask: (taskId) => {
         setInitialBundlePromise(null);
-        setSelectedId(taskId);
         writeTaskParam(taskId);
       },
     }),
-    []
+    [setInitialBundlePromise]
   );
 
-  useEffect(() => {
-    const syncFromUrl = () => {
-      setInitialBundlePromise(null);
-      setSelectedId(new URLSearchParams(window.location.search).get("task"));
-    };
-    window.addEventListener("popstate", syncFromUrl);
-    return () => window.removeEventListener("popstate", syncFromUrl);
-  }, []);
-
-  // A server refresh after a save rewrites the URL without our param, so the
-  // open task is written back whenever the page's task list is re-rendered.
-  // The selected task object is replaced whenever the list re-renders.
-  useEffect(() => {
-    writeTaskParam(selected?.id ?? null);
-  }, [selected]);
   const editable = selected ? editableTaskIds.includes(selected.id) : false;
   const version =
     selected &&
@@ -126,7 +115,7 @@ export const TaskDrawerProvider = ({
   return (
     <TaskDrawerContext.Provider value={value}>
       {children}
-      {selected ? (
+      {hydrated && selected ? (
         <TaskDetailsPanel
           currentUserId={currentUserId}
           editable={editable}
@@ -139,7 +128,6 @@ export const TaskDrawerProvider = ({
           onOpenChange={(next) => {
             if (!next) {
               setInitialBundlePromise(null);
-              setSelectedId(null);
               writeTaskParam(null);
             }
           }}

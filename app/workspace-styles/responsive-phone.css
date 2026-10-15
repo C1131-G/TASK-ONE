@@ -1,4 +1,7 @@
 @media (max-width: 640px) {
+  .workspace-app .home-progress-table {
+    min-width: 640px;
+  }
   .workspace-app .inbox-workspace {
     gap: 12px;
   }
@@ -19,6 +22,15 @@
   }
   .workspace-app .inbox-filters {
     padding-inline: 12px;
+  }
+  .workspace-app .inbox-tabs {
+    flex-wrap: wrap;
+    height: auto;
+    overflow-x: visible;
+    width: 100%;
+  }
+  .workspace-app .inbox-tabs [role="tab"] {
+    height: auto;
   }
   .workspace-app .inbox-item {
     grid-template-columns: minmax(0, 1fr) 32px;
@@ -288,7 +300,21 @@
     min-width: 40px;
     min-height: 40px;
   }
+  .workspace-app .topbar [data-workspace-create] {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding-inline: 8px;
+  }
   .workspace-app .palette {
     top: 8px;
+  }
+}
+@media (pointer: coarse) {
+  .workspace-app .topbar [data-workspace-create] {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }

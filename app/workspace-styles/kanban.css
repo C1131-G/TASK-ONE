@@ -104,7 +104,7 @@
 .workspace-app .kcard .top {
   display: flex;
   align-items: flex-start;
-  gap: 0;
+  gap: 8px;
 }
 .workspace-app .kcard .done-ic {
   display: inline-flex;
@@ -183,9 +183,11 @@
   background: var(--green, #5f9e78);
 }
 .workspace-app .kcard .key {
+  flex: 0 0 auto;
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text-3);
+  white-space: nowrap;
 }
 .workspace-app .drop-line {
   height: 2px;

@@ -33,7 +33,7 @@ export const TaskWorkSections = ({
   readonly editable: boolean;
   readonly employees: readonly EmployeeOption[];
   readonly onDirtyChange: DetailsFormProps["onDirtyChange"];
-  readonly onReload: DetailsFormProps["onReload"];
+  readonly onReload: () => Promise<void>;
   readonly onSaved: DetailsFormProps["onSaved"];
   readonly onVersionChange: (version: number) => void;
   readonly projectId: string;
@@ -61,7 +61,7 @@ export const TaskWorkSections = ({
             employees={employees}
             key={task.version}
             onDirtyChange={onDirtyChange}
-            onReload={onReload}
+            onReload={() => onReload()}
             onSaved={onSaved}
             task={task}
             version={version}
@@ -89,6 +89,7 @@ export const TaskWorkSections = ({
             editable={editable}
             labelIds={task.labelIds}
             onVersionChange={onVersionChange}
+            onReload={onReload}
             projectId={projectId}
             taskId={taskId}
             version={version}
@@ -97,6 +98,7 @@ export const TaskWorkSections = ({
             dueDate={task.dueDate}
             editable={editable}
             onVersionChange={onVersionChange}
+            onReload={onReload}
             recurrence={task.recurrence}
             taskId={taskId}
             version={version}

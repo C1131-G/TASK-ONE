@@ -5,7 +5,7 @@
 
 import { CheckCircle, Circle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -24,6 +24,22 @@ interface Milestone extends MilestoneData {
   readonly key: string;
 }
 
+const toMilestones = (items: readonly MilestoneData[]): readonly Milestone[] =>
+  items.map((milestone, index) => ({
+    ...milestone,
+    key: milestone.id ?? `initial-${index}`,
+  }));
+
+const serializeMilestones = (items: readonly Milestone[]): string =>
+  JSON.stringify(
+    items.map(({ id, name, dueDate, completed }) => ({
+      completed,
+      dueDate,
+      id,
+      name,
+    }))
+  );
+
 export const ProjectMilestones = ({
   projectId,
   version,
@@ -36,15 +52,44 @@ export const ProjectMilestones = ({
   readonly editable: boolean;
 }) => {
   const router = useRouter();
-  const [milestones, setMilestones] = useState<readonly Milestone[]>(() =>
-    initialMilestones.map((milestone, index) => ({
-      ...milestone,
-      key: milestone.id ?? `initial-${index}`,
-    }))
+  const [milestones, setMilestones] = useState(() =>
+    toMilestones(initialMilestones)
   );
   const currentVersion = useRef(version);
+  const baseline = useRef<string | null>(null);
+  const [conflict, setConflict] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (version === currentVersion.current) {
+      return;
+    }
+    if (
+      serializeMilestones(milestones) !==
+      (baseline.current ?? serializeMilestones(toMilestones(initialMilestones)))
+    ) {
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
+      setConflict(true);
+      return;
+    }
+    const incoming = toMilestones(initialMilestones);
+    currentVersion.current = version;
+    baseline.current = serializeMilestones(incoming);
+    // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
+    setMilestones(incoming);
+    // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
+    setConflict(false);
+  }, [initialMilestones, milestones, version, baseline]);
+
+  const reload = () => {
+    const incoming = toMilestones(initialMilestones);
+    currentVersion.current = version;
+    baseline.current = serializeMilestones(incoming);
+    setMilestones(incoming);
+    setConflict(false);
+    setError(null);
+  };
 
   const updateMilestone = (index: number, patch: Partial<Milestone>) =>
     setMilestones((current) =>
@@ -55,6 +100,9 @@ export const ProjectMilestones = ({
 
   const save = () =>
     startTransition(async () => {
+      if (conflict) {
+        return;
+      }
       const result = await saveProjectMilestonesAction({
         expectedVersion: currentVersion.current,
         idempotencyKey: crypto.randomUUID(),
@@ -67,12 +115,10 @@ export const ProjectMilestones = ({
       }
       setError(null);
       currentVersion.current = result.data.version;
-      setMilestones(
-        result.data.milestones.map((milestone) => ({
-          ...milestone,
-          key: milestone.id,
-        }))
-      );
+      const saved = toMilestones(result.data.milestones);
+      baseline.current = serializeMilestones(saved);
+      setMilestones(saved);
+      setConflict(false);
       router.refresh();
     });
 
@@ -84,7 +130,7 @@ export const ProjectMilestones = ({
         {editable ? (
           <WorkspaceButton
             className="btn btn-sm btn-primary"
-            disabled={pending}
+            disabled={pending || conflict}
             onClick={save}
             type="button"
           >
@@ -97,6 +143,14 @@ export const ProjectMilestones = ({
           {error}
         </p>
       ) : null}
+      {conflict ? (
+        <div className="panel-b error" role="alert">
+          Milestones changed elsewhere. Reload before editing or saving.
+          <WorkspaceButton onClick={reload} type="button" workspace>
+            Reload milestones
+          </WorkspaceButton>
+        </div>
+      ) : null}
       <div className="panel-b stack">
         {milestones.map((milestone, index) => (
           <div className="row milestone" key={milestone.key}>
@@ -104,6 +158,7 @@ export const ProjectMilestones = ({
               <Checkbox
                 aria-label={`Milestone ${index + 1} complete`}
                 checked={milestone.completed}
+                disabled={conflict}
                 onCheckedChange={(checked) =>
                   updateMilestone(index, {
                     completed: checked === true,
@@ -123,6 +178,7 @@ export const ProjectMilestones = ({
               <WorkspaceInput
                 aria-label={`Milestone ${index + 1} name`}
                 className="input grow"
+                disabled={conflict}
                 maxLength={120}
                 onChange={(event) =>
                   updateMilestone(index, { name: event.currentTarget.value })
@@ -136,6 +192,7 @@ export const ProjectMilestones = ({
               <WorkspaceDatePicker
                 ariaLabel={`Milestone ${index + 1} due date`}
                 className="input"
+                disabled={conflict}
                 onValueChange={(value) =>
                   updateMilestone(index, { dueDate: value || null })
                 }
@@ -150,6 +207,7 @@ export const ProjectMilestones = ({
               <WorkspaceButton
                 aria-label={`Remove milestone ${milestone.name || index + 1}`}
                 className="ibtn ibtn-sm"
+                disabled={conflict}
                 onClick={() =>
                   setMilestones((current) =>
                     current.filter((_, itemIndex) => itemIndex !== index)
@@ -168,6 +226,7 @@ export const ProjectMilestones = ({
         {editable ? (
           <WorkspaceButton
             className="btn btn-sm btn-ghost"
+            disabled={conflict}
             onClick={() =>
               setMilestones((current) => [
                 ...current,

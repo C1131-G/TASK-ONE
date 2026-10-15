@@ -20,6 +20,7 @@ const WorkspaceSelect = ({
   className,
   defaultValue,
   disabled,
+  displayValue,
   id,
   name,
   onValueChange,
@@ -33,6 +34,7 @@ const WorkspaceSelect = ({
   readonly className?: string;
   readonly defaultValue?: string;
   readonly disabled?: boolean;
+  readonly displayValue?: string;
   readonly id?: string;
   readonly name?: string;
   readonly onValueChange?: (value: string) => void;
@@ -79,7 +81,7 @@ const WorkspaceSelect = ({
           data-status={status}
           id={id}
         >
-          <SelectValue />
+          <SelectValue>{displayValue}</SelectValue>
         </SelectTrigger>
         <SelectContent data-workspace-select="">{children}</SelectContent>
       </Select>

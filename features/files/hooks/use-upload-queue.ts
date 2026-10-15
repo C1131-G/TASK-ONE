@@ -1,7 +1,7 @@
 "use client";
 
 import { useCreateStore, useSelector } from "@tanstack/react-store";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { uploadActions } from "../upload-store";
 import { putWithProgress } from "../upload-transport";
@@ -36,42 +36,83 @@ export const useUploadQueue = (
 ) => {
   const store = useCreateStore({ uploads: [] }, uploadActions);
   const entries = useRef(new Map<string, Entry>());
+  const mounted = useRef(true);
   const uploads = useSelector(store, (state) => state.uploads);
+
+  useEffect(() => {
+    const activeEntries = entries;
+    const activeState = mounted;
+    mounted.current = true;
+    return () => {
+      activeState.current = false;
+      for (const entry of activeEntries.current.values()) {
+        entry.controller.abort();
+      }
+      activeEntries.current.clear();
+    };
+  }, []);
 
   const run = async (id: string, entry: Entry) => {
     const { actions } = store;
     try {
       const attempt = entry.runner(entry.file);
       const ticket = await attempt.request();
-      if (!ticket.ok) {
-        actions.failed(id, ticket.message);
+      if (!mounted.current) {
         return;
       }
-      const result = await putWithProgress(
-        ticket.ticket.uploadUrl,
-        ticket.ticket.requiredHeaders,
-        entry.file,
-        (loaded) => actions.progress(id, loaded),
-        entry.controller.signal
-      );
-      if (result === "aborted") {
+      if (entry.controller.signal.aborted) {
         actions.cancelled(id);
         return;
       }
-      if (result === "failed") {
-        actions.failed(id, FAILED_MESSAGE(entry.file.name));
-        return;
+      if (ticket.ok) {
+        const result = await putWithProgress(
+          ticket.ticket.uploadUrl,
+          ticket.ticket.requiredHeaders,
+          entry.file,
+          (loaded) => {
+            if (mounted.current) {
+              actions.progress(id, loaded);
+            }
+          },
+          entry.controller.signal
+        );
+        if (!mounted.current) {
+          return;
+        }
+        if (result === "aborted" || entry.controller.signal.aborted) {
+          actions.cancelled(id);
+          return;
+        } else if (result === "failed") {
+          actions.failed(id, FAILED_MESSAGE(entry.file.name));
+        } else {
+          const message = await attempt.finalize();
+          if (!mounted.current) {
+            return;
+          }
+          if (message) {
+            actions.failed(id, message);
+          } else {
+            actions.done(id);
+          }
+        }
+      } else if (mounted.current) {
+        actions.failed(id, ticket.message);
       }
-      const message = await attempt.finalize();
-      if (message) {
-        actions.failed(id, message);
-        return;
-      }
-      actions.done(id);
     } catch {
-      actions.failed(id, FAILED_MESSAGE(entry.file.name));
+      if (mounted.current) {
+        actions.failed(id, FAILED_MESSAGE(entry.file.name));
+      }
     }
-    onSettled?.(id);
+    if (mounted.current) {
+      try {
+        await onSettled?.(id);
+      } catch {
+        actions.failed(
+          id,
+          "Upload finished, but the file list could not refresh."
+        );
+      }
+    }
   };
 
   const start = (file: File, runner: (file: File) => UploadRunner) => {

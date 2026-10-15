@@ -64,12 +64,14 @@ export const BugDetailWorkflow = ({
   employees,
   history,
   isAdmin,
+  onRefresh,
   userId,
 }: {
   readonly embedded?: boolean;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
   readonly history: BugHistory;
   readonly isAdmin: boolean;
+  readonly onRefresh?: () => Promise<void>;
   readonly userId: string;
 }) => {
   const router = useRouter();
@@ -93,13 +95,17 @@ export const BugDetailWorkflow = ({
       "withdrawn",
     ].includes(history.bug.status);
 
-  const finishAction = (result: BugActionResult) => {
+  const finishAction = async (result: BugActionResult) => {
     if (!result.ok) {
       setError(result.error.message);
       return;
     }
     setError(null);
-    router.refresh();
+    if (embedded && onRefresh) {
+      await onRefresh();
+    } else {
+      router.refresh();
+    }
   };
 
   const submit = (
@@ -256,6 +262,7 @@ export const BugDetailWorkflow = ({
         isReadOnly={isReadOnly}
         latestAttempt={latestAttempt}
         onError={setError}
+        {...(embedded && onRefresh ? { onRefresh } : {})}
         openFile={openFile}
         pending={pending}
         submit={submit}

@@ -29,12 +29,13 @@ const WorkspaceCreateMenu = ({
         <DropdownMenuTrigger asChild>
           <Button
             data-workspace-create=""
-            size="sm"
+            aria-label="New"
+            size="icon-sm"
             type="button"
-            variant="default"
+            variant="outline"
           >
-            <Plus aria-hidden="true" size={15} />
-            New
+            <Plus aria-hidden="true" size={16} />
+            <span className="sr-only">New</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" data-workspace-menu="">

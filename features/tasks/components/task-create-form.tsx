@@ -73,7 +73,10 @@ const TaskCreateForm = ({
       title="New task"
       trigger={
         trigger === undefined ? (
-          <WorkspaceButton className="btn btn-primary btn-sm" type="button">
+          <WorkspaceButton
+            className="btn btn-primary btn-sm w-fit"
+            type="button"
+          >
             New task
           </WorkspaceButton>
         ) : (
