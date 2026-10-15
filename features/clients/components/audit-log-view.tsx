@@ -5,7 +5,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
-  Table,
   TableBody,
   TableCaption,
   TableCell,
@@ -296,47 +295,57 @@ const AuditLogView = async ({
       {events.ok ? (
         <section aria-label="Audit events" className="panel clients-panel">
           {events.data.length ? (
-            <Table className="clients-table audit-table">
-              <TableCaption className="sr-only">
-                Audit events, newest first
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Person</TableHead>
-                  <TableHead>By</TableHead>
-                  <TableHead>IP</TableHead>
-                  <TableHead>Device</TableHead>
-                  <TableHead>Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {events.data.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="clients-nowrap">
-                      <time dateTime={entry.createdAt} title={entry.createdAt}>
-                        {timeFormatter.format(new Date(entry.createdAt))}
-                      </time>
-                    </TableCell>
-                    <TableCell>{auditEventLabel(entry.type)}</TableCell>
-                    <TableCell>
-                      <PersonCell entry={entry} />
-                    </TableCell>
-                    <TableCell>{entry.actorName ?? "—"}</TableCell>
-                    <TableCell className="clients-nowrap">
-                      {entry.ip ?? "—"}
-                    </TableCell>
-                    <TableCell title={entry.userAgent ?? undefined}>
-                      {shortenUserAgent(entry.userAgent)}
-                    </TableCell>
-                    <TableCell>
-                      <DetailsCell details={entry.details} />
-                    </TableCell>
+            <section
+              aria-label="Audit events table"
+              className="audit-scroll"
+              // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users need to scroll the wide table.
+              tabIndex={0}
+            >
+              <table className="clients-table audit-table">
+                <TableCaption className="sr-only">
+                  Audit events, newest first
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Person</TableHead>
+                    <TableHead>By</TableHead>
+                    <TableHead>IP</TableHead>
+                    <TableHead>Device</TableHead>
+                    <TableHead>Details</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {events.data.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="clients-nowrap">
+                        <time
+                          dateTime={entry.createdAt}
+                          title={entry.createdAt}
+                        >
+                          {timeFormatter.format(new Date(entry.createdAt))}
+                        </time>
+                      </TableCell>
+                      <TableCell>{auditEventLabel(entry.type)}</TableCell>
+                      <TableCell>
+                        <PersonCell entry={entry} />
+                      </TableCell>
+                      <TableCell>{entry.actorName ?? "—"}</TableCell>
+                      <TableCell className="clients-nowrap">
+                        {entry.ip ?? "—"}
+                      </TableCell>
+                      <TableCell title={entry.userAgent ?? undefined}>
+                        {shortenUserAgent(entry.userAgent)}
+                      </TableCell>
+                      <TableCell>
+                        <DetailsCell details={entry.details} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </table>
+            </section>
           ) : (
             <p className="panel-b muted">
               No audit events match these filters.

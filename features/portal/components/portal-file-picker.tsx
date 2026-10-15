@@ -107,6 +107,7 @@ const PortalFilePicker = ({
         </button>
         <input
           accept={PORTAL_FILE_ACCEPT}
+          aria-label="Attach files"
           className="sr-only"
           disabled={disabled}
           multiple
