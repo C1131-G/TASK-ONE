@@ -33,6 +33,9 @@ export const TaskCalendarQuerySchema = Schema.Struct({
     Schema.isGreaterThanOrEqualTo(1),
     Schema.isLessThanOrEqualTo(200)
   ),
+  offset: Schema.optional(
+    Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0))
+  ),
   priorities: Schema.Array(TaskPrioritySchema).check(Schema.isMaxLength(5)),
   projectIds: Schema.optional(
     Schema.Array(Schema.String.check(Schema.isUUID())).check(

@@ -9,6 +9,8 @@ const excludedByDesign = new Set([
   // Returns a one-time temporary password, like createEmployeeAction.
   "createClientUserAction",
   "createEmployeeAction",
+  // Recent search writes are naturally repeat-safe and intentionally not keyed.
+  "recordRecentSearchAction",
   "requestAvatarUploadAction",
   "requestProjectUploadAction",
   "requestTaskUploadAction",

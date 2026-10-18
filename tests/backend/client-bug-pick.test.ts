@@ -21,6 +21,8 @@ import {
 
 const portal = await import("../../features/portal/portal-actions");
 const bugActions = await import("../../features/bugs/bugs-actions");
+const bugClientActions =
+  await import("../../features/bugs/bugs-client-actions");
 const comments = await import("../../features/tasks/actions/task-comments");
 const taskEditing = await import("../../features/tasks/actions/task-editing");
 const portalQueries = await import("../../features/portal/portal-queries");
@@ -263,14 +265,18 @@ it("refuses a pick from someone who is not a handler of the company", async () =
   expect(failureMessage(outsiderPick)).toContain("handler");
   const untouched = await bugRow(bugId);
   expect(untouched.pickedById).toBeNull();
-  const adminPick = await callAs("admin", bugActions.pickClientBugAction, {
-    bugId,
-    expectedVersion: version,
-    priority: "high",
-    severity: "major",
-  });
+  const adminPick = await callAs(
+    "admin",
+    bugClientActions.pickClientBugAction,
+    {
+      bugId,
+      expectedVersion: version,
+      priority: "high",
+      severity: "major",
+    }
+  );
   expect(adminPick).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
-  const ordinary = await callAs("owner", bugActions.pickClientBugAction, {
+  const ordinary = await callAs("owner", bugClientActions.pickClientBugAction, {
     bugId: ids.random,
     expectedVersion: 1,
     priority: "high",
@@ -351,31 +357,47 @@ it("lets only an admin reassign a picked bug, to any employee", async () => {
     [bugId]
   );
 
-  const byHandler = await callAs("owner", bugActions.reassignClientBugAction, {
-    bugId,
-    employeeId: personaId("outsider"),
-    expectedVersion: row.version,
-  });
+  const byHandler = await callAs(
+    "owner",
+    bugClientActions.reassignClientBugAction,
+    {
+      bugId,
+      employeeId: personaId("outsider"),
+      expectedVersion: row.version,
+    }
+  );
   expect(byHandler).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
-  const stale = await callAs("admin", bugActions.reassignClientBugAction, {
-    bugId,
-    employeeId: personaId("outsider"),
-    expectedVersion: row.version + 4,
-  });
+  const stale = await callAs(
+    "admin",
+    bugClientActions.reassignClientBugAction,
+    {
+      bugId,
+      employeeId: personaId("outsider"),
+      expectedVersion: row.version + 4,
+    }
+  );
   expect(stale).toMatchObject({ error: { code: "CONFLICT" }, ok: false });
-  const toClient = await callAs("admin", bugActions.reassignClientBugAction, {
-    bugId,
-    employeeId: personaId("client"),
-    expectedVersion: row.version,
-  });
+  const toClient = await callAs(
+    "admin",
+    bugClientActions.reassignClientBugAction,
+    {
+      bugId,
+      employeeId: personaId("client"),
+      expectedVersion: row.version,
+    }
+  );
   expect(toClient).toMatchObject({ ok: false });
 
   // outsider is not a handler of the company; an admin may still choose them.
-  const reassigned = await callAs("admin", bugActions.reassignClientBugAction, {
-    bugId,
-    employeeId: personaId("outsider"),
-    expectedVersion: row.version,
-  });
+  const reassigned = await callAs(
+    "admin",
+    bugClientActions.reassignClientBugAction,
+    {
+      bugId,
+      employeeId: personaId("outsider"),
+      expectedVersion: row.version,
+    }
+  );
   expect(reassigned).toMatchObject({ ok: true });
   const after = await bugRow(bugId);
   expect(after.needsReassignment).toBe(false);
@@ -415,11 +437,15 @@ it("lets only an admin reassign a picked bug, to any employee", async () => {
 
   // An unpicked bug is assigned through triage, not reassignment.
   const fresh = await submit("client", "Unpicked reassign");
-  const unpicked = await callAs("admin", bugActions.reassignClientBugAction, {
-    bugId: fresh.bugId,
-    employeeId: personaId("outsider"),
-    expectedVersion: fresh.version,
-  });
+  const unpicked = await callAs(
+    "admin",
+    bugClientActions.reassignClientBugAction,
+    {
+      bugId: fresh.bugId,
+      employeeId: personaId("outsider"),
+      expectedVersion: fresh.version,
+    }
+  );
   expect(unpicked).toMatchObject({ error: { code: "FORBIDDEN" }, ok: false });
 });
 

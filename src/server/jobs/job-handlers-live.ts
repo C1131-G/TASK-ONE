@@ -11,15 +11,18 @@ import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
-import { SLA_SWEEP_JOB, runSlaSweep } from "../work/bug-sla";
+import { SLA_SWEEP_JOB } from "../work/bug-sla";
+import { runSlaSweep } from "../work/bug-sla-sweep";
+import {
+  autoCloseAwaitingClient,
+  autoCloseNeedsInfo,
+  remindNeedsInfo,
+} from "../work/bug-workflow-client-jobs";
 import {
   AWAITING_CLIENT_AUTOCLOSE_JOB,
   NEEDS_INFO_AUTOCLOSE_JOB,
   NEEDS_INFO_REMINDER_JOB,
-  autoCloseAwaitingClient,
-  autoCloseNeedsInfo,
-  remindNeedsInfo,
-} from "../work/bug-workflow-client";
+} from "../work/bug-workflow-client-support";
 import {
   UNPICKED_REMINDER_JOB,
   remindUnpickedClientBug,

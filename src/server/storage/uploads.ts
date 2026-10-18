@@ -1,3 +1,4 @@
+import "server-only";
 import { Effect, Layer } from "effect";
 
 import { Storage } from "./storage";

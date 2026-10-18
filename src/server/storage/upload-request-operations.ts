@@ -6,6 +6,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import type { StorageApi } from "./storage";
+import { assertClientUploadAllowed } from "./uploads-client-access";
 import type {
   AvatarUploadInput,
   FinalizedFile,
@@ -13,6 +14,7 @@ import type {
   RequestTaskUploadInput,
   UploadTicket,
 } from "./uploads-contracts";
+import { toFinalizedFile } from "./uploads-finalized-file";
 import * as internal from "./uploads-internal";
 
 interface PendingUpload {
@@ -91,7 +93,7 @@ const listProjectFiles = (
       })
         .orderBy((file) => file.createdAt.desc())
         .all();
-      return files.map(internal.toFinalizedFile);
+      return files.map(toFinalizedFile);
     },
   });
 
@@ -125,7 +127,7 @@ const listTaskFiles = (
         .orderBy((file) => file.createdAt.asc())
         .limit(100)
         .all();
-      return files.map(internal.toFinalizedFile);
+      return files.map(toFinalizedFile);
     },
   });
 
@@ -168,11 +170,7 @@ export const makeUploadRequestOperations = (storage: StorageApi) => {
               input.taskId
             );
             if (actor.role === "client") {
-              await internal.assertClientUploadAllowed(
-                transaction,
-                task.id,
-                input
-              );
+              await assertClientUploadAllowed(transaction, task.id, input);
             }
             return createUploadIntent(transaction, actorId, {
               contentType: input.contentType,

@@ -119,14 +119,18 @@ const sortCalendarEntries = (
   entries.sort((left, right) => {
     const leftValue = left[query.sortBy] ?? "";
     const rightValue = right[query.sortBy] ?? "";
-    return (
+    const sortedValue =
       multiplier *
       (typeof leftValue === "number" && typeof rightValue === "number"
         ? leftValue - rightValue
-        : String(leftValue).localeCompare(String(rightValue)))
+        : String(leftValue).localeCompare(String(rightValue)));
+    return (
+      sortedValue ||
+      left.projectId.localeCompare(right.projectId) ||
+      left.id.localeCompare(right.id)
     );
   });
-  return entries.slice(0, query.limit);
+  return entries.slice(query.offset ?? 0, (query.offset ?? 0) + query.limit);
 };
 
 const mapCalendarEntries = ({

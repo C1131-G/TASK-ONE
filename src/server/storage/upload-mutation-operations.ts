@@ -6,6 +6,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import type { FinalizedFile, UndoReceipt } from "./uploads-contracts";
+import { toFinalizedFile } from "./uploads-finalized-file";
 import * as internal from "./uploads-internal";
 
 export const renameFile = (
@@ -63,7 +64,7 @@ export const renameFile = (
           "file.renamed",
           { fileId, name: fileName }
         );
-        return internal.toFinalizedFile(updated);
+        return toFinalizedFile(updated);
       }),
   });
 

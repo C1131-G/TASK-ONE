@@ -11,6 +11,10 @@ import {
 import type { ActionResultLike } from "./support/action-harness";
 
 const portal = await import("../../features/portal/portal-actions");
+const portalUploads =
+  await import("../../features/portal/portal-upload-actions");
+const portalNotifications =
+  await import("../../features/portal/portal-notification-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
 const portalPush = await import("../../features/portal/portal-push-actions");
 
@@ -82,37 +86,41 @@ const portalActions: readonly ActionEntry[] = [
     body: "Hello",
     idempotencyKey: nextKey(),
   })),
-  entry("requestPortalUploadAction", portal.requestPortalUploadAction, () => ({
-    ...bug(),
-    contentType: "image/png",
-    fileName: "a.png",
-    sizeBytes: 10,
-  })),
+  entry(
+    "requestPortalUploadAction",
+    portalUploads.requestPortalUploadAction,
+    () => ({
+      ...bug(),
+      contentType: "image/png",
+      fileName: "a.png",
+      sizeBytes: 10,
+    })
+  ),
   entry(
     "finalizePortalUploadAction",
-    portal.finalizePortalUploadAction,
+    portalUploads.finalizePortalUploadAction,
     () => ({
       ...bug(),
       idempotencyKey: nextKey(),
       uploadIntentId: ids.random,
     })
   ),
-  entry("attachClientFileAction", portal.attachClientFileAction, () => ({
+  entry("attachClientFileAction", portalUploads.attachClientFileAction, () => ({
     ...bug(),
     fileId: ids.random,
   })),
-  entry("getPortalFileUrlAction", portal.getPortalFileUrlAction, () => ({
+  entry("getPortalFileUrlAction", portalUploads.getPortalFileUrlAction, () => ({
     disposition: "download",
     fileId: ids.random,
   })),
   entry(
     "markPortalNotificationReadAction",
-    portal.markPortalNotificationReadAction,
+    portalNotifications.markPortalNotificationReadAction,
     () => ({ notificationId: ids.random })
   ),
   entry(
     "markAllPortalNotificationsReadAction",
-    portal.markAllPortalNotificationsReadAction,
+    portalNotifications.markAllPortalNotificationsReadAction,
     () => ({})
   ),
   entry(

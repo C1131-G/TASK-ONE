@@ -22,8 +22,10 @@ const { getPortalCompany } =
 const { PORTAL_PREVIEW_COOKIE } = await import("../../src/server/auth/session");
 const { ClientLogos, MAX_CLIENT_LOGO_BYTES } =
   await import("../../src/server/clients/client-logo-contracts");
-const { ClientLogosLive, DELETE_CLIENT_LOGO_JOB } =
+const { ClientLogosLive } =
   await import("../../src/server/clients/client-logo");
+const { DELETE_CLIENT_LOGO_JOB } =
+  await import("../../src/server/clients/client-logo-support");
 const { Storage } = await import("../../src/server/storage/storage");
 
 beforeAll(setupHarness);

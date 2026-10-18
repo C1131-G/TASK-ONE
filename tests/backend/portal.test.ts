@@ -18,6 +18,10 @@ import {
 } from "./support/action-harness";
 
 const portal = await import("../../features/portal/portal-actions");
+const portalUploads =
+  await import("../../features/portal/portal-upload-actions");
+const portalNotifications =
+  await import("../../features/portal/portal-notification-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
 const comments = await import("../../features/tasks/actions/task-comments");
 
@@ -222,7 +226,7 @@ it("keeps internal notes, fix attempts and approvals out of the portal", async (
   ]);
   expect(detail.data.comments[0]).toMatchObject({ isTeam: true });
   expect(detail.data.attachments).toEqual([]);
-  const file = await callAs("client", portal.getPortalFileUrlAction, {
+  const file = await callAs("client", portalUploads.getPortalFileUrlAction, {
     disposition: "download",
     fileId: staffFile,
   });
@@ -538,10 +542,14 @@ it("attaches finalized screenshots and serves them only to the company", async (
       );
     })
   );
-  const attached = await callAs("client", portal.attachClientFileAction, {
-    bugId: bug.bugId,
-    fileId: file.id,
-  });
+  const attached = await callAs(
+    "client",
+    portalUploads.attachClientFileAction,
+    {
+      bugId: bug.bugId,
+      fileId: file.id,
+    }
+  );
   expect(attached).toMatchObject({ ok: true });
   const detail = await callAs("coworker", portalQueries.getPortalBug, {
     bugId: bug.bugId,
@@ -578,10 +586,14 @@ it("attaches finalized screenshots and serves them only to the company", async (
   expect(otherPreview._tag).toBe("Failure");
 
   // Linking someone else's upload, or a file from another bug, is refused.
-  const foreign = await callAs("coworker", portal.attachClientFileAction, {
-    bugId: bug.bugId,
-    fileId: file.id,
-  });
+  const foreign = await callAs(
+    "coworker",
+    portalUploads.attachClientFileAction,
+    {
+      bugId: bug.bugId,
+      fileId: file.id,
+    }
+  );
   expect(foreign).toMatchObject({ error: { code: "NOT_FOUND" }, ok: false });
 });
 
@@ -610,7 +622,7 @@ it("marks portal notifications read for the signed-in client only", async () => 
   expect(target).toBeDefined();
   const otherReads = await callAs(
     "otherClient",
-    portal.markPortalNotificationReadAction,
+    portalNotifications.markPortalNotificationReadAction,
     { notificationId: target?.id }
   );
   void otherReads;
@@ -619,13 +631,17 @@ it("marks portal notifications read for the signed-in client only", async () => 
     [target?.id]
   );
   expect(stillUnread.rows[0]?.readAt).toBeNull();
-  const read = await callAs("client", portal.markPortalNotificationReadAction, {
-    notificationId: target?.id,
-  });
+  const read = await callAs(
+    "client",
+    portalNotifications.markPortalNotificationReadAction,
+    {
+      notificationId: target?.id,
+    }
+  );
   expect(read).toMatchObject({ ok: true });
   const all = await callAs(
     "client",
-    portal.markAllPortalNotificationsReadAction,
+    portalNotifications.markAllPortalNotificationsReadAction,
     {}
   );
   expect(all).toMatchObject({ ok: true });

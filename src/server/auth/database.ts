@@ -1,3 +1,4 @@
+import "server-only";
 import "dotenv/config";
 import { Schema } from "effect";
 import { Pool } from "pg";

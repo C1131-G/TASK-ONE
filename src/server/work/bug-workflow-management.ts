@@ -19,21 +19,22 @@ import type {
 } from "./bug-contracts";
 import { archiveBug, reopenBug, restoreBug } from "./bug-workflow-admin";
 import { decideApproval, submitApproval } from "./bug-workflow-approval";
-import type {
-  CloseNotABugInput,
-  RequestClientInfoInput,
-} from "./bug-workflow-client";
 import {
   closeClientBugAsNotABug,
   requestClientInfo,
 } from "./bug-workflow-client";
+import type {
+  CloseNotABugInput,
+  RequestClientInfoInput,
+} from "./bug-workflow-client-support";
 import type { BugWorkflowReceipt } from "./bug-workflow-internal";
 import {
   addEvidence,
   addFixAttempt,
   recordVerification,
 } from "./bug-workflow-investigation";
-import { pickClientBug, reassignClientBug } from "./bug-workflow-pick";
+import { pickClientBug } from "./bug-workflow-pick";
+import { reassignClientBug } from "./bug-workflow-reassign";
 import { postReleaseCheck, recordRelease } from "./bug-workflow-release";
 import { addBugRelation, triageBug } from "./bug-workflow-triage";
 import type { Transaction } from "./work-internal";

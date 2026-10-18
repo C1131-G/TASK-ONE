@@ -1,3 +1,4 @@
+import "server-only";
 import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";

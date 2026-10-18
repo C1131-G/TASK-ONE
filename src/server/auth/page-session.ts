@@ -5,7 +5,7 @@ import { cache } from "react";
 
 import { AppError } from "../core/action-result";
 import { AuthSession, AuthSessionLive } from "./session";
-import type { AuthenticatedUser } from "./session";
+import type { AuthenticatedUser } from "./session-types";
 
 export type PageSession =
   // `reason` is set when the visitor was signed out rather than never in.

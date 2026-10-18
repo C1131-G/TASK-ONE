@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
-import { enqueueSlaSweep } from "../work/bug-sla";
+import { enqueueSlaSweep } from "../work/bug-sla-sweep";
 import type { DeadJobSummary } from "./processor-contracts";
 
 export const enqueueMaintenance = (

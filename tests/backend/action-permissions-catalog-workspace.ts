@@ -134,6 +134,9 @@ export const workspaceActionCatalog: readonly ActionEntry[] = [
   entry("searchWorkspaceAction", discovery.searchWorkspaceAction, () => ({
     query: "permission",
   })),
+  entry("recordRecentSearchAction", discovery.recordRecentSearchAction, () => ({
+    query: "permission",
+  })),
   entry("listEmployees", peopleQueries.listEmployees, () => ({
     search: "",
   })),

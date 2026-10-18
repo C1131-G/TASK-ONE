@@ -4,6 +4,7 @@ import { Schema } from "effect";
 
 import type { BugRelationInput, BugTriageInput } from "./bug-contracts";
 import { BugRelationInputSchema, BugTriageInputSchema } from "./bug-contracts";
+import { hasRelationPath } from "./bug-relation-path";
 import { markFirstResponse } from "./bug-sla";
 import { transitionBugStatus } from "./bug-workflow";
 import {
@@ -12,7 +13,6 @@ import {
   assertWritable,
   conflict,
   forbidden,
-  hasRelationPath,
   loadBug,
   required,
   updateBugStatus,

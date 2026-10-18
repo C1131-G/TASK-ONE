@@ -45,6 +45,9 @@ const composedReads = new Set([
   "listAllProjects",
   "listAllTeams",
   "listProjectTaskPages",
+  "listAllTaskCalendar",
+  "listTaskCalendarPage",
+  "getWorkspaceSearchResults",
 ]);
 
 it("covers every Server Action and query exported by the features", () => {

@@ -6,7 +6,9 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import type { StorageApi } from "./storage";
+import { assertClientCanReadFile } from "./uploads-client-access";
 import type { FinalizedFile } from "./uploads-contracts";
+import { toFinalizedFile } from "./uploads-finalized-file";
 import * as internal from "./uploads-internal";
 
 const uploadChangedError = () =>
@@ -72,7 +74,7 @@ const findFinalizedFile = async (objectKey: string): Promise<FinalizedFile> => {
       message: "The finalized file record is unavailable.",
     });
   }
-  return internal.toFinalizedFile(file);
+  return toFinalizedFile(file);
 };
 
 // Re-checks the intent inside the write transaction because the object upload happened outside it.
@@ -133,7 +135,7 @@ const claimUploadIntent = (actorId: string, uploadIntentId: string) =>
       "file.uploaded",
       { fileId: file.id }
     );
-    return internal.toFinalizedFile(file);
+    return toFinalizedFile(file);
   });
 
 // Shared by download and preview: the file must be ready, and standalone project files are admin-only.
@@ -150,7 +152,7 @@ const findReadableFile = async (actorId: string, fileId: string) => {
   }
   const actorRole = actor.role;
   if (actorRole === "client") {
-    await internal.assertClientCanReadFile(actor, file);
+    await assertClientCanReadFile(actor, file);
   }
   if (file.copyState !== "ready") {
     throw new AppError({

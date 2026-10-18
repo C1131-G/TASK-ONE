@@ -97,6 +97,27 @@ it("filters, sorts, and groups active tasks in a calendar range", async () => {
     expect(
       result.every(({ groupKey }) => groupKey === "Calendar project")
     ).toBe(true);
+    const secondPage = await Effect.runPromise(
+      Effect.provide(
+        Effect.gen(function* listCalendarSecondPage() {
+          const calendar = yield* TaskCalendar;
+          return yield* calendar.list(actorId, {
+            assigneeIds: [actorId],
+            from: "2026-10-01",
+            groupBy: "project",
+            limit: 1,
+            offset: 1,
+            priorities: [],
+            sortBy: "dueDate",
+            sortDirection: "asc",
+            statuses: ["todo"],
+            to: "2026-11-30",
+          });
+        }),
+        TaskCalendarLive
+      )
+    );
+    expect(secondPage.map(({ id }) => id)).toEqual([tasks[1]?.id]);
   } finally {
     await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
       actorId,

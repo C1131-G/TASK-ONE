@@ -7,8 +7,7 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import { MimeTypeSchema } from "../core/input-schemas";
 import { isUniqueConstraintViolation } from "../core/prisma-errors";
-import { FinalizedFileSchema } from "./uploads-contracts";
-import type { FinalizedFile } from "./uploads-contracts";
+import { assertClientBugTask } from "./uploads-client-access";
 
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 export const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
@@ -32,23 +31,6 @@ export const PreviewContentTypeSchema = Schema.Literals([
 ]);
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type Role = "admin" | "employee" | "client";
-
-// What a client account may attach to a bug it can see.
-export const CLIENT_UPLOAD_CONTENT_TYPES: ReadonlySet<string> = new Set([
-  "application/pdf",
-  "image/gif",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "video/mp4",
-]);
-export const CLIENT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-export const CLIENT_MAX_FILES_PER_BUG = 10;
-const CLOSED_CLIENT_BUG_STATUSES = new Set([
-  "closed",
-  "duplicate",
-  "withdrawn",
-]);
 
 export const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {
@@ -144,34 +126,6 @@ export const getActor = async (transaction: Transaction, actorId: string) => {
   return actor;
 };
 
-// A client may reach only the bug tasks of its own company, and only while
-// the bug is still open.
-const assertClientBugTask = async (
-  transaction: Transaction,
-  actor: { clientCompanyId: string | null },
-  taskId: string
-): Promise<void> => {
-  const bug = await transaction.orm.public.BugReport.where({ taskId })
-    .select("clientCompanyId", "status")
-    .first();
-  if (
-    !bug ||
-    !actor.clientCompanyId ||
-    bug.clientCompanyId !== actor.clientCompanyId
-  ) {
-    throw new AppError({
-      code: "NOT_FOUND",
-      message: "The task was not found.",
-    });
-  }
-  if (CLOSED_CLIENT_BUG_STATUSES.has(bug.status)) {
-    throw new AppError({
-      code: "FORBIDDEN",
-      message: "Closed bugs are read only.",
-    });
-  }
-};
-
 export const getEditableTask = async (
   transaction: Transaction,
   actor: { id: string; role: string; clientCompanyId?: string | null },
@@ -218,71 +172,6 @@ export const getEditableTask = async (
   return task;
 };
 
-// Clients have stricter limits than staff: allowed types, a smaller file size,
-// and a cap on the files a bug can hold.
-export const assertClientUploadAllowed = async (
-  transaction: Transaction,
-  taskId: string,
-  upload: { readonly contentType: string; readonly sizeBytes: number }
-): Promise<void> => {
-  if (!CLIENT_UPLOAD_CONTENT_TYPES.has(upload.contentType)) {
-    throw new AppError({
-      code: "VALIDATION_FAILED",
-      message: "Attach images, PDF files, or MP4 videos.",
-    });
-  }
-  if (upload.sizeBytes > CLIENT_MAX_UPLOAD_BYTES) {
-    throw new AppError({
-      code: "VALIDATION_FAILED",
-      message: "Files must be 10 MB or smaller.",
-    });
-  }
-  const now = new Date();
-  const [files, intents] = await Promise.all([
-    transaction.orm.public.FileAsset.where({ deletedAt: null, taskId })
-      .select("id")
-      .all(),
-    transaction.orm.public.UploadIntent.where({ state: "pending", taskId })
-      .select("expiresAt")
-      .all(),
-  ]);
-  const pending = intents.filter(({ expiresAt }) => expiresAt > now).length;
-  if (files.length + pending >= CLIENT_MAX_FILES_PER_BUG) {
-    throw new AppError({
-      code: "VALIDATION_FAILED",
-      message: "A bug can have at most 10 attachments.",
-    });
-  }
-};
-
-const fileHidden = () =>
-  new AppError({ code: "NOT_FOUND", message: "The file was not found." });
-
-// Clients read only files that client-company users attached to their own
-// company's bugs; internal evidence uploaded by staff stays hidden.
-export const assertClientCanReadFile = async (
-  actor: { readonly clientCompanyId: string | null },
-  file: { readonly taskId: string | null; readonly uploadedById: string }
-): Promise<void> => {
-  if (!actor.clientCompanyId || !file.taskId) {
-    throw fileHidden();
-  }
-  const [bug, uploader] = await Promise.all([
-    db.orm.public.BugReport.where({ taskId: file.taskId })
-      .select("clientCompanyId")
-      .first(),
-    db.orm.public.User.where({ id: file.uploadedById })
-      .select("clientCompanyId")
-      .first(),
-  ]);
-  if (
-    bug?.clientCompanyId !== actor.clientCompanyId ||
-    uploader?.clientCompanyId !== actor.clientCompanyId
-  ) {
-    throw fileHidden();
-  }
-};
-
 export const activeActor = async (
   actorId: string
 ): Promise<{
@@ -316,38 +205,6 @@ export const activeActor = async (
 export const activeRole = async (actorId: string): Promise<Role> => {
   const actor = await activeActor(actorId);
   return actor.role;
-};
-
-export const toFinalizedFile = (file: {
-  id: string;
-  projectId: string;
-  taskId: string | null;
-  originalName: string;
-  contentType: string | null;
-  sizeBytes: bigint;
-  copyState: string;
-  uploadedById: string;
-  createdAt: Date;
-}): FinalizedFile => {
-  if (!file.contentType) {
-    throw new AppError({
-      code: "CONFLICT",
-      message: "The finalized file metadata is incomplete.",
-    });
-  }
-  return {
-    contentType: file.contentType,
-    copyState: Schema.decodeUnknownSync(FinalizedFileSchema.fields.copyState)(
-      file.copyState
-    ),
-    createdAt: file.createdAt.toISOString(),
-    id: file.id,
-    originalName: file.originalName,
-    projectId: file.projectId,
-    sizeBytes: Number(file.sizeBytes),
-    taskId: file.taskId,
-    uploadedById: file.uploadedById,
-  };
 };
 
 export const addActivity = async (
