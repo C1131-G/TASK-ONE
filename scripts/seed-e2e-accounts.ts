@@ -24,9 +24,12 @@ const COMPANY_NAME = "Acme";
 const PROJECT_KEY = "ACMEP";
 
 const adminPassword = process.env["E2E_ADMIN_PASSWORD"];
+const employeePassword = process.env["E2E_EMPLOYEE_PASSWORD"];
 const portalPassword = process.env["E2E_PORTAL_PASSWORD"];
-if (!(adminPassword && portalPassword)) {
-  throw new Error("Set E2E_ADMIN_PASSWORD and E2E_PORTAL_PASSWORD first.");
+if (!(adminPassword && employeePassword && portalPassword)) {
+  throw new Error(
+    "Set E2E_ADMIN_PASSWORD, E2E_EMPLOYEE_PASSWORD, and E2E_PORTAL_PASSWORD first."
+  );
 }
 
 const context = await auth.$context;
@@ -54,7 +57,7 @@ const upsertUser = async (seed: SeedUser): Promise<string> => {
       [userId, seed.companyId ?? null, seed.mustChangePassword ?? false]
     );
     await authPool.query(
-      "UPDATE account SET password = $2, \"updatedAt\" = now() WHERE \"userId\" = $1 AND \"providerId\" = 'credential'",
+      'UPDATE account SET password = $2, "updatedAt" = now() WHERE "userId" = $1 AND "providerId" = \'credential\'',
       [userId, hash]
     );
     return userId;
@@ -72,7 +75,7 @@ const upsertUser = async (seed: SeedUser): Promise<string> => {
     ]
   );
   await authPool.query(
-    "INSERT INTO account (id, \"accountId\", \"providerId\", \"userId\", password) VALUES ($1, $2, 'credential', $2, $3)",
+    'INSERT INTO account (id, "accountId", "providerId", "userId", password) VALUES ($1, $2, \'credential\', $2, $3)',
     [randomUUID(), userId, hash]
   );
   return userId;
@@ -126,6 +129,12 @@ const adminId = await upsertUser({
   password: adminPassword,
   role: "admin",
 });
+await upsertUser({
+  email: "ui-employee@metsys.test",
+  name: "UI Employee",
+  password: employeePassword,
+  role: "employee",
+});
 const handlerOneId = await upsertUser({
   email: E2E_ACCOUNTS.handlerOne,
   name: "Hana Handler",
@@ -172,6 +181,26 @@ await upsertUser({
 });
 const projectId = await ensureProject();
 
+const existingTeam = await authPool.query<{ id: string }>(
+  "SELECT id FROM team WHERE name = $1",
+  ["UI Navigation Team"]
+);
+const teamId = existingTeam.rows[0]?.id ?? randomUUID();
+if (!existingTeam.rows[0]) {
+  await authPool.query(
+    "INSERT INTO team (id, name, description) VALUES ($1, $2, $3)",
+    [
+      teamId,
+      "UI Navigation Team",
+      "Synthetic team for browser navigation checks.",
+    ]
+  );
+}
+await authPool.query(
+  'UPDATE "user" SET "teamId" = $2 WHERE email IN ($1, $3)',
+  [E2E_ACCOUNTS.handlerOne, teamId, E2E_ACCOUNTS.handlerTwo]
+);
+
 await authPool.query(
   'INSERT INTO client_company_project (id, "companyId", "projectId") VALUES ($3, $1, $2) ON CONFLICT DO NOTHING',
   [companyId, projectId, randomUUID()]
@@ -185,7 +214,7 @@ for (const employeeId of [handlerOneId, handlerTwoId]) {
 }
 
 // Earlier runs may have used up the per-address sign-in allowance.
-await authPool.query("DELETE FROM \"rateLimit\"");
+await authPool.query('DELETE FROM "rateLimit"');
 
 process.stdout.write(
   `Seeded ${COMPANY_NAME} (${companyId}) with project ${PROJECT_KEY}, 2 handlers and 4 client users.\n`

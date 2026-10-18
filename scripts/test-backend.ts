@@ -123,7 +123,13 @@ try {
     const before = await countRows();
     const testRun = spawnSync(
       "bun",
-      ["test", "--max-concurrency=1", path.join(testDirectory, testFile)],
+      [
+        "test",
+        "--max-concurrency=1",
+        "--preload",
+        path.join(testDirectory, "support/server-only-stub.ts"),
+        path.join(testDirectory, testFile),
+      ],
       { env: environment, stdio: "inherit" }
     );
     if (testRun.status !== 0) {

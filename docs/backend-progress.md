@@ -2,6 +2,10 @@
 
 This checklist tracks the reference app's persistent actions against an Effect service, its authorized adapter, and behavior tests. A schema row alone does not count as implemented.
 
+## Feature and service ownership
+
+Keep product-facing Server Components, queries, Server Actions, and view models in `features/<feature>/`. Keep authorization, validation, database work, and domain operations in the existing `src/server/<domain>/` Effect services. Feature adapters translate service results into the established action result contracts; do not move service logic into feature folders. Operational reads stay request-fresh, and shared caching is limited to tagged reference data with explicit write invalidation.
+
 ## Implemented vertical slices
 
 | Reference action | Effect service | Adapter | Behavior test |

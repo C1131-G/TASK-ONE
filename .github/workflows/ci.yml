@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: metsys
+          POSTGRES_PASSWORD: local-dev-password
+          POSTGRES_DB: metsys_ci
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U metsys -d metsys_ci" --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci?sslmode=disable
+      BETTER_AUTH_SECRET: ci-only-secret-that-is-long-enough-for-auth
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_TRUSTED_ORIGINS: http://localhost:3000
+      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      SCHEDULER_TOKEN: ci-only-scheduler-token-long-enough
+      TEST_DATABASE_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci_test?sslmode=disable
+      TEST_DATABASE_ADMIN_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci?sslmode=disable
+      S3_ENDPOINT: http://localhost:9000
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: metsys-private
+      S3_ACCESS_KEY_ID: metsys
+      S3_SECRET_ACCESS_KEY: local-minio-password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - run: bun install --frozen-lockfile
+      - name: Create and initialize isolated databases
+        run: |
+          PGPASSWORD=local-dev-password createdb -h localhost -p 5433 -U metsys metsys_ci_test
+          bun run db:init
+          DATABASE_URL="$TEST_DATABASE_URL" bun run db:init
+          bun run db:verify
+          DATABASE_URL="$TEST_DATABASE_URL" bun run db:verify
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun run test:ui
+      - run: bun run test:backend
+      - name: Generate ephemeral browser credentials
+        run: |
+          echo "E2E_ADMIN_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "E2E_EMPLOYEE_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "E2E_PORTAL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+      - name: Seed browser test data
+        run: |
+          docker run -d --name metsys-minio -p 9000:9000 -e MINIO_ROOT_USER=metsys -e MINIO_ROOT_PASSWORD=local-minio-password minio/minio:RELEASE.2025-10-15T17-29-55Z server /data
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
+            sleep 2
+          done
+          docker run --rm --network host minio/mc:RELEASE.2025-08-13T08-35-41Z alias set local http://localhost:9000 metsys local-minio-password
+          docker run --rm --network host minio/mc:RELEASE.2025-08-13T08-35-41Z mb --ignore-existing local/metsys-private
+          bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
+          UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
+      - run: bunx playwright install --with-deps chromium
+      - name: Build with instant-navigation testing API
+        run: bun run build
+        env:
+          EXPOSE_TESTING_API: "1"
+      - name: Run production server and browser checks
+        run: |
+          EXPOSE_TESTING_API=1 bun run start --port 3000 > /tmp/metsys-next.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:3000/api/health; then break; fi
+            sleep 2
+          done
+          curl --fail http://localhost:3000/api/health
+          bunx playwright test --project=chromium --workers=1
