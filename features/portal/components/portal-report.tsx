@@ -2,6 +2,11 @@
 
 import { FolderSimple } from "@phosphor-icons/react/dist/ssr";
 
+import {
+  SKELETON_KEYS,
+  SkeletonBone,
+} from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import {
@@ -136,4 +141,39 @@ const PortalReport = async ({
   );
 };
 
-export { PortalReport };
+const PortalFormSkeleton = ({
+  label = "Loading bug form",
+}: {
+  readonly label?: string;
+}) => (
+  <>
+    <div className="ph">
+      <div>
+        <h1>Report a bug</h1>
+        <p>
+          Tell us what went wrong. The more detail you give, the faster we can
+          fix it.
+        </p>
+      </div>
+    </div>
+    <SkelterSurface label={label}>
+      <div className="panel portal-panel">
+        <div className="portal-form">
+          {SKELETON_KEYS.slice(0, 7).map((key) => (
+            <div className="field skeleton-copy" key={key}>
+              <SkeletonBone shape="short" />
+              <SkeletonBone
+                shape={
+                  key === "bone-2" || key === "bone-4" ? "block" : "control"
+                }
+              />
+            </div>
+          ))}
+          <SkeletonBone shape="control" />
+        </div>
+      </div>
+    </SkelterSurface>
+  </>
+);
+
+export { PortalReport, PortalFormSkeleton };

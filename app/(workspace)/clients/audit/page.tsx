@@ -5,8 +5,10 @@ import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { parseFilters } from "@/features/clients/components/audit-log-parse";
-import { AuditLogView } from "@/features/clients/components/audit-log-view";
-import { AuditLogSkeleton } from "@/features/clients/components/audit-skeleton";
+import {
+  AuditLogView,
+  AuditLogSkeleton,
+} from "@/features/clients/components/audit-log-view";
 
 export const metadata: Metadata = { title: "Audit log | Metsys" };
 

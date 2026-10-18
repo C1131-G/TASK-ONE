@@ -10,7 +10,7 @@ import { PortalTime } from "@/features/portal/components/portal-time";
 import {
   markAllPortalNotificationsReadAction,
   markPortalNotificationReadAction,
-} from "@/features/portal/portal-notification-actions";
+} from "@/features/portal/portal-actions";
 import type { PortalNotificationList as PortalNotificationData } from "@/src/server/portal/portal-contracts";
 
 type Item = PortalNotificationData["items"][number];

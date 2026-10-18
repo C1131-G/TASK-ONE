@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { TeamDetail } from "@/features/people/components/team-detail";
-import { TeamDetailSkeleton } from "@/features/people/components/team-detail-skeleton";
+import {
+  TeamDetail,
+  TeamDetailSkeleton,
+} from "@/features/people/components/team-detail";
 import { teamMetadata } from "@/features/people/team-metadata";
 
 export const generateMetadata = async ({

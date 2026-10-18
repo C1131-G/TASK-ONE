@@ -12,7 +12,7 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
-import { updateSlaSettingsAction } from "@/features/company/sla-actions";
+import { updateSlaSettingsAction } from "@/features/company/company-actions";
 import { useSaveState } from "@/features/settings/hooks/use-settings-save";
 import type { SlaSettingsValues } from "@/src/server/company/sla-settings";
 

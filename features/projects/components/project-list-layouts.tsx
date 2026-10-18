@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { SkeletonBone } from "@/components/workspace/skeleton-shapes";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
 import { ProjectListActions } from "@/features/projects/components/project-list-actions";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
@@ -261,3 +262,34 @@ export const ProjectTableView = ({
     </TableBody>
   </Table>
 );
+
+const ProjectCardSkeleton = () => (
+  <article className="pcard">
+    <div className="pcard-link">
+      <div className="row">
+        <SkeletonBone shape="avatar" />
+        <strong className="grow">
+          <SkeletonBone />
+        </strong>
+        <SkeletonBone shape="short" />
+      </div>
+      <p className="desc">
+        <SkeletonBone />
+      </p>
+      <div className="row">
+        <span className="prog skeleton-prog">
+          <SkeletonBone />
+        </span>
+        <SkeletonBone shape="short" />
+      </div>
+      <div className="foot">
+        <SkeletonBone shape="short" />
+        <span className="sp" />
+        <SkeletonBone shape="short" />
+        <SkeletonBone shape="short" />
+      </div>
+    </div>
+  </article>
+);
+
+export { ProjectCardSkeleton };

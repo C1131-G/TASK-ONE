@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { WorkspaceFilesSkeleton } from "@/features/files/components/files-skeleton";
-import { WorkspaceFiles } from "@/features/files/components/workspace-files";
+import {
+  WorkspaceFilesSkeleton,
+  WorkspaceFiles,
+} from "@/features/files/components/workspace-files";
 
 export const metadata: Metadata = { title: "Files | Metsys" };
 

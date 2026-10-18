@@ -5,7 +5,7 @@
 import { DownloadSimple, FilePdf, FileVideo } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
-import { getPortalFileUrlAction } from "@/features/portal/portal-upload-actions";
+import { getPortalFileUrlAction } from "@/features/portal/portal-actions";
 import { formatFileSize } from "@/features/portal/portal-upload-rules";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
 

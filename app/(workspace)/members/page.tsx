@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { MembersSection } from "@/features/people/components/members-section";
-import { MembersSectionSkeleton } from "@/features/people/components/members-skeleton";
+import {
+  MembersSection,
+  MembersSectionSkeleton,
+} from "@/features/people/components/members-section";
 import { parseMembersSection } from "@/features/people/members-section-param";
 
 export const metadata: Metadata = { title: "Members | Metsys" };

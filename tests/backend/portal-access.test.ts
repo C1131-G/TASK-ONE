@@ -11,12 +11,11 @@ import {
 import type { ActionResultLike } from "./support/action-harness";
 
 const portal = await import("../../features/portal/portal-actions");
-const portalUploads =
-  await import("../../features/portal/portal-upload-actions");
+const portalUploads = await import("../../features/portal/portal-actions");
 const portalNotifications =
-  await import("../../features/portal/portal-notification-actions");
+  await import("../../features/portal/portal-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
-const portalPush = await import("../../features/portal/portal-push-actions");
+const portalPush = await import("../../features/portal/portal-actions");
 
 beforeAll(setupHarness);
 afterAll(teardownHarness);

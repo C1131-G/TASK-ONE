@@ -3,6 +3,11 @@
 import { Effect, Schema } from "effect";
 import { revalidatePath } from "next/cache";
 
+import {
+  revalidateBugViews,
+  runBugWorkflowAction,
+} from "@/features/bugs/actions/bug-workflow-runner";
+import { getBugHistory, listBugs } from "@/features/bugs/bugs-queries";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
 import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
@@ -20,19 +25,19 @@ import {
   BugTriageInputSchema,
   BugVerificationInputSchema,
   BugVersionInputSchema,
+  BugPickInputSchema,
+  BugReassignInputSchema,
 } from "@/src/server/work/bug-contracts";
 import {
   BugManagement,
   BugManagementLive,
   BugReportItemSchema,
 } from "@/src/server/work/bug-management";
-import { BugWorkflowManagement } from "@/src/server/work/bug-workflow-management";
-
 import {
-  revalidateBugViews,
-  runBugWorkflowAction,
-} from "./actions/bug-workflow-runner";
-import { getBugHistory, listBugs } from "./bugs-queries";
+  CloseNotABugInputSchema,
+  RequestClientInfoInputSchema,
+} from "@/src/server/work/bug-workflow-client-support";
+import { BugWorkflowManagement } from "@/src/server/work/bug-workflow-management";
 
 // Bug history and similar-bug search are read from client components.
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -248,6 +253,63 @@ export async function reopenBugAction(input: unknown) {
         const service = yield* BugWorkflowManagement;
         return yield* service.reopen(actorId, value);
       })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function pickClientBugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(input, BugPickInputSchema, (actorId, value) =>
+      Effect.gen(function* pick() {
+        const service = yield* BugWorkflowManagement;
+        return yield* service.pick(actorId, value);
+      })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function requestClientInfoAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      RequestClientInfoInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* requestInfo() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.requestInfo(actorId, value);
+        })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function closeClientBugNotABugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      CloseNotABugInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* closeNotABug() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.closeNotABug(actorId, value);
+        })
+    )
+  );
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function reassignClientBugAction(input: unknown) {
+  return revalidateBugViews(
+    await runBugWorkflowAction(
+      input,
+      BugReassignInputSchema,
+      (actorId, value) =>
+        Effect.gen(function* reassign() {
+          const service = yield* BugWorkflowManagement;
+          return yield* service.reassign(actorId, value);
+        })
     )
   );
 }

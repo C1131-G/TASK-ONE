@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { PortalAccount } from "@/features/portal/components/portal-account";
-import { PortalAccountSkeleton } from "@/features/portal/components/portal-skeletons";
+import {
+  PortalAccount,
+  PortalAccountSkeleton,
+} from "@/features/portal/components/portal-account";
 
 export const metadata: Metadata = { title: "Account | Metsys" };
 

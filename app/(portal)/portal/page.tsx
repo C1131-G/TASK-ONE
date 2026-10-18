@@ -5,8 +5,10 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { PortalBugList } from "@/features/portal/components/portal-bug-list";
-import { PortalListSkeleton } from "@/features/portal/components/portal-skeletons";
+import {
+  PortalBugList,
+  PortalListSkeleton,
+} from "@/features/portal/components/portal-bug-list";
 import { parsePortalBugFilters } from "@/features/portal/portal-filters";
 
 export const metadata: Metadata = {

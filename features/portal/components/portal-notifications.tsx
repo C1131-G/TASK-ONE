@@ -2,6 +2,11 @@
 
 import { Bell } from "@phosphor-icons/react/dist/ssr";
 
+import {
+  SkeletonBone,
+  SkeletonRows,
+} from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalNotificationList } from "@/features/portal/components/portal-notification-list";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import { listPortalNotifications } from "@/features/portal/portal-queries";
@@ -53,4 +58,18 @@ const PortalNotifications = async () => {
   );
 };
 
-export { PortalNotifications };
+const PortalNotificationsSkeleton = () => (
+  <SkelterSurface label="Loading notifications">
+    <div className="panel">
+      <div className="panel-h portal-notif-bar">
+        <SkeletonBone shape="title" />
+        <SkeletonBone shape="control" />
+      </div>
+      <div className="panel-b">
+        <SkeletonRows rows={5} />
+      </div>
+    </div>
+  </SkelterSurface>
+);
+
+export { PortalNotifications, PortalNotificationsSkeleton };

@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { SettingsPanel } from "@/features/settings/components/settings-panel";
-import { SettingsPanelSkeleton } from "@/features/settings/components/settings-skeleton";
+import {
+  SettingsPanel,
+  SettingsPanelSkeleton,
+} from "@/features/settings/components/settings-panel";
 import { parseSettingsSection } from "@/features/settings/settings-section";
 
 export const metadata: Metadata = { title: "Settings | Metsys" };

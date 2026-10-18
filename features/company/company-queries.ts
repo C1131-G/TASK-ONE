@@ -7,6 +7,12 @@ import {
   CompanySettingsManagementLive,
   CompanySettingsValuesSchema,
 } from "@/src/server/company/company-settings";
+import {
+  SlaSettingsManagement,
+  SlaSettingsManagementLive,
+  SlaSettingsValuesSchema,
+} from "@/src/server/company/sla-settings";
+import { requireAdmin } from "@/src/server/core/admin-action";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
 
@@ -28,4 +34,21 @@ export const getCompanySettings = async (input: unknown = {}) =>
       ),
     undefined,
     CompanySettingsValuesSchema
+  );
+
+export const getSlaSettings = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getSlaSettingsProgram() {
+        const administrator = yield* requireAdmin(yield* requestHeadersOrFail);
+        const settings = yield* SlaSettingsManagement;
+        return yield* settings.get(administrator.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(SlaSettingsManagementLive)
+      ),
+    undefined,
+    SlaSettingsValuesSchema
   );

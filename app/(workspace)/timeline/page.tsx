@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { ProjectTimeline } from "@/features/projects/components/project-timeline";
-import { ProjectTimelineSkeleton } from "@/features/projects/components/timeline-skeleton";
+import {
+  ProjectTimeline,
+  ProjectTimelineSkeleton,
+} from "@/features/projects/components/project-timeline";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
 
 export const metadata: Metadata = { title: "Timeline | Metsys" };

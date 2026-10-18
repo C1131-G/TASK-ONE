@@ -5,8 +5,10 @@ import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { bugMetadata } from "@/features/bugs/bug-metadata";
-import { BugDetail } from "@/features/bugs/components/bug-detail";
-import { BugDetailSkeleton } from "@/features/bugs/components/bug-detail-skeleton";
+import {
+  BugDetail,
+  BugDetailSkeleton,
+} from "@/features/bugs/components/bug-detail";
 
 export const generateMetadata = async ({
   params,

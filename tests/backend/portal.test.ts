@@ -18,10 +18,9 @@ import {
 } from "./support/action-harness";
 
 const portal = await import("../../features/portal/portal-actions");
-const portalUploads =
-  await import("../../features/portal/portal-upload-actions");
+const portalUploads = await import("../../features/portal/portal-actions");
 const portalNotifications =
-  await import("../../features/portal/portal-notification-actions");
+  await import("../../features/portal/portal-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
 const comments = await import("../../features/tasks/actions/task-comments");
 

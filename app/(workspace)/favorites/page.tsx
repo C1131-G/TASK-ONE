@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { FavoriteWork } from "@/features/discovery/components/favorite-work";
-import { FavoriteWorkSkeleton } from "@/features/discovery/components/favorites-skeleton";
+import {
+  FavoriteWork,
+  FavoriteWorkSkeleton,
+} from "@/features/discovery/components/favorite-work";
 
 export const metadata: Metadata = { title: "Favorites | Metsys" };
 

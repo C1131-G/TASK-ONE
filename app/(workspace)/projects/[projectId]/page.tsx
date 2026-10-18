@@ -3,8 +3,10 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { ProjectDetail } from "@/features/projects/components/project-detail";
-import { ProjectDetailSkeleton } from "@/features/projects/components/project-detail-skeleton";
+import {
+  ProjectDetail,
+  ProjectDetailSkeleton,
+} from "@/features/projects/components/project-detail";
 import { parseProjectDetailQuery } from "@/features/projects/project-detail-params";
 import { projectMetadata } from "@/features/projects/project-metadata";
 import { parseTaskIdParam } from "@/features/tasks/task-param";

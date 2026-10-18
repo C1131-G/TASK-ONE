@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   closeClientBugNotABugAction,
   requestClientInfoAction,
-} from "@/features/bugs/bugs-client-actions";
+} from "@/features/bugs/bugs-actions";
 
 interface DialogConfig {
   readonly action: (input: {

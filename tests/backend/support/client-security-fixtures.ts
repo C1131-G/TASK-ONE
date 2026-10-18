@@ -16,9 +16,9 @@ import {
 
 export const portal = await import("../../../features/portal/portal-actions");
 export const portalUploads =
-  await import("../../../features/portal/portal-upload-actions");
+  await import("../../../features/portal/portal-actions");
 export const portalNotifications =
-  await import("../../../features/portal/portal-notification-actions");
+  await import("../../../features/portal/portal-actions");
 export const portalQueries =
   await import("../../../features/portal/portal-queries");
 export const clientQueries =

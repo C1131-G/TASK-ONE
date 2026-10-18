@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { ProjectDirectorySkeleton } from "@/features/projects/components/directory-skeleton";
-import { ProjectDirectory } from "@/features/projects/components/project-directory";
+import {
+  ProjectDirectorySkeleton,
+  ProjectDirectory,
+} from "@/features/projects/components/project-directory";
 import { parseProjectFilters } from "@/features/projects/project-filters";
 
 export const metadata: Metadata = { title: "Projects | Metsys" };

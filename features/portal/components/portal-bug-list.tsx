@@ -3,6 +3,12 @@
 import { Bug } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
+import {
+  SKELETON_KEYS,
+  SkeletonBone,
+  SkeletonToolbar,
+} from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalBugFilters } from "@/features/portal/components/portal-bug-filters";
 import { PortalStatusChip } from "@/features/portal/components/portal-status-chip";
 import { PortalTime } from "@/features/portal/components/portal-time";
@@ -124,4 +130,31 @@ const PortalBugList = async ({
   );
 };
 
-export { PortalBugList };
+const PortalListSkeleton = ({ label }: { readonly label: string }) => (
+  <SkelterSurface label={label}>
+    <div className="ph">
+      <SkeletonBone shape="title" />
+      <SkeletonBone shape="control" />
+    </div>
+    <SkeletonToolbar count={3} />
+    <ul className="portal-bug-list">
+      {SKELETON_KEYS.slice(0, 4).map((key) => (
+        <li key={key}>
+          <div className="portal-bug-card">
+            <div className="portal-bug-top">
+              <SkeletonBone shape="short" />
+              <SkeletonBone shape="short" />
+            </div>
+            <SkeletonBone shape="title" />
+            <div className="portal-bug-meta">
+              <SkeletonBone />
+              <SkeletonBone shape="short" />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </SkelterSurface>
+);
+
+export { PortalBugList, PortalListSkeleton };

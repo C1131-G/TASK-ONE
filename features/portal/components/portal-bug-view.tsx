@@ -6,12 +6,17 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import {
+  SKELETON_KEYS,
+  SkeletonBone,
+  SkeletonRows,
+} from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { clientStatusText } from "@/features/portal/client-status";
 import { PortalAttachments } from "@/features/portal/components/portal-attachments";
 import { PortalBugManage } from "@/features/portal/components/portal-bug-manage";
 import { PortalComments } from "@/features/portal/components/portal-comments";
 import { PortalLifecycleBanner } from "@/features/portal/components/portal-lifecycle";
-import { PortalDetailSkeleton } from "@/features/portal/components/portal-skeletons";
 import { PortalStatusChip } from "@/features/portal/components/portal-status-chip";
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
@@ -289,6 +294,35 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
   );
 };
 
-const PortalBugViewSkeleton = () => <PortalDetailSkeleton />;
+const PortalBugViewSkeleton = () => (
+  <SkelterSurface label="Loading bug">
+    <div className="portal-detail">
+      <div className="portal-back">
+        <SkeletonBone shape="short" />
+      </div>
+      <div className="portal-bug-head skeleton-copy">
+        <SkeletonBone shape="short" />
+        <SkeletonBone shape="title" />
+        <SkeletonBone />
+      </div>
+      <div className="portal-detail-grid">
+        <div className="portal-detail-main">
+          {SKELETON_KEYS.slice(0, 3).map((key) => (
+            <div className="panel portal-panel" key={key}>
+              <SkeletonBone shape="title" />
+              <SkeletonRows rows={3} />
+            </div>
+          ))}
+        </div>
+        <div className="portal-detail-side">
+          <div className="panel portal-panel">
+            <SkeletonBone shape="title" />
+            <SkeletonRows rows={4} />
+          </div>
+        </div>
+      </div>
+    </div>
+  </SkelterSurface>
+);
 
 export { PortalBugView, PortalBugViewSkeleton };

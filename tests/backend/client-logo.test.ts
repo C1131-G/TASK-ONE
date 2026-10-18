@@ -15,7 +15,7 @@ import {
 } from "./support/action-harness";
 import type { Persona } from "./support/action-harness";
 
-const logoActions = await import("../../features/clients/client-logo-actions");
+const logoActions = await import("../../features/clients/clients-actions");
 const clientQueries = await import("../../features/clients/clients-queries");
 const { getPortalCompany } =
   await import("../../features/portal/portal-company");

@@ -19,11 +19,13 @@ export const portalQueries =
   await import("../../../features/portal/portal-queries");
 export const bugActions = await import("../../../features/bugs/bugs-actions");
 export const bugClientActions =
-  await import("../../../features/bugs/bugs-client-actions");
+  await import("../../../features/bugs/bugs-actions");
 export const comments =
   await import("../../../features/tasks/actions/task-comments");
-export const slaActions = await import("../../../features/company/sla-actions");
-export const slaQueries = await import("../../../features/company/sla-queries");
+export const slaActions =
+  await import("../../../features/company/company-actions");
+export const slaQueries =
+  await import("../../../features/company/company-queries");
 export const clientQueries =
   await import("../../../features/clients/clients-queries");
 

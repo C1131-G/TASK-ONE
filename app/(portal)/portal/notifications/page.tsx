@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { PortalNotifications } from "@/features/portal/components/portal-notifications";
-import { PortalNotificationsSkeleton } from "@/features/portal/components/portal-skeletons";
+import {
+  PortalNotifications,
+  PortalNotificationsSkeleton,
+} from "@/features/portal/components/portal-notifications";
 
 export const metadata: Metadata = { title: "Notifications | Metsys" };
 

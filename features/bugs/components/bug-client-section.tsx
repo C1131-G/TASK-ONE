@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { reassignClientBugAction } from "@/features/bugs/bugs-client-actions";
+import { reassignClientBugAction } from "@/features/bugs/bugs-actions";
 import {
   AskClientDialog,
   CloseNotABugDialog,

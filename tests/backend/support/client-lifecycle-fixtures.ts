@@ -16,7 +16,7 @@ export const portalQueries =
   await import("../../../features/portal/portal-queries");
 export const bugActions = await import("../../../features/bugs/bugs-actions");
 export const bugClientActions =
-  await import("../../../features/bugs/bugs-client-actions");
+  await import("../../../features/bugs/bugs-actions");
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 

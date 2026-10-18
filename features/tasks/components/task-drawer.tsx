@@ -8,8 +8,8 @@ import type { ReactNode } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { useHydrated } from "@/components/workspace/use-hydrated";
+import { TaskDetailsFormSkeleton } from "@/features/tasks/components/task-details-form";
 import { TaskDetailsPanel } from "@/features/tasks/components/task-details-panel";
-import { TaskDetailsFormSkeleton } from "@/features/tasks/components/task-details-skeleton";
 import { readTaskBundle } from "@/features/tasks/task-details-panel-data";
 import type { TaskBundle } from "@/features/tasks/task-details-panel-data";
 

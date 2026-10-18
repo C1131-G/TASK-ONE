@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { MemberDetail } from "@/features/people/components/member-detail";
-import { MemberDetailSkeleton } from "@/features/people/components/member-detail-skeleton";
+import {
+  MemberDetail,
+  MemberDetailSkeleton,
+} from "@/features/people/components/member-detail";
 import { memberMetadata } from "@/features/people/member-metadata";
 import { parseMemberTab } from "@/features/people/member-tab";
 

@@ -5,8 +5,10 @@ import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { clientCompanyMetadata } from "@/features/clients/client-company-metadata";
-import { ClientCompanyDetailView } from "@/features/clients/components/client-company-detail";
-import { ClientCompanyDetailSkeleton } from "@/features/clients/components/client-detail-skeleton";
+import {
+  ClientCompanyDetailView,
+  ClientCompanyDetailSkeleton,
+} from "@/features/clients/components/client-company-detail";
 
 export const generateMetadata = async ({
   params,

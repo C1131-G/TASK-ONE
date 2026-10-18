@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { PortalReport } from "@/features/portal/components/portal-report";
-import { PortalFormSkeleton } from "@/features/portal/components/portal-skeletons";
+import {
+  PortalReport,
+  PortalFormSkeleton,
+} from "@/features/portal/components/portal-report";
 
 export const metadata: Metadata = {
   description: "Report a bug on one of your projects.",

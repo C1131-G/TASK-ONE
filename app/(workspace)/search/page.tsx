@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
-import { SearchPanel } from "@/features/discovery/components/search-panel";
-import { SearchPanelSkeleton } from "@/features/discovery/components/search-skeleton";
+import {
+  SearchPanel,
+  SearchPanelSkeleton,
+} from "@/features/discovery/components/search-panel";
 import { parseSearchQuery } from "@/features/discovery/search-query";
 
 export const metadata: Metadata = { title: "Search | Metsys" };

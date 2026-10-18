@@ -1,5 +1,7 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
+import { SkeletonRows } from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalChangePassword } from "@/features/portal/components/portal-change-password";
 import { PortalPushControl } from "@/features/portal/components/portal-push-control";
 import { PortalSignOut } from "@/features/portal/components/portal-sign-out";
@@ -77,4 +79,27 @@ const PortalAccount = async () => {
   );
 };
 
-export { PortalAccount };
+const PortalAccountSkeleton = () => (
+  <>
+    <div className="ph">
+      <div>
+        <h1>Account</h1>
+        <p>Your details, password and notification settings.</p>
+      </div>
+    </div>
+    <SkelterSurface label="Loading account">
+      <div className="portal-account">
+        {["Profile", "Change password", "Push notifications", "Sign out"].map(
+          (title) => (
+            <div className="panel portal-panel" key={title}>
+              <h2 className="sec">{title}</h2>
+              <SkeletonRows rows={title === "Change password" ? 3 : 1} />
+            </div>
+          )
+        )}
+      </div>
+    </SkelterSurface>
+  </>
+);
+
+export { PortalAccount, PortalAccountSkeleton };
