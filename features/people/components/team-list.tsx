@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
+import {
+  SKELETON_KEYS,
+  SkeletonBone,
+} from "@/components/workspace/skeleton-shapes";
+import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { TeamCreateForm } from "@/features/people/components/people-admin-forms";
 import { TeamAdminControls } from "@/features/people/components/team-admin-controls";
 import { listTeams } from "@/features/people/people-queries";
@@ -62,8 +66,28 @@ const TeamList = async () => {
   );
 };
 
+const TEAM_CARDS = SKELETON_KEYS.slice(0, 6);
+
+// Mirrors the team card: dot, name and member count, then the description.
 const TeamListSkeleton = () => (
-  <PanelSkeleton label="Loading teams…" rows={4} />
+  <SkelterSurface label="Loading teams…">
+    <div className="pgrid">
+      {TEAM_CARDS.map((key) => (
+        <article className="pcard" key={key}>
+          <div className="row">
+            <SkeletonBone shape="avatar" />
+            <div className="team-card-link grow">
+              <SkeletonBone />
+              <SkeletonBone shape="short" />
+            </div>
+          </div>
+          <p className="desc">
+            <SkeletonBone />
+          </p>
+        </article>
+      ))}
+    </div>
+  </SkelterSurface>
 );
 
 export { TeamList, TeamListSkeleton };

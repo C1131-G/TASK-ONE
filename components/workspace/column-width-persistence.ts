@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import type { TaskTableColumnId } from "@/features/tasks/task-table-columns";
 import { saveTaskTableColumnWidthsAction } from "@/features/user/user-actions";
-
-import type { TaskTableColumnId } from "../../features/tasks/task-table-columns";
 
 const SAVE_DELAY_MS = 600;
 
@@ -16,12 +15,20 @@ export const usePersistColumnWidths = (
   const lastSaved = useRef<string | null>(null);
   const latestWidths = useRef(columnWidths);
   const saving = useRef(false);
+  const mounted = useRef(false);
   const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     latestWidths.current = columnWidths;
   }, [columnWidths]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     const serialized = JSON.stringify(columnWidths);
@@ -33,11 +40,13 @@ export const usePersistColumnWidths = (
       return;
     }
 
+    let timer: number | null = null;
     const persistLatest = async (): Promise<void> => {
       if (saving.current) {
         return;
       }
       saving.current = true;
+      let saved = false;
       const widths = latestWidths.current;
       const currentSerialized = JSON.stringify(widths);
       try {
@@ -45,30 +54,38 @@ export const usePersistColumnWidths = (
           columnWidths: widths,
           idempotencyKey: crypto.randomUUID(),
         });
-        if (
-          !result.ok &&
-          JSON.stringify(latestWidths.current) === currentSerialized
-        ) {
-          setError("Column widths could not be saved. Retry to save them.");
-        } else if (result.ok) {
+        if (result.ok) {
           lastSaved.current = currentSerialized;
-          setError(null);
+          saved = true;
+          if (mounted.current) {
+            setError(null);
+          }
+        } else if (mounted.current) {
+          setError("Column widths could not be saved. Retry to save them.");
         }
       } catch {
-        if (JSON.stringify(latestWidths.current) === currentSerialized) {
+        if (mounted.current) {
           setError("Column widths could not be saved. Retry to save them.");
         }
       }
       saving.current = false;
-      if (JSON.stringify(latestWidths.current) !== lastSaved.current) {
-        await persistLatest();
+      if (
+        saved &&
+        mounted.current &&
+        JSON.stringify(latestWidths.current) !== lastSaved.current
+      ) {
+        timer = window.setTimeout(persistLatest, SAVE_DELAY_MS);
       }
     };
 
-    const timer = window.setTimeout(async () => {
-      await persistLatest();
+    timer = window.setTimeout(() => {
+      void persistLatest();
     }, SAVE_DELAY_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      if (timer !== null) {
+        window.clearTimeout(timer);
+      }
+    };
     // Retry deliberately replays persistence without changing the store value.
     // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [columnWidths, retryCount]);

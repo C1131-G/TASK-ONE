@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   InboxFeed,
   InboxFeedSkeleton,
@@ -17,9 +18,11 @@ const InboxPage = () => (
         <h1>Inbox</h1>
       </div>
     </div>
-    <Suspense fallback={<InboxFeedSkeleton />}>
-      <InboxFeed />
-    </Suspense>
+    <SectionErrorBoundary title="inbox could not be loaded">
+      <Suspense fallback={<InboxFeedSkeleton />}>
+        <InboxFeed />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

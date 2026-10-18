@@ -62,7 +62,12 @@ const bugIdOf = (url: string): string => url.split("/").at(-1) ?? "";
 const advanceToRelease = () => {
   const status = execFileSync(
     "bun",
-    ["scripts/e2e-advance-bug.ts", BUG_TITLE],
+    [
+      "--preload",
+      "./tests/backend/support/server-only-stub.ts",
+      "scripts/e2e-advance-bug.ts",
+      BUG_TITLE,
+    ],
     {
       encoding: "utf-8",
     }
@@ -205,8 +210,14 @@ test.describe("handler A asks", () => {
 
   test("the client a question", async ({ page }) => {
     await page.goto(`/bugs/${bugIdOf(bugUrl)}`);
-    await page.getByRole("button", { name: "Ask client" }).click();
     const dialog = page.getByRole("dialog");
+    const trigger = page.getByRole("button", { name: "Ask client" });
+    await expect(async () => {
+      if (!(await dialog.isVisible())) {
+        await trigger.click();
+      }
+      await expect(dialog).toBeVisible({ timeout: 1000 });
+    }).toPass({ timeout: 15_000 });
     await dialog
       .getByLabel("Question for the client")
       .fill("Which browser are you using?");

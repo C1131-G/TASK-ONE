@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { pickClientBugAction } from "@/features/bugs/bugs-actions";
+import { pickClientBugAction } from "@/features/bugs/bugs-client-actions";
 
 type PickSeverity = "blocker" | "critical" | "major" | "minor" | "trivial";
 type PickPriority = "urgent" | "high" | "medium" | "low" | "none";

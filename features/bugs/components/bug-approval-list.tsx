@@ -26,7 +26,7 @@ const BugApprovalList = async () => {
 };
 
 const BugApprovalListSkeleton = () => (
-  <PanelSkeleton label="Loading approvals…" rows={4} />
+  <PanelSkeleton variant="bugs" label="Loading approvals…" rows={4} />
 );
 
 export { BugApprovalList, BugApprovalListSkeleton };

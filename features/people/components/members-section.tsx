@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { MembersDirectory } from "@/features/people/components/members-directory";
 import { EmployeeCreateForm } from "@/features/people/components/people-admin-forms";
 import type { MembersSectionName } from "@/features/people/members-section-param";
@@ -46,17 +45,4 @@ const MembersSection = async ({
   );
 };
 
-// The header carries the member count, so the skeleton repeats its static title.
-const MembersSectionSkeleton = () => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Members</h1>
-        <p className="muted">Loading people…</p>
-      </div>
-    </div>
-    <PanelSkeleton label="Loading members…" rows={6} />
-  </>
-);
-
-export { MembersSection, MembersSectionSkeleton };
+export { MembersSection };

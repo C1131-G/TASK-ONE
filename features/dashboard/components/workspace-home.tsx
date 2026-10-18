@@ -18,7 +18,7 @@ import { listAllEmployees } from "@/features/people/people-queries";
 import { ProjectCreateForm } from "@/features/projects/components/project-create-form";
 import { listProjects } from "@/features/projects/projects-queries";
 import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
-import { listProjectTasks } from "@/features/tasks/tasks-queries";
+import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const greetingAt = (hour: number): string => {
@@ -100,25 +100,35 @@ const WorkspaceHome = async ({
   const activeProjects = projectResult.data.filter(
     (project) => project.status !== "complete"
   );
-  const projectTasks = await Promise.all(
-    activeProjects.map(async (project) => ({
-      project,
-      result: await listProjectTasks({
-        limit: 200,
-        offset: 0,
-        projectId: project.id,
-      }),
+  const [projectTasks, activityResults] = await Promise.all([
+    Promise.all(
+      activeProjects.map(async (project) => ({
+        project,
+        tasks: await listAllProjectTasks(project.id),
+      }))
+    ),
+    Promise.all(
+      activeProjects.map((project) =>
+        listActivity({ limit: 7, projectId: project.id })
+      )
+    ),
+  ]);
+  if (projectTasks.some(({ tasks }) => tasks === undefined)) {
+    return (
+      <div className="page">
+        <section className="panel panel-b" role="alert">
+          Workspace task totals are incomplete. Refresh to retry.
+        </section>
+      </div>
+    );
+  }
+  const allTasks = projectTasks.flatMap(({ project, tasks }) =>
+    (tasks ?? []).map((task) => ({
+      ...task,
+      projectColor: project.color,
+      projectKey: project.key,
+      projectName: project.name,
     }))
-  );
-  const allTasks = projectTasks.flatMap(({ project, result }) =>
-    result.ok
-      ? result.data.map((task) => ({
-          ...task,
-          projectColor: project.color,
-          projectKey: project.key,
-          projectName: project.name,
-        }))
-      : []
   );
   const myTasks = allTasks.filter((task) =>
     task.assigneeIds.includes(userId ?? "")
@@ -179,11 +189,15 @@ const WorkspaceHome = async ({
       ),
     },
   ];
-  const activityResults = await Promise.all(
-    activeProjects
-      .slice(0, 10)
-      .map((project) => listActivity({ limit: 7, projectId: project.id }))
-  );
+  if (activityResults.some((result) => !result.ok)) {
+    return (
+      <div className="page">
+        <section className="panel panel-b" role="alert">
+          Workspace activity is incomplete. Refresh to retry.
+        </section>
+      </div>
+    );
+  }
   const activities = activityResults
     .flatMap((result) => (result.ok ? result.data : []))
     .toSorted((left, right) => right.createdAt.localeCompare(left.createdAt))

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import {
@@ -211,17 +210,4 @@ const ProjectDirectory = async ({
   );
 };
 
-// The header shows live counts, so the skeleton repeats its static title.
-const ProjectDirectorySkeleton = () => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Projects</h1>
-        <p className="muted">Loading projects…</p>
-      </div>
-    </div>
-    <PanelSkeleton label="Loading projects…" rows={6} />
-  </>
-);
-
-export { ProjectDirectory, ProjectDirectorySkeleton };
+export { ProjectDirectory };

@@ -2,16 +2,16 @@
 
 import { io } from "next/cache";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { WorkspaceCalendar } from "@/components/workspace/workspace-calendar";
 import { calendarPeriod } from "@/features/calendar/calendar-params";
 import type { CalendarMode } from "@/features/calendar/calendar-params";
 import {
   listCalendarEvents,
-  listTaskCalendar,
+  listAllTaskCalendar,
 } from "@/features/calendar/calendar-queries";
 import { CalendarEventForm } from "@/features/calendar/components/calendar-event-form";
 import { CalendarEventManager } from "@/features/calendar/components/calendar-event-manager";
+import { CalendarGridSkeleton } from "@/features/calendar/components/calendar-skeleton";
 import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -26,7 +26,7 @@ const CalendarView = async ({
   await io();
   const { label: monthLabel, range } = calendarPeriod(viewMode, monthOffset);
   const [tasks, events, session, projects, employeeResult] = await Promise.all([
-    listTaskCalendar({
+    listAllTaskCalendar({
       from: range.from,
       groupBy: "none",
       limit: 200,
@@ -98,7 +98,7 @@ const CalendarViewSkeleton = () => (
         <p>Deadlines and events across every project.</p>
       </div>
     </div>
-    <PanelSkeleton label="Loading calendar…" rows={8} />
+    <CalendarGridSkeleton />
   </>
 );
 

@@ -2,7 +2,6 @@
 
 import { notFound } from "next/navigation";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { TeamOverview } from "@/features/people/components/team-overview";
 import type { TeamTask } from "@/features/people/components/team-overview";
 import {
@@ -82,8 +81,4 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
   );
 };
 
-const TeamDetailSkeleton = () => (
-  <PanelSkeleton label="Loading team…" rows={6} title="Team" />
-);
-
-export { TeamDetail, TeamDetailSkeleton };
+export { TeamDetail };

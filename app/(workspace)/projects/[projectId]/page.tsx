@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
-import {
-  ProjectDetail,
-  ProjectDetailSkeleton,
-} from "@/features/projects/components/project-detail";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { ProjectDetail } from "@/features/projects/components/project-detail";
+import { ProjectDetailSkeleton } from "@/features/projects/components/project-detail-skeleton";
 import { parseProjectDetailQuery } from "@/features/projects/project-detail-params";
 import { projectMetadata } from "@/features/projects/project-metadata";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
@@ -27,19 +26,23 @@ const ProjectPage = ({
   searchParams,
 }: PageProps<"/projects/[projectId]">) => (
   <>
-    <Suspense fallback={null}>
-      <DynamicMetadataMarker />
-    </Suspense>
-    <Suspense fallback={<ProjectDetailSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {Promise.all([params, searchParams]).then(([{ projectId }, query]) => (
-        <ProjectDetail
-          initialTaskId={parseTaskIdParam(query["task"])}
-          projectId={projectId}
-          query={parseProjectDetailQuery(query)}
-        />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="Project navigation could not be prepared">
+      <Suspense fallback={null}>
+        <DynamicMetadataMarker />
+      </Suspense>
+    </SectionErrorBoundary>
+    <SectionErrorBoundary title="Project details could not be loaded">
+      <Suspense fallback={<ProjectDetailSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {Promise.all([params, searchParams]).then(([{ projectId }, query]) => (
+          <ProjectDetail
+            initialTaskId={parseTaskIdParam(query["task"])}
+            projectId={projectId}
+            query={parseProjectDetailQuery(query)}
+          />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </>
 );
 

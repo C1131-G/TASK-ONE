@@ -3,12 +3,15 @@
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { clientStatusText } from "@/features/portal/client-status";
 import { PortalAttachments } from "@/features/portal/components/portal-attachments";
 import { PortalBugManage } from "@/features/portal/components/portal-bug-manage";
 import { PortalComments } from "@/features/portal/components/portal-comments";
 import { PortalLifecycleBanner } from "@/features/portal/components/portal-lifecycle";
+import { PortalDetailSkeleton } from "@/features/portal/components/portal-skeletons";
 import { PortalStatusChip } from "@/features/portal/components/portal-status-chip";
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
@@ -173,7 +176,20 @@ const PortalBugNotices = ({
         </p>
       ) : null}
       <PortalLifecycleBanner bug={bug} isPreview={isPreview} />
-      {awaitingResponse ? <PortalResponseNotice bug={bug} /> : null}
+      {awaitingResponse ? (
+        <SectionErrorBoundary title="Response-time guidance is unavailable">
+          <Suspense
+            fallback={
+              <span
+                aria-hidden="true"
+                className="portal-notice portal-response-note portal-response-pending"
+              />
+            }
+          >
+            <PortalResponseNotice bug={bug} />
+          </Suspense>
+        </SectionErrorBoundary>
+      ) : null}
     </>
   );
 };
@@ -273,13 +289,6 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
   );
 };
 
-const PortalBugViewSkeleton = () => (
-  <div aria-busy="true" className="portal-detail">
-    <output className="sr-only">Loading bug</output>
-    <span aria-hidden="true" className="sk portal-sk-title" />
-    <span aria-hidden="true" className="sk portal-sk-block" />
-    <span aria-hidden="true" className="sk portal-sk-block" />
-  </div>
-);
+const PortalBugViewSkeleton = () => <PortalDetailSkeleton />;
 
 export { PortalBugView, PortalBugViewSkeleton };

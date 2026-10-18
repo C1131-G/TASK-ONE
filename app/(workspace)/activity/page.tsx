@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   ActivityFeed,
   ActivityFeedSkeleton,
@@ -18,9 +19,11 @@ const ActivityPage = () => (
         <p>Everything that&apos;s changed across the workspace.</p>
       </div>
     </div>
-    <Suspense fallback={<ActivityFeedSkeleton />}>
-      <ActivityFeed />
-    </Suspense>
+    <SectionErrorBoundary title="activity could not be loaded">
+      <Suspense fallback={<ActivityFeedSkeleton />}>
+        <ActivityFeed />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

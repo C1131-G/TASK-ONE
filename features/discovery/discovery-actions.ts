@@ -121,9 +121,6 @@ export async function searchWorkspaceAction(input: unknown) {
           user.id,
           validated.query
         );
-        if (validated.query.trim()) {
-          yield* discovery.addRecentSearch(user.id, validated.query);
-        }
         return results;
       }).pipe(
         Effect.provide(AuthSessionLive),
@@ -133,4 +130,35 @@ export async function searchWorkspaceAction(input: unknown) {
     WorkspaceSearchResultsSchema
   );
   return result;
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function recordRecentSearchAction(input: unknown) {
+  return await runServerAction(
+    input,
+    Schema.Struct({
+      query: Schema.String.check(
+        Schema.makeFilter((query) =>
+          query.length <= 120
+            ? undefined
+            : "Search text is limited to 120 characters."
+        )
+      ),
+    }),
+    (validated) =>
+      Effect.gen(function* recordRecentSearch() {
+        const requestHeaders = yield* requestHeadersOrFail;
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        if (validated.query.trim()) {
+          const discovery = yield* DiscoveryManagement;
+          yield* discovery.addRecentSearch(user.id, validated.query);
+        }
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(DiscoveryManagementLive)
+      ),
+    undefined,
+    Schema.Void
+  );
 }

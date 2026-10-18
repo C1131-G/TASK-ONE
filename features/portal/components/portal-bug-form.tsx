@@ -8,9 +8,6 @@ import type { FormEvent } from "react";
 
 import {
   BehaviorFields,
-  EnvironmentFields,
-  ImpactField,
-  PageUrlField,
   ProjectField,
   StepsField,
   SummaryFields,
@@ -18,16 +15,19 @@ import {
 import {
   FIELD_ORDER,
   LIMITS,
-  emptyValues,
   toPayload,
   validate,
-  valuesFromBug,
 } from "@/features/portal/components/portal-bug-form-model";
 import type {
   Errors,
   FieldKey,
   Values,
 } from "@/features/portal/components/portal-bug-form-model";
+import {
+  EnvironmentFields,
+  ImpactField,
+  PageUrlField,
+} from "@/features/portal/components/portal-environment-fields";
 import { PortalFilePicker } from "@/features/portal/components/portal-file-picker";
 import {
   editClientBugAction,
@@ -41,60 +41,14 @@ import {
 import { recordFailedUploads } from "@/features/portal/portal-failed-uploads";
 import { uploadPortalFiles } from "@/features/portal/portal-upload";
 import { PORTAL_MAX_FILES_PER_BUG } from "@/features/portal/portal-upload-rules";
-import type {
-  PortalBugDetail,
-  PortalProject,
-  PortalResponseTimes,
-} from "@/src/server/portal/portal-contracts";
 
-type Mode =
-  | {
-      readonly kind: "create";
-      readonly projects: readonly PortalProject[];
-      // A closed bug being reported again; its fields prefill the form.
-      readonly recurrenceOf?: PortalBugDetail;
-      readonly responseTimes?: PortalResponseTimes | null;
-    }
-  | {
-      readonly kind: "edit";
-      readonly bug: PortalBugDetail;
-      readonly onCancel: () => void;
-      readonly onDone: () => void;
-    };
-
-const unsubscribe = () => {
-  // The browser's environment does not change while the form is open.
-};
-const noSubscription = () => unsubscribe;
-
-const initialValues = (mode: Mode): Values => {
-  if (mode.kind === "edit") {
-    return valuesFromBug(mode.bug);
-  }
-  const { recurrenceOf } = mode;
-  if (recurrenceOf) {
-    // Environment is left to the current browser; screenshots start empty.
-    return {
-      ...valuesFromBug(recurrenceOf),
-      browser: null,
-      device: null,
-      os: null,
-    };
-  }
-  return emptyValues(
-    mode.projects.length === 1 ? (mode.projects[0]?.id ?? "") : ""
-  );
-};
-
-const submitLabel = (mode: Mode, pending: boolean) => {
-  if (mode.kind === "edit") {
-    return pending ? "Saving…" : "Save changes";
-  }
-  return pending ? "Submitting…" : "Submit bug";
-};
-
-const conflictMessage =
-  "This bug changed while you were editing. Reload the page to see the latest version, then try again.";
+import {
+  conflictMessage,
+  initialValues,
+  noSubscription,
+  submitLabel,
+} from "./portal-bug-form-mode";
+import type { Mode } from "./portal-bug-form-mode";
 
 // The report form and the edit form share every field. Reporting also takes
 // screenshots, uploaded once the bug exists.

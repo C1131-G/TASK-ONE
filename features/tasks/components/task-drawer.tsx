@@ -1,11 +1,16 @@
+/* eslint-disable shadcn/no-unknown-classes -- Loading frame uses workspace CSS token classes. */
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, Suspense, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { useHydrated } from "@/components/workspace/use-hydrated";
 import { TaskDetailsPanel } from "@/features/tasks/components/task-details-panel";
+import { TaskDetailsFormSkeleton } from "@/features/tasks/components/task-details-skeleton";
+import { readTaskBundle } from "@/features/tasks/task-details-panel-data";
 import type { TaskBundle } from "@/features/tasks/task-details-panel-data";
 
 interface DrawerTask {
@@ -86,6 +91,7 @@ export const TaskDrawerProvider = ({
   // Used once: after the deep-linked task closes, or another task opens, the
   // panel reads fresh data itself. Held in state so a server refresh's new
   // promise does not replace it.
+  const [bundleTaskId, setBundleTaskId] = useState(initialTaskId);
   const [initialBundlePromise, setInitialBundlePromise] = useState(
     initialTaskBundlePromise
   );
@@ -97,11 +103,18 @@ export const TaskDrawerProvider = ({
   const value = useMemo<TaskDrawerValue>(
     () => ({
       openTask: (taskId) => {
-        setInitialBundlePromise(null);
+        const task = tasks.find((item) => item.id === taskId);
+        if (!task) {
+          return;
+        }
+        setBundleTaskId(task.id);
+        setInitialBundlePromise(
+          readTaskBundle(task.projectId, task.id, task.bugId)
+        );
         writeTaskParam(taskId);
       },
     }),
-    [setInitialBundlePromise]
+    [setBundleTaskId, setInitialBundlePromise, tasks]
   );
 
   const editable = selected ? editableTaskIds.includes(selected.id) : false;
@@ -116,36 +129,41 @@ export const TaskDrawerProvider = ({
     <TaskDrawerContext.Provider value={value}>
       {children}
       {hydrated && selected ? (
-        <TaskDetailsPanel
-          currentUserId={currentUserId}
-          editable={editable}
-          employees={employees}
-          initialBundlePromise={
-            selected.id === initialTaskId ? initialBundlePromise : null
-          }
-          isAdmin={isAdmin}
-          key={selected.id}
-          onOpenChange={(next) => {
-            if (!next) {
-              setInitialBundlePromise(null);
-              writeTaskParam(null);
-            }
-          }}
-          onVersionChange={(nextVersion) =>
-            setVersionOverride({
-              sourceVersion: selected.version,
-              taskId: selected.id,
-              value: nextVersion,
-            })
-          }
-          open
-          projectId={selected.projectId}
-          taskId={selected.id}
-          {...(selected.bugId ? { bugId: selected.bugId } : {})}
-          taskType={selected.type ?? "task"}
-          taskTitle={selected.title}
-          version={version}
-        />
+        <SectionErrorBoundary title="Task details could not be loaded">
+          <Suspense fallback={<TaskDetailsFormSkeleton />}>
+            <TaskDetailsPanel
+              currentUserId={currentUserId}
+              editable={editable}
+              employees={employees}
+              initialBundlePromise={
+                selected.id === bundleTaskId ? initialBundlePromise : null
+              }
+              isAdmin={isAdmin}
+              key={selected.id}
+              onOpenChange={(next) => {
+                if (!next) {
+                  setInitialBundlePromise(null);
+                  setBundleTaskId(null);
+                  writeTaskParam(null);
+                }
+              }}
+              onVersionChange={(nextVersion) =>
+                setVersionOverride({
+                  sourceVersion: selected.version,
+                  taskId: selected.id,
+                  value: nextVersion,
+                })
+              }
+              open
+              projectId={selected.projectId}
+              taskId={selected.id}
+              {...(selected.bugId ? { bugId: selected.bugId } : {})}
+              taskType={selected.type ?? "task"}
+              taskTitle={selected.title}
+              version={version}
+            />
+          </Suspense>
+        </SectionErrorBoundary>
       ) : null}
     </TaskDrawerContext.Provider>
   );

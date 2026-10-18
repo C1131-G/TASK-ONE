@@ -15,119 +15,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { reassignClientBugAction } from "@/features/bugs/bugs-actions";
+import { reassignClientBugAction } from "@/features/bugs/bugs-client-actions";
 import {
   AskClientDialog,
   CloseNotABugDialog,
 } from "@/features/bugs/components/bug-client-dialogs";
 import { BugPickForm } from "@/features/bugs/components/bug-pick-form";
 
-import { slaClockText } from "../bug-sla-format";
 import { formatBugDate } from "../bug-workflow-ui-shared";
 import type { BugHistory } from "../bug-workflow-ui-shared";
-
-const CLOSED_STATUSES = new Set(["closed", "duplicate", "withdrawn"]);
-
-const IMPACT_LABELS = {
-  high: "High impact",
-  low: "Low impact",
-  medium: "Medium impact",
-  urgent: "Urgent impact",
-} as const;
-
-const RESOLUTION_TEXT: Record<string, string> = {
-  confirmed: "Client confirmed the fix",
-  no_response: "Auto-closed: no response from the client",
-  not_a_bug: "Closed as not a bug",
-  unconfirmed: "Auto-closed: client did not verify within 7 days",
-};
-
-const DAY_MS = 86_400_000;
-const MAX_CLIENT_REOPENS = 3;
-
-const addDays = (value: string, days: number): string =>
-  formatBugDate(
-    new Date(new Date(value).getTime() + days * DAY_MS).toISOString()
-  );
-
-const waitingText = (
-  status: string,
-  report: NonNullable<BugHistory["clientReport"]>
-): string | null => {
-  if (status === "needs_info" && report.needsInfoSince) {
-    return `Waiting for the client since ${formatBugDate(report.needsInfoSince)} (auto-closes ${addDays(report.needsInfoSince, 14)})`;
-  }
-  if (status === "awaiting_client" && report.awaitingClientSince) {
-    return `Waiting for the client to verify since ${formatBugDate(report.awaitingClientSince)} (auto-closes ${addDays(report.awaitingClientSince, 7)})`;
-  }
-  return null;
-};
-
-const ClientOutcomeFacts = ({
-  report,
-  resolutionText,
-}: {
-  readonly report: NonNullable<BugHistory["clientReport"]>;
-  readonly resolutionText: string | null;
-}) => (
-  <>
-    {report.reopenCount > 0 ? (
-      <div>
-        <dt>Reopened by the client</dt>
-        <dd>
-          {report.reopenCount} of {MAX_CLIENT_REOPENS} times
-          {report.reopenCount >= MAX_CLIENT_REOPENS ? " (now admin-only)" : ""}
-        </dd>
-      </div>
-    ) : null}
-    {report.satisfaction ? (
-      <div>
-        <dt>Client rating</dt>
-        <dd>
-          <span aria-hidden="true">
-            {report.satisfaction === "up" ? "👍" : "👎"}
-          </span>{" "}
-          <span className="sr-only">
-            {report.satisfaction === "up" ? "Thumbs up" : "Thumbs down"}
-          </span>
-          {report.satisfactionComment ? (
-            <span className="muted"> “{report.satisfactionComment}”</span>
-          ) : null}
-        </dd>
-      </div>
-    ) : null}
-    {resolutionText ? (
-      <div>
-        <dt>Closed</dt>
-        <dd>{resolutionText}</dd>
-      </div>
-    ) : null}
-  </>
-);
-
-const SlaFacts = ({
-  sla,
-}: {
-  readonly sla: NonNullable<NonNullable<BugHistory["clientReport"]>["sla"]>;
-}) => (
-  <>
-    {(
-      [
-        ["First response", sla.firstResponse],
-        ["Resolution", sla.resolution],
-      ] as const
-    ).map(([label, clock]) => (
-      <div key={label}>
-        <dt>{label}</dt>
-        <dd>
-          <span className={`bug-sla-text bug-sla-${clock.state}`}>
-            {slaClockText(clock)}
-          </span>
-        </dd>
-      </div>
-    ))}
-  </>
-);
+import { ClientOutcomeFacts, SlaFacts } from "./bug-client-facts";
+import {
+  CLOSED_STATUSES,
+  IMPACT_LABELS,
+  RESOLUTION_TEXT,
+  waitingText,
+} from "./bug-client-labels";
 
 const ReassignForm = ({
   employees,

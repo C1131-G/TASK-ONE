@@ -1,0 +1,184 @@
+/* notifications */
+.portal-app .portal-notif-bar {
+  justify-content: space-between;
+}
+.portal-app .portal-notifs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.portal-app .portal-notif {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 0;
+  border-top: 1px solid var(--divider);
+}
+.portal-app .portal-notif[data-unread] {
+  background: var(--accent-soft);
+}
+.portal-app .portal-notif-main {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+  padding: 10px 14px;
+}
+.portal-app a.portal-notif-main:hover {
+  background: var(--surface-2);
+}
+.portal-app .portal-notif-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.portal-app .portal-notif:not([data-unread]) .portal-notif-text strong {
+  font-weight: 400;
+}
+.portal-app .portal-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.portal-app .portal-notif-snippet {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+.portal-app .portal-account {
+  display: grid;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-app .portal-bug-card {
+    transition: none;
+  }
+}
+
+/* client lifecycle */
+.portal-app .badge[data-attention] {
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.portal-app .portal-action-banner {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.portal-app .portal-action-banner[data-tone="attention"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.portal-app .portal-action-banner > h2 {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+.portal-app .portal-action-banner > p {
+  margin: 0;
+}
+.portal-app .portal-quote {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  white-space: pre-wrap;
+}
+.portal-app .portal-verify {
+  display: grid;
+  gap: 14px;
+}
+.portal-app .portal-verify-reopen {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.portal-app .portal-banner-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  background: var(--amber-soft);
+  font-size: var(--fs);
+}
+.portal-app .portal-rate-set {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.portal-app .portal-rate-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.portal-app .portal-rate-btns .btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.portal-app .portal-rating-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.portal-app .portal-notice {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  background: var(--accent-soft);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+  .portal-app .portal-action-banner {
+    padding: 12px;
+  }
+  .portal-app .portal-action-banner .btn,
+  .portal-app .portal-rate .btn {
+    min-height: 40px;
+  }
+}
+.portal-app .portal-response-note {
+  margin: 8px 0 0;
+  color: var(--muted-foreground, var(--text));
+  font-size: var(--fs);
+}
+.portal-app .portal-notice.portal-response-note {
+  margin: 0 0 14px;
+  color: var(--text);
+}
+.portal-app .portal-response-pending {
+  display: block;
+  min-height: 40px;
+}
+
+/* Admin "View as client" preview: a persistent, unmissable read-only bar. */
+.portal-app .portal-preview-banner {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 2px solid var(--amber);
+  background: var(--amber-soft);
+  color: var(--text);
+  font-size: var(--fs);
+}
+.portal-app .portal-preview-banner p {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

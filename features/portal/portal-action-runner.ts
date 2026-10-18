@@ -2,7 +2,7 @@ import type { Schema } from "effect";
 import { Effect, Layer } from "effect";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
-import type { PortalUser } from "@/src/server/auth/session";
+import type { PortalUser } from "@/src/server/auth/session-types";
 import type { ActionResult, AppError } from "@/src/server/core/action-result";
 import type { Idempotency } from "@/src/server/core/idempotency";
 import { IdempotencyLive } from "@/src/server/core/idempotency";

@@ -1,4 +1,161 @@
 /* shared panel skeleton */
+.workspace-app .skelter-surface {
+  min-width: 0;
+  width: 100%;
+}
+/* Skelter hides its measuring root. The server-rendered bones must still paint. */
+.workspace-app .skelter-surface .skeleton-layout {
+  visibility: visible;
+}
+.workspace-app .skeleton-layout {
+  pointer-events: none;
+  user-select: none;
+}
+.workspace-app .skeleton-bone {
+  color: transparent;
+  flex-shrink: 0;
+  height: 14px;
+  max-width: 100%;
+  width: 100%;
+}
+.workspace-app .skeleton-short {
+  width: 64px;
+  height: 12px;
+}
+.workspace-app .skeleton-title {
+  width: 180px;
+  height: 24px;
+}
+.workspace-app .skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.workspace-app .skeleton-control {
+  width: 136px;
+  height: 32px;
+  border-radius: var(--r-sm);
+}
+.workspace-app .skeleton-block {
+  width: 100%;
+  height: 120px;
+}
+.workspace-app .skeleton-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.workspace-app .skeleton-feed-row {
+  min-height: 60px;
+  gap: 12px;
+  padding: 12px 0;
+}
+.workspace-app .skeleton-feed-row:nth-child(even) .skeleton-text {
+  width: 75%;
+}
+.workspace-app .skeleton-toolbar {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.workspace-app .skeleton-tabs {
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.workspace-app .skeleton-stats {
+  margin-bottom: 16px;
+}
+.workspace-app .skeleton-stats .skeleton-title {
+  width: 48px;
+  height: 28px;
+}
+.workspace-app .skeleton-card .desc {
+  margin-block: 16px;
+}
+.workspace-app .skeleton-card .foot {
+  gap: 16px;
+  margin-top: 16px;
+}
+.workspace-app .skeleton-table-scroll {
+  overflow-x: auto;
+}
+.workspace-app .skeleton-table {
+  width: 100%;
+  min-width: 580px;
+}
+.workspace-app .skeleton-table th,
+.workspace-app .skeleton-table td {
+  padding: 14px 12px;
+}
+.workspace-app .skeleton-table td:first-child {
+  width: 30%;
+}
+.workspace-app .skeleton-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.workspace-app .skeleton-calendar-day {
+  min-height: 110px;
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  padding: 10px;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.workspace-app .skeleton-calendar-day .skeleton-short {
+  width: 20px;
+}
+.workspace-app .skeleton-timeline {
+  overflow: hidden;
+}
+.workspace-app .skeleton-timeline-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 24%) 1fr;
+  align-items: center;
+  min-height: 56px;
+  border-top: 1px solid var(--border);
+}
+.workspace-app .skeleton-timeline-row > .skeleton-bone {
+  margin-left: 16px;
+  width: 70%;
+}
+.workspace-app .skeleton-timeline-track {
+  padding: 10px 16px;
+  border-left: 1px solid var(--border);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(14.285% - 1px),
+    var(--border) 14.285%
+  );
+}
+.workspace-app .skeleton-timeline-track .skeleton-bone {
+  width: 40%;
+}
+.workspace-app
+  .skeleton-timeline-row:nth-child(even)
+  .skeleton-timeline-track
+  .skeleton-bone {
+  margin-left: 30%;
+  width: 55%;
+}
+@media (max-width: 600px) {
+  .workspace-app .skeleton-calendar-day {
+    min-height: 76px;
+    padding: 6px;
+  }
+  .workspace-app .skeleton-toolbar .skeleton-control {
+    width: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-app .skelter-surface *,
+  .workspace-app .sk {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 .workspace-app .skeleton-rows {
   display: flex;
   flex-direction: column;
@@ -11,4 +168,134 @@
   height: 84px;
   margin-bottom: 16px;
   border-radius: var(--r-lg);
+}
+.workspace-app .skeleton-filter-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 180px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.workspace-app .skeleton-filter-select.skeleton-search {
+  min-width: 260px;
+  justify-content: flex-start;
+  color: var(--text-3);
+  font-weight: 400;
+}
+.workspace-app .skeleton-tl-head {
+  width: 100%;
+  padding: 8px 12px;
+}
+.workspace-app .skeleton-tl-grid {
+  width: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 31px,
+    var(--divider) 31px,
+    var(--divider) 32px
+  );
+}
+.workspace-app .skeleton-tl-row {
+  height: 36px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.workspace-app .skeleton-tl-row .skeleton-bone {
+  display: block;
+  height: 24px;
+  width: 96px;
+  margin-left: 64px;
+}
+.workspace-app .skeleton-tl-row:nth-child(3n + 2) .skeleton-bone {
+  margin-left: 160px;
+}
+.workspace-app .skeleton-tl-row:nth-child(3n) .skeleton-bone {
+  margin-left: 288px;
+  width: 128px;
+}
+.workspace-app .skeleton-legend {
+  gap: 12px;
+}
+.workspace-app .skeleton-grid-head,
+.workspace-app .skeleton-grid-row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+}
+.workspace-app .skeleton-grid-head {
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+.workspace-app .skeleton-grid-row {
+  min-height: 58px;
+  border-bottom: 1px solid var(--divider);
+}
+.workspace-app .skeleton-prog {
+  flex: 1;
+}
+.workspace-app .skeleton-prog .skeleton-bone {
+  display: block;
+  width: 100%;
+  height: 6px;
+}
+.workspace-app .project-search.skeleton-filter-select {
+  flex: 1;
+  min-width: 0;
+}
+.workspace-app .skeleton-radio {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.workspace-app .favorite-task-main > .skeleton-text,
+.workspace-app .favorite-task-main > .skeleton-short {
+  display: block;
+}
+.workspace-app .favorite-task-main > .skeleton-text {
+  width: 60%;
+}
+.workspace-app .favorite-task-metadata {
+  display: flex;
+  gap: 8px;
+}
+.workspace-app .kcard .top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.workspace-app .kcard .top .skeleton-text {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.workspace-app .bug-detail-page.skeleton-fill {
+  width: 100%;
+}
+.workspace-app .member-profile-header .skeleton-avatar {
+  width: 72px;
+  height: 72px;
+}
+.workspace-app .skeleton-theme-options {
+  display: grid;
+  gap: 12px;
+}
+.workspace-app .mini .skeleton-text {
+  flex: 1;
+  min-width: 0;
+  width: auto;
 }

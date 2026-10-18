@@ -3,16 +3,19 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { PortalAccount } from "@/features/portal/components/portal-account";
-import { PortalListSkeleton } from "@/features/portal/components/portal-skeletons";
+import { PortalAccountSkeleton } from "@/features/portal/components/portal-skeletons";
 
 export const metadata: Metadata = { title: "Account | Metsys" };
 
 const Page = () => (
   <div className="page portal-narrow">
-    <Suspense fallback={<PortalListSkeleton label="Loading account" />}>
-      <PortalAccount />
-    </Suspense>
+    <SectionErrorBoundary title="account could not be loaded">
+      <Suspense fallback={<PortalAccountSkeleton />}>
+        <PortalAccount />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

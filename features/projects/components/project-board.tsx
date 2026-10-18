@@ -58,6 +58,7 @@ export const ProjectBoard = ({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const draggedTaskId = useRef<string | null>(null);
+  const moveInFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const { search, update: updateSearch } = useProjectViewSearch();
   const { priority: priorityFilter, q: query, sort } = search;
@@ -107,24 +108,33 @@ export const ProjectBoard = ({
     });
 
   const moveTask = (status: Task["status"]) => {
+    if (pending || moveInFlight.current) {
+      return;
+    }
     const task = tasks.find(({ id }) => id === draggedTaskId.current);
     if (!task || task.status === status) {
       draggedTaskId.current = null;
       return;
     }
+    moveInFlight.current = true;
     startTransition(async () => {
-      const result = await changeTaskColumnAction({
-        expectedVersion: task.version,
-        idempotencyKey: crypto.randomUUID(),
-        status,
-        taskId: task.id,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
+      try {
+        const result = await changeTaskColumnAction({
+          expectedVersion: task.version,
+          idempotencyKey: crypto.randomUUID(),
+          status,
+          taskId: task.id,
+        });
+        if (result.ok) {
+          setError(null);
+          router.refresh();
+        } else {
+          setError(result.error.message);
+        }
+      } catch {
+        setError("Task could not be moved. Try again.");
       }
-      setError(null);
-      router.refresh();
+      moveInFlight.current = false;
     });
     draggedTaskId.current = null;
   };

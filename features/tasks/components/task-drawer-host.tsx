@@ -12,7 +12,7 @@ export const TaskDrawerHost = (
     ? props.tasks.find((task) => task.id === props.initialTaskId)
     : undefined;
   const initialTaskBundle = initialTask
-    ? readTaskBundle(initialTask.projectId, initialTask.id)
+    ? readTaskBundle(initialTask.projectId, initialTask.id, initialTask.bugId)
     : null;
   return (
     <TaskDrawerProvider

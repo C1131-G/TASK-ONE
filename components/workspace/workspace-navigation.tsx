@@ -6,6 +6,8 @@ import type { House } from "@phosphor-icons/react";
 import type { Route } from "next";
 import Link from "next/link";
 
+import { NavigationPendingIndicator } from "@/components/workspace/navigation-pending-indicator";
+
 export const WorkspaceLink = ({
   href,
   label,
@@ -29,6 +31,7 @@ export const WorkspaceLink = ({
   >
     <Icon aria-hidden="true" size={16} weight={active ? "fill" : "regular"} />
     <span className="trunc">{label}</span>
+    <NavigationPendingIndicator />
     {unreadCount > 0 ? (
       <>
         <span className="ct dotc">

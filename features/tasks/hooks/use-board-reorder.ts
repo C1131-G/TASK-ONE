@@ -2,7 +2,7 @@
 
 import { useSelector } from "@tanstack/react-store";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useRef, useTransition } from "react";
 
 import { useProjectViewStore } from "@/features/projects/providers/project-view-store-provider";
 import { reorderTasksAction } from "@/features/tasks/tasks-actions";
@@ -28,6 +28,7 @@ export const useBoardReorder = <
 }) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const requestInFlight = useRef(false);
   const projectViewStore = useProjectViewStore();
   const announcement = useSelector(
     projectViewStore,
@@ -39,7 +40,7 @@ export const useBoardReorder = <
     direction: -1 | 1,
     column: { readonly id: string; readonly label: string }
   ) => {
-    if (!canReorder || pending) {
+    if (!canReorder || pending || requestInFlight.current) {
       return;
     }
     const columnTasks = tasks.filter((task) => task.status === column.id);
@@ -49,20 +50,26 @@ export const useBoardReorder = <
     }
     const title =
       columnTasks.find((task) => task.id === taskId)?.title ?? "Task";
+    requestInFlight.current = true;
     startTransition(async () => {
-      const response = await reorderTasksAction({
-        changes: [...result.changes],
-        idempotencyKey: crypto.randomUUID(),
-      });
-      if (!response.ok) {
-        onError(response.error.message);
-        return;
+      try {
+        const response = await reorderTasksAction({
+          changes: [...result.changes],
+          idempotencyKey: crypto.randomUUID(),
+        });
+        if (response.ok) {
+          onError(null);
+          projectViewStore.actions.setAnnouncement(
+            `${title} moved to position ${result.newIndex + 1} of ${columnTasks.length} in ${column.label}`
+          );
+          router.refresh();
+        } else {
+          onError(response.error.message);
+        }
+      } catch {
+        onError("Tasks could not be reordered. Try again.");
       }
-      onError(null);
-      projectViewStore.actions.setAnnouncement(
-        `${title} moved to position ${result.newIndex + 1} of ${columnTasks.length} in ${column.label}`
-      );
-      router.refresh();
+      requestInFlight.current = false;
     });
   };
 

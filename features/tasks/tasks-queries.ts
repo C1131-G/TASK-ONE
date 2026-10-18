@@ -137,34 +137,29 @@ export const listAllProjectTasks = async (
 // Loads every page of a project's tasks in parallel, sized by the known count.
 export const listProjectTaskPages = async (
   projectId: string,
-  taskCount: number
+  _taskCount: number
 ): Promise<Awaited<ReturnType<typeof listProjectTasks>>> => {
-  const pageSize = 200;
-  const pageCount = Math.max(1, Math.ceil(taskCount / pageSize));
-  const results = await Promise.all(
-    Array.from({ length: pageCount }, (_, pageIndex) =>
-      listProjectTasks({
-        limit: pageSize,
-        offset: pageIndex * pageSize,
-        projectId,
-      })
-    )
-  );
-  for (const result of results) {
+  const pageSize = TASK_PAGE_SIZE;
+  const tasks: ProjectTask[] = [];
+  let offset = 0;
+  let firstRequestId = "";
+  while (true) {
+    // eslint-disable-next-line no-await-in-loop -- Every page is required to establish completeness.
+    const result = await listProjectTasks({
+      limit: pageSize,
+      offset,
+      projectId,
+    });
     if (!result.ok) {
       return result;
     }
+    if (offset === 0) {
+      firstRequestId = result.requestId;
+    }
+    tasks.push(...result.data);
+    if (result.data.length < pageSize) {
+      return { data: tasks, ok: true, requestId: firstRequestId };
+    }
+    offset += result.data.length;
   }
-  const [firstResult] = results;
-  if (!firstResult) {
-    throw new Error("Project task pagination returned no page results.");
-  }
-  if (!firstResult.ok) {
-    return firstResult;
-  }
-  return {
-    data: results.flatMap((result) => (result.ok ? result.data : [])),
-    ok: true,
-    requestId: firstResult.requestId,
-  };
 };

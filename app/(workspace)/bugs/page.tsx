@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { parseBugFilters } from "@/features/bugs/bug-filters";
 import {
   BugTracker,
@@ -13,12 +14,14 @@ export const metadata: Metadata = { title: "Bugs | Metsys" };
 
 const BugsPage = ({ searchParams }: PageProps<"/bugs">) => (
   <div className="page flush">
-    <Suspense fallback={<BugTrackerSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {searchParams.then((params) => (
-        <BugTracker filters={parseBugFilters(params)} />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="bugs could not be loaded">
+      <Suspense fallback={<BugTrackerSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {searchParams.then((params) => (
+          <BugTracker filters={parseBugFilters(params)} />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

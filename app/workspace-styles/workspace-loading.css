@@ -18,3 +18,24 @@
 .workspace-app .workspace-loading-nav {
   height: 30px;
 }
+.workspace-app .workspace-loading-title,
+.workspace-app .workspace-loading-action,
+.workspace-app .workspace-loading-tab {
+  display: block;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+.workspace-app .workspace-loading-title {
+  width: 140px;
+  height: 18px;
+}
+.workspace-app .workspace-loading-action {
+  width: var(--h-md);
+  height: var(--h-md);
+  flex-shrink: 0;
+}
+.workspace-app .workspace-loading-tab {
+  flex: 1;
+  height: 28px;
+  margin: 8px;
+}

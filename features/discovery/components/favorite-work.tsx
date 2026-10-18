@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
 import { ProjectGridView } from "@/features/projects/components/project-list-layouts";
@@ -174,15 +173,4 @@ const FavoriteWork = async () => {
   );
 };
 
-const FavoriteWorkSkeleton = () => (
-  <>
-    <PanelSkeleton
-      label="Loading favorite projects…"
-      rows={3}
-      title="Projects"
-    />
-    <PanelSkeleton label="Loading favorite tasks…" rows={4} title="Tasks" />
-  </>
-);
-
-export { FavoriteWork, FavoriteWorkSkeleton };
+export { FavoriteWork };

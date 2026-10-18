@@ -2,7 +2,6 @@
 
 import { notFound } from "next/navigation";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listActivity } from "@/features/activity/activity-queries";
 import { MemberProfile } from "@/features/people/components/member-profile";
 import type { MemberTab } from "@/features/people/member-tab";
@@ -108,11 +107,4 @@ const MemberDetail = async ({
   );
 };
 
-// MemberProfile renders its own page frame, so the skeleton does too.
-const MemberDetailSkeleton = () => (
-  <div className="page member-profile-page">
-    <PanelSkeleton label="Loading member profile…" rows={6} title="Member" />
-  </div>
-);
-
-export { MemberDetail, MemberDetailSkeleton };
+export { MemberDetail };

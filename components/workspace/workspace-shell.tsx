@@ -5,9 +5,11 @@ import { Suspense, ViewTransition } from "react";
 
 import {
   WorkspaceBottomChrome,
+  WorkspaceBottomChromeFallback,
   WorkspaceSidebar,
   WorkspaceSidebarFallback,
   WorkspaceTopbar,
+  WorkspaceTopbarFallback,
 } from "@/components/workspace/workspace-shell-sections";
 import { WorkspaceUndoProvider } from "@/components/workspace/workspace-undo";
 import { PushNotificationsControl } from "@/features/notifications/components/push-notifications-control";
@@ -52,7 +54,7 @@ export const WorkspaceShell = ({
         </nav>
         <main className="main">
           <header className="topbar">
-            <Suspense fallback={<span className="sp" />}>
+            <Suspense fallback={<WorkspaceTopbarFallback />}>
               <WorkspaceTopbar frame={frame} />
             </Suspense>
           </header>
@@ -74,7 +76,7 @@ export const WorkspaceShell = ({
             </ViewTransition>
           </div>
         </main>
-        <Suspense fallback={null}>
+        <Suspense fallback={<WorkspaceBottomChromeFallback />}>
           <WorkspaceBottomChrome frame={frame} />
         </Suspense>
       </div>

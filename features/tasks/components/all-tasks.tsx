@@ -9,7 +9,7 @@ import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { GlobalTaskViewStoreProvider } from "@/features/tasks/providers/global-task-view-store-provider";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { columnWidthsFromPreferences } from "@/features/tasks/task-table-columns";
-import { listProjectTasks } from "@/features/tasks/tasks-queries";
+import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPersonalPreferences } from "@/features/user/user-queries";
 import { getUtcToday } from "@/src/lib/utc-today";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -42,21 +42,24 @@ const AllTasks = async ({
   const taskLists = await Promise.all(
     projects.data.map(async (project) => ({
       project,
-      result: await listProjectTasks({
-        limit: 100,
-        offset: 0,
-        projectId: project.id,
-      }),
+      tasks: await listAllProjectTasks(project.id),
     }))
   );
-  const allTasks = taskLists.flatMap(({ project, result }) =>
-    result.ok
-      ? result.data.map((task) => ({
-          ...task,
-          projectKey: project.key,
-          projectName: project.name,
-        }))
-      : []
+  if (taskLists.some(({ tasks }) => tasks === undefined)) {
+    return (
+      <div className="page">
+        <div className="panel panel-b" role="alert">
+          Some project tasks could not be loaded. Refresh to retry.
+        </div>
+      </div>
+    );
+  }
+  const allTasks = taskLists.flatMap(({ project, tasks }) =>
+    (tasks ?? []).map((task) => ({
+      ...task,
+      projectKey: project.key,
+      projectName: project.name,
+    }))
   );
   const userId = session.kind === "authenticated" ? session.user.id : null;
   const isAdmin =
@@ -112,7 +115,7 @@ const AllTasksSkeleton = () => (
         <p aria-hidden="true">&nbsp;</p>
       </div>
     </div>
-    <PanelSkeleton label="Loading tasks…" rows={6} />
+    <PanelSkeleton variant="tasks" label="Loading tasks…" rows={6} />
   </>
 );
 

@@ -54,28 +54,38 @@ export const GlobalTaskBoard = ({
 }) => {
   const router = useRouter();
   const draggedTaskId = useRef<string | null>(null);
+  const moveInFlight = useRef(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const tasks = taskGroups.flatMap((group) => group.tasks);
   const moveTask = (status: (typeof TASK_STATUSES)[number]["id"]) => {
+    if (pending || moveInFlight.current) {
+      return;
+    }
     const task = tasks.find(({ id }) => id === draggedTaskId.current);
     draggedTaskId.current = null;
     if (!task || task.status === status) {
       return;
     }
+    moveInFlight.current = true;
     startTransition(async () => {
-      const result = await changeTaskColumnAction({
-        expectedVersion: task.version,
-        idempotencyKey: crypto.randomUUID(),
-        status,
-        taskId: task.id,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
+      try {
+        const result = await changeTaskColumnAction({
+          expectedVersion: task.version,
+          idempotencyKey: crypto.randomUUID(),
+          status,
+          taskId: task.id,
+        });
+        if (result.ok) {
+          setError(null);
+          router.refresh();
+        } else {
+          setError(result.error.message);
+        }
+      } catch {
+        setError("Task could not be moved. Try again.");
       }
-      setError(null);
-      router.refresh();
+      moveInFlight.current = false;
     });
   };
 

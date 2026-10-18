@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   TeamList,
   TeamListSkeleton,
@@ -18,9 +19,11 @@ const TeamsPage = () => (
         <p>Organize employees by team.</p>
       </div>
     </div>
-    <Suspense fallback={<TeamListSkeleton />}>
-      <TeamList />
-    </Suspense>
+    <SectionErrorBoundary title="teams could not be loaded">
+      <Suspense fallback={<TeamListSkeleton />}>
+        <TeamList />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

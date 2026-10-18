@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   BugApprovalList,
   BugApprovalListSkeleton,
@@ -22,9 +23,11 @@ const BugApprovalPage = () => (
           </p>
         </div>
       </header>
-      <Suspense fallback={<BugApprovalListSkeleton />}>
-        <BugApprovalList />
-      </Suspense>
+      <SectionErrorBoundary title="bug approvals could not be loaded">
+        <Suspense fallback={<BugApprovalListSkeleton />}>
+          <BugApprovalList />
+        </Suspense>
+      </SectionErrorBoundary>
     </section>
   </div>
 );

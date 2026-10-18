@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  WorkspaceFiles,
-  WorkspaceFilesSkeleton,
-} from "@/features/files/components/workspace-files";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { WorkspaceFilesSkeleton } from "@/features/files/components/files-skeleton";
+import { WorkspaceFiles } from "@/features/files/components/workspace-files";
 
 export const metadata: Metadata = { title: "Files | Metsys" };
 
@@ -18,9 +17,11 @@ const FilesPage = () => (
         <p>Files shared with your projects.</p>
       </div>
     </div>
-    <Suspense fallback={<WorkspaceFilesSkeleton />}>
-      <WorkspaceFiles />
-    </Suspense>
+    <SectionErrorBoundary title="files could not be loaded">
+      <Suspense fallback={<WorkspaceFilesSkeleton />}>
+        <WorkspaceFiles />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

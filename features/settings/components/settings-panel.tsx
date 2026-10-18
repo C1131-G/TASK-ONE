@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getCompanySettings } from "@/features/company/company-queries";
 import { getSlaSettings } from "@/features/company/sla-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
@@ -53,8 +52,10 @@ const SettingsPanel = async ({
       ? employees.data.find(({ id }) => id === user.id)
       : null;
   const isAdmin = user?.role === "admin";
-  const sla = isAdmin ? await getSlaSettings({}) : null;
-  const avatar = user ? await getAvatarDownloadUrl({ userId: user.id }) : null;
+  const [sla, avatar] = await Promise.all([
+    isAdmin ? getSlaSettings({}) : Promise.resolve(null),
+    user ? getAvatarDownloadUrl({ userId: user.id }) : Promise.resolve(null),
+  ]);
   return (
     <SettingsWorkspace
       canManageWorkspace={isAdmin}
@@ -121,8 +122,4 @@ const SettingsPanel = async ({
   );
 };
 
-const SettingsPanelSkeleton = () => (
-  <PanelSkeleton label="Loading settings…" rows={6} />
-);
-
-export { SettingsPanel, SettingsPanelSkeleton };
+export { SettingsPanel };

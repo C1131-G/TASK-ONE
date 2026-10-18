@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { use, useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -60,6 +60,9 @@ export const TaskDetailsPanel = ({
   readonly trigger?: ReactNode;
   readonly version: number;
 }) => {
+  // A deep-link bundle is resolved by the nearest Suspense boundary before
+  // the panel mounts; its rejection is handled by the section boundary.
+  const initialBundle = initialBundlePromise ? use(initialBundlePromise) : null;
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = open ?? localOpen;
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -69,37 +72,22 @@ export const TaskDetailsPanel = ({
     detailsDirtyRef.current = dirty;
   }, []);
   // Only a bug reported by a client company can take public replies.
-  const [clientBug, setClientBug] = useState<{
-    readonly bugId: string;
-    readonly isClient: boolean;
-  } | null>(null);
-  const handleClientReportChange = useCallback(
-    (isClient: boolean) => {
-      if (bugId !== undefined) {
-        setClientBug({ bugId, isClient });
-      }
-    },
-    [bugId]
-  );
-  const allowPublicReplies =
-    taskType === "bug" && bugId !== undefined && clientBug?.bugId === bugId
-      ? clientBug.isClient
-      : false;
   const {
     comments,
+    bugHistory,
     error,
     files,
+    loading,
     refresh,
     setFiles,
     setSubtasks,
     subtasks,
     task,
   } = useTaskBundle({
-    allowPublicReplies,
-    initialBundle: initialBundlePromise,
-    isOpen,
+    initialBundle,
     projectId,
     taskId,
+    ...(taskType === "bug" && bugId ? { bugId } : {}),
   });
   const subtaskActions = useTaskSubtaskActions({
     onVersionChange,
@@ -131,6 +119,9 @@ export const TaskDetailsPanel = ({
 
   const requestOpenChange = (next: boolean) => {
     if (next) {
+      if (!isOpen && !initialBundle) {
+        refresh();
+      }
       setOpen(true);
       return;
     }
@@ -168,14 +159,17 @@ export const TaskDetailsPanel = ({
             {visibleError ? (
               <p className="error" role="alert">
                 {visibleError}
+                <button disabled={loading} onClick={refresh} type="button">
+                  {loading ? "Retrying…" : "Retry"}
+                </button>
               </p>
             ) : null}
             {taskType === "bug" && bugId ? (
               <BugTaskDetail
-                bugId={bugId}
                 employees={employees}
+                history={bugHistory}
                 isAdmin={isAdmin}
-                onClientReportChange={handleClientReportChange}
+                onRefresh={refresh}
                 userId={currentUserId ?? ""}
               />
             ) : (
@@ -199,7 +193,10 @@ export const TaskDetailsPanel = ({
               comments={comments.comments}
               currentUserId={currentUserId}
               employees={employees}
-              allowPublicReplies={allowPublicReplies}
+              allowPublicReplies={
+                taskType === "bug" &&
+                typeof bugHistory?.bug.clientCompanyId === "string"
+              }
               isAdmin={isAdmin}
               onBodyChange={handleCommentBodyChange}
               onReact={handleReact}

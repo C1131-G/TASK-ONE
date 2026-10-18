@@ -85,7 +85,9 @@ const PortalShell = ({ children }: { readonly children: ReactNode }) => (
         </Suspense>
       </div>
     </header>
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={<div aria-hidden="true" className="portal-preview-slot" />}
+    >
       <PortalPreviewBanner />
     </Suspense>
     <main className="portal-main" id="portal-main" tabIndex={-1}>

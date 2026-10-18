@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  SearchPanel,
-  SearchPanelSkeleton,
-} from "@/features/discovery/components/search-panel";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SearchPanel } from "@/features/discovery/components/search-panel";
+import { SearchPanelSkeleton } from "@/features/discovery/components/search-skeleton";
 import { parseSearchQuery } from "@/features/discovery/search-query";
 
 export const metadata: Metadata = { title: "Search | Metsys" };
@@ -19,12 +18,14 @@ const SearchPage = ({ searchParams }: PageProps<"/search">) => (
         <p>Find projects and tasks in Metsys.</p>
       </div>
     </div>
-    <Suspense fallback={<SearchPanelSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {searchParams.then((params) => (
-        <SearchPanel initialQuery={parseSearchQuery(params["q"])} />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="search could not be loaded">
+      <Suspense fallback={<SearchPanelSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {searchParams.then((params) => (
+          <SearchPanel initialQuery={parseSearchQuery(params["q"])} />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

@@ -3,7 +3,6 @@
 import { notFound } from "next/navigation";
 
 import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { ProjectAdminControls } from "@/features/projects/components/project-admin-controls";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
 import { ProjectMemberAvatars } from "@/features/projects/components/project-list-layouts";
@@ -153,10 +152,4 @@ const ProjectDetail = async ({
   );
 };
 
-const ProjectDetailSkeleton = () => (
-  <div className="page flush">
-    <PanelSkeleton label="Loading project…" rows={8} title="Project" />
-  </div>
-);
-
-export { ProjectDetail, ProjectDetailSkeleton };
+export { ProjectDetail };

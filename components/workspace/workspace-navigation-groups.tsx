@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { SheetClose } from "@/components/ui/sheet";
+import { NavigationPendingIndicator } from "@/components/workspace/navigation-pending-indicator";
 import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
 import {
   getNavigationTransitionType,
@@ -106,6 +107,7 @@ export const WorkspaceNavigationGroups = ({
                 size={13}
               />
               <span className="trunc">{project.name}</span>
+              <NavigationPendingIndicator />
             </Link>
           </NavigationEntry>
         ))}

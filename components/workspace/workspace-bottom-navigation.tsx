@@ -14,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { NavigationPendingIndicator } from "@/components/workspace/navigation-pending-indicator";
 import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-menu";
 import {
   getNavigationTransitionType,
@@ -49,6 +50,7 @@ export const WorkspaceBottomNavigation = ({
       >
         <Icon aria-hidden="true" size={19} />
         <span>{label}</span>
+        <NavigationPendingIndicator />
         {label === "Inbox" && unreadInboxCount > 0 ? (
           <span aria-hidden="true" className="bdot" />
         ) : null}
@@ -61,6 +63,7 @@ export const WorkspaceBottomNavigation = ({
     >
       <FolderOpen aria-hidden="true" size={19} />
       <span>Projects</span>
+      <NavigationPendingIndicator />
     </Link>
     <Sheet>
       <SheetTrigger asChild>

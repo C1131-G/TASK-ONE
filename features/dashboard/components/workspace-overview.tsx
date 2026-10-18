@@ -25,10 +25,9 @@ import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const WorkspaceOverview = async () => {
-  const [dashboard, projects, session] = await Promise.all([
+  const [dashboard, projects] = await Promise.all([
     getDashboardOverview({}),
     listProjects({}),
-    getPageSession(),
   ]);
   if (!dashboard.ok || !projects.ok) {
     return (
@@ -59,26 +58,12 @@ const WorkspaceOverview = async () => {
       employee.employeeName,
     ])
   );
-  const isAdmin =
-    session.kind === "authenticated" && session.user.role === "admin";
   const employeesWithTasks = employees
     .filter((employee) => employee.openTaskCount > 0)
     .slice(0, 7);
 
   return (
     <>
-      <div className="ph">
-        <div>
-          <h1>Workspace overview</h1>
-          <p>Health of every project in Metsys.</p>
-        </div>
-        <div className="acts overview-actions">
-          <Link className="btn btn-secondary btn-sm" href="/timeline">
-            Timeline
-          </Link>
-          {isAdmin ? <ProjectCreateForm /> : null}
-        </div>
-      </div>
       <div className="stats" style={{ marginBottom: 16 }}>
         <div className="stat">
           <span className="k">Projects</span>
@@ -267,18 +252,34 @@ const WorkspaceOverview = async () => {
   );
 };
 
-// The header carries an admin-only action, so the skeleton repeats its title.
 const WorkspaceOverviewSkeleton = () => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Workspace overview</h1>
-        <p>Health of every project in Metsys.</p>
-      </div>
-    </div>
-    <span aria-hidden="true" className="sk home-stats-skeleton" />
-    <PanelSkeleton label="Loading workspace overview…" rows={6} />
-  </>
+  <PanelSkeleton label="Loading workspace overview…" variant="overview" />
 );
 
-export { WorkspaceOverview, WorkspaceOverviewSkeleton };
+const WorkspaceOverviewActions = async () => {
+  const session = await getPageSession();
+  const isAdmin =
+    session.kind === "authenticated" && session.user.role === "admin";
+
+  return (
+    <div className="acts overview-actions">
+      <Link className="btn btn-secondary btn-sm" href="/timeline">
+        Timeline
+      </Link>
+      {isAdmin ? <ProjectCreateForm /> : null}
+    </div>
+  );
+};
+
+const WorkspaceOverviewActionsSkeleton = () => (
+  <div aria-hidden="true" className="acts overview-actions">
+    <span className="btn btn-secondary btn-sm opacity-0">Timeline</span>
+  </div>
+);
+
+export {
+  WorkspaceOverview,
+  WorkspaceOverviewActions,
+  WorkspaceOverviewActionsSkeleton,
+  WorkspaceOverviewSkeleton,
+};

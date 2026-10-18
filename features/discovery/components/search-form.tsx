@@ -5,88 +5,47 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
-import { searchWorkspaceAction } from "@/features/discovery/discovery-actions";
+import { recordRecentSearchAction } from "@/features/discovery/discovery-actions";
 import type { WorkspaceSearchResults } from "@/src/server/preferences/discovery-contracts";
 
 const SearchForm = ({
   initialQuery,
+  initialResults,
+  initialError,
   recentSearches,
 }: {
   readonly initialQuery: string;
+  readonly initialResults: WorkspaceSearchResults | null;
+  readonly initialError: string | null;
   readonly recentSearches: readonly string[];
 }) => {
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<WorkspaceSearchResults | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [pending, startTransition] = useTransition();
-  const requestGeneration = useRef(0);
-
-  useEffect(() => {
-    if (!initialQuery.trim()) {
-      return;
-    }
-    requestGeneration.current += 1;
-    const generation = requestGeneration.current;
-    const loadInitialResults = async () => {
-      try {
-        const result = await searchWorkspaceAction({ query: initialQuery });
-        if (generation !== requestGeneration.current) {
-          return;
-        }
-        if (!result.ok) {
-          setError(result.error.message);
-          setResults(null);
-          return;
-        }
-        setError(null);
-        setResults(result.data);
-      } catch {
-        if (generation === requestGeneration.current) {
-          setError("Search is temporarily unavailable. Try again.");
-          setResults(null);
-        }
-      }
-    };
-    void loadInitialResults();
-    return () => {
-      if (generation === requestGeneration.current) {
-        requestGeneration.current += 1;
-      }
-    };
-  }, [initialQuery]);
+  const results = initialResults;
 
   const executeSearch = (searchQuery: string) => {
     const trimmedQuery = searchQuery.trim();
     if (!trimmedQuery) {
       return;
     }
-    requestGeneration.current += 1;
-    const generation = requestGeneration.current;
     setQuery(searchQuery);
     startTransition(async () => {
       try {
-        const result = await searchWorkspaceAction({ query: trimmedQuery });
-        if (generation !== requestGeneration.current) {
-          return;
-        }
+        const result = await recordRecentSearchAction({ query: trimmedQuery });
         if (!result.ok) {
           setError(result.error.message);
-          setResults(null);
           return;
         }
         setError(null);
-        setResults(result.data);
-        router.refresh();
+        router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
       } catch {
-        if (generation === requestGeneration.current) {
-          setError("Search is temporarily unavailable. Try again.");
-          setResults(null);
-        }
+        setError("Search is temporarily unavailable. Try again.");
       }
     });
   };

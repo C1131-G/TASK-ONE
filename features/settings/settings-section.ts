@@ -1,8 +1,20 @@
-type SettingsSection = "appearance" | "preferences";
+type SettingsSection =
+  | "appearance"
+  | "preferences"
+  | "profile"
+  | "sessions"
+  | "workspace"
+  | "sla";
 
-// ?section=preferences deep-links the preferences tab; anything else opens appearance.
+// Unknown section names open appearance, which is available to every role.
 const parseSettingsSection = (value: unknown): SettingsSection =>
-  value === "preferences" ? "preferences" : "appearance";
+  value === "preferences" ||
+  value === "profile" ||
+  value === "sessions" ||
+  value === "workspace" ||
+  value === "sla"
+    ? value
+    : "appearance";
 
 export { parseSettingsSection };
 export type { SettingsSection };

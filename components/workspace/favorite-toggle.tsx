@@ -7,7 +7,7 @@
 
 import { Star } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
@@ -25,7 +25,7 @@ const FavoriteToggle = ({
   readonly initialFavorite: boolean;
 }) => {
   const router = useRouter();
-  const [favorite, setFavorite] = useState(initialFavorite);
+  const [favorite, setFavorite] = useOptimistic(initialFavorite);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +34,7 @@ const FavoriteToggle = ({
       return;
     }
     startTransition(async () => {
+      setFavorite(!favorite);
       const result =
         kind === "project"
           ? await toggleProjectFavoriteAction({

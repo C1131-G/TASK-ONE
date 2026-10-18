@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   parseCalendarMode,
   parseMonthOffset,
@@ -14,16 +15,18 @@ export const metadata: Metadata = { title: "My Tasks | Metsys" };
 
 const MyTasksPage = ({ searchParams }: PageProps<"/my-tasks">) => (
   <div className="page flush">
-    <Suspense fallback={<MyTasksSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {searchParams.then((params) => (
-        <MyTasks
-          calendarMode={parseCalendarMode(params["calendarMode"])}
-          initialTaskId={parseTaskIdParam(params["task"])}
-          monthOffset={parseMonthOffset(params["monthOffset"])}
-        />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="my tasks could not be loaded">
+      <Suspense fallback={<MyTasksSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {searchParams.then((params) => (
+          <MyTasks
+            calendarMode={parseCalendarMode(params["calendarMode"])}
+            initialTaskId={parseTaskIdParam(params["task"])}
+            monthOffset={parseMonthOffset(params["monthOffset"])}
+          />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

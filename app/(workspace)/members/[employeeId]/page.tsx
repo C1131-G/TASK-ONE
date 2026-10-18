@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  MemberDetail,
-  MemberDetailSkeleton,
-} from "@/features/people/components/member-detail";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { MemberDetail } from "@/features/people/components/member-detail";
+import { MemberDetailSkeleton } from "@/features/people/components/member-detail-skeleton";
 import { memberMetadata } from "@/features/people/member-metadata";
 import { parseMemberTab } from "@/features/people/member-tab";
 
@@ -21,15 +20,17 @@ const MemberProfilePage = ({
   params,
   searchParams,
 }: PageProps<"/members/[employeeId]">) => (
-  <Suspense fallback={<MemberDetailSkeleton />}>
-    {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-    {Promise.all([params, searchParams]).then(([{ employeeId }, query]) => (
-      <MemberDetail
-        employeeId={employeeId}
-        tab={parseMemberTab(query["tab"])}
-      />
-    ))}
-  </Suspense>
+  <SectionErrorBoundary title="Member profile could not be loaded">
+    <Suspense fallback={<MemberDetailSkeleton />}>
+      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+      {Promise.all([params, searchParams]).then(([{ employeeId }, query]) => (
+        <MemberDetail
+          employeeId={employeeId}
+          tab={parseMemberTab(query["tab"])}
+        />
+      ))}
+    </Suspense>
+  </SectionErrorBoundary>
 );
 
 export default MemberProfilePage;

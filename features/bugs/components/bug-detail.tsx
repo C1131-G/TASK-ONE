@@ -2,7 +2,6 @@
 
 import { notFound } from "next/navigation";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
 import { BugDetailWorkflow } from "@/features/bugs/components/bug-detail-workflow";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -48,10 +47,4 @@ const BugDetail = async ({ bugId }: { readonly bugId: string }) => {
   );
 };
 
-const BugDetailSkeleton = () => (
-  <div className="page">
-    <PanelSkeleton label="Loading bug details…" rows={6} title="Bug details" />
-  </div>
-);
-
-export { BugDetail, BugDetailSkeleton };
+export { BugDetail };

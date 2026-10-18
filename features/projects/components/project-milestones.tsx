@@ -5,12 +5,13 @@
 
 import { CheckCircle, Circle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useReducer, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import { reduceMilestoneDraft } from "@/features/projects/milestone-draft";
 import { saveProjectMilestonesAction } from "@/features/projects/projects-actions";
 
 interface MilestoneData {
@@ -30,16 +31,6 @@ const toMilestones = (items: readonly MilestoneData[]): readonly Milestone[] =>
     key: milestone.id ?? `initial-${index}`,
   }));
 
-const serializeMilestones = (items: readonly Milestone[]): string =>
-  JSON.stringify(
-    items.map(({ id, name, dueDate, completed }) => ({
-      completed,
-      dueDate,
-      id,
-      name,
-    }))
-  );
-
 export const ProjectMilestones = ({
   projectId,
   version,
@@ -52,59 +43,50 @@ export const ProjectMilestones = ({
   readonly editable: boolean;
 }) => {
   const router = useRouter();
-  const [milestones, setMilestones] = useState(() =>
-    toMilestones(initialMilestones)
-  );
-  const currentVersion = useRef(version);
-  const baseline = useRef<string | null>(null);
-  const [conflict, setConflict] = useState(false);
+  const incoming = toMilestones(initialMilestones);
+  const [draftState, dispatch] = useReducer(reduceMilestoneDraft, {
+    baseVersion: version,
+    baseline: initialMilestones,
+    dirty: false,
+    draft: incoming,
+  });
+  const milestones =
+    draftState.dirty || version < draftState.baseVersion
+      ? draftState.draft
+      : incoming;
+  const conflict = draftState.dirty && draftState.baseVersion !== version;
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (version === currentVersion.current) {
-      return;
-    }
-    if (
-      serializeMilestones(milestones) !==
-      (baseline.current ?? serializeMilestones(toMilestones(initialMilestones)))
-    ) {
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
-      setConflict(true);
-      return;
-    }
-    const incoming = toMilestones(initialMilestones);
-    currentVersion.current = version;
-    baseline.current = serializeMilestones(incoming);
-    // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
-    setMilestones(incoming);
-    // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change, react-doctor/no-chain-state-updates
-    setConflict(false);
-  }, [initialMilestones, milestones, version, baseline]);
-
   const reload = () => {
-    const incoming = toMilestones(initialMilestones);
-    currentVersion.current = version;
-    baseline.current = serializeMilestones(incoming);
-    setMilestones(incoming);
-    setConflict(false);
+    dispatch({
+      draft: incoming,
+      incoming: initialMilestones,
+      type: "reload",
+      version,
+    });
     setError(null);
   };
 
-  const updateMilestone = (index: number, patch: Partial<Milestone>) =>
-    setMilestones((current) =>
-      current.map((milestone, itemIndex) =>
-        itemIndex === index ? { ...milestone, ...patch } : milestone
-      )
+  const updateMilestone = (index: number, patch: Partial<Milestone>) => {
+    const next = milestones.map((milestone, itemIndex) =>
+      itemIndex === index ? { ...milestone, ...patch } : milestone
     );
+    dispatch({
+      draft: next,
+      incoming: initialMilestones,
+      type: "edit",
+      version,
+    });
+  };
 
-  const save = () =>
+  const save = () => {
+    if (pending || conflict) {
+      return;
+    }
     startTransition(async () => {
-      if (conflict) {
-        return;
-      }
       const result = await saveProjectMilestonesAction({
-        expectedVersion: currentVersion.current,
+        expectedVersion: version,
         idempotencyKey: crypto.randomUUID(),
         milestones: milestones.map(({ key: _key, ...milestone }) => milestone),
         projectId,
@@ -114,13 +96,28 @@ export const ProjectMilestones = ({
         return;
       }
       setError(null);
-      currentVersion.current = result.data.version;
       const saved = toMilestones(result.data.milestones);
-      baseline.current = serializeMilestones(saved);
-      setMilestones(saved);
-      setConflict(false);
+      dispatch({
+        draft: saved,
+        incoming: result.data.milestones,
+        type: "saved",
+        version: result.data.version,
+      });
       router.refresh();
     });
+  };
+
+  const setMilestones = (
+    update: (current: readonly Milestone[]) => readonly Milestone[]
+  ) => {
+    const next = update(milestones);
+    dispatch({
+      draft: next,
+      incoming: initialMilestones,
+      type: "edit",
+      version,
+    });
+  };
 
   return (
     <section className="panel milestone-panel">
@@ -158,7 +155,7 @@ export const ProjectMilestones = ({
               <Checkbox
                 aria-label={`Milestone ${index + 1} complete`}
                 checked={milestone.completed}
-                disabled={conflict}
+                disabled={conflict || pending}
                 onCheckedChange={(checked) =>
                   updateMilestone(index, {
                     completed: checked === true,
@@ -178,7 +175,7 @@ export const ProjectMilestones = ({
               <WorkspaceInput
                 aria-label={`Milestone ${index + 1} name`}
                 className="input grow"
-                disabled={conflict}
+                disabled={conflict || pending}
                 maxLength={120}
                 onChange={(event) =>
                   updateMilestone(index, { name: event.currentTarget.value })
@@ -192,7 +189,7 @@ export const ProjectMilestones = ({
               <WorkspaceDatePicker
                 ariaLabel={`Milestone ${index + 1} due date`}
                 className="input"
-                disabled={conflict}
+                disabled={conflict || pending}
                 onValueChange={(value) =>
                   updateMilestone(index, { dueDate: value || null })
                 }
@@ -207,7 +204,7 @@ export const ProjectMilestones = ({
               <WorkspaceButton
                 aria-label={`Remove milestone ${milestone.name || index + 1}`}
                 className="ibtn ibtn-sm"
-                disabled={conflict}
+                disabled={conflict || pending}
                 onClick={() =>
                   setMilestones((current) =>
                     current.filter((_, itemIndex) => itemIndex !== index)
@@ -226,7 +223,7 @@ export const ProjectMilestones = ({
         {editable ? (
           <WorkspaceButton
             className="btn btn-sm btn-ghost"
-            disabled={conflict}
+            disabled={conflict || pending}
             onClick={() =>
               setMilestones((current) => [
                 ...current,

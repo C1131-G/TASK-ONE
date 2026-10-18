@@ -30,34 +30,11 @@ import {
   getFileDownloadUrlAction,
   getFilePreviewUrlAction,
 } from "@/features/files/files-actions";
-import type { BugHistorySchema } from "@/src/server/work/bug-history";
 
-type BugHistory = typeof BugHistorySchema.Type;
+import { formatDate, statusLabels } from "./bug-detail-labels";
+import type { BugHistory } from "./bug-detail-labels";
+
 type BugActionResult = Awaited<ReturnType<typeof addBugFixAttemptAction>>;
-
-const statusLabels: Record<BugHistory["bug"]["status"], string> = {
-  approved_for_release: "Approved for release",
-  awaiting_admin_approval: "Awaiting admin approval",
-  awaiting_client: "Awaiting client",
-  closed: "Closed",
-  duplicate: "Duplicate",
-  in_progress: "In progress",
-  in_verification: "In verification",
-  needs_info: "Needs info",
-  rejected: "Changes requested",
-  released: "Released",
-  reported: "Reported",
-  triaged: "Triaged",
-  withdrawn: "Withdrawn",
-};
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
-const formatDate = (value: string): string =>
-  dateFormatter.format(new Date(value));
 
 export const BugDetailWorkflow = ({
   embedded = false,

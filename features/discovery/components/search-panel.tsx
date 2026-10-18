@@ -1,26 +1,31 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { SearchForm } from "@/features/discovery/components/search-form";
-import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
+import {
+  getPersonalWorkspace,
+  getWorkspaceSearchResults,
+} from "@/features/discovery/discovery-queries";
 
 const SearchPanel = async ({
   initialQuery,
 }: {
   readonly initialQuery: string;
 }) => {
-  const result = await getPersonalWorkspace({});
+  const [workspace, search] = await Promise.all([
+    getPersonalWorkspace({}),
+    initialQuery.trim()
+      ? getWorkspaceSearchResults({ query: initialQuery })
+      : Promise.resolve(null),
+  ]);
   return (
     <SearchForm
       initialQuery={initialQuery}
+      initialResults={search?.ok ? search.data : null}
+      initialError={search && !search.ok ? search.error.message : null}
       key={initialQuery}
-      recentSearches={result.ok ? result.data.recentSearches : []}
+      recentSearches={workspace.ok ? workspace.data.recentSearches : []}
     />
   );
 };
 
-const SearchPanelSkeleton = () => (
-  <PanelSkeleton label="Loading search…" rows={3} />
-);
-
-export { SearchPanel, SearchPanelSkeleton };
+export { SearchPanel };

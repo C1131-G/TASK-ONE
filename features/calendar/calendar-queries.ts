@@ -15,6 +15,7 @@ import {
   TaskCalendarLive,
   TaskCalendarQuerySchema,
 } from "@/src/server/work/task-calendar";
+import type { TaskCalendarQuery } from "@/src/server/work/task-calendar-contracts";
 
 export const listCalendarEvents = async (input: unknown) =>
   await runServerAction(
@@ -57,3 +58,42 @@ export const listTaskCalendar = async (input: unknown) =>
     undefined,
     Schema.Array(TaskCalendarEntrySchema)
   );
+
+export const listTaskCalendarPage = async (input: TaskCalendarQuery) => {
+  const offset = input.offset ?? 0;
+  const result = await listTaskCalendar({ ...input, limit: 200, offset });
+  if (!result.ok) {
+    return result;
+  }
+  return {
+    ...result,
+    data: {
+      entries: result.data,
+      nextOffset:
+        result.data.length === 200 ? offset + result.data.length : null,
+    },
+  };
+};
+
+export const listAllTaskCalendar = async (input: TaskCalendarQuery) => {
+  const entries: (typeof TaskCalendarEntrySchema.Type)[] = [];
+  const { offset: startingOffset = 0, ...query } = input;
+  let offset = startingOffset;
+  let requestId = "";
+  while (true) {
+    // Each next page starts after the preceding page's final stable sort key.
+    // eslint-disable-next-line no-await-in-loop -- Pagination depends on the previous page length.
+    const result = await listTaskCalendarPage({ ...query, limit: 200, offset });
+    if (!result.ok) {
+      return result;
+    }
+    const { data, requestId: pageRequestId } = result;
+    requestId = pageRequestId;
+    const { entries: pageEntries, nextOffset } = data;
+    entries.push(...pageEntries);
+    if (nextOffset === null) {
+      return { data: entries, ok: true as const, requestId };
+    }
+    offset = nextOffset;
+  }
+};

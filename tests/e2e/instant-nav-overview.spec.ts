@@ -27,6 +27,9 @@ test("overview heading and content render on the initial request", async ({
       await expect(
         page.getByRole("navigation", { name: "Main" })
       ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { level: 2, name: "Portfolio" })
+      ).toHaveCount(0);
     },
     { baseURL: BASE_URL }
   );

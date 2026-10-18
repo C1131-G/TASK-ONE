@@ -81,29 +81,29 @@ const loadProjectViewData = async ({
     "calendar",
     "timeline",
   ].includes(view);
-  const taskResult = requiresTaskList
-    ? await listProjectTaskPages(project.id, project.taskCount)
-    : null;
-  const tasks = taskResult?.ok ? taskResult.data : [];
-  const editableTaskIds = getEditableTaskIds(tasks, isAdmin, currentUserId);
-  const [fileResult, activityResult] = await Promise.all([
-    view === "files" ? listProjectFiles({ projectId: project.id }) : null,
-    view === "activity" || view === "overview"
-      ? listActivity({ limit: 100, projectId: project.id })
-      : null,
-  ]);
-  const bugResult =
-    view === "bugs" ? await listBugs({ projectId: project.id }) : null;
   const calendarRange =
     view === "calendar"
       ? calendarPeriod(calendarMode, monthOffset).range
       : null;
-  const calendarResult = calendarRange
-    ? await listCalendarEvents({
-        from: calendarRange.fromInstant,
-        to: calendarRange.toInstant,
-      })
-    : null;
+  const [taskResult, fileResult, activityResult, bugResult, calendarResult] =
+    await Promise.all([
+      requiresTaskList
+        ? listProjectTaskPages(project.id, project.taskCount)
+        : Promise.resolve(null),
+      view === "files" ? listProjectFiles({ projectId: project.id }) : null,
+      view === "activity" || view === "overview"
+        ? listActivity({ limit: 100, projectId: project.id })
+        : null,
+      view === "bugs" ? listBugs({ projectId: project.id }) : null,
+      calendarRange
+        ? listCalendarEvents({
+            from: calendarRange.fromInstant,
+            to: calendarRange.toInstant,
+          })
+        : null,
+    ]);
+  const tasks = taskResult?.ok ? taskResult.data : [];
+  const editableTaskIds = getEditableTaskIds(tasks, isAdmin, currentUserId);
   const calendarEvents = calendarResult?.ok
     ? calendarResult.data.filter((event) => event.projectId === project.id)
     : null;
@@ -126,26 +126,10 @@ export const getProjectDetailData = async (
   query: ProjectDetailQuery
 ) => {
   const requestedView = query.view;
-  const [
-    session,
-    projects,
-    employeeResult,
-    personal,
-    milestoneResult,
-    teamResult,
-    savedViewsResult,
-    labelResult,
-    preferences,
-  ] = await Promise.all([
+  const [session, projects, savedViewsResult] = await Promise.all([
     getPageSession(),
     listAllProjects(),
-    listAllEmployees(),
-    getPersonalWorkspace({}),
-    listProjectMilestones({ projectId }),
-    listTeams({}),
     listSavedViews({}),
-    listLabels({}),
-    getPersonalPreferences({}),
   ]);
   if (!projects.ok) {
     return { kind: "error" as const };
@@ -166,15 +150,31 @@ export const getProjectDetailData = async (
     requestedView
   );
   const view = savedViewState.activeType;
+  const [
+    employeeResult,
+    personal,
+    milestoneResult,
+    teamResult,
+    labelResult,
+    preferences,
+    viewData,
+  ] = await Promise.all([
+    listAllEmployees(),
+    getPersonalWorkspace({}),
+    listProjectMilestones({ projectId }),
+    listTeams({}),
+    listLabels({}),
+    getPersonalPreferences({}),
+    loadProjectViewData({
+      calendarMode: query.calendarMode,
+      currentUserId,
+      isAdmin,
+      monthOffset: query.monthOffset,
+      project,
+      view,
+    }),
+  ]);
   const { calendarMode, monthOffset } = query;
-  const viewData = await loadProjectViewData({
-    calendarMode,
-    currentUserId,
-    isAdmin,
-    monthOffset,
-    project,
-    view,
-  });
   const favoriteProjectIds = new Set(
     personal.ok ? personal.data.projects.map(({ id }) => id) : []
   );

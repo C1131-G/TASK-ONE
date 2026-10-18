@@ -2,7 +2,6 @@
 
 import { notFound, redirect } from "next/navigation";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getClientCompanyOnce } from "@/features/clients/client-company-metadata";
 import { ClientCompanyWorkspace } from "@/features/clients/components/client-company-workspace";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -59,8 +58,4 @@ const ClientCompanyDetailView = async ({
   );
 };
 
-const ClientCompanyDetailSkeleton = () => (
-  <PanelSkeleton label="Loading client company…" rows={6} title="Client" />
-);
-
-export { ClientCompanyDetailSkeleton, ClientCompanyDetailView };
+export { ClientCompanyDetailView };

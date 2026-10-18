@@ -44,6 +44,31 @@ export const WorkspaceSidebarFallback = () => (
   </div>
 );
 
+const TOPBAR_FALLBACK_KEYS = ["t1", "t2", "t3"] as const;
+const BOTTOM_FALLBACK_KEYS = ["b1", "b2", "b3", "b4", "b5"] as const;
+
+// Mirrors the title and action buttons while the session data loads.
+export const WorkspaceTopbarFallback = () => (
+  <>
+    <span aria-hidden="true" className="crumbs">
+      <span className="workspace-loading-title" />
+    </span>
+    <span className="sp" />
+    {TOPBAR_FALLBACK_KEYS.map((key) => (
+      <span aria-hidden="true" className="workspace-loading-action" key={key} />
+    ))}
+  </>
+);
+
+// Mirrors the phone bottom navigation while the session data loads.
+export const WorkspaceBottomChromeFallback = () => (
+  <div aria-hidden="true" className="bottomnav">
+    {BOTTOM_FALLBACK_KEYS.map((key) => (
+      <span className="workspace-loading-tab" key={key} />
+    ))}
+  </div>
+);
+
 const MobileNavigation = ({
   data,
   pathname,

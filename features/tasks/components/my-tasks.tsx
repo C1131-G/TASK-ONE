@@ -12,7 +12,7 @@ import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 import { GlobalTaskViewStoreProvider } from "@/features/tasks/providers/global-task-view-store-provider";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { columnWidthsFromPreferences } from "@/features/tasks/task-table-columns";
-import { listProjectTasks } from "@/features/tasks/tasks-queries";
+import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
 import { getPersonalPreferences } from "@/features/user/user-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
@@ -55,19 +55,21 @@ const MyTasks = async ({
   const taskLists = await Promise.all(
     projectResult.data.map(async (project) => ({
       project,
-      result: await listProjectTasks({
-        limit: 100,
-        offset: 0,
-        projectId: project.id,
-      }),
+      tasks: await listAllProjectTasks(project.id),
     }))
   );
+  if (taskLists.some(({ tasks }) => tasks === undefined)) {
+    return (
+      <div className="page">
+        <div className="panel panel-b" role="alert">
+          Some project tasks could not be loaded. Refresh to retry.
+        </div>
+      </div>
+    );
+  }
   const assignedTasks: AssignedTask[] = [];
-  for (const { project, result } of taskLists) {
-    if (!result.ok) {
-      continue;
-    }
-    for (const task of result.data) {
+  for (const { project, tasks } of taskLists) {
+    for (const task of tasks ?? []) {
       if (task.assigneeIds.includes(session.user.id)) {
         assignedTasks.push({
           ...task,
@@ -141,7 +143,7 @@ const MyTasksSkeleton = () => (
         <p aria-hidden="true">&nbsp;</p>
       </div>
     </div>
-    <PanelSkeleton label="Loading your tasks…" rows={6} />
+    <PanelSkeleton variant="tasks" label="Loading your tasks…" rows={6} />
   </>
 );
 

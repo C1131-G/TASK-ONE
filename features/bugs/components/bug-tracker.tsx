@@ -217,7 +217,7 @@ const BugTrackerSkeleton = () => (
         </p>
       </div>
     </header>
-    <PanelSkeleton label="Loading bug reports…" rows={6} />
+    <PanelSkeleton variant="bugs" label="Loading bug reports…" rows={6} />
   </section>
 );
 

@@ -3,11 +3,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { clientCompanyMetadata } from "@/features/clients/client-company-metadata";
-import {
-  ClientCompanyDetailSkeleton,
-  ClientCompanyDetailView,
-} from "@/features/clients/components/client-company-detail";
+import { ClientCompanyDetailView } from "@/features/clients/components/client-company-detail";
+import { ClientCompanyDetailSkeleton } from "@/features/clients/components/client-detail-skeleton";
 
 export const generateMetadata = async ({
   params,
@@ -18,12 +17,14 @@ export const generateMetadata = async ({
 
 const ClientCompanyPage = ({ params }: PageProps<"/clients/[companyId]">) => (
   <div className="page">
-    <Suspense fallback={<ClientCompanyDetailSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {params.then(({ companyId }) => (
-        <ClientCompanyDetailView companyId={companyId} />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="Client company could not be loaded">
+      <Suspense fallback={<ClientCompanyDetailSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {params.then(({ companyId }) => (
+          <ClientCompanyDetailView companyId={companyId} />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

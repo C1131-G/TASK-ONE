@@ -22,7 +22,7 @@ const InboxFeed = async () => {
 };
 
 const InboxFeedSkeleton = () => (
-  <PanelSkeleton label="Loading inbox…" rows={6} />
+  <PanelSkeleton variant="inbox" label="Loading inbox…" rows={6} />
 );
 
 export { InboxFeed, InboxFeedSkeleton };

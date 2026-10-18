@@ -2,8 +2,6 @@ import "server-only";
 import { Effect, Schema } from "effect";
 
 import {
-  ClientBugIdInputSchema,
-  ListCompanyBugsInputSchema,
   PortalBugDetailSchema,
   PortalBugListSchema,
   PortalBugs,
@@ -11,6 +9,10 @@ import {
   PortalProjectSchema,
   PortalResponseTimesSchema,
 } from "@/src/server/portal/portal-contracts";
+import {
+  ClientBugIdInputSchema,
+  ListCompanyBugsInputSchema,
+} from "@/src/server/portal/portal-input-contracts";
 
 import { runPortalAction, toPortalActor } from "./portal-action-runner";
 

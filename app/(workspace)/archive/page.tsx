@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  ArchivedWork,
-  ArchivedWorkSkeleton,
-} from "@/features/archive/components/archived-work";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { ArchivedWorkSkeleton } from "@/features/archive/components/archive-skeleton";
+import { ArchivedWork } from "@/features/archive/components/archived-work";
 
 export const metadata: Metadata = { title: "Archive | Metsys" };
 
@@ -21,9 +20,11 @@ const ArchivePage = () => (
         </p>
       </div>
     </div>
-    <Suspense fallback={<ArchivedWorkSkeleton />}>
-      <ArchivedWork />
-    </Suspense>
+    <SectionErrorBoundary title="archive could not be loaded">
+      <Suspense fallback={<ArchivedWorkSkeleton />}>
+        <ArchivedWork />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

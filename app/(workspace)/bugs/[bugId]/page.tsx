@@ -3,11 +3,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { bugMetadata } from "@/features/bugs/bug-metadata";
-import {
-  BugDetail,
-  BugDetailSkeleton,
-} from "@/features/bugs/components/bug-detail";
+import { BugDetail } from "@/features/bugs/components/bug-detail";
+import { BugDetailSkeleton } from "@/features/bugs/components/bug-detail-skeleton";
 
 export const generateMetadata = async ({
   params,
@@ -18,12 +17,14 @@ export const generateMetadata = async ({
 
 const BugDetailPage = ({ params }: PageProps<"/bugs/[bugId]">) => (
   <div className="page flush">
-    <Suspense fallback={<BugDetailSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {params.then(({ bugId }) => (
-        <BugDetail bugId={bugId} />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="Bug details could not be loaded">
+      <Suspense fallback={<BugDetailSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {params.then(({ bugId }) => (
+          <BugDetail bugId={bugId} />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

@@ -3,8 +3,7 @@
 
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import type { FormEvent } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
@@ -73,7 +72,7 @@ export const TaskDetailsForm = ({
     readonly conflict: boolean;
     readonly message: string;
   } | null>(null);
-  const [pending, startTransition] = useTransition();
+  const submissionInFlight = useRef(false);
   const dirty = isDraftDirty(draft, task);
 
   // Dirty state is reported from the change handlers, not from an effect, so the
@@ -92,38 +91,51 @@ export const TaskDetailsForm = ({
     });
   };
 
-  const save = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    startTransition(async () => {
-      const result = await updateTaskAction({
-        assigneeIds: draft.assigneeIds,
-        description: draft.description.trim() || null,
-        dueDate: draft.dueDate,
-        estimate: draft.estimate.trim() || null,
-        expectedVersion: version,
-        idempotencyKey: crypto.randomUUID(),
-        priority: draft.priority,
-        startDate: draft.startDate,
-        status: draft.status,
-        taskId: task.id,
-        title: draft.title.trim(),
-      });
-      if (!result.ok) {
-        setError({
-          conflict: result.error.code === "CONFLICT",
-          message: result.error.message,
-        });
-        return;
+  const [, saveAction, pending] = useActionState(
+    async (_previous: null, _formData: FormData) => {
+      if (submissionInFlight.current) {
+        return null;
       }
-      setError(null);
-      onSaved(result.data.version, result.data.completionUndo ?? null);
-    });
-  };
+      submissionInFlight.current = true;
+      try {
+        const result = await updateTaskAction({
+          assigneeIds: draft.assigneeIds,
+          description: draft.description.trim() || null,
+          dueDate: draft.dueDate,
+          estimate: draft.estimate.trim() || null,
+          expectedVersion: version,
+          idempotencyKey: crypto.randomUUID(),
+          priority: draft.priority,
+          startDate: draft.startDate,
+          status: draft.status,
+          taskId: task.id,
+          title: draft.title.trim(),
+        });
+        if (result.ok) {
+          setError(null);
+          onSaved(result.data.version, result.data.completionUndo ?? null);
+        } else {
+          setError({
+            conflict: result.error.code === "CONFLICT",
+            message: result.error.message,
+          });
+        }
+      } catch {
+        setError({
+          conflict: false,
+          message: "Task details could not be saved. Try again.",
+        });
+      }
+      submissionInFlight.current = false;
+      return null;
+    },
+    null
+  );
 
   const fieldId = (name: string) => `task-${task.id}-${name}`;
 
   return (
-    <form className="stack" onSubmit={save}>
+    <form action={saveAction} className="stack">
       <label className="field" htmlFor={fieldId("title")}>
         <span>Title</span>
         <WorkspaceInput

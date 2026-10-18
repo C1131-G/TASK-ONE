@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listClientCompanies } from "@/features/clients/clients-queries";
 import { ClientCompanyCreateForm } from "@/features/clients/components/client-company-forms";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -113,17 +112,4 @@ const ClientCompanyList = async () => {
   );
 };
 
-// The header carries the company count, so the skeleton repeats its title.
-const ClientCompanyListSkeleton = () => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Clients</h1>
-        <p className="muted">Loading client companies…</p>
-      </div>
-    </div>
-    <PanelSkeleton label="Loading client companies…" rows={5} />
-  </>
-);
-
-export { ClientCompanyList, ClientCompanyListSkeleton };
+export { ClientCompanyList };

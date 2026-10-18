@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  FavoriteWork,
-  FavoriteWorkSkeleton,
-} from "@/features/discovery/components/favorite-work";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { FavoriteWork } from "@/features/discovery/components/favorite-work";
+import { FavoriteWorkSkeleton } from "@/features/discovery/components/favorites-skeleton";
 
 export const metadata: Metadata = { title: "Favorites | Metsys" };
 
@@ -18,9 +17,11 @@ const FavoritesPage = () => (
         <p>Projects and tasks you&apos;ve starred for quick access.</p>
       </div>
     </div>
-    <Suspense fallback={<FavoriteWorkSkeleton />}>
-      <FavoriteWork />
-    </Suspense>
+    <SectionErrorBoundary title="favorites could not be loaded">
+      <Suspense fallback={<FavoriteWorkSkeleton />}>
+        <FavoriteWork />
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

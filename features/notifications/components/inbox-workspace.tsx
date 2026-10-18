@@ -3,7 +3,7 @@
 "use client";
 
 import { Bell, Check, EnvelopeOpen } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,12 +25,21 @@ import {
   getInitials,
   typeMatchesFilter,
 } from "@/features/notifications/inbox-format";
-import type { InboxFilter } from "@/features/notifications/inbox-format";
 import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/features/notifications/notifications-actions";
 import type { NotificationItem } from "@/src/server/notifications/contracts";
+
+const updateUrl = (key: string, value: string | null) => {
+  const url = new URL(window.location.href);
+  if (value) {
+    url.searchParams.set(key, value);
+  } else {
+    url.searchParams.delete(key);
+  }
+  window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+};
 
 export const InboxWorkspace = ({
   items,
@@ -40,11 +49,11 @@ export const InboxWorkspace = ({
   readonly unreadCount: number;
 }) => {
   const router = useRouter();
-  const [filter, setFilter] = useState<InboxFilter>("all");
-  const [unreadOnly, setUnreadOnly] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    items[0]?.id ?? null
-  );
+  const searchParams = useSearchParams();
+  const filterValue = searchParams.get("type");
+  const filter = FILTERS.find(({ id }) => id === filterValue)?.id ?? "all";
+  const unreadOnly = searchParams.get("unread") === "1";
+  const selectedId = searchParams.get("notification") ?? items[0]?.id ?? null;
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -99,7 +108,7 @@ export const InboxWorkspace = ({
     });
 
   const selectNotification = (notificationId: string) => {
-    setSelectedId(notificationId);
+    updateUrl("notification", notificationId);
     if (window.matchMedia("(max-width: 900px)").matches) {
       setMobileDetailOpen(true);
     }
@@ -117,7 +126,9 @@ export const InboxWorkspace = ({
               <Checkbox
                 checked={unreadOnly}
                 id="inbox-unread-only"
-                onCheckedChange={(checked) => setUnreadOnly(checked === true)}
+                onCheckedChange={(checked) =>
+                  updateUrl("unread", checked === true ? "1" : null)
+                }
               />
               Unread
             </label>
@@ -142,7 +153,10 @@ export const InboxWorkspace = ({
                 ({ id: filterId }) => filterId === value
               );
               if (nextFilter) {
-                setFilter(nextFilter.id);
+                updateUrl(
+                  "type",
+                  nextFilter.id === "all" ? null : nextFilter.id
+                );
               }
             }}
             value={filter}

@@ -1,3 +1,4 @@
+import { getBugHistoryAction } from "@/features/bugs/bugs-actions";
 import { listTaskFilesAction } from "@/features/files/files-actions";
 import {
   getProjectTaskAction,
@@ -22,14 +23,19 @@ export interface EmployeeOption {
   readonly name: string;
 }
 
-export const readTaskBundle = async (projectId: string, taskId: string) => {
-  const [task, comments, subtasks, files] = await Promise.all([
+export const readTaskBundle = async (
+  projectId: string,
+  taskId: string,
+  bugId?: string
+) => {
+  const [task, comments, subtasks, files, bugHistory] = await Promise.all([
     getProjectTaskAction({ projectId, taskId }),
     listTaskCommentsAction({ taskId }),
     listTaskSubtasksAction({ taskId }),
     listTaskFilesAction({ taskId }),
+    bugId ? getBugHistoryAction({ bugId }) : Promise.resolve(null),
   ]);
-  return { comments, files, subtasks, task };
+  return { bugHistory, comments, files, subtasks, task };
 };
 
 export type TaskBundle = Awaited<ReturnType<typeof readTaskBundle>>;

@@ -1,7 +1,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
-import { listTaskCalendar } from "@/features/calendar/calendar-queries";
+import { listAllTaskCalendar } from "@/features/calendar/calendar-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
 import { WorkspaceTimeline } from "@/features/projects/components/workspace-timeline";
 import {
@@ -22,7 +21,7 @@ const ProjectTimeline = async ({
   const session = await getPageSession();
   const range = currentUtcMonthRange(0, 4);
   const [result, peopleResult, projectResult] = await Promise.all([
-    listTaskCalendar({
+    listAllTaskCalendar({
       from: range.from,
       groupBy: "project",
       limit: 200,
@@ -108,8 +107,4 @@ const ProjectTimeline = async ({
   );
 };
 
-const ProjectTimelineSkeleton = () => (
-  <PanelSkeleton label="Loading timeline…" rows={6} />
-);
-
-export { ProjectTimeline, ProjectTimelineSkeleton };
+export { ProjectTimeline };

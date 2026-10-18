@@ -3,10 +3,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  SettingsPanel,
-  SettingsPanelSkeleton,
-} from "@/features/settings/components/settings-panel";
+import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SettingsPanel } from "@/features/settings/components/settings-panel";
+import { SettingsPanelSkeleton } from "@/features/settings/components/settings-skeleton";
 import { parseSettingsSection } from "@/features/settings/settings-section";
 
 export const metadata: Metadata = { title: "Settings | Metsys" };
@@ -19,14 +18,16 @@ const SettingsPage = ({ searchParams }: PageProps<"/settings">) => (
         <p>Manage your account and workspace preferences.</p>
       </div>
     </div>
-    <Suspense fallback={<SettingsPanelSkeleton />}>
-      {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-      {searchParams.then((params) => (
-        <SettingsPanel
-          initialSection={parseSettingsSection(params["section"])}
-        />
-      ))}
-    </Suspense>
+    <SectionErrorBoundary title="settings could not be loaded">
+      <Suspense fallback={<SettingsPanelSkeleton />}>
+        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+        {searchParams.then((params) => (
+          <SettingsPanel
+            initialSection={parseSettingsSection(params["section"])}
+          />
+        ))}
+      </Suspense>
+    </SectionErrorBoundary>
   </div>
 );
 

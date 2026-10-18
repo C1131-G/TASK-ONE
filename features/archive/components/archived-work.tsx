@@ -1,6 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { ArchiveWorkspace } from "@/features/archive/components/archive-workspace";
 import type {
   ArchivedProject,
@@ -69,8 +68,4 @@ const ArchivedWork = async () => {
   );
 };
 
-const ArchivedWorkSkeleton = () => (
-  <PanelSkeleton label="Loading archived work…" rows={5} />
-);
-
-export { ArchivedWork, ArchivedWorkSkeleton };
+export { ArchivedWork };

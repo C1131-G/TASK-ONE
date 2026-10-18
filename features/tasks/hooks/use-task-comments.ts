@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 
 import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
-import type { TaskCommentView } from "@/features/tasks/components/task-details-comments";
+import type { TaskCommentView } from "@/features/tasks/components/task-comment-parts";
 import {
   createCommentAction,
   listTaskCommentsAction,
@@ -18,17 +18,19 @@ import type { CommentVisibility } from "@/src/server/collaboration/contracts";
 // Undo stack, so it works after the drawer has closed.
 export const useTaskComments = ({
   allowPublicReplies = false,
+  initialComments = [],
   onError,
   taskId,
 }: {
   readonly allowPublicReplies?: boolean;
+  readonly initialComments?: readonly TaskCommentView[];
   readonly onError: (message: string | null) => void;
   readonly taskId: string;
 }) => {
   const router = useRouter();
   const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
-  const [comments, setComments] = useState<readonly TaskCommentView[]>([]);
+  const [comments, setComments] = useState(initialComments);
   const [body, setBody] = useState("");
   const [visibility, setVisibility] = useState<CommentVisibility>("internal");
 

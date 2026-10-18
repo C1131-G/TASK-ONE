@@ -5,11 +5,37 @@
 
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHydrated } from "@/components/workspace/use-hydrated";
+import type { SettingsSection } from "@/features/settings/settings-section";
+
+const changeSection = (value: string) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("section", value);
+  window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+};
+
+const resolveSection = (
+  requestedSection: string | null,
+  canManageWorkspace: boolean,
+  initialSection: SettingsSection
+): SettingsSection => {
+  if (requestedSection === "workspace" || requestedSection === "sla") {
+    return canManageWorkspace ? requestedSection : "appearance";
+  }
+  if (
+    requestedSection === "profile" ||
+    requestedSection === "preferences" ||
+    requestedSection === "sessions"
+  ) {
+    return requestedSection;
+  }
+  return initialSection;
+};
 
 const ThemeChoice = ({
   description,
@@ -55,7 +81,7 @@ const SettingsWorkspace = ({
   workspace,
 }: {
   readonly canManageWorkspace: boolean;
-  readonly initialSection: "appearance" | "preferences";
+  readonly initialSection: SettingsSection;
   readonly notificationPreferences: ReactNode;
   readonly preferences: ReactNode;
   readonly profile: ReactNode;
@@ -65,13 +91,21 @@ const SettingsWorkspace = ({
 }) => {
   const { setTheme, theme } = useTheme();
   const themeHydrated = useHydrated();
+  const searchParams = useSearchParams();
+  const requestedSection = searchParams.get("section");
+  const section = resolveSection(
+    requestedSection,
+    canManageWorkspace,
+    initialSection
+  );
 
   return (
     <Tabs
       className="settings-workspace"
       data-workspace-settings="true"
-      defaultValue={initialSection}
+      onValueChange={changeSection}
       orientation="horizontal"
+      value={section}
     >
       <TabsList aria-label="Settings sections" className="settings-nav">
         <TabsTrigger value="appearance">Appearance</TabsTrigger>

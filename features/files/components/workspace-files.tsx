@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { ProjectFiles } from "@/features/files/components/project-files";
 import { listProjectFiles } from "@/features/files/files-queries";
 import { listProjects } from "@/features/projects/projects-queries";
@@ -69,8 +68,4 @@ const WorkspaceFiles = async () => {
   );
 };
 
-const WorkspaceFilesSkeleton = () => (
-  <PanelSkeleton label="Loading project files…" rows={4} />
-);
-
-export { WorkspaceFiles, WorkspaceFilesSkeleton };
+export { WorkspaceFiles };

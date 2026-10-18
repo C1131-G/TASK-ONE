@@ -5,6 +5,7 @@
 import type { ComponentProps } from "react";
 
 import { TaskDetailsForm } from "@/features/tasks/components/task-details-form";
+import { TaskDetailsFormSkeleton } from "@/features/tasks/components/task-details-skeleton";
 import { TaskSubtasksSection } from "@/features/tasks/components/task-details-subtasks";
 import type { TaskSubtaskView } from "@/features/tasks/components/task-details-subtasks";
 import { TaskRecurrenceEditor } from "@/features/tasks/components/task-recurrence-editor";
@@ -67,7 +68,7 @@ export const TaskWorkSections = ({
             version={version}
           />
         ) : (
-          <p className="muted">Loading task details…</p>
+          <TaskDetailsFormSkeleton />
         )}
       </section>
       <TaskSubtasksSection
