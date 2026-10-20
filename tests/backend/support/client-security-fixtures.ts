@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { auth } from "../../../src/server/auth/auth";
 import { ClientCompanyManagement } from "../../../src/server/clients/client-company-contracts";
 import { ClientCompanyManagementLive } from "../../../src/server/clients/client-company-management";
+import { withResolvedClientIp } from "../../../src/server/core/client-ip";
 import {
   authPool,
   ids,
@@ -72,16 +73,18 @@ export const signIn = (
   extra: HeadersInit = {}
 ) =>
   auth.handler(
-    new Request("http://localhost:3000/api/auth/sign-in/email", {
-      body: JSON.stringify({ email, password }),
-      headers: {
-        "content-type": "application/json",
-        "user-agent": "Vitest Browser/1.0",
-        "x-forwarded-for": nextAddress(),
-        ...extra,
-      },
-      method: "POST",
-    })
+    withResolvedClientIp(
+      new Request("http://localhost:3000/api/auth/sign-in/email", {
+        body: JSON.stringify({ email, password }),
+        headers: {
+          "content-type": "application/json",
+          "user-agent": "Vitest Browser/1.0",
+          "x-forwarded-for": nextAddress(),
+          ...extra,
+        },
+        method: "POST",
+      })
+    )
   );
 
 export const cookieOf = (response: Response): string =>

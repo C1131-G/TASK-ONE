@@ -6,6 +6,7 @@ import { Effect, Layer } from "effect";
 import { auth } from "../../src/server/auth/auth";
 import { authPool } from "../../src/server/auth/database";
 import { AuthSession, AuthSessionLive } from "../../src/server/auth/session";
+import { withResolvedClientIp } from "../../src/server/core/client-ip";
 import {
   PasswordManagement,
   PasswordManagementLive,
@@ -45,17 +46,19 @@ it("lets a forced-change account replace its temporary password and access the w
     userId = created.id;
 
     const signIn = await auth.handler(
-      new Request("http://localhost:3000/api/auth/sign-in/email", {
-        body: JSON.stringify({
-          email,
-          password: created.temporaryPassword,
-        }),
-        headers: {
-          "content-type": "application/json",
-          "x-forwarded-for": "198.51.100.55",
-        },
-        method: "POST",
-      })
+      withResolvedClientIp(
+        new Request("http://localhost:3000/api/auth/sign-in/email", {
+          body: JSON.stringify({
+            email,
+            password: created.temporaryPassword,
+          }),
+          headers: {
+            "content-type": "application/json",
+            "x-forwarded-for": "198.51.100.55",
+          },
+          method: "POST",
+        })
+      )
     );
     const cookie = signIn.headers
       .getSetCookie()
