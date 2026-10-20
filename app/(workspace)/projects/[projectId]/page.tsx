@@ -44,12 +44,12 @@ const ProjectPage = ({
   return (
     <PageTransition>
       <div className="page flush">
-        <SectionErrorBoundary title="Project navigation could not be prepared">
+        <SectionErrorBoundary title="Project navigation couldn't load">
           <Suspense fallback={null}>
             <DynamicMetadataMarker />
           </Suspense>
         </SectionErrorBoundary>
-        <SectionErrorBoundary title="Project details could not be loaded">
+        <SectionErrorBoundary title="Project details couldn't load">
           <SuspenseReveal fallback={<ProjectHeaderSkeleton />}>
             {/* oxlint-disable-next-line promise/prefer-await-to-then -- Route values resolve inside the boundary. */}
             {route.then(({ projectId, query }) => (
@@ -57,7 +57,7 @@ const ProjectPage = ({
             ))}
           </SuspenseReveal>
         </SectionErrorBoundary>
-        <SectionErrorBoundary title="This project view could not be loaded">
+        <SectionErrorBoundary title="This project view couldn't load">
           <SuspenseReveal fallback={<ProjectBodySkeleton />}>
             {/* oxlint-disable-next-line promise/prefer-await-to-then -- Route values resolve inside the boundary. */}
             {route.then(({ initialTaskId, projectId, query }) => (

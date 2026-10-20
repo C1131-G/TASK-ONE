@@ -39,7 +39,7 @@ const MembersPage = ({ searchParams }: PageProps<"/members">) => (
           <MembersActions />
         </Suspense>
       </div>
-      <SectionErrorBoundary title="members could not be loaded">
+      <SectionErrorBoundary title="Members couldn't load">
         <SuspenseReveal fallback={<MembersSectionSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

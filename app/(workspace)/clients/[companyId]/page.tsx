@@ -21,7 +21,7 @@ export const generateMetadata = async ({
 const ClientCompanyPage = ({ params }: PageProps<"/clients/[companyId]">) => (
   <PageTransition>
     <div className="page">
-      <SectionErrorBoundary title="Client company could not be loaded">
+      <SectionErrorBoundary title="Client company couldn't load">
         <SuspenseReveal fallback={<ClientCompanyDetailSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {params.then(({ companyId }) => (

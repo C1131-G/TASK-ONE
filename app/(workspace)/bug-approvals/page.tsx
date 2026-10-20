@@ -26,7 +26,7 @@ const BugApprovalPage = () => (
             </p>
           </div>
         </header>
-        <SectionErrorBoundary title="bug approvals could not be loaded">
+        <SectionErrorBoundary title="Bug approvals couldn't load">
           <SuspenseReveal
             fallback={
               <PanelSkeleton

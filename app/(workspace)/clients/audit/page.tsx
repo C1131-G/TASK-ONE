@@ -33,7 +33,7 @@ const AuditLogPage = ({ searchParams }: PageProps<"/clients/audit">) => (
             <p>Sign-ins, lockouts, account changes and portal previews.</p>
           </div>
         </div>
-        <SectionErrorBoundary title="audit could not be loaded">
+        <SectionErrorBoundary title="Audit log couldn't load">
           <SuspenseReveal fallback={<AuditLogSkeleton />}>
             {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
             {searchParams.then((params) => (

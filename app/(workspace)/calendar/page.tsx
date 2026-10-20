@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Calendar | Metsys" };
 const CalendarPage = ({ searchParams }: PageProps<"/calendar">) => (
   <PageTransition>
     <div className="page">
-      <SectionErrorBoundary title="calendar could not be loaded">
+      <SectionErrorBoundary title="Calendar couldn't load">
         <SuspenseReveal fallback={<CalendarViewSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

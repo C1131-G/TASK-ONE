@@ -10,7 +10,9 @@ const PortalError = ({
   readonly reset: () => void;
 }) => {
   void error;
-  return <RouteError reset={reset} title="Portal unavailable" />;
+  return (
+    <RouteError homeHref="/portal" reset={reset} title="Portal unavailable" />
+  );
 };
 
 export default PortalError;

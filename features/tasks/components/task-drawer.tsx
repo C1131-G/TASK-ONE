@@ -129,7 +129,7 @@ export const TaskDrawerProvider = ({
     <TaskDrawerContext.Provider value={value}>
       {children}
       {hydrated && selected ? (
-        <SectionErrorBoundary title="Task details could not be loaded">
+        <SectionErrorBoundary title="Task details couldn't load">
           <Suspense fallback={<TaskDetailsFormSkeleton />}>
             <TaskDetailsPanel
               currentUserId={currentUserId}

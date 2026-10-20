@@ -22,7 +22,7 @@ const TimelinePage = ({ searchParams }: PageProps<"/timeline">) => (
           <p>Search, filter, and schedule work across active projects.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="timeline could not be loaded">
+      <SectionErrorBoundary title="Timeline couldn't load">
         <SuspenseReveal fallback={<ProjectTimelineSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

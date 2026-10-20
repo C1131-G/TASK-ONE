@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Notifications | Metsys" };
 const NotificationsPage = () => (
   <PageTransition>
     <div className="page">
-      <SectionErrorBoundary title="notifications could not be loaded">
+      <SectionErrorBoundary title="Notifications couldn't load">
         <SuspenseReveal fallback={<NotificationFeedSkeleton />}>
           <NotificationFeed />
         </SuspenseReveal>

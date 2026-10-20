@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "My Tasks | Metsys" };
 const MyTasksPage = ({ searchParams }: PageProps<"/my-tasks">) => (
   <PageTransition>
     <div className="page flush">
-      <SectionErrorBoundary title="my tasks could not be loaded">
+      <SectionErrorBoundary title="My tasks couldn't load">
         <SuspenseReveal fallback={<MyTasksSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

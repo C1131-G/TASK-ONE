@@ -21,7 +21,7 @@ const TeamsPage = () => (
           <p>Organize employees by team.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="teams could not be loaded">
+      <SectionErrorBoundary title="Teams couldn't load">
         <SuspenseReveal fallback={<TeamListSkeleton />}>
           <TeamList />
         </SuspenseReveal>

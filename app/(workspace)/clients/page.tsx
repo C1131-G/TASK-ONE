@@ -42,7 +42,7 @@ const ClientsPage = () => (
           <ClientCompanyCreateForm />
         </div>
       </div>
-      <SectionErrorBoundary title="clients could not be loaded">
+      <SectionErrorBoundary title="Clients couldn't load">
         <SuspenseReveal fallback={<ClientCompanyListSkeleton />}>
           <ClientCompanyList />
         </SuspenseReveal>

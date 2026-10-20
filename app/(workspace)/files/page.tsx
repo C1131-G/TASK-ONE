@@ -21,7 +21,7 @@ const FilesPage = () => (
           <p>Files shared with your projects.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="files could not be loaded">
+      <SectionErrorBoundary title="Files couldn't load">
         <SuspenseReveal fallback={<WorkspaceFilesSkeleton />}>
           <WorkspaceFiles />
         </SuspenseReveal>

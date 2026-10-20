@@ -39,7 +39,7 @@ const ProjectsPage = ({ searchParams }: PageProps<"/projects">) => (
           <ProjectDirectoryActions />
         </Suspense>
       </div>
-      <SectionErrorBoundary title="projects could not be loaded">
+      <SectionErrorBoundary title="Projects couldn't load">
         <SuspenseReveal fallback={<ProjectDirectorySkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

@@ -22,7 +22,7 @@ const SettingsPage = ({ searchParams }: PageProps<"/settings">) => (
           <p>Manage your account and workspace preferences.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="settings could not be loaded">
+      <SectionErrorBoundary title="Settings couldn't load">
         <SuspenseReveal fallback={<SettingsPanelSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

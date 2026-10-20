@@ -21,7 +21,7 @@ const ActivityPage = () => (
           <p>Everything that&apos;s changed across the workspace.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="activity could not be loaded">
+      <SectionErrorBoundary title="Activity couldn't load">
         <SuspenseReveal fallback={<ActivityFeedSkeleton />}>
           <ActivityFeed />
         </SuspenseReveal>

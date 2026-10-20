@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const Page = ({ searchParams }: PageProps<"/portal">) => (
   <PageTransition>
     <div className="page">
-      <SectionErrorBoundary title="portal could not be loaded">
+      <SectionErrorBoundary title="Your portal couldn't load">
         <SuspenseReveal
           fallback={<PortalListSkeleton label="Loading company bugs" />}
         >

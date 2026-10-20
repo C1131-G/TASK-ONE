@@ -28,7 +28,7 @@ const Page = ({ searchParams }: PageProps<"/portal/new">) => (
           </p>
         </div>
       </div>
-      <SectionErrorBoundary title="Bug report form could not be loaded">
+      <SectionErrorBoundary title="Bug report form couldn't load">
         <SuspenseReveal
           fallback={<PortalFormSkeleton label="Loading bug form" />}
         >
