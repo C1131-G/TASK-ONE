@@ -51,3 +51,6 @@ AGENTS.md
 
 # Local-only development seed scripts
 /scripts/seed-*.ts
+
+# Database dumps written by docker/backup.sh
+/backups/
