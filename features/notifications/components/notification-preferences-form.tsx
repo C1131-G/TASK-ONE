@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useOptimistic } from "react";
 
 import { Switch } from "@/components/ui/switch";
 import { setNotificationPreferenceAction } from "@/features/notifications/notifications-actions";
@@ -29,37 +29,40 @@ const NotificationPreferencesForm = ({
 }: {
   readonly values: readonly NotificationPreferenceValue[];
 }) => {
-  const { error, pending, router, setError, startTransition } = useSaveState();
-  const [enabled, setEnabled] = useState(() => {
-    const preferences = new Map<string, boolean>();
-    for (const { channel, enabled: isEnabled, eventType } of values) {
-      preferences.set(`${channel}:${eventType}`, isEnabled);
-    }
-    return preferences;
-  });
+  const { error, pending, setError, startTransition } = useSaveState();
+  const saved = new Map<string, boolean>();
+  for (const { channel, enabled: isEnabled, eventType } of values) {
+    saved.set(`${channel}:${eventType}`, isEnabled);
+  }
+  // The switch flips at once; the saved values come back with the action's
+  // revalidation, and a failed save falls back to them.
+  const [enabled, setOptimisticPreference] = useOptimistic(
+    saved,
+    (current, change: { readonly key: string; readonly value: boolean }) =>
+      new Map(current).set(change.key, change.value)
+  );
 
   const updatePreference = (
     channel: NotificationChannel,
     eventType: NotificationEvent,
     nextEnabled: boolean
   ) => {
-    const key = `${channel}:${eventType}`;
-    const previousEnabled = enabled.get(key) ?? true;
-    setEnabled((current) => new Map(current).set(key, nextEnabled));
     startTransition(async () => {
-      const result = await setNotificationPreferenceAction({
-        channel,
-        enabled: nextEnabled,
-        eventType,
-        idempotencyKey: crypto.randomUUID(),
+      setOptimisticPreference({
+        key: `${channel}:${eventType}`,
+        value: nextEnabled,
       });
-      if (!result.ok) {
-        setEnabled((current) => new Map(current).set(key, previousEnabled));
-        setError(result.error.message);
-        return;
+      try {
+        const result = await setNotificationPreferenceAction({
+          channel,
+          enabled: nextEnabled,
+          eventType,
+          idempotencyKey: crypto.randomUUID(),
+        });
+        setError(result.ok ? null : result.error.message);
+      } catch {
+        setError("Your preference could not be saved. Try again.");
       }
-      setError(null);
-      router.refresh();
     });
   };
 

@@ -3,6 +3,7 @@ import type { Metadata, Route } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { AuthCard } from "@/features/user/components/auth-card";
 import { RequestAccessSteps } from "@/features/user/components/request-access-steps";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -27,17 +28,19 @@ const SignupRedirect = async () => {
 };
 
 const Page = () => (
-  <AuthCard
-    badge={<UserPlus size={22} weight="duotone" />}
-    description="Metsys accounts are created by an administrator."
-    title="Request access"
-    titleId="signup-title"
-  >
-    <RequestAccessSteps />
-    <Suspense>
-      <SignupRedirect />
-    </Suspense>
-  </AuthCard>
+  <PageTransition>
+    <AuthCard
+      badge={<UserPlus size={22} weight="duotone" />}
+      description="Metsys accounts are created by an administrator."
+      title="Request access"
+      titleId="signup-title"
+    >
+      <RequestAccessSteps />
+      <Suspense fallback={null}>
+        <SignupRedirect />
+      </Suspense>
+    </AuthCard>
+  </PageTransition>
 );
 
 export default Page;

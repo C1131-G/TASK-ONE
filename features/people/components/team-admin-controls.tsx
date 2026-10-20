@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -30,7 +29,6 @@ export const TeamAdminControls = ({
   readonly team: Team;
   readonly triggerLabel?: string;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +48,6 @@ export const TeamAdminControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const remove = () =>
@@ -61,9 +58,7 @@ export const TeamAdminControls = ({
       });
       if (!result.ok) {
         setError(result.error.message);
-        return;
       }
-      router.refresh();
     });
 
   return (

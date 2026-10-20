@@ -39,6 +39,11 @@ const portalActions: readonly ActionEntry[] = [
   entry("listPortalBugs", portalQueries.listPortalBugs, () => ({})),
   entry("getPortalBug", portalQueries.getPortalBug, bug),
   entry(
+    "getPortalBugById",
+    async () => await portalQueries.getPortalBugById(ids.random),
+    () => ({})
+  ),
+  entry(
     "getPortalResponseTimes",
     portalQueries.getPortalResponseTimes,
     () => ({})
@@ -108,6 +113,11 @@ const portalActions: readonly ActionEntry[] = [
     ...bug(),
     fileId: ids.random,
   })),
+  entry(
+    "getPortalFilePreviewUrl",
+    async () => await portalQueries.getPortalFilePreviewUrl(ids.random),
+    () => ({})
+  ),
   entry("getPortalFileUrlAction", portalUploads.getPortalFileUrlAction, () => ({
     disposition: "download",
     fileId: ids.random,
@@ -149,7 +159,12 @@ it("covers every portal action and query", () => {
     ...Object.keys(portalQueries),
     ...Object.keys(portalPush),
   ];
-  const covered = new Set(portalActions.map(({ name }) => name));
+  const covered = new Set([
+    ...portalActions.map(({ name }) => name),
+    // Unwraps getPortalBugById for the page and renders not-found instead of
+    // returning a result; getPortalBugById is checked above.
+    "getPortalBugRecord",
+  ]);
   expect(exported.filter((name) => !covered.has(name))).toEqual([]);
 });
 

@@ -11,26 +11,81 @@ import {
   SquaresFour,
   Table,
 } from "@phosphor-icons/react/dist/ssr";
-import { notFound } from "next/navigation";
 
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { ViewSwitchTransition } from "@/components/ui/view-switch-transition";
 import {
   SKELETON_KEYS,
   SkeletonBone,
+  SkeletonRows,
 } from "@/components/workspace/skeleton-shapes";
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { ProjectAdminControls } from "@/features/projects/components/project-admin-controls";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
 import { ProjectMemberAvatars } from "@/features/projects/components/project-list-layouts";
 import { ProjectSavedViews } from "@/features/projects/components/project-saved-views";
 import { ProjectViewContent } from "@/features/projects/components/project-view-content";
 import { ProjectViewTabs } from "@/features/projects/components/project-view-tabs";
-import { getProjectDetailData } from "@/features/projects/project-detail-data";
+import {
+  getProjectBodyData,
+  getProjectHeaderData,
+} from "@/features/projects/project-detail-data";
 import type { ProjectDetailQuery } from "@/features/projects/project-detail-data";
 import { ProjectViewStoreProvider } from "@/features/projects/providers/project-view-store-provider";
 import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
 
-const ProjectDetail = async ({
+const ProjectHeader = async ({
+  projectId,
+  requestedView,
+}: {
+  readonly projectId: string;
+  readonly requestedView: string;
+}) => {
+  const { employees, isAdmin, isFavorite, project, teams, view } =
+    await getProjectHeaderData(projectId, requestedView);
+  const membersById = new Map(
+    employees.map((employee) => [employee.id, employee] as const)
+  );
+  return (
+    <div className="proj-h">
+      <div className="row">
+        <ProjectIcon color={project.color} icon={project.icon} />
+        <span className="faint">Projects</span>
+        <span className="sep">/</span>
+        <h1>{project.name}</h1>
+        <FavoriteToggle
+          id={project.id}
+          initialFavorite={isFavorite}
+          kind="project"
+        />
+      </div>
+      <p>{project.description || "Project workspace"}</p>
+      <div className="row project-meta">
+        <span className={`pstatus ${project.status}`}>{project.status}</span>
+        <span className="muted">
+          {project.startDate ?? "No start date"} —{" "}
+          {project.dueDate ?? "No due date"}
+        </span>
+        {project.memberIds.length > 0 ? (
+          <ProjectMemberAvatars
+            memberIds={project.memberIds}
+            membersById={membersById}
+          />
+        ) : null}
+        {isAdmin ? (
+          <ProjectAdminControls
+            employees={employees}
+            project={project}
+            teams={teams}
+          />
+        ) : null}
+      </div>
+      <ProjectViewTabs projectId={project.id} selected={view} />
+    </div>
+  );
+};
+
+const ProjectBody = async ({
   initialTaskId,
   projectId,
   query,
@@ -39,50 +94,33 @@ const ProjectDetail = async ({
   readonly projectId: string;
   readonly query: ProjectDetailQuery;
 }) => {
-  const model = await getProjectDetailData(projectId, query);
-  if (model.kind === "error") {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Project could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
-  }
-  if (model.kind === "not-found") {
-    notFound();
-  }
   const {
     activityResult,
     bugResult,
     calendarEvents,
     calendarMode,
     calendarRange,
-    initialColumnWidths,
     currentUserId,
     editableTaskIds,
     employeeResult,
     fileResult,
-    favoriteProjectIds,
+    initialColumnWidths,
     isAdmin,
     labelResult,
     milestonePanel,
+    milestones,
+    milestonesVersion,
     monthOffset,
     project,
     savedViewState,
     taskResult,
     tasks,
     teamResult,
-    milestones,
-    milestonesVersion,
     timelineRange,
     today,
     view,
-  } = model;
+  } = await getProjectBodyData(projectId, query);
   const employees = employeeResult.ok ? employeeResult.data : [];
-  const membersById = new Map(
-    employees.map((employee) => [employee.id, employee] as const)
-  );
   return (
     <ProjectViewStoreProvider initialColumnWidths={initialColumnWidths}>
       <TaskDrawerHost
@@ -93,51 +131,14 @@ const ProjectDetail = async ({
         isAdmin={isAdmin}
         tasks={tasks}
       >
-        <div className="page flush">
-          <div className="proj-h">
-            <div className="row">
-              <ProjectIcon color={project.color} icon={project.icon} />
-              <span className="faint">Projects</span>
-              <span className="sep">/</span>
-              <h1>{project.name}</h1>
-              <FavoriteToggle
-                id={project.id}
-                initialFavorite={favoriteProjectIds.has(project.id)}
-                kind="project"
-              />
-            </div>
-            <p>{project.description || "Project workspace"}</p>
-            <div className="row project-meta">
-              <span className={`pstatus ${project.status}`}>
-                {project.status}
-              </span>
-              <span className="muted">
-                {project.startDate ?? "No start date"} —{" "}
-                {project.dueDate ?? "No due date"}
-              </span>
-              {project.memberIds.length > 0 ? (
-                <ProjectMemberAvatars
-                  memberIds={project.memberIds}
-                  membersById={membersById}
-                />
-              ) : null}
-              {isAdmin ? (
-                <ProjectAdminControls
-                  employees={employeeResult.ok ? employeeResult.data : []}
-                  project={project}
-                  teams={teamResult.ok ? teamResult.data : []}
-                />
-              ) : null}
-            </div>
-            <ProjectViewTabs projectId={project.id} selected={view} />
-          </div>
-          <ProjectSavedViews
-            isAdmin={isAdmin}
-            projectId={project.id}
-            selectedId={savedViewState.selected?.id ?? null}
-            userId={currentUserId}
-            views={savedViewState.views}
-          />
+        <ProjectSavedViews
+          isAdmin={isAdmin}
+          projectId={project.id}
+          selectedId={savedViewState.selected?.id ?? null}
+          userId={currentUserId}
+          views={savedViewState.views}
+        />
+        <ViewSwitchTransition name="project-view" view={view}>
           <ProjectViewContent
             activityResult={activityResult}
             bugResult={bugResult}
@@ -162,7 +163,7 @@ const ProjectDetail = async ({
             today={today}
             view={view}
           />
-        </div>
+        </ViewSwitchTransition>
       </TaskDrawerHost>
     </ProjectViewStoreProvider>
   );
@@ -184,77 +185,105 @@ const COLUMNS = ["Backlog", "To Do", "In Progress", "Review", "Done"] as const;
 
 const COLUMN_CARDS = SKELETON_KEYS.slice(0, 3);
 
-// Mirrors ProjectDetail on its default board view: the "Projects /" crumb, the
-// view tabs, the board controls and column names are static; the project name,
-// meta and every card are data.
-const ProjectDetailSkeleton = () => (
-  <div className="page flush">
-    <div className="proj-h">
-      <div className="row">
-        <SkeletonBone shape="avatar" />
-        <span className="faint">Projects</span>
-        <span className="sep">/</span>
-        <h1>
-          <SkeletonBone shape="title" />
-        </h1>
-      </div>
-      <p>
-        <SkeletonBone />
-      </p>
-      <div className="row project-meta">
-        <SkeletonBone shape="short" />
-        <SkeletonBone shape="short" />
-      </div>
-      <nav aria-label="Project views" className="tabs project-tabs">
-        {VIEWS.map(({ Icon, label }) => (
-          <span className={`tab${label === "Board" ? " on" : ""}`} key={label}>
-            <Icon aria-hidden="true" size={14} />
-            {label}
-          </span>
-        ))}
-      </nav>
+// The crumb and view tabs are static; the project name and meta are data.
+const ProjectHeaderSkeleton = ({
+  view = "board",
+}: {
+  readonly view?: string;
+}) => (
+  <div className="proj-h">
+    <div className="row">
+      <SkeletonBone shape="avatar" />
+      <span className="faint">Projects</span>
+      <span className="sep">/</span>
+      <h1>
+        <SkeletonBone shape="title" />
+      </h1>
     </div>
-    <div className="project-board-wrap">
-      <div aria-hidden="true" className="board-toolbar">
-        <span className="skeleton-filter-select skeleton-search board-search">
-          Search tasks...
-        </span>
-        <span className="skeleton-filter-select">
-          All priorities
-          <CaretDown aria-hidden="true" size={14} />
-        </span>
-        <span className="skeleton-filter-select">
-          Manual order
-          <CaretDown aria-hidden="true" size={14} />
-        </span>
-      </div>
-      <SkelterSurface label="Loading project…">
-        <div className="board">
-          {COLUMNS.map((column) => (
-            <section className="bcol" key={column}>
-              <header className="bcol-h">
-                <span aria-hidden="true" className="st" />
-                <SkeletonBone shape="short" />
-              </header>
-              <div className="bcol-b">
-                {COLUMN_CARDS.map((key) => (
-                  <div className="kcard" key={key}>
-                    <div className="top">
-                      <SkeletonBone shape="short" />
-                      <SkeletonBone />
-                    </div>
-                    <div className="meta">
-                      <SkeletonBone shape="short" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </SkelterSurface>
+    <p>
+      <SkeletonBone />
+    </p>
+    <div className="row project-meta">
+      <SkeletonBone shape="short" />
+      <SkeletonBone shape="short" />
     </div>
+    <nav aria-label="Project views" className="tabs project-tabs">
+      {VIEWS.map(({ Icon, label }) => (
+        <span
+          className={`tab${label.toLowerCase() === view ? " on" : ""}`}
+          key={label}
+        >
+          <Icon aria-hidden="true" size={14} />
+          {label}
+        </span>
+      ))}
+    </nav>
   </div>
 );
 
-export { ProjectDetail, ProjectDetailSkeleton };
+const ROW_VIEWS = new Set(["list", "table", "bugs", "files", "activity"]);
+
+// Without a view it is the neutral frame every view shares; once the page has
+// read ?view it draws that view's own shape.
+const ProjectBodySkeleton = ({ view }: { readonly view?: string }) => {
+  if (view === "board") {
+    return (
+      <div className="project-board-wrap">
+        <div aria-hidden="true" className="board-toolbar">
+          <span className="skeleton-filter-select skeleton-search board-search">
+            Search tasks...
+          </span>
+          <span className="skeleton-filter-select">
+            All priorities
+            <CaretDown aria-hidden="true" size={14} />
+          </span>
+          <span className="skeleton-filter-select">
+            Manual order
+            <CaretDown aria-hidden="true" size={14} />
+          </span>
+        </div>
+        <SkelterSurface label="Loading project…">
+          <div className="board">
+            {COLUMNS.map((column) => (
+              <section className="bcol" key={column}>
+                <header className="bcol-h">
+                  <span aria-hidden="true" className="st" />
+                  <SkeletonBone shape="short" />
+                </header>
+                <div className="bcol-b">
+                  {COLUMN_CARDS.map((key) => (
+                    <div className="kcard" key={key}>
+                      <div className="top">
+                        <SkeletonBone shape="short" />
+                        <SkeletonBone />
+                      </div>
+                      <div className="meta">
+                        <SkeletonBone shape="short" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </SkelterSurface>
+      </div>
+    );
+  }
+  return (
+    <SkelterSurface label="Loading project…">
+      <section className="panel">
+        <div className="panel-b">
+          <SkeletonRows rows={view && ROW_VIEWS.has(view) ? 5 : 3} />
+        </div>
+      </section>
+    </SkelterSurface>
+  );
+};
+
+export {
+  ProjectBody,
+  ProjectBodySkeleton,
+  ProjectHeader,
+  ProjectHeaderSkeleton,
+};

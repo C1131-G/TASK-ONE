@@ -3,7 +3,7 @@
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
 import { Effect, Schema, Layer } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import {
   bugIdOf,
@@ -253,6 +253,7 @@ export async function markPortalNotificationReadAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePath("/portal/notifications");
+    refresh();
   }
   return result;
 }
@@ -271,6 +272,7 @@ export async function markAllPortalNotificationsReadAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePath("/portal/notifications");
+    refresh();
   }
   return result;
 }

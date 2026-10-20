@@ -216,6 +216,7 @@ const MembersDirectory = ({
                       <Link
                         className="members-person members-person-link"
                         href={`/members/${employee.id}`}
+                        transitionTypes={["nav-forward"]}
                       >
                         <Avatar className="members-avatar">
                           {employee.avatar ? (

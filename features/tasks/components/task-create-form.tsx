@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
@@ -33,7 +32,6 @@ const TaskCreateForm = ({
   readonly onOpenChange?: (open: boolean) => void;
   readonly trigger?: ReactNode | null;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -61,7 +59,6 @@ const TaskCreateForm = ({
         return;
       }
       updateOpen(false);
-      router.refresh();
     });
   };
 

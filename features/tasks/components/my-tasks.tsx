@@ -43,13 +43,7 @@ const MyTasks = async ({
       getPersonalPreferences({}),
     ]);
   if (session.kind !== "authenticated" || !projectResult.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Your tasks could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
+    throw new Error("Your tasks could not be loaded.");
   }
 
   const taskLists = await Promise.all(
@@ -59,13 +53,7 @@ const MyTasks = async ({
     }))
   );
   if (taskLists.some(({ tasks }) => tasks === undefined)) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Some project tasks could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
+    throw new Error("Some project tasks could not be loaded.");
   }
   const assignedTasks: AssignedTask[] = [];
   for (const { project, tasks } of taskLists) {
@@ -143,7 +131,7 @@ const MyTasksSkeleton = () => (
         <p aria-hidden="true">&nbsp;</p>
       </div>
     </div>
-    <PanelSkeleton variant="tasks" label="Loading your tasks…" rows={6} />
+    <PanelSkeleton variant="tasks" label="Loading your tasks…" rows={5} />
   </>
 );
 

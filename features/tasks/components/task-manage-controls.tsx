@@ -4,7 +4,6 @@
 "use client";
 
 import { DotsThree, ListBullets } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import {
@@ -43,7 +42,6 @@ const TaskManageControls = ({
   readonly employees: readonly EmployeeOption[];
   readonly currentUserId: string | null;
 }) => {
-  const router = useRouter();
   const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [versionState, setVersionState] = useState({
@@ -83,7 +81,6 @@ const TaskManageControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
   };
 
@@ -113,7 +110,6 @@ const TaskManageControls = ({
           if (!undoResult.ok) {
             return undoResult.error.message;
           }
-          router.refresh();
           return null;
         },
       });

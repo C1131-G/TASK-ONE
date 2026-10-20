@@ -2,7 +2,6 @@
 
 import { redirect } from "next/navigation";
 
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { listBugs } from "@/features/bugs/bugs-queries";
 import { BugList } from "@/features/bugs/components/bug-list";
 import { getPageSession } from "@/src/server/auth/page-session";
@@ -25,8 +24,4 @@ const BugApprovalList = async () => {
   );
 };
 
-const BugApprovalListSkeleton = () => (
-  <PanelSkeleton variant="bugs" label="Loading approvals…" rows={4} />
-);
-
-export { BugApprovalList, BugApprovalListSkeleton };
+export { BugApprovalList };

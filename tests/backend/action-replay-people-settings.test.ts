@@ -19,26 +19,28 @@ import {
 import type { ActionFunction, Persona } from "./support/action-harness";
 
 const calendar = await import("../../features/calendar/calendar-actions");
-const comments = await import("../../features/tasks/actions/task-comments");
-const companySettings = await import("../../features/company/company-actions");
+const comments = await import("../../features/tasks/actions/tasks-comments");
+const companySettings =
+  await import("../../features/settings/settings-actions");
 const dashboard = await import("../../features/dashboard/dashboard-queries");
 const discovery = await import("../../features/discovery/discovery-actions");
 const employees = await import("../../features/people/people-actions");
-const jobs = await import("../../features/jobs/jobs-queries");
-const labels = await import("../../features/tasks/actions/labels");
+const jobs = await import("../../features/settings/settings-queries");
+const labels = await import("../../features/tasks/actions/tasks-labels");
 const notifications =
   await import("../../features/notifications/notifications-actions");
-const password = await import("../../features/user/actions/password");
+const password = await import("../../features/user/actions/user-password");
 const personalPreferences =
-  await import("../../features/user/actions/personal-preferences");
+  await import("../../features/user/actions/user-personal-preferences");
 const projects = await import("../../features/projects/projects-actions");
-const savedViews = await import("../../features/projects/actions/saved-views");
-const sessions = await import("../../features/user/actions/sessions");
-const subtasks = await import("../../features/tasks/actions/subtasks");
+const savedViews =
+  await import("../../features/projects/actions/projects-saved-views");
+const sessions = await import("../../features/user/actions/user-sessions");
+const subtasks = await import("../../features/tasks/actions/tasks-subtasks");
 const tasks = await import("../../features/tasks/tasks-actions");
-const teams = await import("../../features/people/actions/teams");
+const teams = await import("../../features/people/actions/people-teams");
 const uploads = await import("../../features/files/files-actions");
-const companyQueries = await import("../../features/company/company-queries");
+const companyQueries = await import("../../features/settings/settings-queries");
 const { Idempotency, IdempotencyLive } =
   await import("../../src/server/core/idempotency");
 const { Storage } = await import("../../src/server/storage/storage");

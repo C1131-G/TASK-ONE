@@ -53,7 +53,6 @@ const ProjectAdminControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const duplicate = (formData: FormData) =>
@@ -71,7 +70,6 @@ const ProjectAdminControls = ({
         return;
       }
       router.push(`/projects/${result.data.id}`);
-      router.refresh();
     });
 
   const archive = () =>
@@ -86,7 +84,6 @@ const ProjectAdminControls = ({
         return;
       }
       router.push("/archive");
-      router.refresh();
     });
 
   return (

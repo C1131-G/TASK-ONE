@@ -7,13 +7,15 @@ import type { CalendarMode } from "@/features/calendar/calendar-params";
 import { listCalendarEvents } from "@/features/calendar/calendar-queries";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listProjectFiles } from "@/features/files/files-queries";
-import { listAllEmployees, listTeams } from "@/features/people/people-queries";
-import { ProjectMilestones } from "@/features/projects/components/project-milestones";
-import type { listProjects } from "@/features/projects/projects-queries";
 import {
-  listAllProjects,
+  listAllEmployees,
+  listAllTeams,
+} from "@/features/people/people-queries";
+import { ProjectMilestones } from "@/features/projects/components/project-milestones";
+import {
+  getProject,
+  listAllSavedViews,
   listProjectMilestones,
-  listSavedViews,
 } from "@/features/projects/projects-queries";
 import { resolveSavedViews } from "@/features/projects/saved-view-selection";
 import { columnWidthsFromPreferences } from "@/features/tasks/task-table-columns";
@@ -67,10 +69,7 @@ const loadProjectViewData = async ({
   readonly currentUserId: string | null;
   readonly isAdmin: boolean;
   readonly monthOffset: number;
-  readonly project: Extract<
-    Awaited<ReturnType<typeof listProjects>>,
-    { readonly ok: true }
-  >["data"][number];
+  readonly project: Awaited<ReturnType<typeof getProject>>;
   readonly view: string;
 }) => {
   const requiresTaskList = [
@@ -121,24 +120,12 @@ const loadProjectViewData = async ({
   };
 };
 
-export const getProjectDetailData = async (
-  projectId: string,
-  query: ProjectDetailQuery
-) => {
-  const requestedView = query.view;
-  const [session, projects, savedViewsResult] = await Promise.all([
+const resolveViewer = async (projectId: string, requestedView: string) => {
+  const [session, project, savedViewsResult] = await Promise.all([
     getPageSession(),
-    listAllProjects(),
-    listSavedViews({}),
+    getProject(projectId),
+    listAllSavedViews(),
   ]);
-  if (!projects.ok) {
-    return { kind: "error" as const };
-  }
-  const project = projects.data.find(({ id }) => id === projectId);
-  if (!project) {
-    return { kind: "not-found" as const };
-  }
-
   const isAdmin =
     session.kind === "authenticated" && session.user.role === "admin";
   const currentUserId =
@@ -149,10 +136,41 @@ export const getProjectDetailData = async (
     currentUserId,
     requestedView
   );
+  return { currentUserId, isAdmin, project, savedViewState };
+};
+
+export const getProjectHeaderData = async (
+  projectId: string,
+  requestedView: string
+) => {
+  const [viewer, employeeResult, teamResult, personal] = await Promise.all([
+    resolveViewer(projectId, requestedView),
+    listAllEmployees(),
+    listAllTeams(),
+    getPersonalWorkspace({}),
+  ]);
+  const favoriteProjectIds = new Set(
+    personal.ok ? personal.data.projects.map(({ id }) => id) : []
+  );
+  return {
+    employees: employeeResult.ok ? employeeResult.data : [],
+    isAdmin: viewer.isAdmin,
+    isFavorite: favoriteProjectIds.has(viewer.project.id),
+    project: viewer.project,
+    teams: teamResult.ok ? teamResult.data : [],
+    view: viewer.savedViewState.activeType,
+  };
+};
+
+export const getProjectBodyData = async (
+  projectId: string,
+  query: ProjectDetailQuery
+) => {
+  const { currentUserId, isAdmin, project, savedViewState } =
+    await resolveViewer(projectId, query.view);
   const view = savedViewState.activeType;
   const [
     employeeResult,
-    personal,
     milestoneResult,
     teamResult,
     labelResult,
@@ -160,9 +178,8 @@ export const getProjectDetailData = async (
     viewData,
   ] = await Promise.all([
     listAllEmployees(),
-    getPersonalWorkspace({}),
     listProjectMilestones({ projectId }),
-    listTeams({}),
+    listAllTeams(),
     listLabels({}),
     getPersonalPreferences({}),
     loadProjectViewData({
@@ -175,9 +192,6 @@ export const getProjectDetailData = async (
     }),
   ]);
   const { calendarMode, monthOffset } = query;
-  const favoriteProjectIds = new Set(
-    personal.ok ? personal.data.projects.map(({ id }) => id) : []
-  );
   const milestonePanel = milestoneResult.ok ? (
     <ProjectMilestones
       editable={isAdmin}
@@ -196,12 +210,10 @@ export const getProjectDetailData = async (
     calendarMode,
     currentUserId,
     employeeResult,
-    favoriteProjectIds,
     initialColumnWidths: columnWidthsFromPreferences(
       preferences.ok ? preferences.data.taskTableColumnWidths : undefined
     ),
     isAdmin,
-    kind: "ready" as const,
     labelResult,
     milestonePanel,
     milestones: milestoneResult.ok ? milestoneResult.data.milestones : [],

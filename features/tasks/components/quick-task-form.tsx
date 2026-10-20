@@ -71,7 +71,6 @@ export const QuickTaskForm = ({
       setError(null);
       setOpen(false);
       router.push(`/projects/${result.data.projectId}?view=board`);
-      router.refresh();
     });
 
   return (

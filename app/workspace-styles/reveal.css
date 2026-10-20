@@ -1,3 +1,8 @@
+/* Page-load reveal: the real UI fades in region by region, in layout order.
+   The top bar is persistent chrome, so it plays once without a gate. Sidebar
+   items and page regions remount on navigation, so they only animate until
+   WorkspaceRevealGate marks the document as revealed. Reduced motion renders
+   everything solid with no animation. */
 @keyframes workspace-reveal {
   from {
     opacity: 0;
@@ -10,34 +15,73 @@
   }
 }
 
-.workspace-app .topbar,
-.workspace-app .side,
-.workspace-app .content {
-  animation: workspace-reveal 250ms cubic-bezier(0.215, 0.61, 0.355, 1) both;
-}
-
-.workspace-app .topbar {
-  animation-delay: 0ms;
-}
-
-.workspace-app .side {
-  animation-delay: 100ms;
-}
-
-.workspace-app .content {
-  animation-delay: 200ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .workspace-app .topbar,
-  .workspace-app .side,
-  .workspace-app .content {
-    animation: none;
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-app:not([data-motion="reduce"]) .topbar,
+  :root:not([data-workspace-revealed])
+    .workspace-app:not([data-motion="reduce"])
+    :is(
+      .shell > .side .side-top,
+      .shell > .side .sitem,
+      .shell > .side .side-bot,
+      .content > .page > *,
+      .content > :not(.page)
+    ) {
+    animation: workspace-reveal 250ms cubic-bezier(0.215, 0.61, 0.355, 1) both;
+    animation-delay: var(--reveal-delay, 0ms);
   }
 }
 
-.workspace-app[data-motion="reduce"] .topbar,
-.workspace-app[data-motion="reduce"] .side,
-.workspace-app[data-motion="reduce"] .content {
-  animation: none;
+/* 1. Shell: brand beside the top bar. */
+.workspace-app .shell > .side .side-top {
+  --reveal-delay: 40ms;
+}
+
+/* 2. Sidebar items: each group starts later, items step 25ms within it. */
+.workspace-app .shell > .side .sgroup {
+  --reveal-group: 100ms;
+}
+.workspace-app .shell > .side .sgroup:nth-child(2) {
+  --reveal-group: 160ms;
+}
+.workspace-app .shell > .side .sgroup:nth-child(n + 3) {
+  --reveal-group: 220ms;
+}
+.workspace-app .shell > .side .sitem {
+  --reveal-delay: calc(var(--reveal-group) + var(--reveal-step, 0) * 25ms);
+}
+.workspace-app .shell > .side .sitem:nth-child(2) {
+  --reveal-step: 1;
+}
+.workspace-app .shell > .side .sitem:nth-child(3) {
+  --reveal-step: 2;
+}
+.workspace-app .shell > .side .sitem:nth-child(4) {
+  --reveal-step: 3;
+}
+.workspace-app .shell > .side .sitem:nth-child(5) {
+  --reveal-step: 4;
+}
+.workspace-app .shell > .side .sitem:nth-child(6) {
+  --reveal-step: 5;
+}
+.workspace-app .shell > .side .sitem:nth-child(n + 7) {
+  --reveal-step: 6;
+}
+.workspace-app .shell > .side .side-bot {
+  --reveal-delay: 300ms;
+}
+
+/* 3–5. Page title, then summary cards, then panels and tables. */
+.workspace-app .content > :not(.page),
+.workspace-app .content > .page > :nth-child(1) {
+  --reveal-delay: 200ms;
+}
+.workspace-app .content > .page > :nth-child(2) {
+  --reveal-delay: 300ms;
+}
+.workspace-app .content > .page > :nth-child(3) {
+  --reveal-delay: 400ms;
+}
+.workspace-app .content > .page > :nth-child(n + 4) {
+  --reveal-delay: 500ms;
 }

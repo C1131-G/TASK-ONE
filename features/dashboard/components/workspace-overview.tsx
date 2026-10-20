@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { getDashboardOverview } from "@/features/dashboard/dashboard-queries";
 import {
   milestoneDateFormatter,
@@ -30,11 +29,7 @@ const WorkspaceOverview = async () => {
     listProjects({}),
   ]);
   if (!dashboard.ok || !projects.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Workspace overview could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Workspace overview could not be loaded.");
   }
 
   const taskCount = Object.values(dashboard.data.tasks).reduce(
@@ -252,10 +247,6 @@ const WorkspaceOverview = async () => {
   );
 };
 
-const WorkspaceOverviewSkeleton = () => (
-  <PanelSkeleton label="Loading workspace overview…" variant="overview" />
-);
-
 const WorkspaceOverviewActions = async () => {
   const session = await getPageSession();
   const isAdmin =
@@ -281,5 +272,4 @@ export {
   WorkspaceOverview,
   WorkspaceOverviewActions,
   WorkspaceOverviewActionsSkeleton,
-  WorkspaceOverviewSkeleton,
 };

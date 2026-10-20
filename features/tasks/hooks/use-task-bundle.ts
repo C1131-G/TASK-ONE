@@ -5,11 +5,11 @@ import { useCallback, useRef, useState } from "react";
 import type { TaskSubtaskView } from "@/features/tasks/components/task-details-subtasks";
 import { useTaskComments } from "@/features/tasks/hooks/use-task-comments";
 import type { EditableTask } from "@/features/tasks/task-details-draft";
-import { readTaskBundle } from "@/features/tasks/task-details-panel-data";
 import type {
   TaskBundle,
   TaskFile,
 } from "@/features/tasks/task-details-panel-data";
+import { getTaskBundleAction } from "@/features/tasks/tasks-actions";
 
 // Reads everything the task panel shows while it is open, and owns the panel's
 // error so the reads and the comment actions report into one place. A deep link
@@ -96,7 +96,7 @@ export const useTaskBundle = ({
     const requestId = requestSequence.current;
     setLoading(true);
     try {
-      const bundle = await readTaskBundle(projectId, taskId, bugId);
+      const bundle = await getTaskBundleAction(projectId, taskId, bugId);
       if (requestId === requestSequence.current) {
         applyBundle(bundle);
       }

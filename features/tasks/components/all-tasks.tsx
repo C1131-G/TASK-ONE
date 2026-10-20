@@ -30,13 +30,7 @@ const AllTasks = async ({
       getPersonalPreferences({}),
     ]);
   if (!projects.ok) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Tasks could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
+    throw new Error("Tasks could not be loaded.");
   }
 
   const taskLists = await Promise.all(
@@ -46,13 +40,7 @@ const AllTasks = async ({
     }))
   );
   if (taskLists.some(({ tasks }) => tasks === undefined)) {
-    return (
-      <div className="page">
-        <div className="panel panel-b" role="alert">
-          Some project tasks could not be loaded. Refresh to retry.
-        </div>
-      </div>
-    );
+    throw new Error("Some project tasks could not be loaded.");
   }
   const allTasks = taskLists.flatMap(({ project, tasks }) =>
     (tasks ?? []).map((task) => ({
@@ -115,7 +103,7 @@ const AllTasksSkeleton = () => (
         <p aria-hidden="true">&nbsp;</p>
       </div>
     </div>
-    <PanelSkeleton variant="tasks" label="Loading tasks…" rows={6} />
+    <PanelSkeleton variant="tasks" label="Loading tasks…" rows={5} />
   </>
 );
 

@@ -74,7 +74,7 @@ export const GlobalTasksWorkspace = ({
   const view = toTaskView(search.view);
 
   return (
-    <div className="page flush">
+    <>
       <div className="ph">
         <div>
           <h1>Tasks</h1>
@@ -126,6 +126,6 @@ export const GlobalTasksWorkspace = ({
           </p>
         </section>
       )}
-    </div>
+    </>
   );
 };

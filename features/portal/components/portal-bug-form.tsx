@@ -145,7 +145,10 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       )
     );
     recordFailedUploads(bugId, failures);
-    router.push(`/portal/bugs/${bugId}`);
+    // The report is filed; Back should not return to the finished form.
+    router.replace(`/portal/bugs/${bugId}`, {
+      transitionTypes: ["nav-forward"],
+    });
   };
 
   const editBug = async (idempotencyKey: string) => {
@@ -167,7 +170,6 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       setPending(false);
       return;
     }
-    router.refresh();
     mode.onDone();
   };
 

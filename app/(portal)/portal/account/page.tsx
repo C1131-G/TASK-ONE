@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
   PortalAccount,
   PortalAccountSkeleton,
@@ -12,13 +13,21 @@ import {
 export const metadata: Metadata = { title: "Account | Metsys" };
 
 const Page = () => (
-  <div className="page portal-narrow">
-    <SectionErrorBoundary title="account could not be loaded">
-      <Suspense fallback={<PortalAccountSkeleton />}>
-        <PortalAccount />
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  <PageTransition>
+    <div className="page portal-narrow">
+      <div className="ph">
+        <div>
+          <h1>Account</h1>
+          <p>Your details, password and notification settings.</p>
+        </div>
+      </div>
+      <SectionErrorBoundary title="account could not be loaded">
+        <SuspenseReveal fallback={<PortalAccountSkeleton />}>
+          <PortalAccount />
+        </SuspenseReveal>
+      </SectionErrorBoundary>
+    </div>
+  </PageTransition>
 );
 
 export default Page;

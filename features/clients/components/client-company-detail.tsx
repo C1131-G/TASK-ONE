@@ -3,17 +3,18 @@
 
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SkeletonBone,
   SkeletonDataGrid,
 } from "@/components/workspace/skeleton-shapes";
-import { getClientCompanyOnce } from "@/features/clients/client-company-metadata";
+import { getClientCompanyRecord } from "@/features/clients/clients-queries";
 import { ClientCompanyWorkspace } from "@/features/clients/components/client-company-workspace";
 import { listAllEmployees } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const ClientCompanyDetailView = async ({
@@ -25,42 +26,23 @@ const ClientCompanyDetailView = async ({
   if (session.kind !== "authenticated" || session.user.role !== "admin") {
     redirect("/");
   }
-  const [result, projectsResult, employeesResult] = await Promise.all([
-    getClientCompanyOnce(companyId),
+  const [detail, projectsResult, employeesResult] = await Promise.all([
+    getClientCompanyRecord(companyId),
     listProjects({}),
     listAllEmployees(),
   ]);
-  if (!result.ok) {
-    if (
-      result.error.code === "NOT_FOUND" ||
-      result.error.code === "VALIDATION_FAILED"
-    ) {
-      notFound();
-    }
-    return (
-      <div className="panel panel-b" role="alert">
-        The client company could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-  if (!projectsResult.ok || !employeesResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Projects or employees could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
+  const projects = readOrThrow(projectsResult, "Projects");
+  const employees = readOrThrow(employeesResult, "Employees");
   return (
     <ClientCompanyWorkspace
-      detail={result.data}
-      employeeOptions={employeesResult.data.map(({ email, id, name }) => ({
+      detail={detail}
+      employeeOptions={employees.map(({ email, id, name }) => ({
         email,
         id,
         name,
       }))}
-      projectOptions={projectsResult.data.flatMap(
-        ({ archivedAt, id, key, name }) =>
-          archivedAt === null ? [{ id, key, name }] : []
+      projectOptions={projects.flatMap(({ archivedAt, id, key, name }) =>
+        archivedAt === null ? [{ id, key, name }] : []
       )}
     />
   );
@@ -72,7 +54,11 @@ const USER_COLUMNS = ["User", "Status", "Last active", "Actions"] as const;
 // headings are static; the company, counts and users are data.
 const ClientCompanyDetailSkeleton = () => (
   <div className="clients-workspace">
-    <Link className="clients-back" href="/clients">
+    <Link
+      className="clients-back"
+      href="/clients"
+      transitionTypes={["nav-back"]}
+    >
       <ArrowLeft aria-hidden="true" size={14} />
       All clients
     </Link>

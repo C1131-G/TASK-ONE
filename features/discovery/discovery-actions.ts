@@ -1,7 +1,7 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
@@ -55,6 +55,7 @@ export async function toggleProjectFavoriteAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/");
     revalidatePath("/projects");
+    refresh();
   }
   return result;
 }
@@ -94,6 +95,7 @@ export async function toggleTaskFavoriteAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/");
     revalidatePath("/tasks");
+    refresh();
   }
   return result;
 }

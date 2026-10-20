@@ -2,7 +2,6 @@
 
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
@@ -21,7 +20,6 @@ const PortalComments = ({
   readonly canComment: boolean;
   readonly comments: readonly PortalComment[];
 }) => {
-  const router = useRouter();
   const [added, setAdded] = useState<readonly PortalComment[]>([]);
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
@@ -55,7 +53,6 @@ const PortalComments = ({
         setAdded((current) => [...current, result.data]);
         setBody("");
         keyRef.current = null;
-        router.refresh();
       } else {
         setError(result.error.message);
       }

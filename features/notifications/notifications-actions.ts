@@ -6,11 +6,11 @@ import {
   markAllNotificationsReadAction as markAllNotificationsReadImpl,
   markNotificationReadAction as markNotificationReadImpl,
   setNotificationPreferenceAction as setNotificationPreferenceImpl,
-} from "./actions/notification-inbox";
+} from "./actions/notifications-inbox";
 import {
   registerPushSubscriptionAction as registerPushSubscriptionImpl,
   removePushSubscriptionAction as removePushSubscriptionImpl,
-} from "./actions/push-subscriptions";
+} from "./actions/notifications-push-subscriptions";
 
 export async function markNotificationReadAction(input: unknown) {
   return await markNotificationReadImpl(input);

@@ -2,7 +2,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -23,7 +22,6 @@ const timeFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 const LockedAccountRow = ({ account }: { readonly account: LockedAccount }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +33,6 @@ const LockedAccountRow = ({ account }: { readonly account: LockedAccount }) => {
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

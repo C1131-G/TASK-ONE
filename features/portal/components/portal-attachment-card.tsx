@@ -3,7 +3,7 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
 import { DownloadSimple, FilePdf, FileVideo } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { getPortalFileUrlAction } from "@/features/portal/portal-actions";
 import { formatFileSize } from "@/features/portal/portal-upload-rules";
@@ -11,34 +11,13 @@ import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
 
 export type Attachment = PortalBugDetail["attachments"][number];
 
-const ImagePreview = ({ attachment }: { readonly attachment: Attachment }) => {
-  const [url, setUrl] = useState<string | null>();
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const result = await getPortalFileUrlAction({
-          disposition: "preview",
-          fileId: attachment.fileId,
-        });
-        if (!cancelled) {
-          setUrl(result.ok ? result.data : null);
-        }
-      } catch {
-        if (!cancelled) {
-          setUrl(null);
-        }
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [attachment.fileId]);
-
-  if (url === undefined) {
-    return <span aria-hidden="true" className="sk portal-preview" />;
-  }
+const ImagePreview = ({
+  attachment,
+  url,
+}: {
+  readonly attachment: Attachment;
+  readonly url: string | null;
+}) => {
   if (url === null) {
     return (
       <span className="portal-preview portal-preview-empty">
@@ -108,15 +87,17 @@ const DownloadButton = ({
 
 export const AttachmentCard = ({
   attachment,
+  previewUrl,
 }: {
   readonly attachment: Attachment;
+  readonly previewUrl: string | null;
 }) => {
   const isImage =
     attachment.previewable && attachment.contentType.startsWith("image/");
   return (
     <li className="portal-attachment">
       {isImage ? (
-        <ImagePreview attachment={attachment} />
+        <ImagePreview attachment={attachment} url={previewUrl} />
       ) : (
         <span aria-hidden="true" className="portal-preview portal-preview-icon">
           {attachment.contentType === "video/mp4" ? (

@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -30,7 +29,6 @@ const ProjectEditForm = ({
   readonly project: ProjectControlsData;
   readonly teams: readonly TeamOption[];
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const update = (formData: FormData) =>
@@ -54,7 +52,6 @@ const ProjectEditForm = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

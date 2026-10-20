@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,7 +30,6 @@ export const GlobalTaskBulkDialog = ({
   readonly employees: readonly EmployeeDirectoryEntry[];
   readonly onSuccess: () => void;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("unset");
   const [priority, setPriority] = useState("unset");
@@ -100,7 +98,6 @@ export const GlobalTaskBulkDialog = ({
       setOpen(false);
       resetForm();
       onSuccess();
-      router.refresh();
     });
   };
 

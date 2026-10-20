@@ -70,7 +70,11 @@ export const BugCard = ({
     bugEntry;
   return (
     <article className="panel panel-b bug-list-item" key={bug.id}>
-      <Link className="bug-list-link" href={`/bugs/${bug.id}`}>
+      <Link
+        className="bug-list-link"
+        href={`/bugs/${bug.id}`}
+        transitionTypes={["nav-forward"]}
+      >
         <span
           aria-hidden="true"
           className={`bug-severity bug-severity-${bug.severity}`}
@@ -125,6 +129,7 @@ export const BugCard = ({
         <Link
           className="btn btn-outline bug-open-drawer"
           href={`/bugs/${bug.id}`}
+          transitionTypes={["nav-forward"]}
         >
           Assign
         </Link>

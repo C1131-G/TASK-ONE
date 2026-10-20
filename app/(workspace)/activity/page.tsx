@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
   ActivityFeed,
   ActivityFeedSkeleton,
@@ -12,19 +13,21 @@ import {
 export const metadata: Metadata = { title: "Activity | Metsys" };
 
 const ActivityPage = () => (
-  <div className="page">
-    <div className="ph">
-      <div>
-        <h1>Activity</h1>
-        <p>Everything that&apos;s changed across the workspace.</p>
+  <PageTransition>
+    <div className="page">
+      <div className="ph">
+        <div>
+          <h1>Activity</h1>
+          <p>Everything that&apos;s changed across the workspace.</p>
+        </div>
       </div>
+      <SectionErrorBoundary title="activity could not be loaded">
+        <SuspenseReveal fallback={<ActivityFeedSkeleton />}>
+          <ActivityFeed />
+        </SuspenseReveal>
+      </SectionErrorBoundary>
     </div>
-    <SectionErrorBoundary title="activity could not be loaded">
-      <Suspense fallback={<ActivityFeedSkeleton />}>
-        <ActivityFeed />
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  </PageTransition>
 );
 
 export default ActivityPage;

@@ -3,7 +3,6 @@
 "use client";
 
 import { SpinnerGap, UploadSimple } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -50,7 +49,6 @@ export const BugEvidenceSection = ({
   readonly pending: boolean;
   readonly submit: BugSubmit;
 }) => {
-  const router = useRouter();
   const [evidenceKind, setEvidenceKind] = useState("before");
   const [fileBusy, setFileBusy] = useState(false);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -109,8 +107,6 @@ export const BugEvidenceSection = ({
       }
       if (onRefresh) {
         await onRefresh();
-      } else {
-        router.refresh();
       }
       setFileInputKey((value) => value + 1);
     } catch {

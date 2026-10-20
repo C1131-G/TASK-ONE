@@ -14,12 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  SkeletonBone,
-  SkeletonDataGrid,
-} from "@/components/workspace/skeleton-shapes";
-import { listClientCompanies } from "@/features/clients/clients-queries";
-import { ClientCompanyCreateForm } from "@/features/clients/components/client-company-forms";
+import { SkeletonDataGrid } from "@/components/workspace/skeleton-shapes";
+import { listAllClientCompanies } from "@/features/clients/clients-queries";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const ClientCompanyList = async () => {
@@ -27,92 +24,66 @@ const ClientCompanyList = async () => {
   if (session.kind !== "authenticated" || session.user.role !== "admin") {
     redirect("/");
   }
-  const result = await listClientCompanies({});
-  if (!result.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Client companies could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-  const companies = result.data;
-  return (
-    <>
-      <div className="ph">
-        <div>
-          <h1>Clients</h1>
-          <p>
-            {companies.length === 1
-              ? "1 client company can report bugs through the portal."
-              : `${companies.length} client companies can report bugs through the portal.`}
-          </p>
-        </div>
-        <div className="acts">
-          <Link className="btn btn-secondary btn-sm" href="/clients/audit">
-            Audit log
-          </Link>
-          <ClientCompanyCreateForm />
-        </div>
-      </div>
-      {companies.length ? (
-        <section aria-label="Client companies" className="panel clients-panel">
-          <Table className="clients-table">
-            <TableCaption className="sr-only">Client companies</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Company</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="clients-num">Active users</TableHead>
-                <TableHead className="clients-num">Projects</TableHead>
-                <TableHead className="clients-num">Handlers</TableHead>
-                <TableHead className="clients-num">Open bugs</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {companies.map((company) => (
-                <TableRow key={company.id}>
-                  <TableCell>
-                    <Link
-                      className="clients-company-link"
-                      href={`/clients/${company.id}`}
-                    >
-                      <Buildings aria-hidden="true" size={16} />
-                      <strong>{company.name}</strong>
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={company.active ? "secondary" : "outline"}>
-                      {company.active ? "Active" : "Deactivated"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="clients-num">
-                    {company.userCount}
-                  </TableCell>
-                  <TableCell className="clients-num">
-                    {company.projectCount}
-                  </TableCell>
-                  <TableCell className="clients-num">
-                    {company.handlerCount}
-                  </TableCell>
-                  <TableCell className="clients-num">
-                    {company.openBugCount}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </section>
-      ) : (
-        <section className="clients-empty-state">
-          <Buildings aria-hidden="true" size={24} />
-          <h2>No client companies yet</h2>
-          <p>
-            Create a company, link its projects and add client users so they can
-            report bugs through the portal.
-          </p>
-        </section>
-      )}
-    </>
+  const companies = readOrThrow(
+    await listAllClientCompanies(),
+    "Client companies"
+  );
+  return companies.length ? (
+    <section aria-label="Client companies" className="panel clients-panel">
+      <Table className="clients-table">
+        <TableCaption className="sr-only">Client companies</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Company</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="clients-num">Active users</TableHead>
+            <TableHead className="clients-num">Projects</TableHead>
+            <TableHead className="clients-num">Handlers</TableHead>
+            <TableHead className="clients-num">Open bugs</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {companies.map((company) => (
+            <TableRow key={company.id}>
+              <TableCell>
+                <Link
+                  className="clients-company-link"
+                  href={`/clients/${company.id}`}
+                  transitionTypes={["nav-forward"]}
+                >
+                  <Buildings aria-hidden="true" size={16} />
+                  <strong>{company.name}</strong>
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Badge variant={company.active ? "secondary" : "outline"}>
+                  {company.active ? "Active" : "Deactivated"}
+                </Badge>
+              </TableCell>
+              <TableCell className="clients-num">{company.userCount}</TableCell>
+              <TableCell className="clients-num">
+                {company.projectCount}
+              </TableCell>
+              <TableCell className="clients-num">
+                {company.handlerCount}
+              </TableCell>
+              <TableCell className="clients-num">
+                {company.openBugCount}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </section>
+  ) : (
+    <section className="clients-empty-state">
+      <Buildings aria-hidden="true" size={24} />
+      <h2>No client companies yet</h2>
+      <p>
+        Create a company, link its projects and add client users so they can
+        report bugs through the portal.
+      </p>
+    </section>
   );
 };
 
@@ -125,32 +96,27 @@ const COLUMNS = [
   "Open bugs",
 ] as const;
 
-// Mirrors ClientCompanyList: the title, audit link and column headings are
-// static; the company count and every row are data.
+const ClientCompanyCount = async () => {
+  const companies = readOrThrow(
+    await listAllClientCompanies(),
+    "Client companies"
+  );
+  return companies.length === 1
+    ? "1 client company can report bugs through the portal."
+    : `${companies.length} client companies can report bugs through the portal.`;
+};
+
+// Mirrors ClientCompanyList: the column headings are static; every row is
+// data.
 const ClientCompanyListSkeleton = () => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Clients</h1>
-        <p>
-          <SkeletonBone />
-        </p>
-      </div>
-      <div className="acts">
-        <Link className="btn btn-secondary btn-sm" href="/clients/audit">
-          Audit log
-        </Link>
-      </div>
-    </div>
-    <section aria-label="Client companies" className="panel clients-panel">
-      <SkeletonDataGrid
-        columns={COLUMNS}
-        label="Loading client companies…"
-        rows={8}
-        widths="2fr 1fr 1fr 1fr 1fr 1fr"
-      />
-    </section>
-  </>
+  <section aria-label="Client companies" className="panel clients-panel">
+    <SkeletonDataGrid
+      columns={COLUMNS}
+      label="Loading client companies…"
+      rows={5}
+      widths="2fr 1fr 1fr 1fr 1fr 1fr"
+    />
+  </section>
 );
 
-export { ClientCompanyList, ClientCompanyListSkeleton };
+export { ClientCompanyCount, ClientCompanyList, ClientCompanyListSkeleton };

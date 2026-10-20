@@ -1,74 +1,81 @@
 /* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-
 import {
   SKELETON_KEYS,
   SkeletonBone,
 } from "@/components/workspace/skeleton-shapes";
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { listActivity } from "@/features/activity/activity-queries";
-import { MemberProfile } from "@/features/people/components/member-profile";
+import {
+  MemberProfileHeader,
+  MemberProfileWork,
+} from "@/features/people/components/member-profile";
+import type { MemberTask } from "@/features/people/components/member-profile-task-rows";
 import type { MemberTab } from "@/features/people/member-tab";
-import { listAllEmployees, listTeams } from "@/features/people/people-queries";
+import {
+  getEmployee,
+  listAllEmployees,
+  listTeams,
+} from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
-const MemberDetail = async ({
+const MemberHeader = async ({
+  employeeId,
+}: {
+  readonly employeeId: string;
+}) => {
+  const [employee, projectsResult, teamsResult, session] = await Promise.all([
+    getEmployee(employeeId),
+    listProjects({}),
+    listTeams({}),
+    getPageSession(),
+  ]);
+  return (
+    <MemberProfileHeader
+      canManageMembers={
+        session.kind === "authenticated" && session.user.role === "admin"
+      }
+      employee={employee}
+      projects={projectsResult.ok ? projectsResult.data : []}
+      teams={teamsResult.ok ? teamsResult.data : []}
+    />
+  );
+};
+
+const byDueDateThenTitle = (left: MemberTask, right: MemberTask) =>
+  (left.dueDate ?? "9999-12-31").localeCompare(right.dueDate ?? "9999-12-31") ||
+  left.title.localeCompare(right.title);
+
+const MemberWork = async ({
   employeeId,
   tab,
 }: {
   readonly employeeId: string;
   readonly tab: MemberTab;
 }) => {
-  const [employeesResult, projectsResult, teamsResult, session] =
+  const [employee, employeesResult, projectsResult, session] =
     await Promise.all([
+      getEmployee(employeeId),
       listAllEmployees(),
       listProjects({}),
-      listTeams({}),
       getPageSession(),
     ]);
-
-  if (!employeesResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Member details could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-  if (!projectsResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Member projects could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-
-  const employee = employeesResult.data.find(({ id }) => id === employeeId);
-  if (!employee) {
-    notFound();
-  }
-
-  const projects = projectsResult.data;
+  const projects = readOrThrow(projectsResult, "Member projects");
   const [activityResult, projectTaskResults] = await Promise.all([
     listActivity({ actorId: employee.id, limit: 8 }),
     Promise.all(projects.map(({ id }) => listAllProjectTasks(id))),
   ]);
   if (projectTaskResults.some((tasks) => tasks === undefined)) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Member work could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Member work could not be loaded.");
   }
 
   const projectsById = new Map(
     projects.map((project) => [project.id, project])
   );
-  const memberTasks = projectTaskResults.flatMap((tasks) =>
+  const memberTasks: MemberTask[] = projectTaskResults.flatMap((tasks) =>
     (tasks ?? []).flatMap((task) => {
       if (!task.assigneeIds.includes(employee.id)) {
         return [];
@@ -81,34 +88,26 @@ const MemberDetail = async ({
   );
   const openTasks = memberTasks
     .filter(({ status }) => status !== "done")
-    .toSorted(
-      (left, right) =>
-        (left.dueDate ?? "9999-12-31").localeCompare(
-          right.dueDate ?? "9999-12-31"
-        ) || left.title.localeCompare(right.title)
-    );
+    .toSorted(byDueDateThenTitle);
   const completedTasks = memberTasks
     .filter(({ status }) => status === "done")
     .toSorted((left, right) =>
       (right.completedAt ?? "").localeCompare(left.completedAt ?? "")
     );
+  const employees = employeesResult.ok ? employeesResult.data : [];
 
   return (
-    <MemberProfile
+    <MemberProfileWork
       activities={activityResult.ok ? activityResult.data : []}
-      canManageMembers={
-        session.kind === "authenticated" && session.user.role === "admin"
-      }
       completedTasks={completedTasks}
       employee={employee}
-      employees={employeesResult.data.map(({ id, name }) => ({ id, name }))}
+      employees={employees.map(({ id, name }) => ({ id, name }))}
       isAdmin={
         session.kind === "authenticated" && session.user.role === "admin"
       }
       openTasks={openTasks}
       projects={projects}
       tab={tab}
-      teams={teamsResult.ok ? teamsResult.data : []}
       viewerId={session.kind === "authenticated" ? session.user.id : null}
     />
   );
@@ -125,30 +124,30 @@ const TASK_ROWS = SKELETON_KEYS.slice(0, 5);
 
 const SIDE_ROWS = SKELETON_KEYS.slice(0, 3);
 
-// Mirrors MemberProfile: the back link, stat labels and panel titles are
-// static; the person, counts and rows are data.
-const MemberDetailSkeleton = () => (
-  <div className="page member-profile-page">
-    <Link className="member-profile-back" href="/members">
-      <ArrowLeft aria-hidden="true" size={14} />
-      All members
-    </Link>
-    <SkelterSurface label="Loading member profile…">
-      <header className="member-profile-header">
-        <SkeletonBone shape="avatar" />
-        <div className="member-profile-identity">
-          <div className="member-profile-name-row">
-            <SkeletonBone shape="title" />
-          </div>
-          <p className="member-profile-job">
-            <SkeletonBone />
-          </p>
-          <p className="member-profile-email">
-            <SkeletonBone />
-          </p>
+// Mirrors MemberProfileHeader: the person is data.
+const MemberHeaderSkeleton = () => (
+  <SkelterSurface label="Loading member profile…">
+    <header className="member-profile-header">
+      <SkeletonBone shape="avatar" />
+      <div className="member-profile-identity">
+        <div className="member-profile-name-row">
+          <SkeletonBone shape="title" />
         </div>
-      </header>
-    </SkelterSurface>
+        <p className="member-profile-job">
+          <SkeletonBone />
+        </p>
+        <p className="member-profile-email">
+          <SkeletonBone />
+        </p>
+      </div>
+    </header>
+  </SkelterSurface>
+);
+
+// Mirrors MemberProfileWork: stat labels and panel titles are static; the
+// counts and rows are data.
+const MemberWorkSkeleton = () => (
+  <>
     <div className="stats member-profile-stats">
       {STATS.map((label) => (
         <div className="stat" key={label}>
@@ -162,10 +161,8 @@ const MemberDetailSkeleton = () => (
     <div className="member-profile-grid">
       <section aria-label="Assigned tasks" className="panel">
         <nav aria-label="Member task filters" className="member-profile-tabs">
-          <Link aria-current="page" href="/members">
-            Assigned
-          </Link>
-          <Link href="/members">Completed</Link>
+          <span aria-current="page">Assigned</span>
+          <span>Completed</span>
         </nav>
         <SkelterSurface label="Loading member tasks…">
           {TASK_ROWS.map((key) => (
@@ -206,7 +203,7 @@ const MemberDetailSkeleton = () => (
         </section>
       </div>
     </div>
-  </div>
+  </>
 );
 
-export { MemberDetail, MemberDetailSkeleton };
+export { MemberHeader, MemberHeaderSkeleton, MemberWork, MemberWorkSkeleton };

@@ -1,7 +1,7 @@
 "use server";
 
 import { Effect, Schema, Layer } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import { auditEffect } from "@/src/server/audit/audit-log";
 import { AuthSessionLive } from "@/src/server/auth/session";
@@ -112,6 +112,7 @@ const runCompanyAction = async <
   );
   if (result.ok) {
     revalidatePath("/clients");
+    refresh();
   }
   return result;
 };
@@ -201,6 +202,7 @@ export async function createClientUserAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePath("/clients");
+    refresh();
   }
   return result;
 }
@@ -237,6 +239,7 @@ export async function unlockUserAction(input: unknown) {
   );
   if (result.ok) {
     revalidatePath("/clients");
+    refresh();
   }
   return result;
 }
@@ -290,6 +293,7 @@ const runLogoAction = async <
 const revalidateLogo = (companyId: string) => {
   revalidatePath(`/clients/${companyId}`);
   revalidatePath("/portal", "layout");
+  refresh();
 };
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.

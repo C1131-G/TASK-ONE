@@ -2,7 +2,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 
@@ -51,7 +50,6 @@ const ClientMessageDialog = ({
   readonly config: DialogConfig;
   readonly version: number;
 }) => {
-  const router = useRouter();
   const id = useId();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -75,7 +73,6 @@ const ClientMessageDialog = ({
         setError(null);
         setText("");
         setOpen(false);
-        router.refresh();
         return;
       }
       setError(result.error.message);

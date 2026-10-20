@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -22,7 +21,6 @@ export const SessionList = ({
 }: {
   readonly sessions: readonly SessionSummary[];
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +32,6 @@ export const SessionList = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

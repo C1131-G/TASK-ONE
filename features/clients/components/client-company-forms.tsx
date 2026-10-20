@@ -44,8 +44,9 @@ const ClientCompanyCreateForm = () => {
         return;
       }
       setError(null);
-      router.push(`/clients/${result.data.companyId}`);
-      router.refresh();
+      router.push(`/clients/${result.data.companyId}`, {
+        transitionTypes: ["nav-forward"],
+      });
     });
   return (
     <WorkspaceDisclosure
@@ -103,7 +104,6 @@ const ClientCompanyRenameForm = ({
   readonly onVersion: VersionSink;
   readonly version: number;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const rename = (formData: FormData, close: () => void) =>
@@ -121,7 +121,6 @@ const ClientCompanyRenameForm = ({
       setError(null);
       onVersion(result.data.version);
       close();
-      router.refresh();
     });
   return (
     <WorkspaceDisclosure
@@ -187,7 +186,6 @@ const ClientCompanyStatusControl = ({
   readonly onVersion: VersionSink;
   readonly version: number;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const change = (activate: boolean) =>
     startTransition(async () => {
@@ -205,7 +203,6 @@ const ClientCompanyStatusControl = ({
       }
       onError(null);
       onVersion(result.data.version);
-      router.refresh();
     });
 
   if (!company.active) {

@@ -32,6 +32,7 @@ export const TaskWorkSections = ({
   task,
   taskId,
   version,
+  versionIsCurrent,
 }: {
   readonly editable: boolean;
   readonly employees: readonly EmployeeOption[];
@@ -45,6 +46,7 @@ export const TaskWorkSections = ({
   readonly task: EditableTask | null;
   readonly taskId: string;
   readonly version: number;
+  readonly versionIsCurrent: boolean;
 }) => {
   const {
     add: handleAdd,
@@ -68,6 +70,7 @@ export const TaskWorkSections = ({
             onSaved={onSaved}
             task={task}
             version={version}
+            versionIsCurrent={versionIsCurrent}
           />
         ) : (
           <TaskDetailsFormSkeleton />

@@ -12,8 +12,8 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
-import { updateSlaSettingsAction } from "@/features/company/company-actions";
 import { useSaveState } from "@/features/settings/hooks/use-settings-save";
+import { updateSlaSettingsAction } from "@/features/settings/settings-actions";
 import type { SlaSettingsValues } from "@/src/server/company/sla-settings";
 
 import {
@@ -38,7 +38,7 @@ const SlaSettingsForm = ({
   readonly timeZones: readonly string[];
   readonly values: SlaSettingsValues;
 }) => {
-  const { error, pending, router, setError, startTransition } = useSaveState();
+  const { error, pending, setError, startTransition } = useSaveState();
   const [saved, setSaved] = useState(false);
   const [days, setDays] = useState<readonly number[]>(
     () => values.businessDays
@@ -115,7 +115,6 @@ const SlaSettingsForm = ({
       }
       setError(null);
       setSaved(true);
-      router.refresh();
     });
   };
 

@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -45,7 +44,6 @@ export const AssignmentDialog = ({
   readonly selectedIds: readonly string[];
   readonly title: string;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +85,6 @@ export const AssignmentDialog = ({
       setError(null);
       onVersion(result.data.version);
       setOpen(false);
-      router.refresh();
     });
 
   const search = query.trim().toLocaleLowerCase();

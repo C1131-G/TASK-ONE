@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import { clientCompanyMetadata } from "@/features/clients/client-company-metadata";
 import {
   ClientCompanyDetailView,
@@ -18,16 +19,18 @@ export const generateMetadata = async ({
 };
 
 const ClientCompanyPage = ({ params }: PageProps<"/clients/[companyId]">) => (
-  <div className="page">
-    <SectionErrorBoundary title="Client company could not be loaded">
-      <Suspense fallback={<ClientCompanyDetailSkeleton />}>
-        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-        {params.then(({ companyId }) => (
-          <ClientCompanyDetailView companyId={companyId} />
-        ))}
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  <PageTransition>
+    <div className="page">
+      <SectionErrorBoundary title="Client company could not be loaded">
+        <SuspenseReveal fallback={<ClientCompanyDetailSkeleton />}>
+          {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+          {params.then(({ companyId }) => (
+            <ClientCompanyDetailView companyId={companyId} />
+          ))}
+        </SuspenseReveal>
+      </SectionErrorBoundary>
+    </div>
+  </PageTransition>
 );
 
 export default ClientCompanyPage;

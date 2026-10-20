@@ -2,10 +2,8 @@
 
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import type { ReactNode } from "react";
 
-import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import {
   SKELETON_KEYS,
   SkeletonBone,
@@ -23,7 +21,8 @@ import { hasLifecycleBanner } from "@/features/portal/lifecycle-state";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import { impactText } from "@/features/portal/portal-format";
 import {
-  getPortalBug,
+  getPortalBugRecord,
+  getPortalFilePreviewUrl,
   getPortalResponseTimes,
 } from "@/features/portal/portal-queries";
 import { usuallyRespondText } from "@/features/portal/portal-response-time";
@@ -128,11 +127,8 @@ const BugSections = ({ bug }: { readonly bug: PortalBugDetail }) => {
   );
 };
 
-const PortalResponseNotice = async ({
-  bug,
-}: {
-  readonly bug: PortalBugDetail;
-}) => {
+const PortalResponseNotice = async ({ bugId }: { readonly bugId: string }) => {
+  const bug = await getPortalBugRecord(bugId);
   if (bug.firstResponse.targetMinutes === null) {
     return null;
   }
@@ -150,9 +146,11 @@ const PortalResponseNotice = async ({
 const PortalBugNotices = ({
   bug,
   isPreview,
+  responseNotice,
 }: {
   readonly bug: PortalBugDetail;
   readonly isPreview: boolean;
+  readonly responseNotice: ReactNode;
 }) => {
   const showReadOnlyNotice =
     !bug.canEdit &&
@@ -181,63 +179,70 @@ const PortalBugNotices = ({
         </p>
       ) : null}
       <PortalLifecycleBanner bug={bug} isPreview={isPreview} />
-      {awaitingResponse ? (
-        <SectionErrorBoundary title="Response-time guidance is unavailable">
-          <Suspense
-            fallback={
-              <span
-                aria-hidden="true"
-                className="portal-notice portal-response-note portal-response-pending"
-              />
-            }
-          >
-            <PortalResponseNotice bug={bug} />
-          </Suspense>
-        </SectionErrorBoundary>
-      ) : null}
+      {awaitingResponse ? responseNotice : null}
     </>
   );
 };
 
-const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
-  const [result, company] = await Promise.all([
-    getPortalBug({ bugId }),
+const isImageAttachment = (
+  attachment: PortalBugDetail["attachments"][number]
+) => attachment.previewable && attachment.contentType.startsWith("image/");
+
+// Image previews are signed with the page, keyed by file id; a failed signature
+// reads as an unavailable preview.
+const signImagePreviews = async (
+  attachments: PortalBugDetail["attachments"]
+): Promise<Readonly<Record<string, string | null>>> => {
+  const images = attachments.filter(isImageAttachment);
+  const results = await Promise.all(
+    images.map(({ fileId }) => getPortalFilePreviewUrl(fileId))
+  );
+  return Object.fromEntries(
+    images.map(({ fileId }, index) => {
+      const result = results[index];
+      return [fileId, result?.ok ? result.data : null];
+    })
+  );
+};
+
+// The page owns the response-notice boundary and hands it in as a slot; it
+// shows only while the bug still awaits a first response.
+const PortalBugView = async ({
+  bugId,
+  responseNotice,
+}: {
+  readonly bugId: string;
+  readonly responseNotice: ReactNode;
+}) => {
+  const [record, company] = await Promise.all([
+    getPortalBugRecord(bugId),
     getPortalCompany(),
   ]);
   const isPreview = Boolean(company?.preview);
-  if (!result.ok) {
-    if (
-      ["NOT_FOUND", "FORBIDDEN", "VALIDATION_FAILED"].includes(
-        result.error.code
-      )
-    ) {
-      notFound();
-    }
-    return (
-      <div className="panel portal-alert" role="alert">
-        This bug could not be loaded. Refresh to try again.
-      </div>
-    );
-  }
   // Preview is read only: every capability the server reports is turned off
   // so no mutating control renders. The server refuses these actions anyway.
   const bug: PortalBugDetail = isPreview
     ? {
-        ...result.data,
+        ...record,
         canAttach: false,
         canComment: false,
         canEdit: false,
         canWithdraw: false,
         lifecycle: {
-          ...result.data.lifecycle,
+          ...record.lifecycle,
           canRate: false,
           canReportAgain: false,
         },
       }
-    : result.data;
+    : record;
+  const previewUrls = await signImagePreviews(bug.attachments);
   return (
     <div className="portal-detail">
-      <Link className="portal-back" href="/portal">
+      <Link
+        className="portal-back"
+        href="/portal"
+        transitionTypes={["nav-back"]}
+      >
         <ArrowLeft aria-hidden="true" size={14} />
         Company bugs
       </Link>
@@ -257,7 +262,11 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
           </span>
         </div>
       </header>
-      <PortalBugNotices bug={bug} isPreview={isPreview} />
+      <PortalBugNotices
+        bug={bug}
+        isPreview={isPreview}
+        responseNotice={responseNotice}
+      />
       <div className="portal-detail-grid">
         <div className="portal-detail-main">
           <PortalBugManage bug={bug}>
@@ -267,6 +276,7 @@ const PortalBugView = async ({ bugId }: { readonly bugId: string }) => {
             attachments={bug.attachments}
             bugId={bug.id}
             canAttach={bug.canAttach}
+            previewUrls={previewUrls}
           />
           <PortalComments
             bugId={bug.id}
@@ -325,4 +335,17 @@ const PortalBugViewSkeleton = () => (
   </SkelterSurface>
 );
 
-export { PortalBugView, PortalBugViewSkeleton };
+// Holds the notice's line while response times load.
+const PortalResponseNoticeSkeleton = () => (
+  <span
+    aria-hidden="true"
+    className="portal-notice portal-response-note portal-response-pending"
+  />
+);
+
+export {
+  PortalBugView,
+  PortalBugViewSkeleton,
+  PortalResponseNotice,
+  PortalResponseNoticeSkeleton,
+};

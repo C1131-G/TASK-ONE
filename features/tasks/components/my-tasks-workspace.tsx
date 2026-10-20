@@ -5,9 +5,9 @@
 import Link from "next/link";
 import { useMemo } from "react";
 
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import type { CalendarTask } from "@/features/calendar/components/task-calendar-grid";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { GlobalTaskFilterBar } from "@/features/tasks/components/global-task-filter-bar";
 import { MyTasksCalendar } from "@/features/tasks/components/my-tasks-calendar";
 import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
@@ -194,7 +194,7 @@ export const MyTasksWorkspace = ({
   })}&monthOffset=` as const;
 
   return (
-    <div className="page flush">
+    <>
       <div className="ph my-tasks-header">
         <div>
           <h1>My Tasks</h1>
@@ -275,6 +275,6 @@ export const MyTasksWorkspace = ({
           </p>
         </section>
       ) : null}
-    </div>
+    </>
   );
 };

@@ -16,6 +16,7 @@ import { CalendarToolbar } from "@/features/calendar/components/task-calendar-to
 import { useTaskReschedule } from "@/features/tasks/hooks/use-task-reschedule";
 import { datesForDueDay } from "@/features/tasks/task-dates";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
+import { useSearchParamState } from "@/hooks/use-search-param-state";
 
 export type {
   CalendarEvent,
@@ -42,6 +43,24 @@ export type CalendarHrefPrefix =
 
 const NO_EMPLOYEES: readonly { readonly id: string; readonly name: string }[] =
   [];
+
+const CALENDAR_STATUSES = [
+  "all",
+  "backlog",
+  "todo",
+  "progress",
+  "review",
+  "done",
+] as const;
+const CALENDAR_PRIORITIES = [
+  "all",
+  "urgent",
+  "high",
+  "medium",
+  "low",
+  "none",
+] as const;
+const CALENDAR_SORTS = ["manual", "dueDate", "name", "priority"] as const;
 
 export const TaskCalendarGrid = ({
   monthOffset,
@@ -72,9 +91,21 @@ export const TaskCalendarGrid = ({
   readonly onAddTask?: (dueDate: string) => void;
 }) => {
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [priority, setPriority] = useState("all");
-  const [sort, setSort] = useState("manual");
+  const [status, setStatus] = useSearchParamState(
+    "calStatus",
+    CALENDAR_STATUSES,
+    "all"
+  );
+  const [priority, setPriority] = useSearchParamState(
+    "calPriority",
+    CALENDAR_PRIORITIES,
+    "all"
+  );
+  const [sort, setSort] = useSearchParamState(
+    "calSort",
+    CALENDAR_SORTS,
+    "manual"
+  );
   const navigation = hrefPrefix ?? "/calendar?monthOffset=";
   // eslint-disable-next-line react/purity -- The workspace calendar renders request-time dates.
   const current = new Date();

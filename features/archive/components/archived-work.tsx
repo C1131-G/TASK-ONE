@@ -21,11 +21,7 @@ const ArchivedWork = async () => {
     getPageSession(),
   ]);
   if (!projectsResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Archive could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Archive could not be loaded.");
   }
 
   const projectResults = await Promise.all(
@@ -35,11 +31,7 @@ const ArchivedWork = async () => {
     }))
   );
   if (projectResults.some(({ tasks }) => tasks === undefined)) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Archived work could not be loaded completely. Refresh to retry.
-      </div>
-    );
+    throw new Error("Archived work could not be loaded completely.");
   }
 
   const projects: ArchivedProject[] = projectsResult.data

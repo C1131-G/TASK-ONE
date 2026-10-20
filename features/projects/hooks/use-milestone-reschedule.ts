@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useOptimistic, useRef, useState, useTransition } from "react";
 
 import type { MilestoneRecord } from "@/features/projects/milestone-dates";
@@ -15,7 +14,6 @@ import type { TimelineMilestoneLane } from "@/features/projects/types/workspace-
 export const useMilestoneReschedule = (
   lanes: readonly TimelineMilestoneLane[]
 ) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -77,7 +75,6 @@ export const useMilestoneReschedule = (
     knownVersions.current.set(lane.projectId, result.data.version);
     setError(null);
     setAnnouncement(`${name} moved to ${dueDate}.`);
-    router.refresh();
   };
 
   const sendAfter = async (

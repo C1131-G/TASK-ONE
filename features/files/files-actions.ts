@@ -8,7 +8,7 @@ import {
   removeFileAction as removeFileImpl,
   renameFileAction as renameFileImpl,
   undoFileRemovalAction as undoFileRemovalImpl,
-} from "./actions/file-management";
+} from "./actions/files-management";
 import {
   finalizeAvatarUploadAction as finalizeAvatarUploadImpl,
   finalizeUploadAction as finalizeUploadImpl,
@@ -17,7 +17,7 @@ import {
   requestAvatarUploadAction as requestAvatarUploadImpl,
   requestProjectUploadAction as requestProjectUploadImpl,
   requestTaskUploadAction as requestTaskUploadImpl,
-} from "./actions/upload-requests";
+} from "./actions/files-upload-requests";
 import { getAvatarDownloadUrl, listProjectFiles } from "./files-queries";
 
 // Reads below are called from client components after the first render.

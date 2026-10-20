@@ -3,6 +3,8 @@
 import { CaretDown } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
+import { TabUnderline } from "@/components/ui/tab-underline";
+import { ViewSwitchTransition } from "@/components/ui/view-switch-transition";
 import {
   SKELETON_KEYS,
   SkeletonBone,
@@ -29,7 +31,8 @@ import {
   statusLabel,
 } from "@/features/projects/project-filters";
 import type { ProjectFilters } from "@/features/projects/project-filters";
-import { listProjects } from "@/features/projects/projects-queries";
+import { listAllProjects } from "@/features/projects/projects-queries";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const ProjectDirectory = async ({
@@ -38,17 +41,13 @@ const ProjectDirectory = async ({
   readonly filters: ProjectFilters;
 }) => {
   const [result, session, personal, employeeResult] = await Promise.all([
-    listProjects({}),
+    listAllProjects(),
     getPageSession(),
     getPersonalWorkspace({}),
     listAllEmployees(),
   ]);
   if (!result.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Projects could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Projects could not be loaded.");
   }
   const favoriteProjectIds = new Set(
     personal.ok ? personal.data.projects.map((project) => project.id) : []
@@ -85,26 +84,8 @@ const ProjectDirectory = async ({
   );
   const isAdmin =
     session.kind === "authenticated" && session.user.role === "admin";
-  const allActiveCount = result.data.filter(
-    (project) => project.status !== "complete"
-  ).length;
-  const completedCount = result.data.length - allActiveCount;
-
   return (
     <>
-      <div className="ph">
-        <div>
-          <h1>Projects</h1>
-          <p>
-            {allActiveCount} active · {completedCount} completed
-          </p>
-        </div>
-        {isAdmin ? (
-          <div className="acts">
-            <ProjectCreateForm />
-          </div>
-        ) : null}
-      </div>
       <form className="toolbar project-toolbar" method="get">
         <label className="field project-search" htmlFor="projects-search">
           <span className="sr-only">Search projects</span>
@@ -168,33 +149,38 @@ const ProjectDirectory = async ({
           >
             {layout[0]?.toUpperCase()}
             {layout.slice(1)}
+            {view === layout ? (
+              <TabUnderline name="project-layout-tab" />
+            ) : null}
           </Link>
         ))}
       </nav>
-      {projects.length > 0 && view === "grid" ? (
-        <ProjectGridView
-          favorites={favoriteProjectIds}
-          isAdmin={isAdmin}
-          membersById={membersById}
-          projects={projects}
-        />
-      ) : null}
-      {projects.length > 0 && view === "list" ? (
-        <ProjectListView
-          favorites={favoriteProjectIds}
-          isAdmin={isAdmin}
-          membersById={membersById}
-          projects={projects}
-        />
-      ) : null}
-      {projects.length > 0 && view === "table" ? (
-        <ProjectTableView
-          favorites={favoriteProjectIds}
-          isAdmin={isAdmin}
-          membersById={membersById}
-          projects={projects}
-        />
-      ) : null}
+      <ViewSwitchTransition name="project-layout" view={view}>
+        {projects.length > 0 && view === "grid" ? (
+          <ProjectGridView
+            favorites={favoriteProjectIds}
+            isAdmin={isAdmin}
+            membersById={membersById}
+            projects={projects}
+          />
+        ) : null}
+        {projects.length > 0 && view === "list" ? (
+          <ProjectListView
+            favorites={favoriteProjectIds}
+            isAdmin={isAdmin}
+            membersById={membersById}
+            projects={projects}
+          />
+        ) : null}
+        {projects.length > 0 && view === "table" ? (
+          <ProjectTableView
+            favorites={favoriteProjectIds}
+            isAdmin={isAdmin}
+            membersById={membersById}
+            projects={projects}
+          />
+        ) : null}
+      </ViewSwitchTransition>
       {projects.length === 0 ? (
         <section className="panel panel-b">
           <h2>
@@ -216,7 +202,29 @@ const ProjectDirectory = async ({
   );
 };
 
-const PROJECT_CARDS = SKELETON_KEYS.slice(0, 6);
+const ProjectCounts = async () => {
+  const projects = readOrThrow(await listAllProjects(), "Projects");
+  const activeCount = projects.filter(
+    (project) => project.status !== "complete"
+  ).length;
+  return `${activeCount} active · ${projects.length - activeCount} completed`;
+};
+
+// Only admins create projects; others see no action, so there is no space to
+// hold.
+const ProjectDirectoryActions = async () => {
+  const session = await getPageSession();
+  if (session.kind !== "authenticated" || session.user.role !== "admin") {
+    return null;
+  }
+  return (
+    <div className="acts">
+      <ProjectCreateForm />
+    </div>
+  );
+};
+
+const PROJECT_CARDS = SKELETON_KEYS.slice(0, 3);
 
 const VIEWS = ["Grid", "List", "Table"] as const;
 
@@ -253,14 +261,6 @@ const ProjectCardSkeleton = () => (
 // counts and every project card are data.
 const ProjectDirectorySkeleton = () => (
   <>
-    <div className="ph">
-      <div>
-        <h1>Projects</h1>
-        <p>
-          <SkeletonBone />
-        </p>
-      </div>
-    </div>
     <div className="toolbar project-toolbar" inert>
       <span className="skeleton-filter-select skeleton-search project-search">
         Search projects
@@ -297,4 +297,9 @@ const ProjectDirectorySkeleton = () => (
   </>
 );
 
-export { ProjectDirectory, ProjectDirectorySkeleton };
+export {
+  ProjectCounts,
+  ProjectDirectory,
+  ProjectDirectoryActions,
+  ProjectDirectorySkeleton,
+};

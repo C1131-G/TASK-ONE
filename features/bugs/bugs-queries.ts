@@ -1,6 +1,7 @@
 import "server-only";
 import { Effect, Schema } from "effect";
 
+import { readRecordOrNotFound } from "@/lib/read-result";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { UUIDSchema } from "@/src/server/core/input-schemas";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
@@ -74,3 +75,7 @@ export const getBugHistory = async (input: unknown) =>
     undefined,
     BugHistorySchema
   );
+
+// The bug page's record: a missing or malformed id renders the not-found page.
+export const getBugRecord = async (bugId: string) =>
+  readRecordOrNotFound(await getBugHistory({ bugId }), "Bug details");

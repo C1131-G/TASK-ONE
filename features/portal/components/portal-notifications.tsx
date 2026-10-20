@@ -17,11 +17,7 @@ const PortalNotifications = async () => {
     getPortalCompany(),
   ]);
   if (!result.ok) {
-    return (
-      <div className="panel portal-alert" role="alert">
-        Notifications could not be loaded. Refresh to try again.
-      </div>
-    );
+    throw new Error("Notifications could not be loaded.");
   }
   const { items, unreadCount } = result.data;
   return (

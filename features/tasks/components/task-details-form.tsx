@@ -52,6 +52,7 @@ export const TaskDetailsForm = ({
   onSaved,
   task,
   version,
+  versionIsCurrent,
 }: {
   readonly editable: boolean;
   readonly employees: readonly TaskEmployeeOption[];
@@ -67,6 +68,7 @@ export const TaskDetailsForm = ({
   readonly task: EditableTask;
   // The panel keeps this current, so a save after a subtask edit is not a conflict.
   readonly version: number;
+  readonly versionIsCurrent: boolean;
 }) => {
   const [draft, setDraft] = useState(() => draftFromTask(task));
   const [assigneeSearch, setAssigneeSearch] = useState("");
@@ -95,6 +97,9 @@ export const TaskDetailsForm = ({
 
   const [, saveAction, pending] = useActionState(
     async (_previous: null, _formData: FormData) => {
+      if (!versionIsCurrent) {
+        return null;
+      }
       if (submissionInFlight.current) {
         return null;
       }
@@ -273,10 +278,23 @@ export const TaskDetailsForm = ({
           ) : null}
         </p>
       ) : null}
+      {versionIsCurrent ? null : (
+        <p className="error" role="alert">
+          This task changed while you were editing it. Reload the task before
+          saving.
+          <WorkspaceButton
+            className="btn btn-sm btn-ghost"
+            onClick={onReload}
+            type="button"
+          >
+            Reload task
+          </WorkspaceButton>
+        </p>
+      )}
       {editable ? (
         <WorkspaceButton
           className="btn btn-primary"
-          disabled={pending || !dirty}
+          disabled={pending || !dirty || !versionIsCurrent}
           type="submit"
         >
           {pending ? "Saving…" : "Save details"}

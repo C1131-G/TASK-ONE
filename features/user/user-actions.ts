@@ -2,12 +2,12 @@
 
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
-import { changeOwnPasswordAction as changeOwnPasswordImpl } from "./actions/password";
+import { changeOwnPasswordAction as changeOwnPasswordImpl } from "./actions/user-password";
 import {
   savePersonalPreferencesAction as savePersonalPreferencesImpl,
   saveTaskTableColumnWidthsAction as saveTaskTableColumnWidthsImpl,
-} from "./actions/personal-preferences";
-import { revokeSessionAction as revokeSessionImpl } from "./actions/sessions";
+} from "./actions/user-personal-preferences";
+import { revokeSessionAction as revokeSessionImpl } from "./actions/user-sessions";
 
 export async function changeOwnPasswordAction(input: unknown) {
   return await changeOwnPasswordImpl(input);

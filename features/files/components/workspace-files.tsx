@@ -19,11 +19,7 @@ const WorkspaceFiles = async () => {
     getPageSession(),
   ]);
   if (!projects.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Files could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Files could not be loaded.");
   }
   const fileResults = await Promise.all(
     projects.data.map(async (project) => ({

@@ -1,6 +1,9 @@
 import "server-only";
 import { Effect, Schema } from "effect";
+import { cache } from "react";
 
+import { HIDDEN_RECORD_CODES, readRecordOrNotFound } from "@/lib/read-result";
+import { UUIDSchema } from "@/src/server/core/input-schemas";
 import {
   PortalBugDetailSchema,
   PortalBugListSchema,
@@ -13,6 +16,7 @@ import {
   ClientBugIdInputSchema,
   ListCompanyBugsInputSchema,
 } from "@/src/server/portal/portal-input-contracts";
+import { Uploads } from "@/src/server/storage/uploads-contracts";
 
 import { runPortalAction, toPortalActor } from "./portal-action-runner";
 
@@ -55,6 +59,11 @@ export const getPortalBug = async (input: unknown) =>
     { preview: true }
   );
 
+// Keyed by id so page metadata and the page body share one fetch per request.
+export const getPortalBugById = cache(
+  async (bugId: string) => await getPortalBug({ bugId })
+);
+
 export const listPortalNotifications = async (input: unknown) =>
   await runPortalAction(
     input,
@@ -78,5 +87,29 @@ export const getPortalResponseTimes = async (input: unknown) =>
         return yield* bugs.responseTimes(toPortalActor(user));
       }),
     PortalResponseTimesSchema,
+    { preview: true }
+  );
+
+// The portal bug page's record. Another company's bug reads as missing so its
+// existence is never confirmed.
+export const getPortalBugRecord = async (bugId: string) =>
+  readRecordOrNotFound(
+    await getPortalBugById(bugId),
+    "This bug",
+    HIDDEN_RECORD_CODES
+  );
+
+// Signs an image attachment's preview while the page renders, so the card
+// shows the image without a client round trip.
+export const getPortalFilePreviewUrl = async (fileId: string) =>
+  await runPortalAction(
+    { fileId },
+    Schema.Struct({ fileId: UUIDSchema }),
+    (user, validated) =>
+      Effect.gen(function* getPortalFilePreviewUrlProgram() {
+        const uploads = yield* Uploads;
+        return yield* uploads.signedPreview(user.id, validated.fileId);
+      }),
+    Schema.String,
     { preview: true }
   );

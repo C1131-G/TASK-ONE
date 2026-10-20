@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import { IdempotencyKeySchema } from "@/src/server/core/input-schemas";
 
@@ -22,4 +22,5 @@ export const revalidatePortal = (bugId?: string) => {
   if (bugId) {
     revalidatePath(`/portal/bugs/${bugId}`);
   }
+  refresh();
 };

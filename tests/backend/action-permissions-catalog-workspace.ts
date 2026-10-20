@@ -5,23 +5,24 @@ import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
 const calendar = await import("../../features/calendar/calendar-actions");
-const comments = await import("../../features/tasks/actions/task-comments");
-const companySettings = await import("../../features/company/company-actions");
+const comments = await import("../../features/tasks/actions/tasks-comments");
+const companySettings =
+  await import("../../features/settings/settings-actions");
 const discovery = await import("../../features/discovery/discovery-actions");
 const employees = await import("../../features/people/people-actions");
-const labels = await import("../../features/tasks/actions/labels");
+const labels = await import("../../features/tasks/actions/tasks-labels");
 const notifications =
   await import("../../features/notifications/notifications-actions");
 const activityQueries =
   await import("../../features/activity/activity-queries");
 const calendarQueries =
   await import("../../features/calendar/calendar-queries");
-const companyQueries = await import("../../features/company/company-queries");
+const companyQueries = await import("../../features/settings/settings-queries");
 const dashboardQueries =
   await import("../../features/dashboard/dashboard-queries");
 const discoveryQueries =
   await import("../../features/discovery/discovery-queries");
-const jobsQueries = await import("../../features/jobs/jobs-queries");
+const jobsQueries = await import("../../features/settings/settings-queries");
 const notificationsQueries =
   await import("../../features/notifications/notifications-queries");
 const peopleQueries = await import("../../features/people/people-queries");

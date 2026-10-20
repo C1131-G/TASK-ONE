@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
   TeamList,
   TeamListSkeleton,
@@ -12,19 +13,21 @@ import {
 export const metadata: Metadata = { title: "Teams | Metsys" };
 
 const TeamsPage = () => (
-  <div className="page">
-    <div className="ph">
-      <div>
-        <h1>Teams</h1>
-        <p>Organize employees by team.</p>
+  <PageTransition>
+    <div className="page">
+      <div className="ph">
+        <div>
+          <h1>Teams</h1>
+          <p>Organize employees by team.</p>
+        </div>
       </div>
+      <SectionErrorBoundary title="teams could not be loaded">
+        <SuspenseReveal fallback={<TeamListSkeleton />}>
+          <TeamList />
+        </SuspenseReveal>
+      </SectionErrorBoundary>
     </div>
-    <SectionErrorBoundary title="teams could not be loaded">
-      <Suspense fallback={<TeamListSkeleton />}>
-        <TeamList />
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  </PageTransition>
 );
 
 export default TeamsPage;

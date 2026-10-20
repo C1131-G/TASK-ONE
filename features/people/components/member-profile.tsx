@@ -1,11 +1,12 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
 
-import { ArrowLeft, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
+import { EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ViewSwitchTransition } from "@/components/ui/view-switch-transition";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { EmployeeAdminControls } from "@/features/people/components/employee-admin-controls";
 import { MemberProfileCopyEmail } from "@/features/people/components/member-profile-copy-email";
@@ -21,28 +22,77 @@ import type { ActivityEntry } from "@/src/server/activity/activity-management";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 
-const MemberProfile = ({
-  activities,
+const MemberProfileHeader = ({
   canManageMembers,
   employee,
-  employees,
-  openTasks,
-  completedTasks,
   projects,
   teams,
+}: {
+  readonly canManageMembers: boolean;
+  readonly employee: EmployeeDirectoryEntry;
+  readonly projects: readonly ProjectListItem[];
+  readonly teams: readonly { readonly id: string; readonly name: string }[];
+}) => (
+  <header className="member-profile-header">
+    <Avatar className="member-profile-avatar">
+      {employee.avatar ? <AvatarImage alt="" src={employee.avatar} /> : null}
+      <AvatarFallback>{employee.name.slice(0, 1).toUpperCase()}</AvatarFallback>
+    </Avatar>
+    <div className="member-profile-identity">
+      <div className="member-profile-name-row">
+        <h1>{employee.name}</h1>
+        <Badge variant="secondary">
+          {employee.role === "admin" ? "Admin" : "Employee"}
+        </Badge>
+      </div>
+      <p className="member-profile-job">
+        {employee.jobTitle ?? "No job title"}
+        {employee.teamName ? ` · ${employee.teamName}` : " · No team"}
+      </p>
+      <a className="member-profile-email" href={`mailto:${employee.email}`}>
+        <EnvelopeSimple aria-hidden="true" size={15} />
+        {employee.email}
+      </a>
+    </div>
+    <div className="member-profile-actions">
+      <MemberProfileCopyEmail email={employee.email} />
+      {projects.length ? (
+        <QuickTaskForm
+          defaultAssigneeIds={[employee.id]}
+          description={`This task will be assigned to ${employee.name}.`}
+          projects={projects.map(({ id, name }) => ({ id, name }))}
+          trigger={
+            <WorkspaceButton className="btn btn-primary" type="button">
+              Assign task
+            </WorkspaceButton>
+          }
+        />
+      ) : null}
+      {canManageMembers ? (
+        <EmployeeAdminControls employee={employee} teams={teams} />
+      ) : null}
+    </div>
+  </header>
+);
+
+const MemberProfileWork = ({
+  activities,
+  completedTasks,
+  employee,
+  employees,
+  isAdmin,
+  openTasks,
+  projects,
   tab,
   viewerId,
-  isAdmin,
 }: {
   readonly activities: readonly ActivityEntry[];
-  readonly canManageMembers: boolean;
+  readonly completedTasks: readonly MemberTask[];
   readonly employee: EmployeeDirectoryEntry;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
   readonly isAdmin: boolean;
   readonly openTasks: readonly MemberTask[];
-  readonly completedTasks: readonly MemberTask[];
   readonly projects: readonly ProjectListItem[];
-  readonly teams: readonly { readonly id: string; readonly name: string }[];
   readonly tab: "assigned" | "completed";
   readonly viewerId: string | null;
 }) => {
@@ -59,60 +109,7 @@ const MemberProfile = ({
   const visibleTasks = tab === "assigned" ? openTasks : completedTasks;
 
   return (
-    <div className="page member-profile-page">
-      <Link
-        className="member-profile-back"
-        href="/members"
-        transitionTypes={["nav-back"]}
-      >
-        <ArrowLeft aria-hidden="true" size={15} />
-        All members
-      </Link>
-      <header className="member-profile-header">
-        <Avatar className="member-profile-avatar">
-          {employee.avatar ? (
-            <AvatarImage alt="" src={employee.avatar} />
-          ) : null}
-          <AvatarFallback>
-            {employee.name.slice(0, 1).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <div className="member-profile-identity">
-          <div className="member-profile-name-row">
-            <h1>{employee.name}</h1>
-            <Badge variant="secondary">
-              {employee.role === "admin" ? "Admin" : "Employee"}
-            </Badge>
-          </div>
-          <p className="member-profile-job">
-            {employee.jobTitle ?? "No job title"}
-            {employee.teamName ? ` · ${employee.teamName}` : " · No team"}
-          </p>
-          <a className="member-profile-email" href={`mailto:${employee.email}`}>
-            <EnvelopeSimple aria-hidden="true" size={15} />
-            {employee.email}
-          </a>
-        </div>
-        <div className="member-profile-actions">
-          <MemberProfileCopyEmail email={employee.email} />
-          {projects.length ? (
-            <QuickTaskForm
-              defaultAssigneeIds={[employee.id]}
-              description={`This task will be assigned to ${employee.name}.`}
-              projects={projects.map(({ id, name }) => ({ id, name }))}
-              trigger={
-                <WorkspaceButton className="btn btn-primary" type="button">
-                  Assign task
-                </WorkspaceButton>
-              }
-            />
-          ) : null}
-          {canManageMembers ? (
-            <EmployeeAdminControls employee={employee} teams={teams} />
-          ) : null}
-        </div>
-      </header>
-
+    <>
       <section
         aria-label="Member work summary"
         className="stats member-profile-stats"
@@ -153,12 +150,14 @@ const MemberProfile = ({
               Completed · {completedTasks.length}
             </Link>
           </nav>
-          <MemberTaskRows
-            employees={employees}
-            isAdmin={isAdmin}
-            tasks={visibleTasks}
-            viewerId={viewerId}
-          />
+          <ViewSwitchTransition name="member-task-tab" view={tab}>
+            <MemberTaskRows
+              employees={employees}
+              isAdmin={isAdmin}
+              tasks={visibleTasks}
+              viewerId={viewerId}
+            />
+          </ViewSwitchTransition>
         </section>
 
         <div className="member-profile-side">
@@ -226,8 +225,8 @@ const MemberProfile = ({
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export { MemberProfile };
+export { MemberProfileHeader, MemberProfileWork };

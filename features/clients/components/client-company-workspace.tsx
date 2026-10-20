@@ -49,7 +49,11 @@ const ClientCompanyWorkspace = ({
 
   return (
     <div className="clients-workspace">
-      <Link className="clients-back" href="/clients">
+      <Link
+        className="clients-back"
+        href="/clients"
+        transitionTypes={["nav-back"]}
+      >
         <ArrowLeft aria-hidden="true" size={14} />
         All clients
       </Link>

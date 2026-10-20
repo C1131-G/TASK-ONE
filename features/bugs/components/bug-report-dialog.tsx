@@ -91,8 +91,9 @@ export const BugReportDialog = ({
         setMessage(result.error.message);
       } else {
         setOpen(false);
-        router.push(`/bugs/${result.data.id}`);
-        router.refresh();
+        router.push(`/bugs/${result.data.id}`, {
+          transitionTypes: ["nav-forward"],
+        });
       }
     } catch {
       setMessage("The bug report could not be submitted. Please try again.");

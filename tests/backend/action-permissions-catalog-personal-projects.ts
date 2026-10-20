@@ -10,14 +10,15 @@ import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
 const personalPreferences =
-  await import("../../features/user/actions/personal-preferences");
+  await import("../../features/user/actions/user-personal-preferences");
 const notifications =
   await import("../../features/notifications/notifications-actions");
-const password = await import("../../features/user/actions/password");
+const password = await import("../../features/user/actions/user-password");
 const projects = await import("../../features/projects/projects-actions");
-const savedViews = await import("../../features/projects/actions/saved-views");
-const sessions = await import("../../features/user/actions/sessions");
-const subtasks = await import("../../features/tasks/actions/subtasks");
+const savedViews =
+  await import("../../features/projects/actions/projects-saved-views");
+const sessions = await import("../../features/user/actions/user-sessions");
+const subtasks = await import("../../features/tasks/actions/tasks-subtasks");
 const tasks = await import("../../features/tasks/tasks-actions");
 const projectsQueries =
   await import("../../features/projects/projects-queries");

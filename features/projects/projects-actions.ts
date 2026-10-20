@@ -6,18 +6,18 @@ import {
   restoreProjectAction as restoreProjectImpl,
   saveProjectMilestonesAction as saveProjectMilestonesImpl,
   setProjectPeopleAction as setProjectPeopleImpl,
-} from "./actions/project-people-and-milestones";
+} from "./actions/projects-people-and-milestones";
 import {
   archiveProjectAction as archiveProjectImpl,
   createProjectAction as createProjectImpl,
   duplicateProjectAction as duplicateProjectImpl,
   updateProjectAction as updateProjectImpl,
-} from "./actions/project-records";
+} from "./actions/projects-records";
 import {
   createSavedViewAction as createSavedViewImpl,
   deleteSavedViewAction as deleteSavedViewImpl,
   updateSavedViewAction as updateSavedViewImpl,
-} from "./actions/saved-views";
+} from "./actions/projects-saved-views";
 
 export async function createProjectAction(input: unknown) {
   return await createProjectImpl(input);

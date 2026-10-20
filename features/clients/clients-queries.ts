@@ -1,6 +1,8 @@
 import "server-only";
 import { Effect, Layer, Schema } from "effect";
+import { cache } from "react";
 
+import { readRecordOrNotFound } from "@/lib/read-result";
 import {
   AuditFilterSchema,
   AuditListSchema,
@@ -94,3 +96,21 @@ export const listLockedAccounts = async (input: unknown) =>
     undefined,
     LockedAccountListSchema
   );
+
+// Metadata and the page body both read the company; one request loads it once.
+export const getClientCompanyOnce = cache(
+  async (companyId: string) => await getClientCompany({ companyId })
+);
+
+// The client company page's record: a missing or malformed id renders the
+// not-found page.
+export const getClientCompanyRecord = async (companyId: string) =>
+  readRecordOrNotFound(
+    await getClientCompanyOnce(companyId),
+    "The client company"
+  );
+
+// The page header's count and the list share one read per request.
+export const listAllClientCompanies = cache(
+  async () => await listClientCompanies({})
+);

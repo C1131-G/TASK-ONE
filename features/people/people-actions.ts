@@ -6,18 +6,18 @@ import {
   changeEmployeeRoleAction as changeEmployeeRoleImpl,
   resetEmployeePasswordAction as resetEmployeePasswordImpl,
   updateEmployeeDetailsAction as updateEmployeeDetailsImpl,
-} from "./actions/employee-access";
+} from "./actions/people-employee-access";
 import {
   createEmployeeAction as createEmployeeImpl,
   deactivateEmployeeAction as deactivateEmployeeImpl,
   reactivateEmployeeAction as reactivateEmployeeImpl,
-} from "./actions/employee-records";
-import { updateOwnProfileAction as updateOwnProfileImpl } from "./actions/own-profile";
+} from "./actions/people-employee-records";
+import { updateOwnProfileAction as updateOwnProfileImpl } from "./actions/people-own-profile";
 import {
   createTeamAction as createTeamImpl,
   deleteTeamAction as deleteTeamImpl,
   updateTeamAction as updateTeamImpl,
-} from "./actions/teams";
+} from "./actions/people-teams";
 
 export async function createEmployeeAction(input: unknown) {
   return await createEmployeeImpl(input);

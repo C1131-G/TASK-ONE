@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -13,7 +12,6 @@ import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import { createCalendarEventAction } from "@/features/calendar/calendar-actions";
 
 const CalendarEventForm = () => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -45,7 +43,6 @@ const CalendarEventForm = () => {
         return;
       }
       setOpen(false);
-      router.refresh();
     });
   };
 

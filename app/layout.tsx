@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Geist_Mono, Noto_Sans } from "next/font/google";
-import { Suspense } from "react";
 
 import "./globals.css";
+import "./view-transitions.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
@@ -53,15 +53,7 @@ const RootLayout = ({
     )}
   >
     <body>
-      <ThemeProvider>
-        <Suspense
-          fallback={
-            <div aria-live="polite" className="min-h-svh bg-background" />
-          }
-        >
-          {children}
-        </Suspense>
-      </ThemeProvider>
+      <ThemeProvider>{children}</ThemeProvider>
     </body>
   </html>
 );

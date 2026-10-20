@@ -6,15 +6,10 @@ import { BugList } from "./bug-list";
 import { BugReportDialog } from "./bug-report-dialog";
 
 export const ProjectBugs = ({
-  bugResult,
+  bugs,
   project,
 }: {
-  readonly bugResult:
-    | {
-        readonly ok: true;
-        readonly data: readonly (typeof BugListItemSchema.Type)[];
-      }
-    | { readonly ok: false };
+  readonly bugs: readonly (typeof BugListItemSchema.Type)[];
   readonly project: {
     readonly id: string;
     readonly key: string;
@@ -29,15 +24,6 @@ export const ProjectBugs = ({
       </div>
       <BugReportDialog initialProjectId={project.id} projects={[project]} />
     </header>
-    {bugResult.ok ? (
-      <BugList
-        bugs={bugResult.data}
-        emptyMessage="This project has no bug reports yet."
-      />
-    ) : (
-      <section className="panel panel-b" role="alert">
-        Project bugs could not be loaded. Refresh to retry.
-      </section>
-    )}
+    <BugList bugs={bugs} emptyMessage="This project has no bug reports yet." />
   </section>
 );

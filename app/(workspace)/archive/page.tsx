@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
   ArchivedWorkSkeleton,
   ArchivedWork,
@@ -12,22 +13,24 @@ import {
 export const metadata: Metadata = { title: "Archive | Metsys" };
 
 const ArchivePage = () => (
-  <div className="page">
-    <div className="ph">
-      <div>
-        <h1>Archive</h1>
-        <p>
-          Archived work is hidden from active views. Restore it when it is
-          needed.
-        </p>
+  <PageTransition>
+    <div className="page">
+      <div className="ph">
+        <div>
+          <h1>Archive</h1>
+          <p>
+            Archived work is hidden from active views. Restore it when it is
+            needed.
+          </p>
+        </div>
       </div>
+      <SectionErrorBoundary title="archive could not be loaded">
+        <SuspenseReveal fallback={<ArchivedWorkSkeleton />}>
+          <ArchivedWork />
+        </SuspenseReveal>
+      </SectionErrorBoundary>
     </div>
-    <SectionErrorBoundary title="archive could not be loaded">
-      <Suspense fallback={<ArchivedWorkSkeleton />}>
-        <ArchivedWork />
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  </PageTransition>
 );
 
 export default ArchivePage;

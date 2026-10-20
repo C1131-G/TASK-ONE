@@ -2,7 +2,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 
@@ -39,7 +38,6 @@ const ReassignForm = ({
   readonly employees: readonly { readonly id: string; readonly name: string }[];
   readonly history: BugHistory;
 }) => {
-  const router = useRouter();
   const id = useId();
   const [pending, startTransition] = useTransition();
   const [employeeId, setEmployeeId] = useState("");
@@ -66,7 +64,6 @@ const ReassignForm = ({
       if (result.ok) {
         setMessage({ ok: true, text: `Reassigned to ${name ?? "employee"}.` });
         setEmployeeId("");
-        router.refresh();
         return;
       }
       setMessage({ ok: false, text: result.error.message });

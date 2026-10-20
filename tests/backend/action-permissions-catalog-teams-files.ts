@@ -5,7 +5,7 @@ import type { ActionEntry } from "./action-permissions-shared";
 import { ids, nextKey } from "./support/action-harness";
 
 const tasks = await import("../../features/tasks/tasks-actions");
-const teams = await import("../../features/people/actions/teams");
+const teams = await import("../../features/people/actions/people-teams");
 const uploads = await import("../../features/files/files-actions");
 const peopleQueries = await import("../../features/people/people-queries");
 const filesQueries = await import("../../features/files/files-queries");

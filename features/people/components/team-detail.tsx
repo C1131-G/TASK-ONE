@@ -5,7 +5,6 @@ import {
   CheckCircle,
   UsersThree,
 } from "@phosphor-icons/react/dist/ssr";
-import { notFound } from "next/navigation";
 
 import {
   SKELETON_KEYS,
@@ -15,38 +14,28 @@ import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { TeamOverview } from "@/features/people/components/team-overview";
 import type { TeamTask } from "@/features/people/components/team-overview";
 import {
-  listAllTeams,
+  getTeam,
   listAllEmployees,
+  listAllTeams,
 } from "@/features/people/people-queries";
 import { listProjects } from "@/features/projects/projects-queries";
 import { listAllProjectTasks } from "@/features/tasks/tasks-queries";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
-  const [teamsResult, projectsResult, employeesResult, session] =
+  const [team, teams, projectsResult, employeesResult, session] =
     await Promise.all([
+      getTeam(teamId),
       listAllTeams(),
       listProjects({}),
       listAllEmployees(),
       getPageSession(),
     ]);
+  const allProjects = readOrThrow(projectsResult, "Team projects");
+  const employees = readOrThrow(employeesResult, "Team members");
 
-  if (!teamsResult.ok || !projectsResult.ok || !employeesResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Team details could not be loaded. Refresh to retry.
-      </div>
-    );
-  }
-
-  const team = teamsResult.data.find(({ id }) => id === teamId);
-  if (!team) {
-    notFound();
-  }
-
-  const projects = projectsResult.data.filter(
-    (project) => project.teamId === team.id
-  );
+  const projects = allProjects.filter((project) => project.teamId === team.id);
   const taskResults = await Promise.all(
     projects.map(async (project) => ({
       project,
@@ -54,11 +43,7 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
     }))
   );
   if (taskResults.some(({ tasks }) => tasks === undefined)) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Team tasks could not be loaded completely. Refresh to retry.
-      </div>
-    );
+    throw new Error("Team tasks could not be loaded.");
   }
 
   const tasks: TeamTask[] = taskResults.flatMap(({ project, tasks: items }) =>
@@ -73,9 +58,7 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
       title: task.title,
     }))
   );
-  const members = employeesResult.data.filter(
-    (employee) => employee.teamId === team.id
-  );
+  const members = employees.filter((employee) => employee.teamId === team.id);
 
   return (
     <TeamOverview
@@ -86,7 +69,7 @@ const TeamDetail = async ({ teamId }: { readonly teamId: string }) => {
       projects={projects}
       tasks={tasks}
       team={team}
-      teams={teamsResult.data}
+      teams={readOrThrow(teams, "Teams")}
     />
   );
 };

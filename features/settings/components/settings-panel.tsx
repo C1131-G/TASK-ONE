@@ -2,10 +2,6 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  getCompanySettings,
-  getSlaSettings,
-} from "@/features/company/company-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
 import { getNotificationPreferences } from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
@@ -17,6 +13,10 @@ import {
 } from "@/features/settings/components/settings-forms";
 import { SettingsWorkspace } from "@/features/settings/components/settings-workspace";
 import { SlaSettingsForm } from "@/features/settings/components/sla-settings-form";
+import {
+  getCompanySettings,
+  getSlaSettings,
+} from "@/features/settings/settings-queries";
 import type { SettingsSection } from "@/features/settings/settings-section";
 import { AvatarUpload } from "@/features/user/components/avatar-upload";
 import { SessionList } from "@/features/user/components/session-list";

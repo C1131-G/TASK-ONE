@@ -33,7 +33,7 @@ const ActivityFeed = async () => {
   );
 };
 
-const ACTIVITY_SKELETON_ROWS = SKELETON_KEYS.slice(0, 12);
+const ACTIVITY_SKELETON_ROWS = SKELETON_KEYS.slice(0, 5);
 
 // Mirrors ActivityFeedList: the filter row is static, only the entries are data.
 const ActivityFeedSkeleton = () => (

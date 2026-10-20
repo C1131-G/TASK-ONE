@@ -14,6 +14,8 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 
+import { TabUnderline } from "@/components/ui/tab-underline";
+
 const views = [
   { Icon: SquaresFour, id: "overview", label: "Overview" },
   { Icon: SquaresFour, id: "board", label: "Board" },
@@ -43,6 +45,7 @@ export const ProjectViewTabs = ({
       >
         <Icon aria-hidden="true" size={14} />
         {label}
+        {selected === id ? <TabUnderline name="project-view-tab" /> : null}
       </Link>
     ))}
   </nav>

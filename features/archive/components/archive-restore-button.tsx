@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -19,7 +18,6 @@ const ArchiveRestoreButton = ({
   readonly id: string;
   readonly version: number;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -35,9 +33,7 @@ const ArchiveRestoreButton = ({
           : await restoreTaskAction({ ...input, taskId: id });
       if (!result.ok) {
         setError(result.error.message);
-        return;
       }
-      router.refresh();
     });
 
   return (

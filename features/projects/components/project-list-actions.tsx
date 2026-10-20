@@ -50,8 +50,9 @@ const ProjectListActions = ({
       }
       setError(null);
       setDuplicateOpen(false);
-      router.push(`/projects/${result.data.id}`);
-      router.refresh();
+      router.push(`/projects/${result.data.id}`, {
+        transitionTypes: ["nav-forward"],
+      });
     });
 
   const archive = () =>
@@ -66,7 +67,6 @@ const ProjectListActions = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

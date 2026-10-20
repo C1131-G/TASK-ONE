@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 export type Satisfaction = "up" | "down";
@@ -21,7 +20,6 @@ export const failureText = (failure: ActionFailure) =>
 // Shared state for a one-shot action: busy flag, visible error, and an
 // idempotency key that is reused on retry until the input changes.
 export const useLifecycleAction = () => {
-  const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const keyRef = useRef<string | null>(null);
@@ -46,7 +44,6 @@ export const useLifecycleAction = () => {
       const result = await call(keyRef.current);
       if (result.ok) {
         keyRef.current = null;
-        router.refresh();
         setPending(false);
         return true;
       }

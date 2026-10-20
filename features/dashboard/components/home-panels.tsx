@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ViewSwitchTransition } from "@/components/ui/view-switch-transition";
 import {
   OpenTasksIcon,
   ViewAllTasksIcon,
@@ -120,32 +121,34 @@ export const MyTasksPanel = ({
           </Link>
         </div>
       </div>
-      {visible.length ? (
-        visible.map((task) => (
-          <article className="mini home-task-row" key={task.id}>
-            <TaskCompletionCheckbox
-              status={task.status}
-              taskId={task.id}
-              title={task.title}
-              version={task.version}
-            />
-            <Link
-              className="trunc grow"
-              href={`/projects/${task.projectId}?view=board`}
-            >
-              {task.title}
-            </Link>
-            <span className="muted">{task.projectName}</span>
-            <span className="num">{formatDate(task.dueDate)}</span>
-          </article>
-        ))
-      ) : (
-        <div className="panel-b muted">
-          {taskView === "overdue"
-            ? "Nothing overdue. Every task assigned to you is on schedule."
-            : "No tasks here. Tasks assigned to you appear here."}
-        </div>
-      )}
+      <ViewSwitchTransition name="home-task-view" view={taskView}>
+        {visible.length ? (
+          visible.map((task) => (
+            <article className="mini home-task-row" key={task.id}>
+              <TaskCompletionCheckbox
+                status={task.status}
+                taskId={task.id}
+                title={task.title}
+                version={task.version}
+              />
+              <Link
+                className="trunc grow"
+                href={`/projects/${task.projectId}?view=board`}
+              >
+                {task.title}
+              </Link>
+              <span className="muted">{task.projectName}</span>
+              <span className="num">{formatDate(task.dueDate)}</span>
+            </article>
+          ))
+        ) : (
+          <div className="panel-b muted">
+            {taskView === "overdue"
+              ? "Nothing overdue. Every task assigned to you is on schedule."
+              : "No tasks here. Tasks assigned to you appear here."}
+          </div>
+        )}
+      </ViewSwitchTransition>
       {taskViews[taskView].length > 7 ? (
         <Link className="addrow" href="/my-tasks">
           View all {taskViews[taskView].length} tasks

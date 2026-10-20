@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useOptimistic, useRef, useState, useTransition } from "react";
 
 import type { TaskSpan } from "@/features/tasks/task-dates";
@@ -25,7 +24,6 @@ const describeSpan = ({ dueDate, startDate }: TaskSpan): string => {
 export const useTaskReschedule = <Task extends ReschedulableTask>(
   tasks: readonly Task[]
 ) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -64,7 +62,6 @@ export const useTaskReschedule = <Task extends ReschedulableTask>(
     knownVersions.current.set(task.id, result.data.version);
     setError(null);
     setAnnouncement(`${task.title} moved to ${describeSpan(dates)}.`);
-    router.refresh();
   };
 
   const sendAfter = async (

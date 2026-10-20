@@ -3,7 +3,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -35,7 +34,6 @@ const ClientCompanyLogo = ({
   readonly onVersion: VersionSink;
   readonly version: number;
 }) => {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [removing, startRemoval] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -46,7 +44,7 @@ const ClientCompanyLogo = ({
   }, [version]);
   const queue = useUploadQueue();
   const uploading = queue.uploads.some(
-    (upload) => upload.status === "uploading"
+    (upload) => upload.status === "uploading" || upload.status === "finalizing"
   );
   const busy = uploading || removing;
   const inputId = `client-company-${companyId}-logo`;
@@ -70,7 +68,6 @@ const ClientCompanyLogo = ({
         }
         latestVersion.current = finalized.data.version;
         onVersion(finalized.data.version);
-        router.refresh();
         return null;
       },
       request: async () => {
@@ -125,7 +122,6 @@ const ClientCompanyLogo = ({
       setError(null);
       latestVersion.current = result.data.version;
       onVersion(result.data.version);
-      router.refresh();
     });
 
   return (

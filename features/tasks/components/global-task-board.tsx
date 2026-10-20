@@ -3,11 +3,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
+import { BoardCardTransition } from "@/features/tasks/components/board-card-transition";
 import { TaskManageControls } from "@/features/tasks/components/task-manage-controls";
 import { TaskStatusSelect } from "@/features/tasks/components/task-status-select";
 import { changeTaskColumnAction } from "@/features/tasks/tasks-actions";
@@ -52,7 +52,6 @@ export const GlobalTaskBoard = ({
   readonly selectedIds: ReadonlySet<string>;
   readonly onToggle: (taskId: string, checked: boolean) => void;
 }) => {
-  const router = useRouter();
   const draggedTaskId = useRef<string | null>(null);
   const moveInFlight = useRef(false);
   const [pending, startTransition] = useTransition();
@@ -78,7 +77,6 @@ export const GlobalTaskBoard = ({
         });
         if (result.ok) {
           setError(null);
-          router.refresh();
         } else {
           setError(result.error.message);
         }
@@ -124,71 +122,75 @@ export const GlobalTaskBoard = ({
                     task.createdById === userId ||
                     task.assigneeIds.includes(userId ?? "");
                   return (
-                    <article
-                      className={`kcard${task.status === "done" ? " done" : ""}`}
-                      draggable={canEdit && !pending}
-                      key={task.id}
-                      onDragEnd={() => {
-                        draggedTaskId.current = null;
-                      }}
-                      onDragStart={() => {
-                        draggedTaskId.current = task.id;
-                      }}
-                    >
-                      <div className="top">
-                        <Checkbox
-                          aria-label={`Select ${task.title}`}
-                          checked={selectedIds.has(task.id)}
-                          onCheckedChange={(checked) =>
-                            onToggle(task.id, checked === true)
-                          }
-                        />
-                        <span className="key">
-                          {task.projectKey}-{task.projectTaskNumber}
-                        </span>
-                        <h3 className="title">
-                          <Link href={`/projects/${task.projectId}?view=board`}>
-                            {task.title}
-                          </Link>
-                        </h3>
-                      </div>
-                      <div className="meta">
-                        <span className="m">{task.projectName}</span>
-                        <span className="m">{task.priority}</span>
-                        {task.dueDate ? (
-                          <span className="m">{task.dueDate}</span>
-                        ) : null}
-                        <span className="m">
-                          {task.assignees.map(({ name }) => name).join(", ") ||
-                            "Unassigned"}
-                        </span>
-                      </div>
-                      {canEdit ? (
-                        <TaskStatusSelect
-                          status={task.status}
-                          taskId={task.id}
-                          version={task.version}
-                        />
-                      ) : (
-                        <span className={`pstatus ${task.status}`}>
-                          {task.status}
-                        </span>
-                      )}
-                      <div className="c-meta row">
-                        <FavoriteToggle
-                          id={task.id}
-                          initialFavorite={favoriteTaskIds.has(task.id)}
-                          kind="task"
-                        />
-                        <TaskManageControls
-                          canEdit={canEdit}
-                          currentUserId={userId}
-                          employees={employees}
-                          isAdmin={isAdmin}
-                          task={task}
-                        />
-                      </div>
-                    </article>
+                    <BoardCardTransition key={task.id} taskId={task.id}>
+                      <article
+                        className={`kcard${task.status === "done" ? " done" : ""}`}
+                        draggable={canEdit && !pending}
+                        onDragEnd={() => {
+                          draggedTaskId.current = null;
+                        }}
+                        onDragStart={() => {
+                          draggedTaskId.current = task.id;
+                        }}
+                      >
+                        <div className="top">
+                          <Checkbox
+                            aria-label={`Select ${task.title}`}
+                            checked={selectedIds.has(task.id)}
+                            onCheckedChange={(checked) =>
+                              onToggle(task.id, checked === true)
+                            }
+                          />
+                          <span className="key">
+                            {task.projectKey}-{task.projectTaskNumber}
+                          </span>
+                          <h3 className="title">
+                            <Link
+                              href={`/projects/${task.projectId}?view=board`}
+                            >
+                              {task.title}
+                            </Link>
+                          </h3>
+                        </div>
+                        <div className="meta">
+                          <span className="m">{task.projectName}</span>
+                          <span className="m">{task.priority}</span>
+                          {task.dueDate ? (
+                            <span className="m">{task.dueDate}</span>
+                          ) : null}
+                          <span className="m">
+                            {task.assignees
+                              .map(({ name }) => name)
+                              .join(", ") || "Unassigned"}
+                          </span>
+                        </div>
+                        {canEdit ? (
+                          <TaskStatusSelect
+                            status={task.status}
+                            taskId={task.id}
+                            version={task.version}
+                          />
+                        ) : (
+                          <span className={`pstatus ${task.status}`}>
+                            {task.status}
+                          </span>
+                        )}
+                        <div className="c-meta row">
+                          <FavoriteToggle
+                            id={task.id}
+                            initialFavorite={favoriteTaskIds.has(task.id)}
+                            kind="task"
+                          />
+                          <TaskManageControls
+                            canEdit={canEdit}
+                            currentUserId={userId}
+                            employees={employees}
+                            isAdmin={isAdmin}
+                            task={task}
+                          />
+                        </div>
+                      </article>
+                    </BoardCardTransition>
                   );
                 })}
               </div>

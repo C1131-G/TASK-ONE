@@ -10,9 +10,9 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
-import { updateCompanySettingsAction } from "@/features/company/company-actions";
 import { updateOwnProfileAction } from "@/features/people/people-actions";
 import { useSaveState } from "@/features/settings/hooks/use-settings-save";
+import { updateCompanySettingsAction } from "@/features/settings/settings-actions";
 import { savePersonalPreferencesAction } from "@/features/user/user-actions";
 import type { CompanySettingsValues } from "@/src/server/company/company-settings";
 import type { PersonalPreferenceValues } from "@/src/server/preferences/personal-preferences";
@@ -20,7 +20,7 @@ import type { PersonalPreferenceValues } from "@/src/server/preferences/personal
 export { NotificationPreferencesForm } from "@/features/notifications/components/notification-preferences-form";
 
 const ProfileForm = ({ name }: { readonly name: string }) => {
-  const { error, pending, router, setError, startTransition } = useSaveState();
+  const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const result = await updateOwnProfileAction({
@@ -32,7 +32,6 @@ const ProfileForm = ({ name }: { readonly name: string }) => {
         return;
       }
       setError(null);
-      router.refresh();
     });
   return (
     <form action={save} className="panel panel-b stack">
@@ -69,7 +68,7 @@ const PreferencesForm = ({
 }: {
   readonly values: PersonalPreferenceValues;
 }) => {
-  const { error, pending, router, setError, startTransition } = useSaveState();
+  const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const density = String(formData.get("density"));
@@ -91,7 +90,6 @@ const PreferencesForm = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
   return (
     <form action={save} className="panel panel-b stack">
@@ -165,7 +163,7 @@ const CompanySettingsForm = ({
 }: {
   readonly values: CompanySettingsValues;
 }) => {
-  const { error, pending, router, setError, startTransition } = useSaveState();
+  const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const result = await updateCompanySettingsAction({
@@ -181,7 +179,6 @@ const CompanySettingsForm = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
   return (
     <form action={save} className="panel panel-b stack">

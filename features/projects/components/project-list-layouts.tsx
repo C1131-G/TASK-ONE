@@ -14,8 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import { SkeletonBone } from "@/components/workspace/skeleton-shapes";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
 import { ProjectListActions } from "@/features/projects/components/project-list-actions";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
@@ -83,7 +83,11 @@ const ProjectCard = ({
   readonly isAdmin: boolean;
 }) => (
   <article className="pcard">
-    <Link className="pcard-link" href={`/projects/${project.id}`}>
+    <Link
+      className="pcard-link"
+      href={`/projects/${project.id}`}
+      transitionTypes={["nav-forward"]}
+    >
       <div className="row">
         <ProjectIcon color={project.color} icon={project.icon} />
         <strong className="trunc grow">{project.name}</strong>
@@ -145,6 +149,7 @@ export const ProjectListView = ({
           aria-label={`Open ${project.name}`}
           className="project-list-main"
           href={`/projects/${project.id}`}
+          transitionTypes={["nav-forward"]}
         >
           <ProjectIcon color={project.color} icon={project.icon} />
           <span className="project-list-title">
@@ -212,6 +217,7 @@ export const ProjectTableView = ({
             <Link
               className="project-table-name"
               href={`/projects/${project.id}`}
+              transitionTypes={["nav-forward"]}
             >
               <ProjectIcon color={project.color} icon={project.icon} />
               <span>{project.name}</span>

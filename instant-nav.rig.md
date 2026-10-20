@@ -10,4 +10,4 @@
 - LIVENESS: n/a; local build and start.
 - WALLS: `next dev` and `next build` share `.next`; stop the dev server before building. Playwright uses the configured `E2E_CHROMIUM_PATH` on Windows.
 - PITFALLS: Playwright loads `.env.e2e.local`, which sets `E2E_BASE_URL=http://localhost:3000`; confirm the server on that origin was built with `EXPOSE_TESTING_API=1` before trusting lock assertions. The backend harness creates and migrates a dedicated `metsys*_test` database; do not point it at the app database.
-- GUARDS: `tests/e2e/instant-nav-overview.spec.ts`, `instant-nav-tasks.spec.ts`, `instant-nav-clients-portal.spec.ts` (clients, audit, portal routes), `instant-nav-routes.spec.ts` (every other workspace route plus the four `[id]` detail routes).
+- GUARDS: `tests/e2e/overview-page.spec.ts`, `tasks-instant-flow.spec.ts`, `clients-portal-instant-flow.spec.ts` (clients, audit, portal routes), `workspace-instant-flow.spec.ts` (every other workspace route plus the four `[id]` detail routes).

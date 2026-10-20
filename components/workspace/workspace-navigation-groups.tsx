@@ -1,10 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 /* eslint-disable shadcn/no-restyle */
-import Link from "next/link";
+import type { Route } from "next";
 import type { ReactNode } from "react";
 
 import { SheetClose } from "@/components/ui/sheet";
-import { NavigationPendingIndicator } from "@/components/workspace/navigation-pending-indicator";
+import { NavLink } from "@/components/workspace/nav-link";
 import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
 import {
   getNavigationTransitionType,
@@ -13,6 +13,10 @@ import {
 } from "@/components/workspace/workspace-navigation-data";
 import type { WorkspaceProject } from "@/components/workspace/workspace-shell";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
+
+const isProjectPath = (pathname: string, projectId: string) =>
+  pathname === `/projects/${projectId}` ||
+  pathname.startsWith(`/projects/${projectId}/`);
 
 const NavigationEntry = ({
   children,
@@ -24,24 +28,18 @@ const NavigationEntry = ({
   closeOnNavigate ? <SheetClose asChild>{children}</SheetClose> : children;
 
 export const WorkspaceNavigationGroups = ({
-  pathname,
   role,
   projects,
   unreadInboxCount,
   unreadNotificationCount,
   closeOnNavigate = false,
 }: {
-  readonly pathname: string;
   readonly role: "admin" | "employee";
   readonly projects: readonly WorkspaceProject[];
   readonly unreadInboxCount: number;
   readonly unreadNotificationCount: number;
   readonly closeOnNavigate?: boolean;
 }) => {
-  const activeProject = projects.find(
-    ({ id }) =>
-      pathname === `/projects/${id}` || pathname.startsWith(`/projects/${id}/`)
-  );
   const unreadCountFor = (label: string): number => {
     if (label === "Inbox") {
       return unreadInboxCount;
@@ -65,15 +63,17 @@ export const WorkspaceNavigationGroups = ({
             return [
               <NavigationEntry closeOnNavigate={closeOnNavigate} key={href}>
                 <WorkspaceLink
-                  active={
+                  href={href}
+                  Icon={Icon}
+                  isActive={(pathname) =>
                     href === "/projects"
                       ? pathname === href
                       : isNavigationItemActive(pathname, href)
                   }
-                  href={href}
-                  Icon={Icon}
                   label={label}
-                  transitionType={getNavigationTransitionType(pathname, href)}
+                  transitionTypes={(pathname) => [
+                    getNavigationTransitionType(pathname, href),
+                  ]}
                   unreadCount={unreadCountFor(label)}
                 />
               </NavigationEntry>,
@@ -88,13 +88,13 @@ export const WorkspaceNavigationGroups = ({
         <div className="sgroup-h">Projects</div>
         {projects.map((project) => (
           <NavigationEntry closeOnNavigate={closeOnNavigate} key={project.id}>
-            <Link
-              aria-current={
-                activeProject?.id === project.id ? "page" : undefined
-              }
-              className={`sitem${activeProject?.id === project.id ? " on" : ""}`}
-              href={`/projects/${project.id}`}
-              transitionTypes={[
+            <NavLink
+              activeClassName="on"
+              className="sitem"
+              // A project id from the shell data names an existing project route.
+              href={`/projects/${project.id}` as Route}
+              isActive={(pathname) => isProjectPath(pathname, project.id)}
+              transitionTypes={(pathname) => [
                 getNavigationTransitionType(
                   pathname,
                   `/projects/${project.id}`
@@ -107,8 +107,7 @@ export const WorkspaceNavigationGroups = ({
                 size={13}
               />
               <span className="trunc">{project.name}</span>
-              <NavigationPendingIndicator />
-            </Link>
+            </NavLink>
           </NavigationEntry>
         ))}
       </div>

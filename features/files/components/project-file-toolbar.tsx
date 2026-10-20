@@ -11,12 +11,11 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
+import { FILE_SORTS } from "@/features/files/types/project-file-types";
 import type {
   FileLayout,
   FileSort,
 } from "@/features/files/types/project-file-types";
-
-const FILE_SORTS: readonly FileSort[] = ["newest", "oldest", "name", "size"];
 
 const ProjectFilesToolbar = ({
   canUpload,

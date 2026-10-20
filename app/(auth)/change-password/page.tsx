@@ -1,8 +1,9 @@
 import { Password } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata, Route } from "next";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import { AuthCard } from "@/features/user/components/auth-card";
 import {
   ChangePasswordForm,
@@ -31,16 +32,18 @@ const PasswordChangeGate = async () => {
 };
 
 const Page = () => (
-  <AuthCard
-    badge={<Password size={22} weight="duotone" />}
-    description="Replace your temporary password to open your workspace."
-    title="Set a new password"
-    titleId="password-title"
-  >
-    <Suspense fallback={<ChangePasswordFormSkeleton />}>
-      <PasswordChangeGate />
-    </Suspense>
-  </AuthCard>
+  <PageTransition>
+    <AuthCard
+      badge={<Password size={22} weight="duotone" />}
+      description="Replace your temporary password to open your workspace."
+      title="Set a new password"
+      titleId="password-title"
+    >
+      <SuspenseReveal fallback={<ChangePasswordFormSkeleton />}>
+        <PasswordChangeGate />
+      </SuspenseReveal>
+    </AuthCard>
+  </PageTransition>
 );
 
 export default Page;

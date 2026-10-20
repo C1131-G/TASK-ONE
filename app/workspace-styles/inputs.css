@@ -294,3 +294,18 @@
     opacity: 1;
   }
 }
+
+/* Tab strips that slide their underline render it as an element (see
+   TabUnderline) instead of the ::after above. */
+.workspace-app .tab.on:has(> .tab-underline)::after {
+  content: none;
+}
+.workspace-app .tab-underline {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text);
+}

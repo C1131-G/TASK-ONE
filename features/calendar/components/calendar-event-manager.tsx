@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -34,7 +33,6 @@ export const CalendarEventManager = ({
   readonly isAdmin: boolean;
   readonly period?: "month" | "week";
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -63,9 +61,7 @@ export const CalendarEventManager = ({
       });
       if (!result.ok) {
         setError(result.error.message);
-        return;
       }
-      router.refresh();
     });
   };
 
@@ -83,7 +79,6 @@ export const CalendarEventManager = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
   };
 

@@ -5,8 +5,9 @@
 import { Bell, Bug, ListChecks, UserCircle } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import type { Route } from "next";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+
+import { NavLink } from "@/components/workspace/nav-link";
 
 interface NavItem {
   readonly href: Route;
@@ -42,43 +43,44 @@ const NAV_ITEMS: readonly NavItem[] = [
   },
 ];
 
-const PortalNav = ({ unreadCount }: { readonly unreadCount: number }) => {
-  const pathname = usePathname();
-  return (
-    <nav aria-label="Client portal" className="portal-nav">
-      <ul>
-        {NAV_ITEMS.map((item) => {
-          const active = item.match(pathname);
-          const Glyph = item.icon;
-          const isNotifications = item.href === "/portal/notifications";
-          return (
-            <li key={item.href}>
-              <Link
-                aria-current={active ? "page" : undefined}
-                className="portal-nav-link"
-                href={item.href}
-              >
-                <Glyph
-                  aria-hidden="true"
-                  size={18}
-                  weight={active ? "fill" : "regular"}
-                />
-                <span>{item.label}</span>
-                {isNotifications && unreadCount > 0 ? (
-                  <span className="portal-nav-badge">
-                    <span aria-hidden="true">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                    <span className="sr-only">{unreadCount} unread</span>
-                  </span>
-                ) : null}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-};
+// Each link marks itself active from the URL; until the URL is read it renders
+// inactive. The unread badge streams in its own boundary, so the links never
+// wait on the count.
+const PortalNavLinks = ({
+  notificationBadge,
+}: {
+  readonly notificationBadge: ReactNode;
+}) => (
+  <nav aria-label="Client portal" className="portal-nav">
+    <ul>
+      {NAV_ITEMS.map((item) => {
+        const Glyph = item.icon;
+        return (
+          <li key={item.href}>
+            <NavLink
+              className="portal-nav-link"
+              href={item.href}
+              isActive={item.match}
+            >
+              {(active) => (
+                <>
+                  <Glyph
+                    aria-hidden="true"
+                    size={18}
+                    weight={active ? "fill" : "regular"}
+                  />
+                  <span>{item.label}</span>
+                  {item.href === "/portal/notifications"
+                    ? notificationBadge
+                    : null}
+                </>
+              )}
+            </NavLink>
+          </li>
+        );
+      })}
+    </ul>
+  </nav>
+);
 
-export { PortalNav };
+export { PortalNavLinks };

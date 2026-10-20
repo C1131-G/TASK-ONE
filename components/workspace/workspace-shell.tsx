@@ -1,15 +1,20 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { ReactNode } from "react";
-import { Suspense, ViewTransition } from "react";
+import { Suspense } from "react";
 
+import { WorkspaceRevealGate } from "@/components/workspace/workspace-reveal-gate";
 import {
   WorkspaceBottomChrome,
   WorkspaceBottomChromeFallback,
   WorkspaceSidebar,
   WorkspaceSidebarFallback,
-  WorkspaceTopbar,
-  WorkspaceTopbarFallback,
+  WorkspaceTopbarActions,
+  WorkspaceTopbarActionsFallback,
+  WorkspaceTopbarMenu,
+  WorkspaceTopbarMenuFallback,
+  WorkspaceTopbarTitle,
+  WorkspaceTopbarTitleFallback,
 } from "@/components/workspace/workspace-shell-sections";
 import { WorkspaceUndoProvider } from "@/components/workspace/workspace-undo";
 import { PushNotificationsControl } from "@/features/notifications/components/push-notifications-control";
@@ -30,15 +35,17 @@ export interface WorkspaceFrameData {
   readonly unreadNotificationCount: number;
 }
 
-// The frame markup and page slot are static. Only the navigation, top bar and
-// bottom bar wait for the session data, each behind its own boundary.
+// The frame markup and page slot are static. The top bar title reads only the
+// URL; the navigation, top bar actions and bottom bar wait for the session
+// data, each behind its own boundary. Each page owns its view transition: a
+// layout-level one never mounts or unmounts, so enter and exit never fire.
 export const WorkspaceShell = ({
   children,
-  frame,
+  framePromise,
   publicKey,
 }: {
   readonly children: ReactNode;
-  readonly frame: Promise<WorkspaceFrameData | null>;
+  readonly framePromise: Promise<WorkspaceFrameData | null>;
   readonly publicKey: string;
 }) => (
   <div className="workspace-app">
@@ -49,38 +56,34 @@ export const WorkspaceShell = ({
       <div className="shell">
         <nav aria-label="Main" className="side">
           <Suspense fallback={<WorkspaceSidebarFallback />}>
-            <WorkspaceSidebar frame={frame} />
+            <WorkspaceSidebar framePromise={framePromise} />
           </Suspense>
         </nav>
         <main className="main">
           <header className="topbar">
-            <Suspense fallback={<WorkspaceTopbarFallback />}>
-              <WorkspaceTopbar frame={frame} />
+            <Suspense fallback={<WorkspaceTopbarMenuFallback />}>
+              <WorkspaceTopbarMenu framePromise={framePromise} />
+            </Suspense>
+            <span className="crumbs">
+              <Suspense fallback={<WorkspaceTopbarTitleFallback />}>
+                <WorkspaceTopbarTitle framePromise={framePromise} />
+              </Suspense>
+            </span>
+            <span className="sp" />
+            <Suspense fallback={<WorkspaceTopbarActionsFallback />}>
+              <WorkspaceTopbarActions framePromise={framePromise} />
             </Suspense>
           </header>
           <div className="content" id="main-content" tabIndex={-1}>
-            <ViewTransition
-              default="none"
-              enter={{
-                default: "none",
-                "nav-back": "nav-back",
-                "nav-forward": "nav-forward",
-              }}
-              exit={{
-                default: "none",
-                "nav-back": "nav-back",
-                "nav-forward": "nav-forward",
-              }}
-            >
-              {children}
-            </ViewTransition>
+            {children}
           </div>
         </main>
         <Suspense fallback={<WorkspaceBottomChromeFallback />}>
-          <WorkspaceBottomChrome frame={frame} />
+          <WorkspaceBottomChrome framePromise={framePromise} />
         </Suspense>
       </div>
       <PushNotificationsControl publicKey={publicKey} />
+      <WorkspaceRevealGate />
     </WorkspaceUndoProvider>
   </div>
 );

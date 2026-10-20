@@ -3,7 +3,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { PortalTime } from "@/features/portal/components/portal-time";
@@ -24,7 +23,6 @@ const PortalNotificationList = ({
   readonly items: readonly Item[];
   readonly unreadCount: number;
 }) => {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [readIds, setReadIds] = useState<ReadonlySet<string>>(new Set());
@@ -40,7 +38,6 @@ const PortalNotificationList = ({
       });
       if (result.ok) {
         setReadIds((current) => new Set([...current, id]));
-        router.refresh();
       } else {
         setError(result.error.message);
       }
@@ -56,7 +53,6 @@ const PortalNotificationList = ({
       const result = await markAllPortalNotificationsReadAction({});
       if (result.ok) {
         setReadIds(new Set(items.map(({ id }) => id)));
-        router.refresh();
       } else {
         setError(result.error.message);
       }
@@ -125,6 +121,7 @@ const PortalNotificationList = ({
                 <Link
                   className="portal-notif-main"
                   href={`/portal/bugs/${item.bugId}`}
+                  transitionTypes={["nav-forward"]}
                   onClick={() => {
                     if (unread) {
                       void markOne(item.id);

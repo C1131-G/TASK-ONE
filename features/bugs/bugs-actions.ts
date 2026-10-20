@@ -1,12 +1,12 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import {
   revalidateBugViews,
   runBugWorkflowAction,
-} from "@/features/bugs/actions/bug-workflow-runner";
+} from "@/features/bugs/actions/bugs-workflow-runner";
 import { getBugHistory, listBugs } from "@/features/bugs/bugs-queries";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { Idempotency, IdempotencyLive } from "@/src/server/core/idempotency";
@@ -88,6 +88,7 @@ export async function reportBugAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/bugs");
     revalidatePath(`/projects/${result.data.projectId}`);
+    refresh();
   }
   return result;
 }

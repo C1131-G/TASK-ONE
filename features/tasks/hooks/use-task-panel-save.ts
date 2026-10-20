@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
 import { undoTaskCompletionAction } from "@/features/tasks/tasks-actions";
 
@@ -14,7 +12,6 @@ export const useTaskPanelSave = ({
   readonly refresh: () => Promise<void>;
   readonly taskTitle: string;
 }) => {
-  const router = useRouter();
   const { addUndo } = useWorkspaceUndo();
 
   const handleSaved = (
@@ -37,12 +34,10 @@ export const useTaskPanelSave = ({
           if (!result.ok) {
             return result.error.message;
           }
-          router.refresh();
           return null;
         },
       });
     }
-    router.refresh();
     void refresh();
   };
 

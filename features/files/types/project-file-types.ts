@@ -13,4 +13,11 @@ interface ProjectFile {
 type FileLayout = "grid" | "list";
 type FileSort = "newest" | "oldest" | "name" | "size";
 
+export const FILE_SORTS: readonly FileSort[] = [
+  "newest",
+  "oldest",
+  "name",
+  "size",
+];
+
 export type { FileLayout, FileSort, ProjectFile };

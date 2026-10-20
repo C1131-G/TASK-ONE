@@ -1,0 +1,132 @@
+/*
+ * View transitions for every route group. React names the boundaries; these
+ * rules only style them. Classes:
+ * - nav-forward / nav-back: hierarchical navigation (list ↔ detail).
+ * - nav-fade: lateral or untyped navigation (sidebar, tabs, browser back).
+ * - reveal: streamed content replacing its skeleton.
+ */
+
+:root {
+  --vt-duration-exit: 150ms;
+  --vt-duration-enter: 210ms;
+  --vt-duration-move: 350ms;
+}
+
+/*
+ * Keep the root live: unnamed chrome (sidebar, top bar, skeletons) swaps in
+ * place instead of freezing behind a snapshot, and stays clickable while a
+ * page animates.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root) {
+  display: none;
+}
+
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(.nav-forward) {
+  --vt-offset: -20px;
+  animation:
+    var(--vt-duration-exit) ease-in both vt-fade reverse,
+    var(--vt-duration-move) ease-in-out both vt-slide reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --vt-offset: 20px;
+  animation:
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-fade,
+    var(--vt-duration-move) ease-in-out both vt-slide;
+}
+
+::view-transition-old(.nav-back) {
+  --vt-offset: 20px;
+  animation:
+    var(--vt-duration-exit) ease-in both vt-fade reverse,
+    var(--vt-duration-move) ease-in-out both vt-slide reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --vt-offset: -20px;
+  animation:
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-fade,
+    var(--vt-duration-move) ease-in-out both vt-slide;
+}
+
+::view-transition-old(.nav-fade) {
+  animation: var(--vt-duration-exit) ease-in both vt-fade reverse;
+}
+
+::view-transition-new(.nav-fade) {
+  animation: var(--vt-duration-enter) ease-out var(--vt-duration-exit) both
+    vt-fade;
+}
+
+::view-transition-new(.reveal) {
+  animation:
+    var(--vt-duration-enter) ease-out both vt-fade,
+    var(--vt-duration-move) cubic-bezier(0.215, 0.61, 0.355, 1) both vt-rise;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide {
+  from {
+    translate: var(--vt-offset);
+  }
+
+  to {
+    translate: 0;
+  }
+}
+
+@keyframes vt-rise {
+  from {
+    translate: 0 8px;
+  }
+
+  to {
+    translate: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* Shared indicators (sidebar pill, tab underline) slide as one solid shape. */
+::view-transition-group(.indicator) {
+  z-index: 10;
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+::view-transition-old(.indicator),
+::view-transition-new(.indicator) {
+  height: 100%;
+  animation: none;
+}
+
+/* Kanban cards glide to their new column or position. */
+::view-transition-group(.card-move) {
+  z-index: 5;
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+}

@@ -2,8 +2,7 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { changeTaskColumnAction } from "@/features/tasks/tasks-actions";
@@ -19,12 +18,15 @@ const TaskCompletionCheckbox = ({
   readonly status: "backlog" | "todo" | "progress" | "review" | "done";
   readonly version: number;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // The box ticks at once; the action's revalidation brings the saved status,
+  // and a failed save falls back to it.
+  const [completed, setOptimisticCompleted] = useOptimistic(status === "done");
 
   const setCompleted = (checked: boolean) =>
     startTransition(async () => {
+      setOptimisticCompleted(checked);
       const result = await changeTaskColumnAction({
         expectedVersion: version,
         idempotencyKey: crypto.randomUUID(),
@@ -36,14 +38,13 @@ const TaskCompletionCheckbox = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (
     <span className="home-task-completion">
       <Checkbox
-        aria-label={`${status === "done" ? "Reopen" : "Complete"} ${title}`}
-        checked={status === "done"}
+        aria-label={`${completed ? "Reopen" : "Complete"} ${title}`}
+        checked={completed}
         disabled={pending}
         onCheckedChange={(checked) => {
           if (typeof checked === "boolean") {

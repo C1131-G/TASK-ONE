@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -41,7 +40,6 @@ export const EmployeeAdminControls = ({
   readonly employee: Employee;
   readonly teams: readonly Team[];
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
@@ -62,7 +60,6 @@ export const EmployeeAdminControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const changeRole = (role: "admin" | "employee") =>
@@ -77,7 +74,6 @@ export const EmployeeAdminControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const resetPassword = () =>
@@ -104,7 +100,6 @@ export const EmployeeAdminControls = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

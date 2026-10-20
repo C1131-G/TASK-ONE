@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WorkspaceCombobox } from "@/components/workspace/workspace-combobox";
+import { useSearchParamState } from "@/hooks/use-search-param-state";
 import {
   formatActivityGroup,
   formatActivityTime,
@@ -46,7 +47,11 @@ const ActivityFeedList = ({
 }: {
   readonly entries: readonly ActivityEntry[];
 }) => {
-  const [filter, setFilter] = useState<ActivityFilter>("all");
+  const [filter, setFilter] = useSearchParamState(
+    "activity",
+    ACTIVITY_FILTERS,
+    "all"
+  );
   const [actorId, setActorId] = useState("everyone");
   const people = useMemo(
     () =>

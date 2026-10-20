@@ -3,10 +3,39 @@
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
 import {
+  archiveTaskAction as archiveTaskImpl,
+  restoreTaskAction as restoreTaskImpl,
+  undoTaskArchiveAction as undoTaskArchiveImpl,
+  undoTaskCompletionAction as undoTaskCompletionImpl,
+} from "./actions/tasks-archiving";
+import {
+  bulkUpdateTasksAction as bulkUpdateTasksImpl,
+  reorderTasksAction as reorderTasksImpl,
+  setTaskRelationsAction as setTaskRelationsImpl,
+} from "./actions/tasks-bulk-and-relations";
+import {
+  createCommentAction as createCommentImpl,
+  listTaskCommentsAction as listTaskCommentsImpl,
+  removeCommentAction as removeCommentImpl,
+  toggleCommentReactionAction as toggleCommentReactionImpl,
+  undoCommentRemovalAction as undoCommentRemovalImpl,
+} from "./actions/tasks-comments";
+import {
+  changeTaskColumnAction as changeTaskColumnImpl,
+  createTaskAction as createTaskImpl,
+  rescheduleTaskAction as rescheduleTaskImpl,
+  updateTaskAction as updateTaskImpl,
+} from "./actions/tasks-editing";
+import {
   createLabelAction as createLabelImpl,
   removeLabelAction as removeLabelImpl,
   updateLabelAction as updateLabelImpl,
-} from "./actions/labels";
+} from "./actions/tasks-labels";
+import {
+  duplicateTaskAction as duplicateTaskImpl,
+  moveTaskAction as moveTaskImpl,
+  setTaskRecurrenceAction as setTaskRecurrenceImpl,
+} from "./actions/tasks-placement";
 import {
   createSubtaskAction as createSubtaskImpl,
   listTaskSubtasksAction as listTaskSubtasksImpl,
@@ -14,39 +43,22 @@ import {
   removeSubtaskAction as removeSubtaskImpl,
   reorderSubtasksAction as reorderSubtasksImpl,
   updateSubtaskAction as updateSubtaskImpl,
-} from "./actions/subtasks";
-import {
-  archiveTaskAction as archiveTaskImpl,
-  restoreTaskAction as restoreTaskImpl,
-  undoTaskArchiveAction as undoTaskArchiveImpl,
-  undoTaskCompletionAction as undoTaskCompletionImpl,
-} from "./actions/task-archiving";
-import {
-  bulkUpdateTasksAction as bulkUpdateTasksImpl,
-  reorderTasksAction as reorderTasksImpl,
-  setTaskRelationsAction as setTaskRelationsImpl,
-} from "./actions/task-bulk-and-relations";
-import {
-  createCommentAction as createCommentImpl,
-  listTaskCommentsAction as listTaskCommentsImpl,
-  removeCommentAction as removeCommentImpl,
-  toggleCommentReactionAction as toggleCommentReactionImpl,
-  undoCommentRemovalAction as undoCommentRemovalImpl,
-} from "./actions/task-comments";
-import {
-  changeTaskColumnAction as changeTaskColumnImpl,
-  createTaskAction as createTaskImpl,
-  rescheduleTaskAction as rescheduleTaskImpl,
-  updateTaskAction as updateTaskImpl,
-} from "./actions/task-editing";
-import {
-  duplicateTaskAction as duplicateTaskImpl,
-  moveTaskAction as moveTaskImpl,
-  setTaskRecurrenceAction as setTaskRecurrenceImpl,
-} from "./actions/task-placement";
+} from "./actions/tasks-subtasks";
+import { readTaskBundle } from "./task-details-panel-data";
 import { getProjectTask, listLabels, listProjectTasks } from "./tasks-queries";
 
 // Reads below are called from client components after the first render.
+
+// The drawer's reads in one call: they run in parallel on the server instead
+// of queueing as five separate action requests.
+export async function getTaskBundleAction(
+  projectId: string,
+  taskId: string,
+  bugId?: string
+) {
+  return await readTaskBundle(projectId, taskId, bugId);
+}
+
 export async function getProjectTaskAction(input: unknown) {
   return await getProjectTask(input);
 }

@@ -1,9 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
+import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
   ProjectTimeline,
   ProjectTimelineSkeleton,
@@ -13,22 +14,24 @@ import { parseTaskIdParam } from "@/features/tasks/task-param";
 export const metadata: Metadata = { title: "Timeline | Metsys" };
 
 const TimelinePage = ({ searchParams }: PageProps<"/timeline">) => (
-  <div className="page">
-    <div className="ph">
-      <div>
-        <h1>Timeline</h1>
-        <p>Search, filter, and schedule work across active projects.</p>
+  <PageTransition>
+    <div className="page">
+      <div className="ph">
+        <div>
+          <h1>Timeline</h1>
+          <p>Search, filter, and schedule work across active projects.</p>
+        </div>
       </div>
+      <SectionErrorBoundary title="timeline could not be loaded">
+        <SuspenseReveal fallback={<ProjectTimelineSkeleton />}>
+          {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
+          {searchParams.then((params) => (
+            <ProjectTimeline initialTaskId={parseTaskIdParam(params["task"])} />
+          ))}
+        </SuspenseReveal>
+      </SectionErrorBoundary>
     </div>
-    <SectionErrorBoundary title="timeline could not be loaded">
-      <Suspense fallback={<ProjectTimelineSkeleton />}>
-        {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
-        {searchParams.then((params) => (
-          <ProjectTimeline initialTaskId={parseTaskIdParam(params["task"])} />
-        ))}
-      </Suspense>
-    </SectionErrorBoundary>
-  </div>
+  </PageTransition>
 );
 
 export default TimelinePage;

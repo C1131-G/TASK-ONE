@@ -1,7 +1,9 @@
 import "server-only";
 import { Effect, Schema } from "effect";
+import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { readOrThrow } from "@/lib/read-result";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
@@ -65,3 +67,21 @@ export const listAllTeams = cache(async () => await listTeams({}));
 export const listAllEmployees = cache(
   async () => await listEmployees({ search: "" })
 );
+
+export const getEmployee = cache(async (employeeId: string) => {
+  const employees = readOrThrow(await listAllEmployees(), "Members");
+  const employee = employees.find(({ id }) => id === employeeId);
+  if (!employee) {
+    notFound();
+  }
+  return employee;
+});
+
+export const getTeam = cache(async (teamId: string) => {
+  const teams = readOrThrow(await listAllTeams(), "Teams");
+  const team = teams.find(({ id }) => id === teamId);
+  if (!team) {
+    notFound();
+  }
+  return team;
+});

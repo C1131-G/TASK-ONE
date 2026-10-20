@@ -24,7 +24,6 @@ const SearchPanel = async ({
   ]);
   return (
     <SearchForm
-      initialQuery={initialQuery}
       initialResults={search?.ok ? search.data : null}
       initialError={search && !search.ok ? search.error.message : null}
       key={initialQuery}
@@ -33,7 +32,7 @@ const SearchPanel = async ({
   );
 };
 
-const RESULT_ROWS = SKELETON_KEYS.slice(0, 8);
+const RESULT_ROWS = SKELETON_KEYS.slice(0, 5);
 
 // Mirrors SearchForm: the search bar and result headings are static; the rows
 // are data.

@@ -18,6 +18,7 @@ import {
   listPortalBugs,
   listPortalProjects,
 } from "@/features/portal/portal-queries";
+import { readOrThrow } from "@/lib/read-result";
 import type { PortalBugSummary } from "@/src/server/portal/portal-contracts";
 
 const PortalBugItems = ({
@@ -57,7 +58,11 @@ const PortalBugItems = ({
     <ul aria-label="Company bugs" className="portal-bug-list">
       {bugs.map((bug) => (
         <li key={bug.id}>
-          <Link className="portal-bug-card" href={`/portal/bugs/${bug.id}`}>
+          <Link
+            className="portal-bug-card"
+            href={`/portal/bugs/${bug.id}`}
+            transitionTypes={["nav-forward"]}
+          >
             <span className="portal-bug-top">
               <span className="portal-bug-key">{bug.key}</span>
               <PortalStatusChip status={bug.status} />
@@ -98,6 +103,7 @@ const PortalBugList = async ({
     ...(projectId ? { projectId } : {}),
     ...(filters.status ? { status: filters.status } : {}),
   });
+  const bugs = readOrThrow(result, "Bugs");
   const filtered = Boolean(filters.mine || projectId || filters.status);
 
   return (
@@ -119,13 +125,7 @@ const PortalBugList = async ({
         projects={projects}
         status={filters.status}
       />
-      {result.ok ? (
-        <PortalBugItems bugs={result.data} filtered={filtered} />
-      ) : (
-        <div className="panel portal-alert" role="alert">
-          Bugs could not be loaded. Refresh to try again.
-        </div>
-      )}
+      <PortalBugItems bugs={bugs} filtered={filtered} />
     </>
   );
 };

@@ -18,11 +18,7 @@ const TeamList = async () => {
     getPageSession(),
   ]);
   if (!result.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Teams could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Teams could not be loaded.");
   }
   return (
     <>
@@ -44,6 +40,7 @@ const TeamList = async () => {
                 <Link
                   className="team-card-link grow"
                   href={`/teams/${team.id}`}
+                  transitionTypes={["nav-forward"]}
                 >
                   <strong>{team.name}</strong>
                   <span className="muted">{team.memberCount} members</span>
@@ -66,7 +63,7 @@ const TeamList = async () => {
   );
 };
 
-const TEAM_CARDS = SKELETON_KEYS.slice(0, 6);
+const TEAM_CARDS = SKELETON_KEYS.slice(0, 3);
 
 // Mirrors the team card: dot, name and member count, then the description.
 const TeamListSkeleton = () => (

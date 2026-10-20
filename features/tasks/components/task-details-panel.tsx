@@ -21,6 +21,24 @@ import type {
   TaskBundle,
 } from "@/features/tasks/task-details-panel-data";
 
+const TaskPanelError = ({
+  loading,
+  message,
+  onRetry,
+}: {
+  readonly loading: boolean;
+  readonly message: string | null;
+  readonly onRetry: () => void;
+}) =>
+  message ? (
+    <p className="error" role="alert">
+      {message}
+      <button disabled={loading} onClick={onRetry} type="button">
+        {loading ? "Retrying…" : "Retry"}
+      </button>
+    </p>
+  ) : null;
+
 // One panel per task. Everything it edits is read from the server when it opens,
 // so a caller only needs the task's ID, project and version. Closing with unsaved
 // details or a comment draft asks first.
@@ -66,12 +84,19 @@ export const TaskDetailsPanel = ({
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = open ?? localOpen;
   const [discardOpen, setDiscardOpen] = useState(false);
+  const [trustedVersion, setTrustedVersion] = useState<number | null>(null);
+  const recordVersionChange = (nextVersion: number) => {
+    setTrustedVersion(nextVersion);
+    onVersionChange(nextVersion);
+  };
   // A ref, not state: the dirty flag only decides what a close does.
   const detailsDirtyRef = useRef(false);
   const setDetailsDirty = useCallback((dirty: boolean) => {
     detailsDirtyRef.current = dirty;
   }, []);
-  // Only a bug reported by a client company can take public replies.
+  const isBug = taskType === "bug";
+  // Set only when this panel shows a bug, so bug-only reads and views key off it.
+  const bugDetailId = isBug ? bugId : undefined;
   const {
     comments,
     bugHistory,
@@ -87,16 +112,18 @@ export const TaskDetailsPanel = ({
     initialBundle,
     projectId,
     taskId,
-    ...(taskType === "bug" && bugId ? { bugId } : {}),
+    ...(bugDetailId ? { bugId: bugDetailId } : {}),
   });
   const subtaskActions = useTaskSubtaskActions({
-    onVersionChange,
+    onVersionChange: recordVersionChange,
     setSubtasks,
     subtasks,
     taskId,
     version,
   });
-  const visibleError = error ?? subtaskActions.error;
+  // Only a bug reported by a client company can take public replies.
+  const allowPublicReplies =
+    isBug && typeof bugHistory?.bug.clientCompanyId === "string";
   const {
     react: handleReact,
     remove: handleRemoveComment,
@@ -105,7 +132,7 @@ export const TaskDetailsPanel = ({
     submit: handleSubmitComment,
   } = comments;
   const handleSaved = useTaskPanelSave({
-    onVersionChange,
+    onVersionChange: recordVersionChange,
     refresh,
     taskTitle: task?.title ?? taskTitle ?? "task",
   });
@@ -152,19 +179,16 @@ export const TaskDetailsPanel = ({
           side="right"
         >
           <TaskDetailsHeading
-            isBug={taskType === "bug"}
+            isBug={isBug}
             title={task?.title ?? taskTitle ?? "Task details"}
           />
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-6">
-            {visibleError ? (
-              <p className="error" role="alert">
-                {visibleError}
-                <button disabled={loading} onClick={refresh} type="button">
-                  {loading ? "Retrying…" : "Retry"}
-                </button>
-              </p>
-            ) : null}
-            {taskType === "bug" && bugId ? (
+            <TaskPanelError
+              loading={loading}
+              message={error ?? subtaskActions.error}
+              onRetry={refresh}
+            />
+            {bugDetailId ? (
               <BugTaskDetail
                 employees={employees}
                 history={bugHistory}
@@ -179,13 +203,18 @@ export const TaskDetailsPanel = ({
                 onDirtyChange={setDetailsDirty}
                 onReload={() => refresh()}
                 onSaved={handleSaved}
-                onVersionChange={onVersionChange}
+                onVersionChange={recordVersionChange}
                 projectId={projectId}
                 subtaskActions={subtaskActions}
                 subtasks={subtasks}
                 task={task}
                 taskId={taskId}
                 version={version}
+                versionIsCurrent={
+                  task === null ||
+                  task.version === version ||
+                  trustedVersion === version
+                }
               />
             )}
             <TaskCommentsSection
@@ -193,10 +222,7 @@ export const TaskDetailsPanel = ({
               comments={comments.comments}
               currentUserId={currentUserId}
               employees={employees}
-              allowPublicReplies={
-                taskType === "bug" &&
-                typeof bugHistory?.bug.clientCompanyId === "string"
-              }
+              allowPublicReplies={allowPublicReplies}
               isAdmin={isAdmin}
               onBodyChange={handleCommentBodyChange}
               onReact={handleReact}

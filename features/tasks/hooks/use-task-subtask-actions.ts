@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import type { TaskSubtaskView } from "@/features/tasks/components/task-details-subtasks";
@@ -25,7 +24,6 @@ export const useTaskSubtaskActions = ({
   readonly setSubtasks: (subtasks: readonly TaskSubtaskView[]) => void;
   readonly onVersionChange: (version: number) => void;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +45,6 @@ export const useTaskSubtaskActions = ({
       onVersionChange(result.data.parentVersion);
       setSubtasks([...subtasks, result.data.subtask]);
       setError(null);
-      router.refresh();
     });
 
   const toggle = (subtask: TaskSubtaskView) =>
@@ -75,7 +72,6 @@ export const useTaskSubtaskActions = ({
         )
       );
       setError(null);
-      router.refresh();
     });
 
   const edit = (subtask: TaskSubtaskView, formData: FormData) =>
@@ -103,7 +99,6 @@ export const useTaskSubtaskActions = ({
         )
       );
       setError(null);
-      router.refresh();
     });
 
   const remove = (subtask: TaskSubtaskView) =>
@@ -120,7 +115,6 @@ export const useTaskSubtaskActions = ({
       onVersionChange(result.data.parentVersion);
       setSubtasks(subtasks.filter(({ id }) => id !== subtask.id));
       setError(null);
-      router.refresh();
     });
 
   const reorder = (index: number, direction: -1 | 1) =>
@@ -148,7 +142,6 @@ export const useTaskSubtaskActions = ({
       onVersionChange(result.data.parentVersion);
       setSubtasks(result.data.subtasks);
       setError(null);
-      router.refresh();
     });
 
   const promote = (subtask: TaskSubtaskView) =>
@@ -165,7 +158,6 @@ export const useTaskSubtaskActions = ({
       onVersionChange(version + 1);
       setSubtasks(subtasks.filter(({ id }) => id !== subtask.id));
       setError(null);
-      router.refresh();
     });
 
   return { add, edit, error, pending, promote, remove, reorder, toggle };

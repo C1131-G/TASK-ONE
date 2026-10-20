@@ -29,7 +29,7 @@ import { WorkspaceSearchPalette } from "@/components/workspace/workspace-search-
 import type { WorkspaceFrameData } from "@/components/workspace/workspace-shell";
 
 interface SectionProps {
-  readonly frame: Promise<WorkspaceFrameData | null>;
+  readonly framePromise: Promise<WorkspaceFrameData | null>;
 }
 
 const SIDEBAR_FALLBACK_KEYS = ["n1", "n2", "n3", "n4"] as const;
@@ -47,18 +47,30 @@ export const WorkspaceSidebarFallback = () => (
 const TOPBAR_FALLBACK_KEYS = ["t1", "t2", "t3"] as const;
 const BOTTOM_FALLBACK_KEYS = ["b1", "b2", "b3", "b4", "b5"] as const;
 
-// Mirrors the title and action buttons while the session data loads.
-export const WorkspaceTopbarFallback = () => (
-  <>
-    <span aria-hidden="true" className="crumbs">
-      <span className="workspace-loading-title" />
-    </span>
-    <span className="sp" />
-    {TOPBAR_FALLBACK_KEYS.map((key) => (
-      <span aria-hidden="true" className="workspace-loading-action" key={key} />
-    ))}
-  </>
+// Holds the title's place until the URL is read on a dynamic route.
+export const WorkspaceTopbarTitleFallback = () => (
+  <span aria-hidden="true" className="workspace-loading-title" />
 );
+
+// Holds the phone menu button's place while the session data loads.
+export const WorkspaceTopbarMenuFallback = () => (
+  <Button
+    aria-hidden="true"
+    data-workspace-mobile-menu=""
+    disabled
+    size="icon-sm"
+    tabIndex={-1}
+    variant="ghost"
+  >
+    <List aria-hidden="true" size={18} />
+  </Button>
+);
+
+// Mirrors the action buttons while the session data loads.
+export const WorkspaceTopbarActionsFallback = () =>
+  TOPBAR_FALLBACK_KEYS.map((key) => (
+    <span aria-hidden="true" className="workspace-loading-action" key={key} />
+  ));
 
 // Mirrors the phone bottom navigation while the session data loads.
 export const WorkspaceBottomChromeFallback = () => (
@@ -69,17 +81,10 @@ export const WorkspaceBottomChromeFallback = () => (
   </div>
 );
 
-const MobileNavigation = ({
-  data,
-  pathname,
-}: {
-  readonly data: WorkspaceFrameData;
-  readonly pathname: string;
-}) => (
+const MobileNavigation = ({ data }: { readonly data: WorkspaceFrameData }) => (
   <div className="mobile-navigation">
     <WorkspaceNavigationGroups
       closeOnNavigate
-      pathname={pathname}
       role={data.role}
       projects={data.projects}
       unreadInboxCount={data.unreadInboxCount}
@@ -88,8 +93,8 @@ const MobileNavigation = ({
   </div>
 );
 
-export const WorkspaceSidebar = ({ frame }: SectionProps) => {
-  const data = use(frame);
+export const WorkspaceSidebar = ({ framePromise }: SectionProps) => {
+  const data = use(framePromise);
   const pathname = usePathname();
   if (!data) {
     return <WorkspaceSidebarFallback />;
@@ -109,7 +114,6 @@ export const WorkspaceSidebar = ({ frame }: SectionProps) => {
       </div>
       <div className="side-scroll">
         <WorkspaceNavigationGroups
-          pathname={pathname}
           role={data.role}
           projects={data.projects}
           unreadInboxCount={data.unreadInboxCount}
@@ -123,57 +127,71 @@ export const WorkspaceSidebar = ({ frame }: SectionProps) => {
   );
 };
 
-export const WorkspaceTopbar = ({ frame }: SectionProps) => {
-  const data = use(frame);
+// Names the destination from the URL alone, so a deep link shows the right
+// title on first paint. Only project pages wait on the frame, for the name.
+export const WorkspaceTopbarTitle = ({ framePromise }: SectionProps) => {
+  const pathname = usePathname();
+  const [, segment, projectPathId] = pathname.split("/");
+  const projectId = segment === "projects" ? projectPathId : undefined;
+  const projectName = projectId
+    ? use(framePromise)?.projects.find(({ id }) => id === projectId)?.name
+    : undefined;
+  const sectionLabel = sections
+    .flatMap((section) => section.items)
+    .find((link) => isNavigationItemActive(pathname, link.href))?.label;
+  return (
+    <span className="topbar-title">
+      {projectName ?? sectionLabel ?? "Workspace"}
+    </span>
+  );
+};
+
+export const WorkspaceTopbarMenu = ({ framePromise }: SectionProps) => {
+  const data = use(framePromise);
+  if (!data) {
+    return null;
+  }
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          aria-label="Open workspace navigation"
+          data-workspace-mobile-menu=""
+          size="icon-sm"
+          variant="ghost"
+        >
+          <List aria-hidden="true" size={18} />
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        className="workspace-app"
+        data-workspace-nav=""
+        data-workspace-sheet=""
+        side="left"
+      >
+        <SheetHeader>
+          <SheetTitle>Metsys</SheetTitle>
+        </SheetHeader>
+        <nav aria-label="Workspace" className="mobile-navigation-scroll">
+          <MobileNavigation data={data} />
+        </nav>
+        <div className="mobile-navigation-footer">
+          <WorkspaceAccountMenu name={data.name} role={data.role} />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+export const WorkspaceTopbarActions = ({ framePromise }: SectionProps) => {
+  const data = use(framePromise);
   const pathname = usePathname();
   if (!data) {
     return null;
   }
   const { name, projects, role, unreadNotificationCount } = data;
-  const activeProject = projects.find(({ id }) => {
-    const projectPath = `/projects/${id}`;
-    return pathname === projectPath || pathname.startsWith(`${projectPath}/`);
-  });
-  const title =
-    activeProject?.name ??
-    sections
-      .flatMap((section) => section.items)
-      .find((link) => isNavigationItemActive(pathname, link.href))?.label ??
-    "Workspace";
   return (
     <>
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            aria-label="Open workspace navigation"
-            data-workspace-mobile-menu=""
-            size="icon-sm"
-            variant="ghost"
-          >
-            <List aria-hidden="true" size={18} />
-          </Button>
-        </SheetTrigger>
-        <SheetContent
-          className="workspace-app"
-          data-workspace-nav=""
-          data-workspace-sheet=""
-          side="left"
-        >
-          <SheetHeader>
-            <SheetTitle>Metsys</SheetTitle>
-          </SheetHeader>
-          <nav aria-label="Workspace" className="mobile-navigation-scroll">
-            <MobileNavigation data={data} pathname={pathname} />
-          </nav>
-          <div className="mobile-navigation-footer">
-            <WorkspaceAccountMenu name={name} role={role} />
-          </div>
-        </SheetContent>
-      </Sheet>
-      <span className="crumbs">
-        <span className="topbar-title">{title}</span>
-      </span>
-      <span className="sp" />
       <WorkspaceSearchPalette projects={projects} />
       <Link
         aria-label={
@@ -204,8 +222,8 @@ export const WorkspaceTopbar = ({ frame }: SectionProps) => {
   );
 };
 
-export const WorkspaceBottomChrome = ({ frame }: SectionProps) => {
-  const data = use(frame);
+export const WorkspaceBottomChrome = ({ framePromise }: SectionProps) => {
+  const data = use(framePromise);
   const pathname = usePathname();
   if (!data) {
     return null;
@@ -213,7 +231,7 @@ export const WorkspaceBottomChrome = ({ frame }: SectionProps) => {
   return (
     <>
       <WorkspaceBottomNavigation
-        mobileNavigation={<MobileNavigation data={data} pathname={pathname} />}
+        mobileNavigation={<MobileNavigation data={data} />}
         name={data.name}
         pathname={pathname}
         role={data.role}

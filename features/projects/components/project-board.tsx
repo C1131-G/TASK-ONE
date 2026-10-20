@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
@@ -11,6 +10,7 @@ import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
+import { BoardCardTransition } from "@/features/tasks/components/board-card-transition";
 import { useBoardReorder } from "@/features/tasks/hooks/use-board-reorder";
 import { changeTaskColumnAction } from "@/features/tasks/tasks-actions";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
@@ -55,7 +55,6 @@ export const ProjectBoard = ({
   readonly currentUserId: string | null;
   readonly isAdmin: boolean;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const draggedTaskId = useRef<string | null>(null);
   const moveInFlight = useRef(false);
@@ -127,7 +126,6 @@ export const ProjectBoard = ({
         });
         if (result.ok) {
           setError(null);
-          router.refresh();
         } else {
           setError(result.error.message);
         }
@@ -235,30 +233,31 @@ export const ProjectBoard = ({
                 }}
               >
                 {columnTasks.map((task) => (
-                  <ProjectBoardCard
-                    canEdit={
-                      isAdmin ||
-                      task.createdById === currentUserId ||
-                      task.assigneeIds.includes(currentUserId ?? "")
-                    }
-                    canReorder={canReorder}
-                    column={column}
-                    currentUserId={currentUserId}
-                    employees={employees}
-                    isAdmin={isAdmin}
-                    key={task.id}
-                    labelsById={labelsById}
-                    onDragCancel={() => {
-                      draggedTaskId.current = null;
-                    }}
-                    onDragStart={(taskId) => {
-                      draggedTaskId.current = taskId;
-                    }}
-                    onMove={handleMove}
-                    projectKey={projectKey}
-                    reorderPending={reorder.pending}
-                    task={task}
-                  />
+                  <BoardCardTransition key={task.id} taskId={task.id}>
+                    <ProjectBoardCard
+                      canEdit={
+                        isAdmin ||
+                        task.createdById === currentUserId ||
+                        task.assigneeIds.includes(currentUserId ?? "")
+                      }
+                      canReorder={canReorder}
+                      column={column}
+                      currentUserId={currentUserId}
+                      employees={employees}
+                      isAdmin={isAdmin}
+                      labelsById={labelsById}
+                      onDragCancel={() => {
+                        draggedTaskId.current = null;
+                      }}
+                      onDragStart={(taskId) => {
+                        draggedTaskId.current = taskId;
+                      }}
+                      onMove={handleMove}
+                      projectKey={projectKey}
+                      reorderPending={reorder.pending}
+                      task={task}
+                    />
+                  </BoardCardTransition>
                 ))}
               </div>
             </section>

@@ -5,8 +5,8 @@ import { ids, nextKey } from "./support/action-harness";
 const clientLogos = await import("../../features/clients/clients-actions");
 const clients = await import("../../features/clients/clients-actions");
 const clientQueries = await import("../../features/clients/clients-queries");
-const slaActions = await import("../../features/company/company-actions");
-const slaQueries = await import("../../features/company/company-queries");
+const slaActions = await import("../../features/settings/settings-actions");
+const slaQueries = await import("../../features/settings/settings-queries");
 
 export const clientActionCatalog: readonly ActionEntry[] = [
   entry("listClientCompanies", clientQueries.listClientCompanies, () => ({})),

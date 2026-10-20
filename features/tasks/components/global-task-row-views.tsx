@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { TaskManageControls } from "@/features/tasks/components/task-manage-controls";
 import { TaskStatusSelect } from "@/features/tasks/components/task-status-select";
 import { TaskTableHeaderCell } from "@/features/tasks/components/task-table-header-cell";

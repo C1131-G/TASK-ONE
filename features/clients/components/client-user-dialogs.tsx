@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -25,7 +24,6 @@ export const AddClientUserDialog = ({
   readonly companyName: string;
   readonly disabled: boolean;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +59,6 @@ export const AddClientUserDialog = ({
         email: result.data.email,
         temporaryPassword: result.data.temporaryPassword,
       });
-      router.refresh();
     });
   };
 
@@ -163,7 +160,6 @@ export const ResetPasswordDialog = ({
 }: {
   readonly user: ClientUser;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -190,7 +186,6 @@ export const ResetPasswordDialog = ({
       }
       setError(null);
       setTemporaryPassword(result.data.temporaryPassword);
-      router.refresh();
     });
 
   return (

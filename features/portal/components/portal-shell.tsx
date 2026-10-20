@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
-import { PortalNav } from "@/features/portal/components/portal-nav";
+import { PortalNavLinks } from "@/features/portal/components/portal-nav";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import { listPortalNotifications } from "@/features/portal/portal-queries";
 
@@ -56,10 +56,27 @@ const PortalPreviewBanner = async () => {
   );
 };
 
-const PortalNavWithCount = async () => {
+const PortalUnreadBadge = async () => {
   const result = await listPortalNotifications({});
-  return <PortalNav unreadCount={result.ok ? result.data.unreadCount : 0} />;
+  const unreadCount = result.ok ? result.data.unreadCount : 0;
+  if (unreadCount === 0) {
+    return null;
+  }
+  return (
+    <span className="portal-nav-badge">
+      <span aria-hidden="true">{unreadCount > 99 ? "99+" : unreadCount}</span>
+      <span className="sr-only">{unreadCount} unread</span>
+    </span>
+  );
 };
+
+// The fallback and the nav both carry the badge, so the count shows whether
+// or not the URL has been read yet.
+const unreadBadge = (
+  <Suspense fallback={null}>
+    <PortalUnreadBadge />
+  </Suspense>
+);
 
 // The portal has its own frame: no workspace sidebar, only the client's
 // company, a few links and the page. `workspace-app` supplies the design
@@ -80,9 +97,7 @@ const PortalShell = ({ children }: { readonly children: ReactNode }) => (
         <Suspense fallback={<p className="portal-company" />}>
           <PortalCompanyName />
         </Suspense>
-        <Suspense fallback={<PortalNav unreadCount={0} />}>
-          <PortalNavWithCount />
-        </Suspense>
+        <PortalNavLinks notificationBadge={unreadBadge} />
       </div>
     </header>
     <Suspense

@@ -1,7 +1,5 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-restyle -- Workspace classes are defined in app/workspace-styles. */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
@@ -22,6 +20,7 @@ import {
   listLockedAccounts,
 } from "@/features/clients/clients-queries";
 import { LockedAccountsPanel } from "@/features/clients/components/locked-accounts-panel";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 import {
@@ -53,92 +52,67 @@ const AuditLogView = async ({
     }),
     listLockedAccounts({}),
   ]);
+  const auditEvents = readOrThrow(events, "Audit events");
+  const lockedAccounts = readOrThrow(locked, "Locked accounts");
   return (
-    <div className="clients-workspace">
-      <Link className="clients-back" href="/clients">
-        <ArrowLeft aria-hidden="true" size={14} />
-        All clients
-      </Link>
-      <div className="ph">
-        <div>
-          <h1>Audit log</h1>
-          <p>Sign-ins, lockouts, account changes and portal previews.</p>
-        </div>
-      </div>
-      {locked.ok ? (
-        <LockedAccountsPanel accounts={locked.data} />
-      ) : (
-        <div className="panel panel-b" role="alert">
-          Locked accounts could not be loaded. Refresh to retry.
-        </div>
-      )}
+    <>
+      <LockedAccountsPanel accounts={lockedAccounts} />
       <AuditFilters filters={filters} />
-      {events.ok ? (
-        <section aria-label="Audit events" className="panel clients-panel">
-          {events.data.length ? (
-            <section
-              aria-label="Audit events table"
-              className="audit-scroll"
-              // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users need to scroll the wide table.
-              tabIndex={0}
-            >
-              <table className="clients-table audit-table">
-                <TableCaption className="sr-only">
-                  Audit events, newest first
-                </TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Person</TableHead>
-                    <TableHead>By</TableHead>
-                    <TableHead>IP</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>Details</TableHead>
+      <section aria-label="Audit events" className="panel clients-panel">
+        {auditEvents.length ? (
+          <section
+            aria-label="Audit events table"
+            className="audit-scroll"
+            // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users need to scroll the wide table.
+            tabIndex={0}
+          >
+            <table className="clients-table audit-table">
+              <TableCaption className="sr-only">
+                Audit events, newest first
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Person</TableHead>
+                  <TableHead>By</TableHead>
+                  <TableHead>IP</TableHead>
+                  <TableHead>Device</TableHead>
+                  <TableHead>Details</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {auditEvents.map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell className="clients-nowrap">
+                      <time dateTime={entry.createdAt} title={entry.createdAt}>
+                        {timeFormatter.format(new Date(entry.createdAt))}
+                      </time>
+                    </TableCell>
+                    <TableCell>{auditEventLabel(entry.type)}</TableCell>
+                    <TableCell>
+                      <PersonCell entry={entry} />
+                    </TableCell>
+                    <TableCell>{entry.actorName ?? "—"}</TableCell>
+                    <TableCell className="clients-nowrap">
+                      {entry.ip ?? "—"}
+                    </TableCell>
+                    <TableCell title={entry.userAgent ?? undefined}>
+                      {shortenUserAgent(entry.userAgent)}
+                    </TableCell>
+                    <TableCell>
+                      <DetailsCell details={entry.details} />
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {events.data.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell className="clients-nowrap">
-                        <time
-                          dateTime={entry.createdAt}
-                          title={entry.createdAt}
-                        >
-                          {timeFormatter.format(new Date(entry.createdAt))}
-                        </time>
-                      </TableCell>
-                      <TableCell>{auditEventLabel(entry.type)}</TableCell>
-                      <TableCell>
-                        <PersonCell entry={entry} />
-                      </TableCell>
-                      <TableCell>{entry.actorName ?? "—"}</TableCell>
-                      <TableCell className="clients-nowrap">
-                        {entry.ip ?? "—"}
-                      </TableCell>
-                      <TableCell title={entry.userAgent ?? undefined}>
-                        {shortenUserAgent(entry.userAgent)}
-                      </TableCell>
-                      <TableCell>
-                        <DetailsCell details={entry.details} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </table>
-            </section>
-          ) : (
-            <p className="panel-b muted">
-              No audit events match these filters.
-            </p>
-          )}
-        </section>
-      ) : (
-        <div className="panel panel-b" role="alert">
-          Audit events could not be loaded. Refresh to retry.
-        </div>
-      )}
-    </div>
+                ))}
+              </TableBody>
+            </table>
+          </section>
+        ) : (
+          <p className="panel-b muted">No audit events match these filters.</p>
+        )}
+      </section>
+    </>
   );
 };
 
@@ -155,17 +129,7 @@ const COLUMNS = [
 // Mirrors AuditLogView: heading, locked-accounts copy, the filter form and the
 // column titles are static; only the event rows are data.
 const AuditLogSkeleton = () => (
-  <div className="clients-workspace">
-    <Link className="clients-back" href="/clients">
-      <ArrowLeft aria-hidden="true" size={14} />
-      All clients
-    </Link>
-    <div className="ph">
-      <div>
-        <h1>Audit log</h1>
-        <p>Sign-ins, lockouts, account changes and portal previews.</p>
-      </div>
-    </div>
+  <>
     <section aria-label="Locked accounts" className="panel clients-panel">
       <div className="panel-h clients-panel-h">
         <div>
@@ -186,11 +150,11 @@ const AuditLogSkeleton = () => (
       <SkeletonDataGrid
         columns={COLUMNS}
         label="Loading audit events…"
-        rows={12}
+        rows={5}
         widths="1.4fr 1.2fr 1.5fr 1fr 1fr 2fr 0.8fr"
       />
     </section>
-  </div>
+  </>
 );
 
 export { AuditLogView, AuditLogSkeleton };

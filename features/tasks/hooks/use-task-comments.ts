@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 
 import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
@@ -27,7 +26,6 @@ export const useTaskComments = ({
   readonly onError: (message: string | null) => void;
   readonly taskId: string;
 }) => {
-  const router = useRouter();
   const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [comments, setComments] = useState(initialComments);
@@ -59,7 +57,6 @@ export const useTaskComments = ({
       setBody("");
       setVisibility("internal");
       await refresh();
-      router.refresh();
     });
 
   const remove = (commentId: string) =>

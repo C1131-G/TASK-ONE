@@ -4,7 +4,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -12,20 +12,31 @@ import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { recordRecentSearchAction } from "@/features/discovery/discovery-actions";
 import type { WorkspaceSearchResults } from "@/src/server/preferences/discovery-contracts";
 
+const searchHref = (query: string) =>
+  `/search?q=${encodeURIComponent(query)}` as const;
+
+// The recent-search list is a convenience; a failed write never holds up or
+// fails the search itself.
+const recordRecentSearch = async (query: string) => {
+  try {
+    await recordRecentSearchAction({ query });
+  } catch {
+    // Intentionally ignored.
+  }
+};
+
 const SearchForm = ({
-  initialQuery,
   initialResults,
   initialError,
   recentSearches,
 }: {
-  readonly initialQuery: string;
   readonly initialResults: WorkspaceSearchResults | null;
   readonly initialError: string | null;
   readonly recentSearches: readonly string[];
 }) => {
   const router = useRouter();
-  const [query, setQuery] = useState(initialQuery);
-  const [error, setError] = useState<string | null>(initialError);
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [pending, startTransition] = useTransition();
   const results = initialResults;
 
@@ -35,19 +46,10 @@ const SearchForm = ({
       return;
     }
     setQuery(searchQuery);
-    startTransition(async () => {
-      try {
-        const result = await recordRecentSearchAction({ query: trimmedQuery });
-        if (!result.ok) {
-          setError(result.error.message);
-          return;
-        }
-        setError(null);
-        router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
-      } catch {
-        setError("Search is temporarily unavailable. Try again.");
-      }
+    startTransition(() => {
+      router.push(searchHref(trimmedQuery));
     });
+    void recordRecentSearch(trimmedQuery);
   };
 
   const search = (event: React.FormEvent<HTMLFormElement>) => {
@@ -55,10 +57,18 @@ const SearchForm = ({
     executeSearch(query);
   };
 
+  const updateQuery = (nextQuery: string) => {
+    setQuery(nextQuery);
+    const trimmedQuery = nextQuery.trim();
+    if (trimmedQuery) {
+      router.prefetch(searchHref(trimmedQuery));
+    }
+  };
+
   return (
     <div className="stack">
       <search className="panel panel-b">
-        <form className="row" onSubmit={search}>
+        <form className="row" key={searchParams.toString()} onSubmit={search}>
           <label className="sr" htmlFor="workspace-search">
             Search projects and tasks
           </label>
@@ -67,7 +77,7 @@ const SearchForm = ({
             className="input grow"
             id="workspace-search"
             maxLength={120}
-            onChange={(event) => setQuery(event.currentTarget.value)}
+            onChange={(event) => updateQuery(event.currentTarget.value)}
             placeholder="Search projects and tasks"
             value={query}
           />
@@ -80,13 +90,17 @@ const SearchForm = ({
           </WorkspaceButton>
         </form>
       </search>
-      {error ? (
+      {initialError ? (
         <p className="error" role="alert">
-          {error}
+          {initialError}
         </p>
       ) : null}
       {results ? (
-        <div className="grid2">
+        <div
+          aria-busy={pending}
+          className="grid2 transition-opacity data-pending:opacity-60"
+          data-pending={pending ? "" : undefined}
+        >
           <section className="panel">
             <div className="panel-h">
               <h2>Projects</h2>

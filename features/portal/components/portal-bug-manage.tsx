@@ -3,7 +3,6 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-restyle -- Portal pages reuse the workspace stylesheet classes. */
 
 import { PencilSimple, ArrowUUpLeft } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
@@ -21,7 +20,6 @@ const PortalBugManage = ({
   readonly bug: PortalBugDetail;
   readonly children: ReactNode;
 }) => {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -36,7 +34,6 @@ const PortalBugManage = ({
           idempotencyKey: crypto.randomUUID(),
         });
         if (result.ok) {
-          router.refresh();
           return;
         }
         setError(

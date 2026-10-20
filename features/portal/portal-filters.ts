@@ -26,3 +26,19 @@ export const parsePortalBugFilters = (
     ...(status ? { status } : {}),
   };
 };
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+// The client user a staff member previews the portal as, from `?as=`.
+export const parsePortalPreviewTarget = (
+  params: SearchParams
+): string | undefined => first(params["as"])?.trim() || undefined;
+
+// The bug being reported again, from `?from=`; anything but a UUID is ignored.
+export const parsePortalReportFrom = (
+  params: SearchParams
+): string | undefined => {
+  const from = first(params["from"]);
+  return from && UUID_PATTERN.test(from) ? from : undefined;
+};

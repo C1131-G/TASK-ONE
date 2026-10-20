@@ -3,7 +3,6 @@
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
 import { Paperclip } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { PortalFilePicker } from "@/features/portal/components/portal-file-picker";
@@ -28,7 +27,6 @@ const FailedUploads = ({
   readonly bugId: string;
   readonly canAttach: boolean;
 }) => {
-  const router = useRouter();
   const failed = useFailedUploads(bugId);
   const [retrying, setRetrying] = useState<string>();
 
@@ -45,9 +43,7 @@ const FailedUploads = ({
     const result = await uploadPortalFile(bugId, entry.file);
     setRetrying(undefined);
     clearFailedUpload(bugId, id);
-    if (result.ok) {
-      router.refresh();
-    } else {
+    if (!result.ok) {
       recordFailedUploads(bugId, [
         { file: entry.file, message: result.message },
       ]);
@@ -100,7 +96,6 @@ const AddAttachments = ({
   readonly bugId: string;
   readonly slots: number;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [pending, setPending] = useState(false);
@@ -118,7 +113,6 @@ const AddAttachments = ({
     setFiles([]);
     setPending(false);
     setOpen(false);
-    router.refresh();
   };
 
   if (!open) {
@@ -185,10 +179,12 @@ const PortalAttachments = ({
   attachments,
   bugId,
   canAttach,
+  previewUrls,
 }: {
   readonly attachments: readonly Attachment[];
   readonly bugId: string;
   readonly canAttach: boolean;
+  readonly previewUrls: Readonly<Record<string, string | null>>;
 }) => (
   <section
     aria-labelledby="portal-attachments-h"
@@ -201,7 +197,11 @@ const PortalAttachments = ({
     {attachments.length > 0 ? (
       <ul className="portal-attachments">
         {attachments.map((attachment) => (
-          <AttachmentCard attachment={attachment} key={attachment.fileId} />
+          <AttachmentCard
+            attachment={attachment}
+            key={attachment.fileId}
+            previewUrl={previewUrls[attachment.fileId] ?? null}
+          />
         ))}
       </ul>
     ) : (

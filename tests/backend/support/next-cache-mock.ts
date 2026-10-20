@@ -5,6 +5,7 @@ import { mock } from "bun:test";
 // This module must be imported before any module that imports next/cache.
 export const revalidatedPaths: string[] = [];
 export const updatedTags: string[] = [];
+export const refreshes: { count: number } = { count: 0 };
 const noop = () => {
   // Intentionally empty.
 };
@@ -12,6 +13,9 @@ mock.module("next/cache", () => ({
   cacheLife: noop,
   cacheTag: noop,
   io: () => Promise.resolve(),
+  refresh: () => {
+    refreshes.count += 1;
+  },
   revalidatePath: (path: string) => {
     revalidatedPaths.push(path);
   },

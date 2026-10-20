@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -33,7 +32,6 @@ const EmployeeCreateForm = ({
   readonly triggerLabel?: string;
   readonly teams: readonly TeamOption[];
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
@@ -56,7 +54,6 @@ const EmployeeCreateForm = ({
         return;
       }
       setTemporaryPassword(result.data.temporaryPassword);
-      router.refresh();
     });
   };
   return (
@@ -185,7 +182,6 @@ const EmployeeCreateForm = ({
 };
 
 const TeamCreateForm = () => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const create = (formData: FormData, close: () => void) =>
@@ -202,7 +198,6 @@ const TeamCreateForm = () => {
       }
       setError(null);
       close();
-      router.refresh();
     });
   return (
     <WorkspaceDisclosure

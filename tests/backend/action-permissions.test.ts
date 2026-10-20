@@ -19,10 +19,10 @@ import type {
 } from "./support/action-harness";
 import { serverEntryModules } from "./support/server-entry-modules";
 
-const comments = await import("../../features/tasks/actions/task-comments");
-const password = await import("../../features/user/actions/password");
+const comments = await import("../../features/tasks/actions/tasks-comments");
+const password = await import("../../features/user/actions/user-password");
 const projects = await import("../../features/projects/projects-actions");
-const subtasks = await import("../../features/tasks/actions/subtasks");
+const subtasks = await import("../../features/tasks/actions/tasks-subtasks");
 const tasks = await import("../../features/tasks/tasks-actions");
 const userQueries = await import("../../features/user/user-queries");
 
@@ -48,6 +48,17 @@ const composedReads = new Set([
   "listAllTaskCalendar",
   "listTaskCalendarPage",
   "getWorkspaceSearchResults",
+  // Record reads and request-shared lists built on the reads above.
+  "getClientCompanyOnce",
+  "getClientCompanyRecord",
+  "getEmployee",
+  "getProject",
+  "getTeam",
+  "listAllClientCompanies",
+  "listAllSavedViews",
+  // The drawer bundle runs getProjectTask, listTaskComments, listTaskSubtasks,
+  // listTaskFiles and getBugHistory, each covered by the catalog.
+  "getTaskBundleAction",
 ]);
 
 it("covers every Server Action and query exported by the features", () => {

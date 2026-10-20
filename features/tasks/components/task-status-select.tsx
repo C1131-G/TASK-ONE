@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import {
@@ -35,7 +34,6 @@ const TaskStatusSelect = ({
   readonly version: number;
   readonly status: TaskStatus;
 }) => {
-  const router = useRouter();
   const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -69,12 +67,10 @@ const TaskStatusSelect = ({
             if (!undoResult.ok) {
               return undoResult.error.message;
             }
-            router.refresh();
             return null;
           },
         });
       }
-      router.refresh();
     });
   };
 

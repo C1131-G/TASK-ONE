@@ -3,12 +3,12 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { FavoriteToggle } from "@/components/workspace/favorite-toggle";
 import {
   SKELETON_KEYS,
   SkeletonBone,
 } from "@/components/workspace/skeleton-shapes";
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
+import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
 import {
@@ -45,11 +45,7 @@ const FavoriteWork = async () => {
     ]);
 
   if (!personal.ok || !projectsResult.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Favorites could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Favorites could not be loaded.");
   }
 
   const favoriteProjectIds = new Set(
@@ -183,7 +179,7 @@ const FavoriteWork = async () => {
 
 const FAVORITE_PROJECTS = SKELETON_KEYS.slice(0, 3);
 
-const FAVORITE_TASKS = SKELETON_KEYS.slice(0, 6);
+const FAVORITE_TASKS = SKELETON_KEYS.slice(0, 5);
 
 // Mirrors FavoriteWork: section headings are static; counts, project cards and
 // task rows are data.

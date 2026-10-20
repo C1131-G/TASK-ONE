@@ -14,12 +14,14 @@ import {
 import { UploadProgressList } from "@/features/files/components/upload-progress-list";
 import { filterProjectFiles } from "@/features/files/filter-project-files";
 import { useProjectFiles } from "@/features/files/hooks/use-project-files";
+import { FILE_SORTS } from "@/features/files/types/project-file-types";
 import type {
   FileLayout,
   FileSort,
   ProjectFile,
 } from "@/features/files/types/project-file-types";
 import type { TaskFile } from "@/features/tasks/task-details-panel-data";
+import { useSearchParamState } from "@/hooks/use-search-param-state";
 
 const ProjectFiles = ({
   projectId,
@@ -42,7 +44,11 @@ const ProjectFiles = ({
 }) => {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [sort, setSort] = useState<FileSort>("newest");
+  const [sort, setSort] = useSearchParamState<FileSort>(
+    "fileSort",
+    FILE_SORTS,
+    "newest"
+  );
   const [layout, setLayout] = useState<FileLayout>("grid");
   const {
     actOnFile,

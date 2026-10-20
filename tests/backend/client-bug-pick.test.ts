@@ -22,8 +22,8 @@ import {
 const portal = await import("../../features/portal/portal-actions");
 const bugActions = await import("../../features/bugs/bugs-actions");
 const bugClientActions = await import("../../features/bugs/bugs-actions");
-const comments = await import("../../features/tasks/actions/task-comments");
-const taskEditing = await import("../../features/tasks/actions/task-editing");
+const comments = await import("../../features/tasks/actions/tasks-comments");
+const taskEditing = await import("../../features/tasks/actions/tasks-editing");
 const portalQueries = await import("../../features/portal/portal-queries");
 
 beforeAll(async () => {

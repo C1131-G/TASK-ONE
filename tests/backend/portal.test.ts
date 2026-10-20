@@ -22,7 +22,7 @@ const portalUploads = await import("../../features/portal/portal-actions");
 const portalNotifications =
   await import("../../features/portal/portal-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
-const comments = await import("../../features/tasks/actions/task-comments");
+const comments = await import("../../features/tasks/actions/tasks-comments");
 
 beforeAll(async () => {
   await setupHarness();

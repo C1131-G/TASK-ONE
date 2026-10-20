@@ -3,7 +3,7 @@
 "use client";
 
 import { Bell, Check, EnvelopeOpen } from "@phosphor-icons/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -48,7 +48,6 @@ export const InboxWorkspace = ({
   readonly items: readonly NotificationItem[];
   readonly unreadCount: number;
 }) => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const filterValue = searchParams.get("type");
   const filter = FILTERS.find(({ id }) => id === filterValue)?.id ?? "all";
@@ -91,7 +90,6 @@ export const InboxWorkspace = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const markAllRead = () =>
@@ -104,7 +102,6 @@ export const InboxWorkspace = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const selectNotification = (notificationId: string) => {

@@ -10,7 +10,7 @@ import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import {
-  getPortalBug,
+  getPortalBugById,
   getPortalResponseTimes,
   listPortalProjects,
 } from "@/features/portal/portal-queries";
@@ -20,20 +20,21 @@ import type {
   PortalResponseTimes,
 } from "@/src/server/portal/portal-contracts";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
-
-// The closed bug being reported again, or null for a missing, invalid or
-// not-closed `from` value.
+// The closed bug being reported again, or null for a missing or not-closed
+// `from` value (already UUID-checked by parsePortalReportFrom).
 const loadRecurrence = async (
   from: string | undefined,
-  projects: readonly PortalProject[]
+  projectsPromise: Promise<readonly PortalProject[] | null>
 ): Promise<PortalBugDetail | null> => {
-  if (!from || !UUID_PATTERN.test(from)) {
+  if (!from) {
     return null;
   }
-  const result = await getPortalBug({ bugId: from });
+  const [result, projects] = await Promise.all([
+    getPortalBugById(from),
+    projectsPromise,
+  ]);
   if (
+    !projects ||
     !result.ok ||
     !result.data.lifecycle.canReportAgain ||
     !projects.some(({ id }) => id === result.data.projectId)
@@ -96,48 +97,31 @@ const PortalReport = async ({
   const company = await getPortalCompany();
   if (company?.preview) {
     return (
-      <>
-        <div className="ph">
-          <div>
-            <h1>Report a bug</h1>
-          </div>
-        </div>
-        <p className="portal-banner" role="note">
-          Reporting is disabled in preview.
-        </p>
-      </>
+      <p className="portal-banner" role="note">
+        Reporting is disabled in preview.
+      </p>
     );
   }
-  const [result, times] = await Promise.all([
-    listPortalProjects({}),
+  // The recurrence lookup only needs `from`, so it runs alongside the rest.
+  const projectsPromise = listPortalProjects({});
+  const [result, times, recurrenceOf] = await Promise.all([
+    projectsPromise,
     getPortalResponseTimes({}),
+    loadRecurrence(
+      from,
+      // oxlint-disable-next-line promise/prefer-await-to-then -- Shares the in-flight projects request instead of awaiting it first.
+      projectsPromise.then((projects) => (projects.ok ? projects.data : null))
+    ),
   ]);
-  const recurrenceOf = result.ok
-    ? await loadRecurrence(from, result.data)
-    : null;
+  if (!result.ok) {
+    throw new Error("Projects could not be loaded.");
+  }
   return (
-    <>
-      <div className="ph">
-        <div>
-          <h1>Report a bug</h1>
-          <p>
-            Tell us what went wrong. The more detail you give, the faster we can
-            fix it.
-          </p>
-        </div>
-      </div>
-      {result.ok ? (
-        <PortalReportBody
-          projects={result.data}
-          recurrenceOf={recurrenceOf}
-          responseTimes={times.ok ? times.data : null}
-        />
-      ) : (
-        <div className="panel portal-alert" role="alert">
-          Projects could not be loaded. Refresh to try again.
-        </div>
-      )}
-    </>
+    <PortalReportBody
+      projects={result.data}
+      recurrenceOf={recurrenceOf}
+      responseTimes={times.ok ? times.data : null}
+    />
   );
 };
 
@@ -146,34 +130,21 @@ const PortalFormSkeleton = ({
 }: {
   readonly label?: string;
 }) => (
-  <>
-    <div className="ph">
-      <div>
-        <h1>Report a bug</h1>
-        <p>
-          Tell us what went wrong. The more detail you give, the faster we can
-          fix it.
-        </p>
+  <SkelterSurface label={label}>
+    <div className="panel portal-panel">
+      <div className="portal-form">
+        {SKELETON_KEYS.slice(0, 7).map((key) => (
+          <div className="field skeleton-copy" key={key}>
+            <SkeletonBone shape="short" />
+            <SkeletonBone
+              shape={key === "bone-2" || key === "bone-4" ? "block" : "control"}
+            />
+          </div>
+        ))}
+        <SkeletonBone shape="control" />
       </div>
     </div>
-    <SkelterSurface label={label}>
-      <div className="panel portal-panel">
-        <div className="portal-form">
-          {SKELETON_KEYS.slice(0, 7).map((key) => (
-            <div className="field skeleton-copy" key={key}>
-              <SkeletonBone shape="short" />
-              <SkeletonBone
-                shape={
-                  key === "bone-2" || key === "bone-4" ? "block" : "control"
-                }
-              />
-            </div>
-          ))}
-          <SkeletonBone shape="control" />
-        </div>
-      </div>
-    </SkelterSurface>
-  </>
+  </SkelterSurface>
 );
 
 export { PortalReport, PortalFormSkeleton };

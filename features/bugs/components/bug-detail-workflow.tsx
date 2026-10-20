@@ -6,7 +6,6 @@
 
 import { ArrowLeft } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { FormEvent } from "react";
 
@@ -51,7 +50,6 @@ export const BugDetailWorkflow = ({
   readonly onRefresh?: () => Promise<void>;
   readonly userId: string;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const canEdit =
@@ -80,8 +78,6 @@ export const BugDetailWorkflow = ({
     setError(null);
     if (embedded && onRefresh) {
       await onRefresh();
-    } else {
-      router.refresh();
     }
   };
 

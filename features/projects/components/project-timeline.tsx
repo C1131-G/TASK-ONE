@@ -45,11 +45,7 @@ const ProjectTimeline = async ({
     listProjects({}),
   ]);
   if (!result.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Timeline could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Timeline could not be loaded.");
   }
   const items = result.data.filter((task) => task.startDate || task.dueDate);
   const userId = session.kind === "authenticated" ? session.user.id : null;
@@ -117,7 +113,7 @@ const ProjectTimeline = async ({
   );
 };
 
-const TIMELINE_ROWS = SKELETON_KEYS.slice(0, 16);
+const TIMELINE_ROWS = SKELETON_KEYS.slice(0, 5);
 
 const SELECTS = [
   "All statuses",

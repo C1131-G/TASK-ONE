@@ -7,7 +7,7 @@ import {
   Uploads,
 } from "@/src/server/storage/uploads-contracts";
 
-import { runUploadAction } from "./actions/upload-action-runner";
+import { runUploadAction } from "./actions/files-upload-runner";
 
 export const listProjectFiles = async (input: unknown) =>
   await runUploadAction(

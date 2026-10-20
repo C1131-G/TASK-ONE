@@ -1,7 +1,7 @@
 "use server";
 
 import { Effect, Schema } from "effect";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import {
@@ -73,6 +73,7 @@ export async function createCalendarEventAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/calendar");
     revalidatePath("/");
+    refresh();
   }
   return result;
 }
@@ -121,6 +122,7 @@ export async function updateCalendarEventAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/calendar");
     revalidatePath("/");
+    refresh();
   }
   return result;
 }
@@ -162,6 +164,7 @@ export async function deleteCalendarEventAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/calendar");
     revalidatePath("/");
+    refresh();
   }
   return result;
 }

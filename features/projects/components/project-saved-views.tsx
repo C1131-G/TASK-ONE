@@ -95,7 +95,6 @@ export const ProjectSavedViews = ({
       }
       setError(null);
       router.push(projectViewHref(projectId, result.data.id, search));
-      router.refresh();
     });
 
   const saveChanges = (view: SavedViewSummary) =>
@@ -119,7 +118,6 @@ export const ProjectSavedViews = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const remove = (viewId: string) =>
@@ -136,7 +134,6 @@ export const ProjectSavedViews = ({
       if (selectedId === viewId) {
         router.push(`/projects/${projectId}?view=board`);
       }
-      router.refresh();
     });
 
   return (

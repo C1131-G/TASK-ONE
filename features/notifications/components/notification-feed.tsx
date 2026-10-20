@@ -15,11 +15,7 @@ import { listNotificationInbox } from "@/features/notifications/notifications-qu
 const NotificationFeed = async () => {
   const result = await listNotificationInbox({ limit: 100, unreadOnly: false });
   if (!result.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Notifications could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Notifications could not be loaded.");
   }
   return (
     <NotificationList
@@ -29,7 +25,7 @@ const NotificationFeed = async () => {
   );
 };
 
-const NOTIFICATION_ROWS = SKELETON_KEYS.slice(0, 6);
+const NOTIFICATION_ROWS = SKELETON_KEYS.slice(0, 5);
 
 // Mirrors NotificationList: title, filters and the day heading are static;
 // only the unread count and the rows are data.

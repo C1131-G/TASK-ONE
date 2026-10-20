@@ -56,8 +56,9 @@ const ProjectCreateForm = () => {
         return;
       }
       setOpen(false);
-      router.push(`/projects/${result.data.id}`);
-      router.refresh();
+      router.push(`/projects/${result.data.id}`, {
+        transitionTypes: ["nav-forward"],
+      });
     });
   };
 

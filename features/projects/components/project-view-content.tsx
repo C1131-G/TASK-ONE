@@ -18,6 +18,7 @@ import type {
   listLabels,
   listProjectTasks,
 } from "@/features/tasks/tasks-queries";
+import { readOrThrow } from "@/lib/read-result";
 import type { currentUtcMonthRange } from "@/src/lib/utc-date-range";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectMilestone } from "@/src/server/projects/project-contracts";
@@ -110,11 +111,7 @@ const renderProjectOverview = ({
   today,
 }: ProjectViewContentProps): ReactNode => {
   if (!taskResult?.ok) {
-    return (
-      <section className="panel panel-b" role="alert">
-        Project tasks could not be loaded. Refresh to retry.
-      </section>
-    );
+    throw new Error("Project tasks could not be loaded.");
   }
   return (
     <ProjectOverview
@@ -201,7 +198,12 @@ const renderProjectBugs = ({
   if (!bugResult) {
     return null;
   }
-  return <ProjectBugs bugResult={bugResult} project={project} />;
+  return (
+    <ProjectBugs
+      bugs={readOrThrow(bugResult, "Project bugs")}
+      project={project}
+    />
+  );
 };
 
 const renderProjectTasks = ({
@@ -223,11 +225,7 @@ const renderProjectTasks = ({
   view,
 }: ProjectViewContentProps): ReactNode => {
   if (!taskResult?.ok) {
-    return (
-      <section className="panel panel-b" role="alert">
-        Project tasks could not be loaded. Refresh to retry.
-      </section>
-    );
+    throw new Error("Project tasks could not be loaded.");
   }
   return (
     <ProjectTaskViews

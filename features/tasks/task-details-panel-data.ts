@@ -1,10 +1,9 @@
-import { getBugHistoryAction } from "@/features/bugs/bugs-actions";
-import { listTaskFilesAction } from "@/features/files/files-actions";
-import {
-  getProjectTaskAction,
-  listTaskCommentsAction,
-  listTaskSubtasksAction,
-} from "@/features/tasks/tasks-actions";
+import "server-only";
+import { getBugHistory } from "@/features/bugs/bugs-queries";
+import { listTaskFilesAction } from "@/features/files/actions/files-upload-requests";
+import { listTaskCommentsAction } from "@/features/tasks/actions/tasks-comments";
+import { listTaskSubtasksAction } from "@/features/tasks/actions/tasks-subtasks";
+import { getProjectTask } from "@/features/tasks/tasks-queries";
 
 export interface TaskFile {
   readonly id: string;
@@ -23,17 +22,18 @@ export interface EmployeeOption {
   readonly name: string;
 }
 
+// Every read the task panel shows, run together on the server.
 export const readTaskBundle = async (
   projectId: string,
   taskId: string,
   bugId?: string
 ) => {
   const [task, comments, subtasks, files, bugHistory] = await Promise.all([
-    getProjectTaskAction({ projectId, taskId }),
+    getProjectTask({ projectId, taskId }),
     listTaskCommentsAction({ taskId }),
     listTaskSubtasksAction({ taskId }),
     listTaskFilesAction({ taskId }),
-    bugId ? getBugHistoryAction({ bugId }) : Promise.resolve(null),
+    bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
   ]);
   return { bugHistory, comments, files, subtasks, task };
 };

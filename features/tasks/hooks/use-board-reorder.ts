@@ -1,7 +1,6 @@
 "use client";
 
 import { useSelector } from "@tanstack/react-store";
-import { useRouter } from "next/navigation";
 import { useRef, useTransition } from "react";
 
 import { useProjectViewStore } from "@/features/projects/providers/project-view-store-provider";
@@ -26,7 +25,6 @@ export const useBoardReorder = <
   readonly onError: (message: string | null) => void;
   readonly tasks: readonly Task[];
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const requestInFlight = useRef(false);
   const projectViewStore = useProjectViewStore();
@@ -62,7 +60,6 @@ export const useBoardReorder = <
           projectViewStore.actions.setAnnouncement(
             `${title} moved to position ${result.newIndex + 1} of ${columnTasks.length} in ${column.label}`
           );
-          router.refresh();
         } else {
           onError(response.error.message);
         }

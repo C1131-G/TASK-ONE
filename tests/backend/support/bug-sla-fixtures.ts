@@ -21,11 +21,11 @@ export const bugActions = await import("../../../features/bugs/bugs-actions");
 export const bugClientActions =
   await import("../../../features/bugs/bugs-actions");
 export const comments =
-  await import("../../../features/tasks/actions/task-comments");
+  await import("../../../features/tasks/actions/tasks-comments");
 export const slaActions =
-  await import("../../../features/company/company-actions");
+  await import("../../../features/settings/settings-actions");
 export const slaQueries =
-  await import("../../../features/company/company-queries");
+  await import("../../../features/settings/settings-queries");
 export const clientQueries =
   await import("../../../features/clients/clients-queries");
 

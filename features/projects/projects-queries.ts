@@ -1,7 +1,9 @@
 import "server-only";
 import { Effect, Schema } from "effect";
+import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { readOrThrow } from "@/lib/read-result";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
@@ -84,3 +86,18 @@ export const listSavedViews = async (input: unknown) => {
 // Project pages read the full list for their title and their body; one
 // request shares a single read.
 export const listAllProjects = cache(async () => await listProjects({}));
+
+// The project pages' single record. Its existence is decided here, so a
+// missing or malformed id renders the segment's not-found page.
+export const getProject = cache(async (projectId: string) => {
+  const projects = readOrThrow(await listAllProjects(), "Projects");
+  const project = projects.find(({ id }) => id === projectId);
+  if (!project) {
+    notFound();
+  }
+  return project;
+});
+
+// The header and the body both resolve the active view; one request reads the
+// saved views once.
+export const listAllSavedViews = cache(async () => await listSavedViews({}));

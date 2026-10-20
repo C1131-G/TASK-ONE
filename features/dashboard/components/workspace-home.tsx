@@ -75,16 +75,7 @@ const WorkspaceHome = async ({
       listAllEmployees(),
     ]);
   if (!dashboardResult.ok || !projectResult.ok) {
-    return (
-      <div className="page">
-        <section aria-live="polite" className="panel panel-b">
-          <h1>Workspace unavailable</h1>
-          <p className="muted">
-            Refresh the page to retry loading your workspace data.
-          </p>
-        </section>
-      </div>
-    );
+    throw new Error("Workspace data could not be loaded.");
   }
 
   const userId = session.kind === "authenticated" ? session.user.id : null;
@@ -114,13 +105,7 @@ const WorkspaceHome = async ({
     ),
   ]);
   if (projectTasks.some(({ tasks }) => tasks === undefined)) {
-    return (
-      <div className="page">
-        <section className="panel panel-b" role="alert">
-          Workspace task totals are incomplete. Refresh to retry.
-        </section>
-      </div>
-    );
+    throw new Error("Workspace task totals are incomplete.");
   }
   const allTasks = projectTasks.flatMap(({ project, tasks }) =>
     (tasks ?? []).map((task) => ({
@@ -190,13 +175,7 @@ const WorkspaceHome = async ({
     },
   ];
   if (activityResults.some((result) => !result.ok)) {
-    return (
-      <div className="page">
-        <section className="panel panel-b" role="alert">
-          Workspace activity is incomplete. Refresh to retry.
-        </section>
-      </div>
-    );
+    throw new Error("Workspace activity is incomplete.");
   }
   const activities = activityResults
     .flatMap((result) => (result.ok ? result.data : []))

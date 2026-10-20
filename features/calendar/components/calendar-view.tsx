@@ -54,11 +54,7 @@ const CalendarView = async ({
     listAllEmployees(),
   ]);
   if (!tasks.ok || !events.ok) {
-    return (
-      <div className="panel panel-b" role="alert">
-        Calendar could not be loaded. Refresh to retry.
-      </div>
-    );
+    throw new Error("Calendar could not be loaded.");
   }
   return (
     <>

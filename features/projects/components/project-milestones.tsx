@@ -4,7 +4,6 @@
 "use client";
 
 import { CheckCircle, Circle } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { useReducer, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -42,7 +41,6 @@ export const ProjectMilestones = ({
   readonly initialMilestones: readonly MilestoneData[];
   readonly editable: boolean;
 }) => {
-  const router = useRouter();
   const incoming = toMilestones(initialMilestones);
   const [draftState, dispatch] = useReducer(reduceMilestoneDraft, {
     baseVersion: version,
@@ -103,7 +101,6 @@ export const ProjectMilestones = ({
         type: "saved",
         version: result.data.version,
       });
-      router.refresh();
     });
   };
 

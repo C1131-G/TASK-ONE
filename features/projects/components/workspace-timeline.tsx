@@ -16,6 +16,7 @@ import type {
   TimelineTask,
 } from "@/features/projects/types/workspace-timeline-types";
 import { useTaskReschedule } from "@/features/tasks/hooks/use-task-reschedule";
+import { useSearchParamState } from "@/hooks/use-search-param-state";
 
 const DAY_MS = 86_400_000;
 const DAY_WIDTH = { month: 12, week: 32 } as const;
@@ -73,6 +74,32 @@ const groupTasks = (
   return [...groups.values()];
 };
 
+const TIMELINE_STATUSES = [
+  "all",
+  "backlog",
+  "todo",
+  "progress",
+  "review",
+  "done",
+] as const;
+const TIMELINE_PRIORITIES = [
+  "all",
+  "urgent",
+  "high",
+  "medium",
+  "low",
+  "none",
+] as const;
+const TIMELINE_SORTS = [
+  "manual",
+  "startDate",
+  "dueDate",
+  "title",
+  "priority",
+] as const;
+const TIMELINE_GROUPS = ["project", "status", "assignee", "none"] as const;
+const TIMELINE_SCALES: readonly TimelineScale[] = ["week", "month"];
+
 export const WorkspaceTimeline = ({
   from,
   to,
@@ -91,12 +118,36 @@ export const WorkspaceTimeline = ({
   const id = useId();
   const viewportRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [priority, setPriority] = useState("all");
-  const [assignee, setAssignee] = useState("all");
-  const [sortBy, setSortBy] = useState("manual");
-  const [groupBy, setGroupBy] = useState("project");
-  const [scale, setScale] = useState<TimelineScale>("week");
+  const [status, setStatus] = useSearchParamState(
+    "tlStatus",
+    TIMELINE_STATUSES,
+    "all"
+  );
+  const [priority, setPriority] = useSearchParamState(
+    "tlPriority",
+    TIMELINE_PRIORITIES,
+    "all"
+  );
+  const [assignee, setAssignee] = useSearchParamState(
+    "tlAssignee",
+    ["all", ...employees.map((employee) => employee.id)],
+    "all"
+  );
+  const [sortBy, setSortBy] = useSearchParamState(
+    "tlSort",
+    TIMELINE_SORTS,
+    "manual"
+  );
+  const [groupBy, setGroupBy] = useSearchParamState(
+    "tlGroup",
+    TIMELINE_GROUPS,
+    "project"
+  );
+  const [scale, setScale] = useSearchParamState<TimelineScale>(
+    "tlScale",
+    TIMELINE_SCALES,
+    "week"
+  );
   const start = Date.parse(`${from}T00:00:00Z`);
   const dayCount = Math.max(
     1,

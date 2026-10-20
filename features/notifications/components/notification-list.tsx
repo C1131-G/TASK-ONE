@@ -4,7 +4,6 @@
 
 import { Bell, Check, GearSix } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,7 +23,10 @@ import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/features/notifications/notifications-actions";
+import { useSearchParamState } from "@/hooks/use-search-param-state";
 import type { NotificationItem } from "@/src/server/notifications/contracts";
+
+const NOTIFICATION_FILTERS: readonly NotificationFilter[] = ["all", "unread"];
 
 const NotificationList = ({
   items,
@@ -33,10 +35,13 @@ const NotificationList = ({
   readonly items: readonly NotificationItem[];
   readonly unreadCount: number;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<NotificationFilter>("all");
+  const [filter, setFilter] = useSearchParamState<NotificationFilter>(
+    "show",
+    NOTIFICATION_FILTERS,
+    "all"
+  );
   const visibleItems = items.filter(
     (notification) => filter === "all" || notification.readAt === null
   );
@@ -57,7 +62,6 @@ const NotificationList = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const markRead = (notificationId: string) =>
@@ -71,7 +75,6 @@ const NotificationList = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   return (

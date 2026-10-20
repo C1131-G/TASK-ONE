@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ViewSwitchTransition } from "@/components/ui/view-switch-transition";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { BUG_STATUS_FILTERS } from "@/features/bugs/bug-filters";
 import type { BugFilters } from "@/features/bugs/bug-filters";
@@ -12,8 +13,9 @@ import { BugBoard } from "@/features/bugs/components/bug-board";
 import { BugList } from "@/features/bugs/components/bug-list";
 import { BugReportDialog } from "@/features/bugs/components/bug-report-dialog";
 import { listAllEmployees } from "@/features/people/people-queries";
-import { listProjects } from "@/features/projects/projects-queries";
+import { listAllProjects } from "@/features/projects/projects-queries";
 import { TaskDrawerHost } from "@/features/tasks/components/task-drawer-host";
+import { readOrThrow } from "@/lib/read-result";
 import { getPageSession } from "@/src/server/auth/page-session";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
@@ -77,41 +79,26 @@ const BugViewContent = ({
 
 const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
   const isQueue = filters.view === "client_queue";
-  const [projectsResult, employeeResult, session, bugsResult] =
-    await Promise.all([
-      listProjects({}),
-      listAllEmployees(),
-      getPageSession(),
-      listBugs({
-        ...(isQueue ? { view: "client_queue" } : {}),
-        includeArchived: filters.archived,
-        ...(filters.query ? { query: filters.query } : {}),
-        ...(filters.severity ? { severity: filters.severity } : {}),
-        ...(filters.status ? { status: filters.status } : {}),
-      }),
-    ]);
-  const projects = projectsResult.ok ? projectsResult.data : [];
+  const [employeeResult, session, bugsResult] = await Promise.all([
+    listAllEmployees(),
+    getPageSession(),
+    listBugs({
+      ...(isQueue ? { view: "client_queue" } : {}),
+      includeArchived: filters.archived,
+      ...(filters.query ? { query: filters.query } : {}),
+      ...(filters.severity ? { severity: filters.severity } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
+    }),
+  ]);
   const employees = employeeResult.ok ? employeeResult.data : [];
-  const bugs = bugsResult.ok ? bugsResult.data : [];
+  const bugs = readOrThrow(bugsResult, "Bug reports");
   const isAdmin =
     session.kind === "authenticated" && session.user.role === "admin";
   const currentUserId =
     session.kind === "authenticated" ? session.user.id : null;
   const drawer = drawerData(bugs, currentUserId, isAdmin);
   return (
-    <section aria-labelledby="bugs-heading" className="page bug-page">
-      <header className="bug-page-header">
-        <div>
-          <p className="eyebrow">Workspace</p>
-          <h1 id="bugs-heading">Bugs</h1>
-          <p className="muted">
-            Track issues, compare earlier fixes, and follow each release.
-          </p>
-        </div>
-        <BugReportDialog
-          projects={projects.map(({ id, key, name }) => ({ id, key, name }))}
-        />
-      </header>
+    <>
       <search>
         <form action="/bugs" className="bug-filter-form">
           <label className="sr-only" htmlFor="bug-search">
@@ -184,41 +171,44 @@ const BugTracker = async ({ filters }: { readonly filters: BugFilters }) => {
           Client queue
         </Link>
       </nav>
-      {bugsResult.ok ? (
-        <TaskDrawerHost
-          currentUserId={currentUserId}
-          editableTaskIds={drawer.editableTaskIds}
-          employees={employees.map(({ id, name }) => ({ id, name }))}
-          initialTaskId={filters.taskId}
-          isAdmin={isAdmin}
-          tasks={drawer.tasks}
-        >
+      <TaskDrawerHost
+        currentUserId={currentUserId}
+        editableTaskIds={drawer.editableTaskIds}
+        employees={employees.map(({ id, name }) => ({ id, name }))}
+        initialTaskId={filters.taskId}
+        isAdmin={isAdmin}
+        tasks={drawer.tasks}
+      >
+        <ViewSwitchTransition name="bug-view" view={filters.view}>
           <BugViewContent bugs={bugs} isAdmin={isAdmin} view={filters.view} />
-        </TaskDrawerHost>
-      ) : (
-        <section className="panel panel-b" role="alert">
-          Bug reports could not be loaded. Refresh the page to retry.
-        </section>
-      )}
-    </section>
+        </ViewSwitchTransition>
+      </TaskDrawerHost>
+    </>
   );
 };
 
-// The header holds the report dialog, which needs projects, so the skeleton
-// repeats its static title to keep the heading in place.
+// The report action needs the project list; everything else in the header is
+// static and lives in the page.
+const BugReportAction = async () => {
+  const projects = readOrThrow(await listAllProjects(), "Projects");
+  return (
+    <BugReportDialog
+      projects={projects.map(({ id, key, name }) => ({ id, key, name }))}
+    />
+  );
+};
+
+// With no projects the dialog renders its disabled trigger, the same size as
+// the real one.
+const BugReportActionSkeleton = () => <BugReportDialog projects={[]} />;
+
 const BugTrackerSkeleton = () => (
-  <section aria-labelledby="bugs-heading" className="page bug-page">
-    <header className="bug-page-header">
-      <div>
-        <p className="eyebrow">Workspace</p>
-        <h1 id="bugs-heading">Bugs</h1>
-        <p className="muted">
-          Track issues, compare earlier fixes, and follow each release.
-        </p>
-      </div>
-    </header>
-    <PanelSkeleton variant="bugs" label="Loading bug reports…" rows={6} />
-  </section>
+  <PanelSkeleton variant="bugs" label="Loading bug reports…" rows={5} />
 );
 
-export { BugTracker, BugTrackerSkeleton };
+export {
+  BugReportAction,
+  BugReportActionSkeleton,
+  BugTracker,
+  BugTrackerSkeleton,
+};

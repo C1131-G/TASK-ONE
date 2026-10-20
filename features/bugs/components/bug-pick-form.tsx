@@ -48,8 +48,8 @@ export const BugPickForm = ({
   readonly expectedVersion: number;
   readonly onPicked?: () => void;
 }) => {
-  const router = useRouter();
   const id = useId();
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [severity, setSeverity] = useState<PickSeverity>(defaultSeverity);
   const [priority, setPriority] = useState<PickPriority>("medium");
@@ -67,7 +67,6 @@ export const BugPickForm = ({
       if (result.ok) {
         setError(null);
         onPicked?.();
-        router.refresh();
         return;
       }
       // Losing the race reports who won; refresh so the row reflects it.

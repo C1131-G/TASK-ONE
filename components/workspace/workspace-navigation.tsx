@@ -4,41 +4,49 @@
 
 import type { House } from "@phosphor-icons/react";
 import type { Route } from "next";
-import Link from "next/link";
 
-import { NavigationPendingIndicator } from "@/components/workspace/navigation-pending-indicator";
+import type { NavigationTransitionType } from "@/components/ui/page-transition";
+import { NavLink } from "@/components/workspace/nav-link";
 
 export const WorkspaceLink = ({
   href,
   label,
   Icon,
-  active,
-  transitionType,
+  isActive,
+  transitionTypes,
   unreadCount = 0,
 }: {
   readonly href: Route;
   readonly label: string;
   readonly Icon: typeof House;
-  readonly active: boolean;
-  readonly transitionType: "nav-back" | "nav-forward";
+  readonly isActive: (pathname: string) => boolean;
+  readonly transitionTypes: (pathname: string) => NavigationTransitionType[];
   readonly unreadCount?: number;
 }) => (
-  <Link
-    aria-current={active ? "page" : undefined}
-    className={`sitem${active ? " on" : ""}`}
+  <NavLink
+    activeClassName="on"
+    className="sitem"
     href={href}
-    transitionTypes={[transitionType]}
+    isActive={isActive}
+    transitionTypes={transitionTypes}
   >
-    <Icon aria-hidden="true" size={16} weight={active ? "fill" : "regular"} />
-    <span className="trunc">{label}</span>
-    <NavigationPendingIndicator />
-    {unreadCount > 0 ? (
+    {(active) => (
       <>
-        <span className="ct dotc">
-          {unreadCount > 99 ? "99+" : unreadCount}
-        </span>
-        <span className="sr-only">unread</span>
+        <Icon
+          aria-hidden="true"
+          size={16}
+          weight={active ? "fill" : "regular"}
+        />
+        <span className="trunc">{label}</span>
+        {unreadCount > 0 ? (
+          <>
+            <span className="ct dotc">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+            <span className="sr-only">unread</span>
+          </>
+        ) : null}
       </>
-    ) : null}
-  </Link>
+    )}
+  </NavLink>
 );

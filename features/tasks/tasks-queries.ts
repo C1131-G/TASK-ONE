@@ -17,7 +17,7 @@ import {
   WorkManagementLive,
 } from "@/src/server/work/work-management";
 
-import { ListProjectTasksInputSchema } from "./actions/task-action-schemas";
+import { ListProjectTasksInputSchema } from "./actions/tasks-action-schemas";
 
 export const getProjectTask = async (input: unknown) =>
   await runServerAction(

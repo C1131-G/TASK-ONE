@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +44,6 @@ const ClientUserActions = ({
   readonly companyActive: boolean;
   readonly user: ClientUser;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -62,7 +60,6 @@ const ClientUserActions = ({
         return;
       }
       setError(null);
-      router.refresh();
     });
 
   const deactivate = () =>
