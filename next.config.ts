@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     turbopackRustReactCompiler: true,
     useTypeScriptCli: true,
   },
+  output: "standalone",
   partialPrefetching: true,
   reactCompiler: true,
   typedRoutes: true,

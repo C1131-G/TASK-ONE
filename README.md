@@ -38,18 +38,20 @@ The suite checks keyboard use of every dialog, sheet and menu, WCAG A and AA rul
 
 ## Docker
 
-Set `BETTER_AUTH_SECRET`, `SCHEDULER_TOKEN`, and a stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in `.env`, then run `docker compose up --build`. Generate the auth and scheduler secrets independently. Generate the Next.js key with `openssl rand -base64 32`; use the same key for every app replica and keep it stable across deployments. The example key is a placeholder and must be replaced.
+Set `BETTER_AUTH_SECRET`, `SCHEDULER_TOKEN`, and a stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in `.env`, then run `docker compose up --build`. Generate the auth and scheduler secrets independently. Generate the Next.js key with `openssl rand -base64 32`; use the same key for every app replica and keep it stable across deployments. The example key is a placeholder and must be replaced. The key is embedded at build time, so compose passes it to the image build as a BuildKit secret.
 
-The app and worker use the same database pool limit and business services. Migrations remain an explicit one-shot setup step:
+The app image is the Next.js standalone server and runs as a non-root user. The worker and the migration task share a separate `worker` image with the full source. `docker-compose.override.yml` publishes Postgres, MinIO and the app to the host for local development, and is loaded automatically, so `bun run db:up` keeps working. Migrations remain an explicit one-shot setup step:
 
 ```bash
 docker compose --profile setup run --rm migrate
 docker compose up --build -d
 ```
 
+For production, add `-f docker-compose.yml -f docker-compose.prod.yml` to every command. That overlay publishes no Postgres or MinIO ports, binds the app to `127.0.0.1` for a reverse proxy, and requires real credentials. See [docs/operations.md](docs/operations.md) for the reverse proxy, backups (`docker/backup.sh`), bucket versioning and the restore drill.
+
 ## Production operation
 
-The backend supports a managed Node.js host such as Vercel or a Docker deployment. Both use the same PostgreSQL schema, Effect services, and Server Actions. Apply migrations with `bun run db:migrate` as a deployment step before serving traffic; do not run migration commands independently from every app replica. Run `bun run db:verify` after migration.
+The backend supports a managed Node.js host such as Vercel or a Docker deployment. Both use the same PostgreSQL schema, Effect services, and Server Actions. Apply migrations with `bun run db:migrate` as a deployment step before serving traffic; do not run migration commands independently from every app replica. Run `bun run db:verify` after migration. Back up the database and bucket and rehearse restores as described in [docs/operations.md](docs/operations.md).
 
 Configure `DATABASE_URL` and `DATABASE_POOL_MAX` for the host's connection limits. Keep Better Auth's URL and trusted origins aligned with the public app URL. Keep `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` stable and identical across all replicas so encrypted Server Action payloads work during rolling deployments.
 

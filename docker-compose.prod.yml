@@ -1,0 +1,35 @@
+# Production overlay. Run with both files so the development override is skipped:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Postgres and MinIO publish no host ports; only the app listens, on loopback,
+# for a reverse proxy on the same host. See docs/operations.md.
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD for production}
+
+  minio:
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER for production}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD for production}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${S3_BROWSER_ORIGIN:?Set S3_BROWSER_ORIGIN to the public app origin}
+
+  app:
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:?Set DATABASE_URL_DOCKER for production}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Set BETTER_AUTH_URL to the public app URL}
+      BETTER_AUTH_TRUSTED_ORIGINS: ${BETTER_AUTH_TRUSTED_ORIGINS:?Set BETTER_AUTH_TRUSTED_ORIGINS}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:?Set S3_PUBLIC_ENDPOINT to a browser-reachable storage URL}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?Set S3_ACCESS_KEY_ID for production}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?Set S3_SECRET_ACCESS_KEY for production}
+
+  worker:
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:?Set DATABASE_URL_DOCKER for production}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?Set S3_ACCESS_KEY_ID for production}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?Set S3_SECRET_ACCESS_KEY for production}
+
+  migrate:
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:?Set DATABASE_URL_DOCKER for production}

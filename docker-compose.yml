@@ -1,3 +1,7 @@
+# Base services shared by every environment. No service publishes a host port
+# here: docker-compose.override.yml (loaded automatically) publishes the local
+# development ports, and docker-compose.prod.yml binds only the app to loopback
+# for a reverse proxy.
 services:
   postgres:
     image: postgres:18-alpine
@@ -6,8 +10,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-metsys}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dev-password}
       POSTGRES_DB: ${POSTGRES_DB:-metsys}
-    ports:
-      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - metsys-postgres-data:/var/lib/postgresql
     healthcheck:
@@ -31,9 +33,6 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-metsys}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-local-minio-password}
       MINIO_API_CORS_ALLOW_ORIGIN: ${S3_BROWSER_ORIGIN:-http://localhost:3000}
-    ports:
-      - "${MINIO_API_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - metsys-minio-data:/data
 
@@ -57,7 +56,11 @@ services:
     restart: "no"
 
   app:
-    build: .
+    build:
+      context: .
+      target: runner
+      secrets:
+        - next_server_actions_encryption_key
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -78,30 +81,17 @@ services:
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@example.test}
       WEB_PUSH_ALLOWED_HOSTS: ${WEB_PUSH_ALLOWED_HOSTS:-fcm.googleapis.com,push.services.mozilla.com,web.push.apple.com}
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:?Set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY in .env}
-    ports:
-      - "${APP_PORT:-3000}:3000"
     depends_on:
       postgres:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "bun",
-          "-e",
-          "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   worker:
-    build: .
+    build:
+      context: .
+      target: worker
     restart: unless-stopped
-    command: ["bun", "run", "scripts/run-worker.ts"]
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://metsys:local-dev-password@postgres:5432/metsys?sslmode=disable}
@@ -123,7 +113,9 @@ services:
         condition: service_completed_successfully
 
   migrate:
-    build: .
+    build:
+      context: .
+      target: worker
     profiles: ["setup"]
     command: ["bun", "run", "db:migrate"]
     environment:
@@ -132,6 +124,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+secrets:
+  next_server_actions_encryption_key:
+    environment: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 
 volumes:
   metsys-postgres-data:
