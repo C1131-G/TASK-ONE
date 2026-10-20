@@ -3,6 +3,7 @@
 
 "use client";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import type { CommentVisibility } from "@/src/server/collaboration/contracts";
 
@@ -65,9 +66,11 @@ export const CommentCard = ({
       {comment.visibility === "public" ? (
         <span className="badge accent">Public</span>
       ) : null}
-      <time className="muted" dateTime={comment.createdAt}>
-        {comment.createdAt.slice(0, 10)}
-      </time>
+      <LocalTime
+        className="muted"
+        format="relative"
+        value={comment.createdAt}
+      />
       <span className="sp" />
       {canRemove ? (
         <WorkspaceButton

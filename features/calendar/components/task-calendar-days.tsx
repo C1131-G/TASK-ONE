@@ -24,6 +24,7 @@ interface CalendarProject {
   readonly color: string;
 }
 
+// Grid cells are UTC calendar days, the same keys task due dates use.
 const dayKey = (date: Date): string => date.toISOString().slice(0, 10);
 const dayLabelFormatter = new Intl.DateTimeFormat("en", {
   day: "numeric",

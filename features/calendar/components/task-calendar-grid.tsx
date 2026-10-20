@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useHydrated } from "@/components/workspace/use-hydrated";
+import { eventsByLocalDay } from "@/features/calendar/calendar-event-days";
 import type {
   CalendarEvent,
   CalendarTask,
@@ -17,13 +19,13 @@ import { useTaskReschedule } from "@/features/tasks/hooks/use-task-reschedule";
 import { datesForDueDay } from "@/features/tasks/task-dates";
 import { canEditTaskRecord } from "@/features/tasks/task-permissions";
 import { useSearchParamState } from "@/hooks/use-search-param-state";
+import { dayKeyIn } from "@/lib/format-date";
 
 export type {
   CalendarEvent,
   CalendarTask,
 } from "@/features/calendar/components/task-calendar-chips";
 
-const dayKey = (date: Date): string => date.toISOString().slice(0, 10);
 const priorityOrder: Record<string, number> = {
   high: 1,
   low: 3,
@@ -107,6 +109,10 @@ export const TaskCalendarGrid = ({
     "manual"
   );
   const navigation = hrefPrefix ?? "/calendar?monthOffset=";
+  // The grid's days are UTC calendar days, matching how due dates are stored
+  // and the period the server loaded. "Today" and timed events follow the
+  // viewer's own zone once hydrated; the server render uses UTC so it matches.
+  const viewerTimeZone = useHydrated() ? undefined : "UTC";
   // eslint-disable-next-line react/purity -- The workspace calendar renders request-time dates.
   const current = new Date();
   if (viewMode === "month") {
@@ -120,7 +126,7 @@ export const TaskCalendarGrid = ({
   const firstWeekday = (start.getUTCDay() + 6) % 7;
   start.setUTCDate(start.getUTCDate() - firstWeekday);
   // eslint-disable-next-line react/purity -- The today marker is request-time calendar data.
-  const today = dayKey(new Date());
+  const today = dayKeyIn(new Date(), viewerTimeZone);
   const days = Array.from(
     { length: viewMode === "week" ? 7 : 42 },
     (_, index) => {
@@ -182,13 +188,7 @@ export const TaskCalendarGrid = ({
       taskByDay.set(task.dueDate, existing);
     }
   }
-  const eventByDay = new Map<string, CalendarEvent[]>();
-  for (const event of events) {
-    const key = dayKey(event.startsAt);
-    const existing = eventByDay.get(key) ?? [];
-    existing.push(event);
-    eventByDay.set(key, existing);
-  }
+  const eventByDay = eventsByLocalDay(events, viewerTimeZone);
   const projectById = new Map(projects.map((project) => [project.id, project]));
   const calendarHref = (offset: number, mode = viewMode): CalendarHrefPrefix =>
     `${navigation}${offset}&calendarMode=${mode}`;

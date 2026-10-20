@@ -5,6 +5,7 @@
 import { Archive, FolderOpen } from "@phosphor-icons/react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LocalTime } from "@/components/workspace/local-time";
 import { ArchiveRestoreButton } from "@/features/archive/components/archive-restore-button";
 import type {
   ArchivedProject,
@@ -54,9 +55,12 @@ const ArchiveWorkspace = ({
                   <strong>{task.title}</strong>
                   <span>
                     {task.projectName}
-                    {task.archivedAt
-                      ? ` · Archived ${task.archivedAt.slice(0, 10)}`
-                      : ""}
+                    {task.archivedAt ? (
+                      <>
+                        {" · Archived "}
+                        <LocalTime format="date" value={task.archivedAt} />
+                      </>
+                    ) : null}
                   </span>
                 </div>
                 {canRestore ? (
@@ -85,9 +89,14 @@ const ArchiveWorkspace = ({
                 <div className="archive-row-main">
                   <strong>{project.name}</strong>
                   <span>
-                    {project.archivedAt
-                      ? `Archived ${project.archivedAt.slice(0, 10)}`
-                      : "Archived project"}
+                    {project.archivedAt ? (
+                      <>
+                        {"Archived "}
+                        <LocalTime format="date" value={project.archivedAt} />
+                      </>
+                    ) : (
+                      "Archived project"
+                    )}
                   </span>
                 </div>
                 {canRestore ? (

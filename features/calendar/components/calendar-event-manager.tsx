@@ -5,6 +5,7 @@
 
 import { useState, useTransition } from "react";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import {
@@ -110,12 +111,7 @@ export const CalendarEventManager = ({
                 >
                   <span aria-hidden="true" className="pdot" />
                   <span className="trunc grow">{event.title}</span>
-                  <time
-                    className="num faint"
-                    dateTime={event.startsAt.toISOString()}
-                  >
-                    {event.startsAt.toLocaleString()}
-                  </time>
+                  <LocalTime className="num faint" value={event.startsAt} />
                 </WorkspaceButton>
               }
             >

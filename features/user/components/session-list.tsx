@@ -5,6 +5,7 @@
 
 import { useState, useTransition } from "react";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { revokeSessionAction } from "@/features/user/user-actions";
@@ -51,11 +52,11 @@ export const SessionList = ({
             <div className="grow">
               <strong>{session.userAgent || "Browser session"}</strong>
               <div className="muted">
-                Started {session.createdAt.slice(0, 16).replace("T", " ")} ·{" "}
+                Started <LocalTime value={session.createdAt} /> ·{" "}
                 {session.ipAddress ?? "Unknown network"}
               </div>
               <div className="muted">
-                Expires {session.expiresAt.slice(0, 16).replace("T", " ")}
+                Expires <LocalTime value={session.expiresAt} />
               </div>
             </div>
             <WorkspaceConfirmDialog

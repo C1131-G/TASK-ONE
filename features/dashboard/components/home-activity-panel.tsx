@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
 
 const RecentActivityPanel = ({
@@ -27,9 +28,11 @@ const RecentActivityPanel = ({
               <strong>{activity.actorName}</strong>
               <p className="muted">{activity.action.replaceAll("_", " ")}</p>
             </div>
-            <time className="muted" dateTime={activity.createdAt}>
-              {activity.createdAt.slice(0, 10)}
-            </time>
+            <LocalTime
+              className="muted"
+              format="relative"
+              value={activity.createdAt}
+            />
           </article>
         ))
       ) : (
