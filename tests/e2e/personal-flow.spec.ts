@@ -95,9 +95,12 @@ test.describe("activity and archive as admin", () => {
   }) => {
     await page.goto("/activity");
     await page.waitForLoadState("networkidle");
+    // The streamed skeleton repeats the tabs but keeps its filters inert.
+    const filters = page.locator(".activity-filters:not([inert])");
+    await expect(filters).toBeVisible();
     // Clicks must run one after another, since each tab replaces the list.
     const selectTab = async (name: string) => {
-      const tab = page.getByRole("tab", { name });
+      const tab = filters.getByRole("tab", { name });
       await tab.click();
       await expect(tab).toHaveAttribute("aria-selected", "true");
     };
