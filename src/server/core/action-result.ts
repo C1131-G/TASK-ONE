@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { Cause, Data, Effect, Exit } from "effect";
 import { io } from "next/cache";
 
+import { logger } from "./logger";
+
 export type AppErrorCode =
   | "UNAUTHENTICATED"
   | "FORBIDDEN"
@@ -62,5 +64,12 @@ export const runEffectResult = async <Result, ErrorType>(
     };
   }
 
+  // Defects and untyped failures are bugs: the caller only sees the request
+  // ID, so the full cause must reach the logs under that same ID.
+  logger.error("Unexpected failure while running an action.", {
+    cause: Cause.pretty(exit.cause),
+    error: Cause.squash(exit.cause),
+    requestId: resolvedRequestId,
+  });
   return safeFailure(resolvedRequestId);
 };
