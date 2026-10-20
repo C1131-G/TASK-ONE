@@ -2,8 +2,10 @@
 
 "use client";
 
+import { LockOpen } from "@phosphor-icons/react";
 import { useState, useTransition } from "react";
 
+import { EmptyState } from "@/components/workspace/empty-state";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { unlockUserAction } from "@/features/clients/clients-actions";
 
@@ -89,7 +91,12 @@ const LockedAccountsPanel = ({
         ))}
       </ul>
     ) : (
-      <p className="panel-b muted">No accounts are locked.</p>
+      <EmptyState
+        description="Accounts locked after repeated failed sign-ins show here."
+        icon={LockOpen}
+        size="compact"
+        title="No locked accounts"
+      />
     )}
   </section>
 );

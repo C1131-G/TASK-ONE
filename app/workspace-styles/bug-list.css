@@ -182,9 +182,3 @@
 .workspace-app .bug-board-cards .bug-list-arrow {
   display: none;
 }
-
-.workspace-app .bug-board-empty {
-  padding: 1rem 0.4rem;
-  text-align: center;
-  font-size: 0.825rem;
-}

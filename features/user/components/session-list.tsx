@@ -3,8 +3,10 @@
 
 "use client";
 
+import { Devices } from "@phosphor-icons/react";
 import { useState, useTransition } from "react";
 
+import { EmptyState } from "@/components/workspace/empty-state";
 import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
@@ -76,7 +78,12 @@ export const SessionList = ({
           </article>
         ))
       ) : (
-        <div className="panel-b muted">No active sessions found.</div>
+        <EmptyState
+          description="Devices you sign in on appear here so you can sign them out."
+          icon={Devices}
+          size="compact"
+          title="No active sessions"
+        />
       )}
     </section>
   );

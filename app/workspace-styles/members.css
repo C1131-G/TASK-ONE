@@ -138,9 +138,6 @@
   color: var(--text-3);
   font-size: var(--fs-xs);
 }
-.workspace-app .members-empty {
-  text-align: center;
-}
 .workspace-app .members-person-link {
   color: inherit;
   text-decoration: none;

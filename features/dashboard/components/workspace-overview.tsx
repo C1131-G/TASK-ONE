@@ -1,5 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-inline-styles, shadcn/no-restyle */
 
+import {
+  CalendarCheck,
+  FolderOpen,
+  UsersThree,
+} from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 import { Progress } from "@/components/ui/progress";
@@ -12,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EmptyState } from "@/components/workspace/empty-state";
 import { getDashboardOverview } from "@/features/dashboard/dashboard-queries";
 import {
   milestoneDateFormatter,
@@ -24,10 +30,13 @@ import { listProjects } from "@/features/projects/projects-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 const WorkspaceOverview = async () => {
-  const [dashboard, projects] = await Promise.all([
+  const [dashboard, projects, session] = await Promise.all([
     getDashboardOverview({}),
     listProjects({}),
+    getPageSession(),
   ]);
+  const isAdmin =
+    session.kind === "authenticated" && session.user.role === "admin";
   if (!dashboard.ok || !projects.ok) {
     throw new Error("Workspace overview could not be loaded.");
   }
@@ -150,7 +159,20 @@ const WorkspaceOverview = async () => {
               </TableBody>
             </Table>
           ) : (
-            <div className="panel-b muted">No projects yet.</div>
+            <EmptyState
+              action={
+                isAdmin ? (
+                  <ProjectCreateForm triggerLabel="Create project" />
+                ) : null
+              }
+              description={
+                isAdmin
+                  ? "Create a project to start tracking its tasks and progress here."
+                  : "Projects you can see appear here once an admin creates them."
+              }
+              icon={FolderOpen}
+              title="No projects yet"
+            />
           )}
         </section>
         <section aria-labelledby="overview-status-heading" className="panel">
@@ -209,7 +231,12 @@ const WorkspaceOverview = async () => {
                 ))}
               </div>
             ) : (
-              <p className="muted">No open tasks are assigned to employees.</p>
+              <EmptyState
+                description="Assign open tasks to see who is carrying the most work."
+                icon={UsersThree}
+                size="compact"
+                title="No assigned open tasks"
+              />
             )}
           </div>
         </section>
@@ -239,7 +266,12 @@ const WorkspaceOverview = async () => {
               ))}
             </div>
           ) : (
-            <div className="panel-b muted">No upcoming milestones.</div>
+            <EmptyState
+              description="Milestones with a due date show here as they approach."
+              icon={CalendarCheck}
+              size="compact"
+              title="No upcoming milestones"
+            />
           )}
         </section>
       </div>

@@ -3,10 +3,12 @@
 
 "use client";
 
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { EmptyState } from "@/components/workspace/empty-state";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { recordRecentSearchAction } from "@/features/discovery/discovery-actions";
@@ -115,7 +117,12 @@ const SearchForm = ({
               </Link>
             ))}
             {results.projects.length === 0 ? (
-              <p className="panel-b muted">No matching projects.</p>
+              <EmptyState
+                description="Try a project name or key."
+                icon={MagnifyingGlass}
+                size="compact"
+                title="No matching projects"
+              />
             ) : null}
           </section>
           <section className="panel">
@@ -133,7 +140,12 @@ const SearchForm = ({
               </Link>
             ))}
             {results.tasks.length === 0 ? (
-              <p className="panel-b muted">No matching tasks.</p>
+              <EmptyState
+                description="Try fewer or different words from the task title."
+                icon={MagnifyingGlass}
+                size="compact"
+                title="No matching tasks"
+              />
             ) : null}
           </section>
         </div>

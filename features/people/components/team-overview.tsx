@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 
 import { Progress } from "@/components/ui/progress";
+import { EmptyState } from "@/components/workspace/empty-state";
 import { EmployeeCreateForm } from "@/features/people/components/people-admin-forms";
 import { TeamAdminControls } from "@/features/people/components/team-admin-controls";
 import type { TeamSummary } from "@/src/server/people/team-management";
@@ -164,7 +165,12 @@ const TeamOverview = ({
               ))}
             </div>
           ) : (
-            <div className="panel-b muted">No open tasks for this team.</div>
+            <EmptyState
+              description="Open tasks assigned to this team's members show here."
+              icon={CheckCircle}
+              size="compact"
+              title="No open tasks"
+            />
           )}
         </section>
 
@@ -194,7 +200,12 @@ const TeamOverview = ({
               ))}
             </div>
           ) : (
-            <div className="panel-b muted">No members in this team yet.</div>
+            <EmptyState
+              description="Add people to this team from Members."
+              icon={UsersThree}
+              size="compact"
+              title="No members yet"
+            />
           )}
           <div className="panel-b team-member-footer">
             <Link className="team-members-link" href="/members">
