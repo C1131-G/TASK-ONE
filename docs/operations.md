@@ -11,7 +11,11 @@ The `Dockerfile` has two targets built from one dependency install:
 | `runner` (default) | `.next/standalone`, `.next/static` and `public` only | `bun server.js` on port 3000, as the `bun` user |
 | `worker` | Source and full dependencies (including the Prisma CLI) | `scripts/run-worker.ts`, or `bun run db:migrate` |
 
-The `runner` image declares a `HEALTHCHECK` against `GET /api/health`, which returns 503 when the database is unreachable.
+The `runner` image declares a `HEALTHCHECK` against `GET /api/health`, the readiness check: it returns 503 when the database (`SELECT 1`) or, when S3 is configured, the private bucket (`HeadBucket`) does not answer within two seconds. `GET /api/health/ready` is the same check. `GET /api/health/live` is the liveness check: it touches no dependency and answers 200 while the process serves requests, so point restart policies at it and traffic routing at readiness. Neither response carries error details; failures are logged.
+
+### Data retention
+
+The daily maintenance run enqueues `maintenance.purge-expired-data`, which deletes, in batches of 5,000 rows: completed jobs older than 14 days, dead jobs older than 30 days, push delivery records older than 30 days, expired idempotency keys, sessions and verification tokens, and rate-limit counters idle for a day. Override the windows with `RETENTION_COMPLETED_JOB_DAYS`, `RETENTION_DEAD_JOB_DAYS` and `RETENTION_PUSH_DELIVERY_DAYS` (whole days). Audit events are never purged by this job; they are the compliance record and need an explicit retention decision.
 
 ### Server Actions encryption key
 
