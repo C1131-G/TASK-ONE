@@ -1,12 +1,27 @@
 import { Schema } from "effect";
-import sanitizeHtml from "sanitize-html";
 
 import type { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
 import { isUniqueConstraintViolation } from "../core/prisma-errors";
+import { sanitizeDescription } from "./sanitize-description";
 import type { CreateTaskInput } from "./work-contracts";
+import {
+  TASK_DESCRIPTION_MAX_LENGTH,
+  TaskDescriptionSchema,
+} from "./work-contracts";
+
+export const assertTaskDescriptionLength = (
+  description: string | null
+): void => {
+  if (!Schema.is(TaskDescriptionSchema)(description)) {
+    throw new AppError({
+      code: "VALIDATION_FAILED",
+      message: `Keep the task description under ${TASK_DESCRIPTION_MAX_LENGTH.toLocaleString("en-US")} characters.`,
+    });
+  }
+};
 
 export const databaseError = (error: unknown): AppError => {
   if (error instanceof AppError) {
@@ -53,32 +68,12 @@ export const validateInput = (input: CreateTaskInput): CreateTaskInput => {
       message: "Enter a valid due date.",
     });
   }
+  assertTaskDescriptionLength(input.description);
   const assigneeIds = [...new Set(input.assigneeIds)];
   return {
     ...input,
     assigneeIds,
-    description: input.description
-      ? sanitizeHtml(input.description, {
-          allowedAttributes: { a: ["href", "title"] },
-          allowedSchemes: ["https", "http", "mailto"],
-          allowedTags: [
-            "a",
-            "b",
-            "br",
-            "code",
-            "em",
-            "i",
-            "li",
-            "ol",
-            "p",
-            "pre",
-            "s",
-            "strong",
-            "u",
-            "ul",
-          ],
-        })
-      : null,
+    description: sanitizeDescription(input.description),
     title,
   };
 };

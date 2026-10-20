@@ -169,11 +169,17 @@ it("audits the start and end of a preview and refuses everyone else", async () =
   ).rejects.toMatchObject({ code: "UNAUTHENTICATED" });
 });
 
+const fromSite = (headers: HeadersInit, site: string): Headers => {
+  const navigation = new Headers(headers);
+  navigation.set("sec-fetch-site", site);
+  return navigation;
+};
+
 it("starts and ends a preview through its link", async () => {
   const start = await previewRoute.GET(
     new Request(
       `http://localhost:3000/portal/preview?as=${personaId("client")}`,
-      { headers: personaHeaders("admin") }
+      { headers: fromSite(personaHeaders("admin"), "same-origin") }
     )
   );
   expect(start.status).toBe(303);
@@ -186,13 +192,13 @@ it("starts and ends a preview through its link", async () => {
   const refused = await previewRoute.GET(
     new Request(
       `http://localhost:3000/portal/preview?as=${personaId("client")}`,
-      { headers: personaHeaders("owner") }
+      { headers: fromSite(personaHeaders("owner"), "same-origin") }
     )
   );
   expect(refused.headers.get("location")).toBe("http://localhost:3000/");
   expect(refused.headers.get("set-cookie")).toBeNull();
 
-  const exitHeaders = new Headers(personaHeaders("admin"));
+  const exitHeaders = fromSite(personaHeaders("admin"), "none");
   exitHeaders.set(
     "cookie",
     `${exitHeaders.get("cookie")}; ${previewCookie(personaId("client"))}`
@@ -204,4 +210,36 @@ it("starts and ends a preview through its link", async () => {
   );
   expect(exit.headers.get("location")).toBe("http://localhost:3000/clients");
   expect(exit.headers.get("set-cookie")).toContain("Max-Age=0");
+});
+
+it("refuses to start or end a preview from a cross-site request", async () => {
+  const startUrl = `http://localhost:3000/portal/preview?as=${personaId("client")}`;
+  const attempts = [
+    fromSite(personaHeaders("admin"), "cross-site"),
+    fromSite(personaHeaders("admin"), "same-site"),
+    new Headers(personaHeaders("admin")),
+  ];
+  const responses = await Promise.all(
+    attempts.map((headers) =>
+      previewRoute.GET(new Request(startUrl, { headers }))
+    )
+  );
+  for (const response of responses) {
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("http://localhost:3000/");
+    expect(response.headers.get("set-cookie")).toBeNull();
+  }
+
+  const exitHeaders = fromSite(personaHeaders("admin"), "cross-site");
+  exitHeaders.set(
+    "cookie",
+    `${exitHeaders.get("cookie")}; ${previewCookie(personaId("client"))}`
+  );
+  const exit = await previewRoute.GET(
+    new Request("http://localhost:3000/portal/preview?exit=1", {
+      headers: exitHeaders,
+    })
+  );
+  expect(exit.headers.get("location")).toBe("http://localhost:3000/");
+  expect(exit.headers.get("set-cookie")).toBeNull();
 });
