@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'15e177bc3628643bbddfcbefce631baf5a64f6750a45ca10c460ab21e7d92fdc'>;
+  StorageHashBase<'528b7cf51b0cd2ed9244a8c489cebe1c38cc3e470114a3762bee79d8f4eff192'>;
 export type ExecutionHash =
   ExecutionHashBase<'eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651'>;
 export type ProfileHash =
@@ -6371,14 +6371,24 @@ type ContractBase = Omit<
               uniques: readonly [{ readonly columns: readonly ['dedupeKey'] }];
               indexes: readonly [
                 {
-                  readonly name: 'job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0';
-                  readonly prefix: 'job_availableAt_leasedUntil_completedAt_deadAt_idx';
-                  readonly columns: readonly [
-                    'availableAt',
-                    'leasedUntil',
-                    'completedAt',
-                    'deadAt',
-                  ];
+                  readonly name: 'job_claimable_30895498';
+                  readonly prefix: 'job_claimable';
+                  readonly columns: readonly ['availableAt', 'leasedUntil'];
+                  readonly where: '"completedAt" IS NULL AND "deadAt" IS NULL';
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'job_completed_b4a9c7bd';
+                  readonly prefix: 'job_completed';
+                  readonly columns: readonly ['completedAt'];
+                  readonly where: '"completedAt" IS NOT NULL';
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'job_dead_a8ecce47';
+                  readonly prefix: 'job_dead';
+                  readonly columns: readonly ['deadAt'];
+                  readonly where: '"deadAt" IS NOT NULL';
                   readonly unique: false;
                 },
                 {
@@ -7078,6 +7088,12 @@ type ContractBase = Omit<
               ];
               indexes: readonly [
                 {
+                  readonly name: 'push_delivery_deliveredAt_idx_6b420379';
+                  readonly prefix: 'push_delivery_deliveredAt_idx';
+                  readonly columns: readonly ['deliveredAt'];
+                  readonly unique: false;
+                },
+                {
                   readonly name: 'push_delivery_userId_deliveredAt_idx_c60c106a';
                   readonly prefix: 'push_delivery_userId_deliveredAt_idx';
                   readonly columns: readonly ['userId', 'deliveredAt'];
@@ -7553,6 +7569,12 @@ type ContractBase = Omit<
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [{ readonly columns: readonly ['token'] }];
               indexes: readonly [
+                {
+                  readonly name: 'session_expiresAt_idx_6b6b8c10';
+                  readonly prefix: 'session_expiresAt_idx';
+                  readonly columns: readonly ['expiresAt'];
+                  readonly unique: false;
+                },
                 {
                   readonly name: 'session_userId_idx_a489d58a';
                   readonly prefix: 'session_userId_idx';

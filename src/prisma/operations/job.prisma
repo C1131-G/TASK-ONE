@@ -17,7 +17,11 @@ model Job {
   createdAt TimestamptzJsDate @default(now())
   updatedAt TimestamptzJsDate @default(now())
 
-  @@index([availableAt, leasedUntil, completedAt, deadAt])
+  // Only pending work is claimed; finished and dead rows stay out of the index.
+  @@index([availableAt, leasedUntil], where: "\"completedAt\" IS NULL AND \"deadAt\" IS NULL", name: "job_claimable")
+  // Retention purges and the dead-job list scan these, never the pending rows.
+  @@index([completedAt], where: "\"completedAt\" IS NOT NULL", name: "job_completed")
+  @@index([deadAt], where: "\"deadAt\" IS NOT NULL", name: "job_dead")
   @@index([leaseOwner, leasedUntil])
   @@map("job")
 }

@@ -11724,13 +11724,30 @@
                 {
                   "columns": [
                     "availableAt",
-                    "leasedUntil",
-                    "completedAt",
+                    "leasedUntil"
+                  ],
+                  "name": "job_claimable_30895498",
+                  "prefix": "job_claimable",
+                  "unique": false,
+                  "where": "\"completedAt\" IS NULL AND \"deadAt\" IS NULL"
+                },
+                {
+                  "columns": [
+                    "completedAt"
+                  ],
+                  "name": "job_completed_b4a9c7bd",
+                  "prefix": "job_completed",
+                  "unique": false,
+                  "where": "\"completedAt\" IS NOT NULL"
+                },
+                {
+                  "columns": [
                     "deadAt"
                   ],
-                  "name": "job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0",
-                  "prefix": "job_availableAt_leasedUntil_completedAt_deadAt_idx",
-                  "unique": false
+                  "name": "job_dead_a8ecce47",
+                  "prefix": "job_dead",
+                  "unique": false,
+                  "where": "\"deadAt\" IS NOT NULL"
                 },
                 {
                   "columns": [
@@ -12609,6 +12626,14 @@
               "indexes": [
                 {
                   "columns": [
+                    "deliveredAt"
+                  ],
+                  "name": "push_delivery_deliveredAt_idx_6b420379",
+                  "prefix": "push_delivery_deliveredAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "userId",
                     "deliveredAt"
                   ],
@@ -13189,6 +13214,14 @@
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "expiresAt"
+                  ],
+                  "name": "session_expiresAt_idx_6b6b8c10",
+                  "prefix": "session_expiresAt_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "userId"
@@ -15051,7 +15084,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "15e177bc3628643bbddfcbefce631baf5a64f6750a45ca10c460ab21e7d92fdc"
+    "storageHash": "528b7cf51b0cd2ed9244a8c489cebe1c38cc3e470114a3762bee79d8f4eff192"
   },
   "execution": {
     "executionHash": "eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651",

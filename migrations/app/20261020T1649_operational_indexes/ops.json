@@ -1,0 +1,236 @@
+[
+  {
+    "id": "dropIndex.job.job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0",
+    "label": "Drop index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\"",
+        "sql": "DROP INDEX \"public\".\"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_availableAt_leasedUntil_completedAt_deadAt_idx_69cc2ae0\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.job.job_claimable_30895498",
+    "label": "Create index \"job_claimable_30895498\" on \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_claimable_30895498",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_claimable_30895498\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_claimable_30895498\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"job_claimable_30895498\"",
+        "sql": "CREATE INDEX \"job_claimable_30895498\" ON \"public\".\"job\" (\"availableAt\", \"leasedUntil\") WHERE (\"completedAt\" IS NULL AND \"deadAt\" IS NULL)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_claimable_30895498\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_claimable_30895498\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.job.job_completed_b4a9c7bd",
+    "label": "Create index \"job_completed_b4a9c7bd\" on \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_completed_b4a9c7bd",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_completed_b4a9c7bd\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_completed_b4a9c7bd\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"job_completed_b4a9c7bd\"",
+        "sql": "CREATE INDEX \"job_completed_b4a9c7bd\" ON \"public\".\"job\" (\"completedAt\") WHERE (\"completedAt\" IS NOT NULL)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_completed_b4a9c7bd\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_completed_b4a9c7bd\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.job.job_dead_a8ecce47",
+    "label": "Create index \"job_dead_a8ecce47\" on \"job\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "job_dead_a8ecce47",
+        "table": "job"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"job_dead_a8ecce47\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_dead_a8ecce47\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"job_dead_a8ecce47\"",
+        "sql": "CREATE INDEX \"job_dead_a8ecce47\" ON \"public\".\"job\" (\"deadAt\") WHERE (\"deadAt\" IS NOT NULL)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"job_dead_a8ecce47\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"job_dead_a8ecce47\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.push_delivery.push_delivery_deliveredAt_idx_6b420379",
+    "label": "Create index \"push_delivery_deliveredAt_idx_6b420379\" on \"push_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "push_delivery_deliveredAt_idx_6b420379",
+        "table": "push_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"push_delivery_deliveredAt_idx_6b420379\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"push_delivery_deliveredAt_idx_6b420379\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"push_delivery_deliveredAt_idx_6b420379\"",
+        "sql": "CREATE INDEX \"push_delivery_deliveredAt_idx_6b420379\" ON \"public\".\"push_delivery\" (\"deliveredAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"push_delivery_deliveredAt_idx_6b420379\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"push_delivery_deliveredAt_idx_6b420379\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.session.session_expiresAt_idx_6b6b8c10",
+    "label": "Create index \"session_expiresAt_idx_6b6b8c10\" on \"session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "session_expiresAt_idx_6b6b8c10",
+        "table": "session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"session_expiresAt_idx_6b6b8c10\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"session_expiresAt_idx_6b6b8c10\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"session_expiresAt_idx_6b6b8c10\"",
+        "sql": "CREATE INDEX \"session_expiresAt_idx_6b6b8c10\" ON \"public\".\"session\" (\"expiresAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"session_expiresAt_idx_6b6b8c10\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"session_expiresAt_idx_6b6b8c10\""
+        ]
+      }
+    ]
+  }
+]
