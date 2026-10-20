@@ -186,11 +186,13 @@ export const handOverClientDuplicates = async (
   )
     .select("id")
     .all();
-  for (const duplicate of duplicates) {
-    // Each hand-over reads and updates its own bug row.
-    // eslint-disable-next-line no-await-in-loop, react-doctor/async-await-in-loop
-    await handOverToClient(transaction, { actorId, bugId: duplicate.id, now });
-  }
+  // Each hand-over reads and updates only its own bug, task and SLA rows, so
+  // they are queued together on the transaction instead of awaited in turn.
+  await Promise.all(
+    duplicates.map((duplicate) =>
+      handOverToClient(transaction, { actorId, bugId: duplicate.id, now })
+    )
+  );
   return duplicates.length;
 };
 

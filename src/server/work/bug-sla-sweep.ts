@@ -27,6 +27,8 @@ interface SweepContext {
   };
   readonly key: string;
   readonly title: string;
+  // Loaded once per sweep; every breach and handler-less warning goes here.
+  readonly adminIds: readonly string[];
 }
 
 const assigneeIdsOf = async (
@@ -44,7 +46,7 @@ const assigneeIdsOf = async (
 const warningRecipients = async (
   transaction: Transaction,
   context: SweepContext
-): Promise<string[]> => {
+): Promise<readonly string[]> => {
   const assignees = await assigneeIdsOf(transaction, context.bug.taskId);
   if (assignees.length > 0) {
     return assignees;
@@ -66,9 +68,7 @@ const warningRecipients = async (
         .select("id")
         .all()
     : [];
-  return active.length > 0
-    ? active.map(({ id }) => id)
-    : activeAdminIds(transaction);
+  return active.length > 0 ? active.map(({ id }) => id) : context.adminIds;
 };
 
 const notifySla = async (
@@ -142,11 +142,10 @@ const sweepClock = async (
       return 0;
     }
     const assignees = await assigneeIdsOf(transaction, context.bug.taskId);
-    const admins = await activeAdminIds(transaction);
     await notifySla(
       transaction,
       context,
-      [...assignees, ...admins],
+      [...assignees, ...context.adminIds],
       `${context.key} breached its ${label} target`
     );
     return 1;
@@ -172,6 +171,23 @@ const sweepClock = async (
     return 1;
   }
   return 0;
+};
+
+const sweepBug = async (
+  transaction: Transaction,
+  context: SweepContext
+): Promise<number> => {
+  const { sla } = context;
+  let notices = 0;
+  // A bug that left the queue unanswered (withdrawn, merged, closed) no
+  // longer owes a first response.
+  if (!(sla.firstRespondedAt || sla.resolvedAt || sla.breachedResponse)) {
+    notices += await sweepClock(transaction, context, "response");
+  }
+  if (!sla.resolvedAt && !sla.pausedAt && !sla.breachedResolution) {
+    notices += await sweepClock(transaction, context, "resolution");
+  }
+  return notices;
 };
 
 // Checks every open clock; warns at 75% of the target and alerts on breach.
@@ -220,35 +236,29 @@ export const runSlaSweep = async (
     .select("id", "key")
     .all();
   const projectById = new Map(projects.map((project) => [project.id, project]));
-  let notices = 0;
-  for (const sla of open) {
-    const bug = bugById.get(sla.bugId);
-    const task = bug ? taskById.get(bug.taskId) : undefined;
-    const project = bug ? projectById.get(bug.projectId) : undefined;
-    if (!bug || !task || !project || task.archivedAt) {
-      continue;
-    }
-    const context: SweepContext = {
-      bug,
-      key: keyOf(project, task),
-      now,
-      settings,
-      sla,
-      title: task.title,
-    };
-    // A bug that left the queue unanswered (withdrawn, merged, closed) no
-    // longer owes a first response.
-    if (!(sla.firstRespondedAt || sla.resolvedAt || sla.breachedResponse)) {
-      // Each clock claims its own flag, so they run one after the other.
-      // eslint-disable-next-line no-await-in-loop, react-doctor/async-await-in-loop
-      notices += await sweepClock(transaction, context, "response");
-    }
-    if (!sla.resolvedAt && !sla.pausedAt && !sla.breachedResolution) {
-      // eslint-disable-next-line no-await-in-loop, react-doctor/async-await-in-loop
-      notices += await sweepClock(transaction, context, "resolution");
-    }
-  }
-  return notices;
+  const adminIds = await activeAdminIds(transaction);
+  // Bugs touch only their own SLA row and notices, so they are swept
+  // together; the clocks within one bug still run in turn.
+  const notices = await Promise.all(
+    open.map((sla) => {
+      const bug = bugById.get(sla.bugId);
+      const task = bug ? taskById.get(bug.taskId) : undefined;
+      const project = bug ? projectById.get(bug.projectId) : undefined;
+      if (!bug || !task || !project || task.archivedAt) {
+        return 0;
+      }
+      return sweepBug(transaction, {
+        adminIds,
+        bug,
+        key: keyOf(project, task),
+        now,
+        settings,
+        sla,
+        title: task.title,
+      });
+    })
+  );
+  return notices.reduce((total, count) => total + count, 0);
 };
 
 // The sweep runs every five minutes; one job per interval keeps a busy
