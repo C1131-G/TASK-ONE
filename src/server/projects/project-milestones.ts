@@ -17,6 +17,42 @@ import {
   writeActivity,
 } from "./project-internal";
 
+const MILESTONE_READ_ATTEMPTS = 5;
+
+// One attempt at a consistent read. When a save lands mid-read the version
+// read first is returned: an older version can only cause a refused save,
+// never one that overwrites newer milestones.
+const readMilestoneSnapshot = async (projectId: string) => {
+  const project = await db.orm.public.Project.where({ id: projectId }).first();
+  if (!project || project.archivedAt) {
+    throw new AppError({
+      code: "NOT_FOUND",
+      message: "The project was not found.",
+    });
+  }
+  const milestones = await db.orm.public.ProjectMilestone.where({ projectId })
+    .orderBy((milestone) => milestone.position.asc())
+    .all();
+  // oxlint-disable-next-line react-doctor/server-sequential-independent-await -- The second version read must follow the milestones read to detect a save in between.
+  const after = await db.orm.public.Project.where({ id: projectId })
+    .select("version")
+    .first();
+  const result: ProjectMilestonesResult = {
+    milestones: milestones.map(
+      ({ completedAt, dueDate, id, name, position }) => ({
+        completed: completedAt !== null,
+        dueDate,
+        id,
+        name,
+        position,
+      })
+    ),
+    projectId,
+    version: project.version,
+  };
+  return { consistent: after?.version === project.version, result };
+};
+
 export const listProjectMilestones = (
   requesterId: string,
   projectId: string
@@ -39,33 +75,17 @@ export const listProjectMilestones = (
           message: "Change your password before continuing.",
         });
       }
-      const project = await db.orm.public.Project.where({
-        id: projectId,
-      }).first();
-      if (!project || project.archivedAt) {
-        throw new AppError({
-          code: "NOT_FOUND",
-          message: "The project was not found.",
-        });
+      // The project row and its milestones are separate reads. A save that
+      // commits between them would pair new dates with the old version, and
+      // the next move would be refused as a conflict, so the version is read
+      // again after the milestones and the read repeats until both agree.
+      for (let attempt = 1; ; attempt += 1) {
+        // eslint-disable-next-line no-await-in-loop -- Each attempt re-reads after the previous one raced a save.
+        const read = await readMilestoneSnapshot(projectId);
+        if (read.consistent || attempt === MILESTONE_READ_ATTEMPTS) {
+          return read.result;
+        }
       }
-      const milestones = await db.orm.public.ProjectMilestone.where({
-        projectId,
-      })
-        .orderBy((milestone) => milestone.position.asc())
-        .all();
-      return {
-        milestones: milestones.map(
-          ({ completedAt, dueDate, id, name, position }) => ({
-            completed: completedAt !== null,
-            dueDate,
-            id,
-            name,
-            position,
-          })
-        ),
-        projectId,
-        version: project.version,
-      };
     },
   });
 
