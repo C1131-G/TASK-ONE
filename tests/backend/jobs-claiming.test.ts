@@ -134,14 +134,14 @@ it("renews a job lease while a handler is running", async () => {
     JobHandlers.of({
       handle: () =>
         Effect.gen(function* handleLongJob() {
-          yield* Effect.sleep("100 millis");
+          yield* Effect.sleep("600 millis");
           handled = true;
         }),
     })
   );
   const processorLayer = makeJobProcessorLayer({
-    leaseDurationMs: 30,
-    renewalIntervalMs: 5,
+    leaseDurationMs: 200,
+    renewalIntervalMs: 25,
   });
   const program = Effect.gen(function* program() {
     const processor = yield* JobProcessor;

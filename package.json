@@ -15,7 +15,7 @@
     "test:backend": "bun run scripts/test-backend.ts",
     "test:ui": "bun test tests/ui",
     "bootstrap:admin": "bun run scripts/bootstrap-admin.ts",
-    "worker": "bun run scripts/run-worker.ts",
+    "worker": "bun --conditions=react-server scripts/run-worker.ts",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "prepare": "lefthook install",
