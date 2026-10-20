@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -32,6 +32,7 @@ const TaskCreateForm = ({
   readonly onOpenChange?: (open: boolean) => void;
   readonly trigger?: ReactNode | null;
 }) => {
+  const fieldId = useId();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -88,7 +89,7 @@ const TaskCreateForm = ({
           createTask(new FormData(event.currentTarget));
         }}
       >
-        <label className="field" htmlFor="metsys-task-create-form-field-72">
+        <label className="field" htmlFor={`${fieldId}-title`}>
           <span>Task name</span>
           <WorkspaceInput
             autoComplete="off"
@@ -96,27 +97,27 @@ const TaskCreateForm = ({
             maxLength={200}
             name="title"
             required
-            id="metsys-task-create-form-field-72"
+            id={`${fieldId}-title`}
           />
         </label>
-        <label className="field" htmlFor="metsys-task-create-form-field-83">
+        <label className="field" htmlFor={`${fieldId}-description`}>
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
             maxLength={10_000}
             name="description"
             rows={3}
-            id="metsys-task-create-form-field-83"
+            id={`${fieldId}-description`}
           />
         </label>
         <div className="row">
-          <label className="field" htmlFor="metsys-task-create-form-field-92">
+          <label className="field" htmlFor={`${fieldId}-priority`}>
             <span>Priority</span>
             <WorkspaceSelect
               className="input"
               defaultValue="none"
               name="priority"
-              id="metsys-task-create-form-field-92"
+              id={`${fieldId}-priority`}
             >
               <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
               <WorkspaceSelectItem value="high">High</WorkspaceSelectItem>
@@ -127,7 +128,7 @@ const TaskCreateForm = ({
               </WorkspaceSelectItem>
             </WorkspaceSelect>
           </label>
-          <label className="field" htmlFor="metsys-task-create-form-field-108">
+          <label className="field" htmlFor={`${fieldId}-dueDate`}>
             <span>Due date</span>
             <WorkspaceDatePicker
               className="input"
@@ -135,7 +136,7 @@ const TaskCreateForm = ({
                 ? {}
                 : { defaultValue: defaultDueDate })}
               name="dueDate"
-              id="metsys-task-create-form-field-108"
+              id={`${fieldId}-dueDate`}
             />
           </label>
         </div>

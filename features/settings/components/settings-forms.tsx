@@ -3,6 +3,8 @@
 
 "use client";
 
+import { useId } from "react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
@@ -20,6 +22,7 @@ import type { PersonalPreferenceValues } from "@/src/server/preferences/personal
 export { NotificationPreferencesForm } from "@/features/notifications/components/notification-preferences-form";
 
 const ProfileForm = ({ name }: { readonly name: string }) => {
+  const fieldId = useId();
   const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
@@ -35,7 +38,7 @@ const ProfileForm = ({ name }: { readonly name: string }) => {
     });
   return (
     <form action={save} className="panel panel-b stack">
-      <label className="field" htmlFor="metsys-settings-forms-field-46">
+      <label className="field" htmlFor={`${fieldId}-name`}>
         <span>Display name</span>
         <WorkspaceInput
           autoComplete="name"
@@ -44,7 +47,7 @@ const ProfileForm = ({ name }: { readonly name: string }) => {
           maxLength={120}
           name="name"
           required
-          id="metsys-settings-forms-field-46"
+          id={`${fieldId}-name`}
         />
       </label>
       {error ? (
@@ -68,6 +71,7 @@ const PreferencesForm = ({
 }: {
   readonly values: PersonalPreferenceValues;
 }) => {
+  const fieldId = useId();
   const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
@@ -94,13 +98,13 @@ const PreferencesForm = ({
   return (
     <form action={save} className="panel panel-b stack">
       <div className="row">
-        <label className="field" htmlFor="metsys-settings-forms-field-105">
+        <label className="field" htmlFor={`${fieldId}-density`}>
           <span>Density</span>
           <WorkspaceSelect
             className="input"
             defaultValue={values.density ?? "comfortable"}
             name="density"
-            id="metsys-settings-forms-field-105"
+            id={`${fieldId}-density`}
           >
             <WorkspaceSelectItem value="comfortable">
               Comfortable
@@ -108,13 +112,13 @@ const PreferencesForm = ({
             <WorkspaceSelectItem value="compact">Compact</WorkspaceSelectItem>
           </WorkspaceSelect>
         </label>
-        <label className="field" htmlFor="metsys-settings-forms-field-118">
+        <label className="field" htmlFor={`${fieldId}-calendarView`}>
           <span>Calendar view</span>
           <WorkspaceSelect
             className="input"
             defaultValue={values.calendarView ?? "week"}
             name="calendarView"
-            id="metsys-settings-forms-field-118"
+            id={`${fieldId}-calendarView`}
           >
             <WorkspaceSelectItem value="day">Day</WorkspaceSelectItem>
             <WorkspaceSelectItem value="week">Week</WorkspaceSelectItem>
@@ -122,13 +126,13 @@ const PreferencesForm = ({
           </WorkspaceSelect>
         </label>
       </div>
-      <label className="field" htmlFor="metsys-settings-forms-field-131">
+      <label className="field" htmlFor={`${fieldId}-timezone`}>
         <span>Time zone</span>
         <WorkspaceSelect
           className="input"
           defaultValue={values.timezone ?? "Asia/Kolkata"}
           name="timezone"
-          id="metsys-settings-forms-field-131"
+          id={`${fieldId}-timezone`}
         >
           <WorkspaceSelectItem value="Asia/Kolkata">
             India Standard Time
@@ -163,6 +167,7 @@ const CompanySettingsForm = ({
 }: {
   readonly values: CompanySettingsValues;
 }) => {
+  const fieldId = useId();
   const { error, pending, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
@@ -182,7 +187,7 @@ const CompanySettingsForm = ({
     });
   return (
     <form action={save} className="panel panel-b stack">
-      <label className="field" htmlFor="metsys-settings-forms-field-191">
+      <label className="field" htmlFor={`${fieldId}-name`}>
         <span>Company name</span>
         <WorkspaceInput
           className="input"
@@ -190,11 +195,11 @@ const CompanySettingsForm = ({
           maxLength={100}
           name="name"
           required
-          id="metsys-settings-forms-field-191"
+          id={`${fieldId}-name`}
         />
       </label>
       <div className="row">
-        <label className="field" htmlFor="metsys-settings-forms-field-202">
+        <label className="field" htmlFor={`${fieldId}-slug`}>
           <span>Company slug</span>
           <WorkspaceInput
             className="input"
@@ -202,16 +207,16 @@ const CompanySettingsForm = ({
             maxLength={80}
             name="slug"
             required
-            id="metsys-settings-forms-field-202"
+            id={`${fieldId}-slug`}
           />
         </label>
-        <label className="field" htmlFor="metsys-settings-forms-field-212">
+        <label className="field" htmlFor={`${fieldId}-timeZone`}>
           <span>Time zone</span>
           <WorkspaceSelect
             className="input"
             defaultValue={values.timeZone}
             name="timeZone"
-            id="metsys-settings-forms-field-212"
+            id={`${fieldId}-timeZone`}
           >
             <WorkspaceSelectItem value="Asia/Kolkata">
               India Standard Time
@@ -227,21 +232,21 @@ const CompanySettingsForm = ({
         </label>
       </div>
       <div className="row">
-        <label className="field" htmlFor="metsys-settings-forms-field-233">
+        <label className="field" htmlFor={`${fieldId}-brandColor`}>
           <span>Brand color</span>
           <WorkspaceInput
             className="input"
             defaultValue={values.brandColor}
             name="brandColor"
             type="color"
-            id="metsys-settings-forms-field-233"
+            id={`${fieldId}-brandColor`}
           />
         </label>
-        <label className="row" htmlFor="metsys-settings-forms-field-242">
+        <label className="row" htmlFor={`${fieldId}-brandEnabled`}>
           <Checkbox
             defaultChecked={values.brandEnabled}
             name="brandEnabled"
-            id="metsys-settings-forms-field-242"
+            id={`${fieldId}-brandEnabled`}
           />
           <span>Enable company branding</span>
         </label>

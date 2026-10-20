@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
@@ -32,6 +32,7 @@ const EmployeeCreateForm = ({
   readonly triggerLabel?: string;
   readonly teams: readonly TeamOption[];
 }) => {
+  const fieldId = useId();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
@@ -74,10 +75,7 @@ const EmployeeCreateForm = ({
         }}
       >
         <div className="row">
-          <label
-            className="field grow"
-            htmlFor="metsys-people-admin-forms-field-73"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-name`}>
             <span>Name</span>
             <WorkspaceInput
               autoComplete="name"
@@ -85,13 +83,10 @@ const EmployeeCreateForm = ({
               maxLength={120}
               name="name"
               required
-              id="metsys-people-admin-forms-field-73"
+              id={`${fieldId}-name`}
             />
           </label>
-          <label
-            className="field grow"
-            htmlFor="metsys-people-admin-forms-field-83"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-email`}>
             <span>Work email</span>
             <WorkspaceInput
               autoComplete="email"
@@ -100,34 +95,28 @@ const EmployeeCreateForm = ({
               name="email"
               required
               type="email"
-              id="metsys-people-admin-forms-field-83"
+              id={`${fieldId}-email`}
             />
           </label>
         </div>
         <div className="row">
-          <label
-            className="field grow"
-            htmlFor="metsys-people-admin-forms-field-96"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-jobTitle`}>
             <span>Job title</span>
             <WorkspaceInput
               autoComplete="organization-title"
               className="input"
               maxLength={120}
               name="jobTitle"
-              id="metsys-people-admin-forms-field-96"
+              id={`${fieldId}-jobTitle`}
             />
           </label>
-          <label
-            className="field"
-            htmlFor="metsys-people-admin-forms-field-105"
-          >
+          <label className="field" htmlFor={`${fieldId}-role`}>
             <span>Role</span>
             <WorkspaceSelect
               className="input"
               defaultValue="employee"
               name="role"
-              id="metsys-people-admin-forms-field-105"
+              id={`${fieldId}-role`}
             >
               <WorkspaceSelectItem value="employee">
                 Employee
@@ -135,16 +124,13 @@ const EmployeeCreateForm = ({
               <WorkspaceSelectItem value="admin">Admin</WorkspaceSelectItem>
             </WorkspaceSelect>
           </label>
-          <label
-            className="field"
-            htmlFor="metsys-people-admin-forms-field-118"
-          >
+          <label className="field" htmlFor={`${fieldId}-teamId`}>
             <span>Team</span>
             <WorkspaceSelect
               className="input"
               defaultValue={defaultTeamId ?? ""}
               name="teamId"
-              id="metsys-people-admin-forms-field-118"
+              id={`${fieldId}-teamId`}
             >
               <WorkspaceSelectItem value="">No team</WorkspaceSelectItem>
               {teams.map((team) => (
@@ -182,6 +168,7 @@ const EmployeeCreateForm = ({
 };
 
 const TeamCreateForm = () => {
+  const fieldId = useId();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const create = (formData: FormData, close: () => void) =>
@@ -218,43 +205,34 @@ const TeamCreateForm = () => {
           }}
         >
           <div className="row">
-            <label
-              className="field grow"
-              htmlFor="metsys-people-admin-forms-field-195"
-            >
+            <label className="field grow" htmlFor={`${fieldId}-name`}>
               <span>Team name</span>
               <WorkspaceInput
                 className="input"
                 maxLength={80}
                 name="name"
                 required
-                id="metsys-people-admin-forms-field-195"
+                id={`${fieldId}-name`}
               />
             </label>
-            <label
-              className="field"
-              htmlFor="metsys-people-admin-forms-field-204"
-            >
+            <label className="field" htmlFor={`${fieldId}-color`}>
               <span>Color</span>
               <WorkspaceInput
                 className="input"
                 defaultValue="#4b5bd6"
                 name="color"
                 type="color"
-                id="metsys-people-admin-forms-field-204"
+                id={`${fieldId}-color`}
               />
             </label>
           </div>
-          <label
-            className="field"
-            htmlFor="metsys-people-admin-forms-field-214"
-          >
+          <label className="field" htmlFor={`${fieldId}-description`}>
             <span>Description</span>
             <WorkspaceInput
               className="input"
               maxLength={500}
               name="description"
-              id="metsys-people-admin-forms-field-214"
+              id={`${fieldId}-description`}
             />
           </label>
           {error ? (

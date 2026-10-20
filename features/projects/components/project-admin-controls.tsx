@@ -9,12 +9,15 @@ import { useState, useTransition } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceCombobox } from "@/components/workspace/workspace-combobox";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
 import { ProjectEditForm } from "@/features/projects/components/project-edit-form";
 import {
   archiveProjectAction,
   duplicateProjectAction,
+  restoreProjectAction,
   setProjectPeopleAction,
 } from "@/features/projects/projects-actions";
 import type {
@@ -22,6 +25,10 @@ import type {
   ProjectControlsData,
   TeamOption,
 } from "@/features/projects/types/project-admin-contracts";
+
+// Restore stays available from the archive; the notice offers it for the same
+// window task archives get.
+const ARCHIVE_UNDO_WINDOW_MS = 5 * 60 * 1000;
 
 const ProjectAdminControls = ({
   project,
@@ -33,6 +40,7 @@ const ProjectAdminControls = ({
   readonly teams: readonly TeamOption[];
 }) => {
   const router = useRouter();
+  const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [memberQuery, setMemberQuery] = useState("");
@@ -83,6 +91,19 @@ const ProjectAdminControls = ({
         setError(result.error.message);
         return;
       }
+      const archived = result.data;
+      addUndo({
+        expiresAt: new Date(Date.now() + ARCHIVE_UNDO_WINDOW_MS).toISOString(),
+        label: `Archived “${archived.name}”`,
+        run: async () => {
+          const restoreResult = await restoreProjectAction({
+            expectedVersion: archived.version,
+            idempotencyKey: crypto.randomUUID(),
+            projectId: archived.id,
+          });
+          return restoreResult.ok ? null : restoreResult.error.message;
+        },
+      });
       router.push("/archive");
     });
 
@@ -226,14 +247,20 @@ const ProjectAdminControls = ({
         </form>
       </WorkspaceDisclosure>
       <div className="acts">
-        <WorkspaceButton
-          className="btn btn-secondary"
-          disabled={pending}
-          onClick={archive}
-          type="button"
+        <WorkspaceConfirmDialog
+          confirmLabel="Archive project"
+          description={`Archive ${project.name}? It leaves the project list and moves to the archive, where an admin can restore it.`}
+          onConfirm={archive}
+          title="Archive project"
         >
-          Archive project
-        </WorkspaceButton>
+          <WorkspaceButton
+            className="btn btn-secondary"
+            disabled={pending}
+            type="button"
+          >
+            Archive project
+          </WorkspaceButton>
+        </WorkspaceConfirmDialog>
       </div>
     </div>
   );

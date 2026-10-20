@@ -3,9 +3,10 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
 import {
@@ -20,11 +21,21 @@ import {
   updateEmployeeDetailsAction,
 } from "@/features/people/people-actions";
 
+type EmployeeRole = "admin" | "employee";
+
+const isEmployeeRole = (value: string): value is EmployeeRole =>
+  value === "admin" || value === "employee";
+
+const roleChangeDescription = (email: string, role: EmployeeRole | null) =>
+  role === "admin"
+    ? `Make ${email} an admin? Admins can manage every person, project and setting.`
+    : `Make ${email} an employee? They lose access to admin tools.`;
+
 interface Employee {
   readonly id: string;
   readonly email: string;
   readonly jobTitle: string | null;
-  readonly role: "admin" | "employee";
+  readonly role: EmployeeRole;
   readonly teamId: string | null;
 }
 
@@ -45,6 +56,9 @@ export const EmployeeAdminControls = ({
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
     null
   );
+  const [optimisticRole, setOptimisticRole] = useOptimistic(employee.role);
+  // The role picked in the select, held until the admin confirms or cancels.
+  const [requestedRole, setRequestedRole] = useState<EmployeeRole | null>(null);
 
   const saveDetails = (formData: FormData) =>
     startTransition(async () => {
@@ -62,8 +76,9 @@ export const EmployeeAdminControls = ({
       setError(null);
     });
 
-  const changeRole = (role: "admin" | "employee") =>
+  const changeRole = (role: EmployeeRole) =>
     startTransition(async () => {
+      setOptimisticRole(role);
       const result = await changeEmployeeRoleAction({
         employeeId: employee.id,
         idempotencyKey: crypto.randomUUID(),
@@ -181,34 +196,62 @@ export const EmployeeAdminControls = ({
             className="input"
             disabled={pending}
             onValueChange={(role) => {
-              if (role === "admin" || role === "employee") {
-                changeRole(role);
+              if (isEmployeeRole(role) && role !== optimisticRole) {
+                setRequestedRole(role);
               }
             }}
-            value={employee.role}
+            value={requestedRole ?? optimisticRole}
             id={`employee-${employee.id}-field-170`}
           >
             <WorkspaceSelectItem value="employee">Employee</WorkspaceSelectItem>
             <WorkspaceSelectItem value="admin">Admin</WorkspaceSelectItem>
           </WorkspaceSelect>
         </label>
+        <WorkspaceConfirmDialog
+          confirmLabel="Change role"
+          description={roleChangeDescription(employee.email, requestedRole)}
+          onConfirm={() => {
+            if (requestedRole) {
+              changeRole(requestedRole);
+            }
+          }}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRequestedRole(null);
+            }
+          }}
+          open={requestedRole !== null}
+          title="Change role"
+        />
         <div className="row">
-          <WorkspaceButton
-            className="btn btn-sm btn-secondary"
-            disabled={pending}
-            onClick={resetPassword}
-            type="button"
+          <WorkspaceConfirmDialog
+            confirmLabel="Reset password"
+            description={`Reset the password for ${employee.email}? Their current password stops working and a temporary one is shown once.`}
+            onConfirm={resetPassword}
+            title="Reset password"
           >
-            Reset password
-          </WorkspaceButton>
-          <WorkspaceButton
-            className="btn btn-sm btn-ghost"
-            disabled={pending}
-            onClick={deactivate}
-            type="button"
+            <WorkspaceButton
+              className="btn btn-sm btn-secondary"
+              disabled={pending}
+              type="button"
+            >
+              Reset password
+            </WorkspaceButton>
+          </WorkspaceConfirmDialog>
+          <WorkspaceConfirmDialog
+            confirmLabel="Deactivate"
+            description={`Deactivate ${employee.email}? They are signed out and can no longer sign in.`}
+            onConfirm={deactivate}
+            title="Deactivate employee"
           >
-            Deactivate
-          </WorkspaceButton>
+            <WorkspaceButton
+              className="btn btn-sm btn-ghost"
+              disabled={pending}
+              type="button"
+            >
+              Deactivate
+            </WorkspaceButton>
+          </WorkspaceConfirmDialog>
         </div>
         {temporaryPassword ? (
           <TemporaryPasswordReveal

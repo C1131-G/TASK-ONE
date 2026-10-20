@@ -12,7 +12,7 @@ export const RouteError = ({
   const [pending, startTransition] = useTransition();
 
   return (
-    <main className="page">
+    <div className="page">
       <section aria-live="polite" className="panel panel-b" role="alert">
         <h1>{title}</h1>
         <p>Something went wrong. Retrying is safe.</p>
@@ -25,6 +25,6 @@ export const RouteError = ({
           {pending ? "Retrying…" : "Try again"}
         </button>
       </section>
-    </main>
+    </div>
   );
 };

@@ -6,7 +6,7 @@
 import { Plus, X } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -59,6 +59,7 @@ export const ProjectSavedViews = ({
   readonly userId: string | null;
   readonly isAdmin: boolean;
 }) => {
+  const fieldId = useId();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -201,29 +202,23 @@ export const ProjectSavedViews = ({
           }
         >
           <form action={create} className="panel-b stack">
-            <label
-              className="field"
-              htmlFor="metsys-project-saved-views-field-143"
-            >
+            <label className="field" htmlFor={`${fieldId}-name`}>
               <span>Name</span>
               <WorkspaceInput
                 className="input"
                 maxLength={80}
                 name="name"
                 required
-                id="metsys-project-saved-views-field-143"
+                id={`${fieldId}-name`}
               />
             </label>
-            <label
-              className="field"
-              htmlFor="metsys-project-saved-views-field-152"
-            >
+            <label className="field" htmlFor={`${fieldId}-type`}>
               <span>Layout</span>
               <WorkspaceSelect
                 className="input"
                 defaultValue="board"
                 name="type"
-                id="metsys-project-saved-views-field-152"
+                id={`${fieldId}-type`}
               >
                 <WorkspaceSelectItem value="board">Board</WorkspaceSelectItem>
                 <WorkspaceSelectItem value="list">List</WorkspaceSelectItem>
@@ -237,14 +232,8 @@ export const ProjectSavedViews = ({
               </WorkspaceSelect>
             </label>
             {isAdmin ? (
-              <label
-                className="row"
-                htmlFor="metsys-project-saved-views-field-171"
-              >
-                <Checkbox
-                  name="isShared"
-                  id="metsys-project-saved-views-field-171"
-                />
+              <label className="row" htmlFor={`${fieldId}-isShared`}>
+                <Checkbox name="isShared" id={`${fieldId}-isShared`} />
                 <span>Share with workspace</span>
               </label>
             ) : null}

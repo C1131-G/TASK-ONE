@@ -5,7 +5,7 @@
 
 import { Plus } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
@@ -46,6 +46,7 @@ export const QuickTaskForm = ({
   readonly projects: readonly ProjectOption[];
   readonly trigger?: ReactNode | null;
 }) => {
+  const fieldId = useId();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +94,7 @@ export const QuickTaskForm = ({
       }
     >
       <form action={create} className="stack">
-        <label className="field" htmlFor="metsys-quick-task-form-field-71">
+        <label className="field" htmlFor={`${fieldId}-title`}>
           <span>Task name</span>
           <WorkspaceInput
             autoComplete="off"
@@ -101,10 +102,10 @@ export const QuickTaskForm = ({
             maxLength={200}
             name="title"
             required
-            id="metsys-quick-task-form-field-71"
+            id={`${fieldId}-title`}
           />
         </label>
-        <label className="field" htmlFor="metsys-quick-task-form-field-81">
+        <label className="field" htmlFor={`${fieldId}-projectId`}>
           <span>Project</span>
           <WorkspaceCombobox
             ariaLabel="Choose a project"
@@ -112,7 +113,7 @@ export const QuickTaskForm = ({
             defaultValue={projects[0]?.id ?? ""}
             disabled={projects.length === 0}
             emptyMessage="No projects found."
-            id="metsys-quick-task-form-field-81"
+            id={`${fieldId}-projectId`}
             name="projectId"
             options={projects.map((project) => ({
               label: project.name,
@@ -122,24 +123,24 @@ export const QuickTaskForm = ({
             searchPlaceholder="Search projects"
           />
         </label>
-        <label className="field" htmlFor="metsys-quick-task-form-field-99">
+        <label className="field" htmlFor={`${fieldId}-description`}>
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
             maxLength={10_000}
             name="description"
             rows={2}
-            id="metsys-quick-task-form-field-99"
+            id={`${fieldId}-description`}
           />
         </label>
         <div className="row">
-          <label className="field" htmlFor="metsys-quick-task-form-field-107">
+          <label className="field" htmlFor={`${fieldId}-priority`}>
             <span>Priority</span>
             <WorkspaceSelect
               className="input"
               defaultValue="none"
               name="priority"
-              id="metsys-quick-task-form-field-107"
+              id={`${fieldId}-priority`}
             >
               <WorkspaceSelectItem value="urgent">Urgent</WorkspaceSelectItem>
               <WorkspaceSelectItem value="high">High</WorkspaceSelectItem>
@@ -150,7 +151,7 @@ export const QuickTaskForm = ({
               </WorkspaceSelectItem>
             </WorkspaceSelect>
           </label>
-          <label className="field" htmlFor="metsys-quick-task-form-field-123">
+          <label className="field" htmlFor={`${fieldId}-dueDate`}>
             <span>Due date</span>
             <WorkspaceDatePicker
               className="input"
@@ -158,7 +159,7 @@ export const QuickTaskForm = ({
                 ? {}
                 : { defaultValue: defaultDueDate })}
               name="dueDate"
-              id="metsys-quick-task-form-field-123"
+              id={`${fieldId}-dueDate`}
             />
           </label>
         </div>
