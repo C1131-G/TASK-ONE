@@ -54,6 +54,7 @@ export const useUploadQueue = (
 
   const run = async (id: string, entry: Entry) => {
     const { actions } = store;
+    let finalized = false;
     try {
       const attempt = entry.runner(entry.file);
       const ticket = await attempt.request();
@@ -85,6 +86,7 @@ export const useUploadQueue = (
         } else if (result === "failed") {
           actions.failed(id, FAILED_MESSAGE(entry.file.name));
         } else {
+          actions.finalizing(id);
           const message = await attempt.finalize();
           if (!mounted.current) {
             return;
@@ -92,7 +94,7 @@ export const useUploadQueue = (
           if (message) {
             actions.failed(id, message);
           } else {
-            actions.done(id);
+            finalized = true;
           }
         }
       } else if (mounted.current) {
@@ -106,11 +108,13 @@ export const useUploadQueue = (
     if (mounted.current) {
       try {
         await onSettled?.(id);
+        if (finalized && mounted.current) {
+          actions.done(id);
+        }
       } catch {
-        actions.failed(
-          id,
-          "Upload finished, but the file list could not refresh."
-        );
+        if (finalized && mounted.current) {
+          actions.refreshFailed(id);
+        }
       }
     }
   };
@@ -123,12 +127,36 @@ export const useUploadQueue = (
     return run(id, entry);
   };
 
-  const cancel = (id: string) => entries.current.get(id)?.controller.abort();
+  const cancel = (id: string) => {
+    if (
+      store.state.uploads.find((upload) => upload.id === id)?.status ===
+      "uploading"
+    ) {
+      entries.current.get(id)?.controller.abort();
+    }
+  };
 
-  const retry = (id: string) => {
+  const retry = async (id: string) => {
+    if (
+      store.state.uploads.find((upload) => upload.id === id)?.status ===
+      "refresh-error"
+    ) {
+      store.actions.finalizing(id);
+      try {
+        await onSettled?.(id);
+        if (mounted.current) {
+          store.actions.done(id);
+        }
+      } catch {
+        if (mounted.current) {
+          store.actions.refreshFailed(id);
+        }
+      }
+      return;
+    }
     const previous = entries.current.get(id);
     if (!previous) {
-      return Promise.resolve();
+      return;
     }
     const entry: Entry = { ...previous, controller: new AbortController() };
     entries.current.set(id, entry);
@@ -143,7 +171,7 @@ export const useUploadQueue = (
 
   const clearFinished = () => {
     for (const upload of store.state.uploads) {
-      if (upload.status !== "uploading") {
+      if (upload.status !== "uploading" && upload.status !== "finalizing") {
         entries.current.delete(upload.id);
       }
     }

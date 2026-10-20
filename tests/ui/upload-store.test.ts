@@ -48,6 +48,18 @@ test("cancelled uploads stay listed until dismissed, and clearFinished keeps run
   expect(store.state.uploads).toEqual([]);
 });
 
+test("finalizing uploads survive Clear finished and cannot be treated as failed transfers", () => {
+  const store = createUploadStore();
+  store.actions.add({ id: "one", name: "one.txt", sizeBytes: 10 });
+  store.actions.finalizing("one");
+  store.actions.clearFinished();
+  expect(store.state.uploads[0]?.status).toBe("finalizing");
+  store.actions.refreshFailed("one");
+  expect(store.state.uploads[0]?.status).toBe("refresh-error");
+  store.actions.done("one");
+  expect(store.state.uploads[0]).toMatchObject({ error: null, status: "done" });
+});
+
 test("a zero-byte file reports 0 percent instead of dividing by zero", () => {
   const store = createUploadStore();
   store.actions.add({ id: "z", name: "empty.txt", sizeBytes: 0 });

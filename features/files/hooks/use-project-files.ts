@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { FormEvent } from "react";
 
@@ -33,7 +32,6 @@ export const useProjectFiles = ({
   readonly projectId: string;
   readonly taskId: string | undefined;
 }) => {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [localFiles, setLocalFiles] = useState(initialFiles);
   const files = controlledFiles ?? localFiles;
@@ -62,12 +60,14 @@ export const useProjectFiles = ({
         setLocalFiles(result.data);
       }
     }
+    return result.ok;
   };
 
   // Each file settles on its own, so the list refreshes as uploads finish.
   const queue = useUploadQueue(async () => {
-    await reloadFiles();
-    router.refresh();
+    if (!(await reloadFiles())) {
+      throw new Error("The file list could not be refreshed.");
+    }
   });
 
   const upload = (selectedFiles: FileList | null) => {
@@ -108,7 +108,6 @@ export const useProjectFiles = ({
           return;
         }
         await reloadFiles();
-        router.refresh();
         return;
       }
       const result = await removeFileAction({
@@ -173,7 +172,6 @@ export const useProjectFiles = ({
       }
       setUndo(null);
       await reloadFiles();
-      router.refresh();
     });
   };
 

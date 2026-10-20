@@ -1,7 +1,13 @@
 import type { Store } from "@tanstack/store";
 import { createStore } from "@tanstack/store";
 
-export type UploadStatus = "uploading" | "done" | "error" | "cancelled";
+export type UploadStatus =
+  | "uploading"
+  | "finalizing"
+  | "done"
+  | "refresh-error"
+  | "error"
+  | "cancelled";
 
 export interface UploadItem {
   readonly id: string;
@@ -47,7 +53,8 @@ export const uploadActions = ({
   clearFinished: () =>
     setState((previous) => ({
       uploads: previous.uploads.filter(
-        (upload) => upload.status === "uploading"
+        (upload) =>
+          upload.status === "uploading" || upload.status === "finalizing"
       ),
     })),
   dismiss: (id: string) =>
@@ -65,8 +72,17 @@ export const uploadActions = ({
     }),
   failed: (id: string, error: string) =>
     setState((previous) => patchItem(previous, id, { error, status: "error" })),
+  finalizing: (id: string) =>
+    setState((previous) => patchItem(previous, id, { status: "finalizing" })),
   progress: (id: string, loadedBytes: number) =>
     setState((previous) => patchItem(previous, id, { loadedBytes })),
+  refreshFailed: (id: string) =>
+    setState((previous) =>
+      patchItem(previous, id, {
+        error: "Upload finished, but the file list could not refresh.",
+        status: "refresh-error",
+      })
+    ),
   restart: (id: string) =>
     setState((previous) =>
       patchItem(previous, id, {

@@ -11,10 +11,13 @@ const statusLabel = (upload: UploadItem): string => {
   if (upload.status === "done") {
     return "Uploaded";
   }
+  if (upload.status === "finalizing") {
+    return "Finishing upload…";
+  }
   if (upload.status === "cancelled") {
     return "Cancelled";
   }
-  if (upload.status === "error") {
+  if (upload.status === "error" || upload.status === "refresh-error") {
     return upload.error ?? "Upload failed";
   }
   return `${uploadPercent(upload)}%`;
@@ -36,7 +39,9 @@ export const UploadProgressList = ({
   if (uploads.length === 0) {
     return null;
   }
-  const finished = uploads.some((upload) => upload.status !== "uploading");
+  const finished = uploads.some(
+    (upload) => upload.status !== "uploading" && upload.status !== "finalizing"
+  );
   return (
     <section aria-label="Uploads" className="panel-b stack upload-list">
       <ul className="stack">
@@ -45,8 +50,16 @@ export const UploadProgressList = ({
             <div className="row">
               <span className="trunc grow">{upload.name}</span>
               <span
-                className={upload.status === "error" ? "error" : "muted"}
-                role={upload.status === "error" ? "alert" : undefined}
+                className={
+                  upload.status === "error" || upload.status === "refresh-error"
+                    ? "error"
+                    : "muted"
+                }
+                role={
+                  upload.status === "error" || upload.status === "refresh-error"
+                    ? "alert"
+                    : undefined
+                }
               >
                 {statusLabel(upload)}
               </span>
@@ -60,17 +73,21 @@ export const UploadProgressList = ({
                 >
                   Cancel
                 </WorkspaceButton>
-              ) : (
+              ) : null}
+              {upload.status !== "uploading" &&
+              upload.status !== "finalizing" ? (
                 <>
                   {upload.status === "done" ? null : (
                     <WorkspaceButton
-                      aria-label={`Retry upload of ${upload.name}`}
+                      aria-label={`${upload.status === "refresh-error" ? "Refresh file list for" : "Retry upload of"} ${upload.name}`}
                       onClick={() => onRetry(upload.id)}
                       size="sm"
                       type="button"
                       workspace
                     >
-                      Retry
+                      {upload.status === "refresh-error"
+                        ? "Refresh list"
+                        : "Retry"}
                     </WorkspaceButton>
                   )}
                   <WorkspaceButton
@@ -83,9 +100,9 @@ export const UploadProgressList = ({
                     Dismiss
                   </WorkspaceButton>
                 </>
-              )}
+              ) : null}
             </div>
-            {upload.status === "uploading" ? (
+            {upload.status === "uploading" || upload.status === "finalizing" ? (
               <Progress
                 aria-label={`Uploading ${upload.name}`}
                 value={uploadPercent(upload)}
