@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 
-import { parseDatabaseEnv, parseServerEnv } from "../../src/server/core/env";
+import {
+  parseDatabaseEnv,
+  parseRetentionEnv,
+  parseServerEnv,
+} from "../../src/server/core/env";
 
 const validEnv = {
   BETTER_AUTH_SECRET: "a-test-secret-that-is-at-least-thirty-two-chars",
@@ -92,5 +96,17 @@ describe("parseDatabaseEnv", () => {
 
     expect(env.DATABASE_STATEMENT_TIMEOUT_MS).toBe(15_000);
     expect(() => parseDatabaseEnv({})).toThrow("DATABASE_URL");
+  });
+});
+
+describe("parseRetentionEnv", () => {
+  it("accepts whole-day retention overrides and rejects nonsense", () => {
+    const env = parseRetentionEnv({ RETENTION_DEAD_JOB_DAYS: "45" });
+
+    expect(env.RETENTION_DEAD_JOB_DAYS).toBe(45);
+    expect(env.RETENTION_COMPLETED_JOB_DAYS).toBeUndefined();
+    expect(() =>
+      parseRetentionEnv({ RETENTION_COMPLETED_JOB_DAYS: "0" })
+    ).toThrow("RETENTION_COMPLETED_JOB_DAYS");
   });
 });

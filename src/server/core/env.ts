@@ -48,8 +48,18 @@ const databaseFields = {
 
 const httpUrl = urlString(["http:", "https:"], "Expected an http(s) URL");
 
+const MAX_RETENTION_DAYS = 3650;
+const retentionDays = Schema.optional(integerFromString(1, MAX_RETENTION_DAYS));
+
+const retentionFields = {
+  RETENTION_COMPLETED_JOB_DAYS: retentionDays,
+  RETENTION_DEAD_JOB_DAYS: retentionDays,
+  RETENTION_PUSH_DELIVERY_DAYS: retentionDays,
+};
+
 const serverFields = {
   ...databaseFields,
+  ...retentionFields,
   BETTER_AUTH_SECRET: secretString,
   BETTER_AUTH_URL: Schema.optional(httpUrl),
   CI: Schema.optional(Schema.String),
@@ -75,6 +85,7 @@ const configuredTogether = (values: readonly (string | undefined)[]) =>
   values.every((value) => value !== undefined);
 
 export const DatabaseEnvSchema = Schema.Struct(databaseFields);
+export const RetentionEnvSchema = Schema.Struct(retentionFields);
 
 export const ServerEnvSchema = Schema.Struct(serverFields).check(
   Schema.makeFilter((env) =>
@@ -102,6 +113,7 @@ export const ServerEnvSchema = Schema.Struct(serverFields).check(
 
 export type DatabaseEnv = typeof DatabaseEnvSchema.Type;
 export type ServerEnv = typeof ServerEnvSchema.Type;
+export type RetentionEnv = typeof RetentionEnvSchema.Type;
 
 // An empty assignment such as `S3_ENDPOINT=` in .env means "not configured".
 const withoutBlankValues = (source: EnvironmentSource): EnvironmentSource =>
@@ -136,3 +148,8 @@ export const parseServerEnv = (
 export const parseDatabaseEnv = (
   source: EnvironmentSource = process.env
 ): DatabaseEnv => decodeOrThrow(DatabaseEnvSchema, source);
+
+/** Validates the optional data-retention window overrides, in days. */
+export const parseRetentionEnv = (
+  source: EnvironmentSource = process.env
+): RetentionEnv => decodeOrThrow(RetentionEnvSchema, source);
