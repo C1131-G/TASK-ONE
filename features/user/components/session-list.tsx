@@ -6,6 +6,7 @@
 import { useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { revokeSessionAction } from "@/features/user/user-actions";
 
 interface SessionSummary {
@@ -57,14 +58,20 @@ export const SessionList = ({
                 Expires {session.expiresAt.slice(0, 16).replace("T", " ")}
               </div>
             </div>
-            <WorkspaceButton
-              className="btn btn-sm btn-secondary"
-              disabled={pending}
-              onClick={() => revoke(session.id)}
-              type="button"
+            <WorkspaceConfirmDialog
+              confirmLabel="Revoke session"
+              description={`Sign out ${session.userAgent || "this browser session"}? It must sign in again to continue.`}
+              onConfirm={() => revoke(session.id)}
+              title="Revoke session"
             >
-              Revoke
-            </WorkspaceButton>
+              <WorkspaceButton
+                className="btn btn-sm btn-secondary"
+                disabled={pending}
+                type="button"
+              >
+                Revoke
+              </WorkspaceButton>
+            </WorkspaceConfirmDialog>
           </article>
         ))
       ) : (

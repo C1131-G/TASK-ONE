@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
@@ -12,6 +12,7 @@ import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import { createCalendarEventAction } from "@/features/calendar/calendar-actions";
 
 const CalendarEventForm = () => {
+  const fieldId = useId();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -65,7 +66,7 @@ const CalendarEventForm = () => {
           createEvent(new FormData(event.currentTarget));
         }}
       >
-        <label className="field" htmlFor="metsys-calendar-event-form-field-67">
+        <label className="field" htmlFor={`${fieldId}-title`}>
           <span>Event title</span>
           <WorkspaceInput
             autoComplete="off"
@@ -73,59 +74,47 @@ const CalendarEventForm = () => {
             maxLength={160}
             name="title"
             required
-            id="metsys-calendar-event-form-field-67"
+            id={`${fieldId}-title`}
           />
         </label>
         <div className="row">
-          <label
-            className="field"
-            htmlFor="metsys-calendar-event-form-field-78"
-          >
+          <label className="field" htmlFor={`${fieldId}-startsAt`}>
             <span>Starts</span>
             <WorkspaceDateTimePicker
               ariaLabel="Choose event start date and time"
               className="input"
-              id="metsys-calendar-event-form-field-78"
+              id={`${fieldId}-startsAt`}
               name="startsAt"
               required
             />
           </label>
-          <label
-            className="field"
-            htmlFor="metsys-calendar-event-form-field-87"
-          >
+          <label className="field" htmlFor={`${fieldId}-endsAt`}>
             <span>Ends</span>
             <WorkspaceDateTimePicker
               ariaLabel="Choose event end date and time"
               className="input"
-              id="metsys-calendar-event-form-field-87"
+              id={`${fieldId}-endsAt`}
               name="endsAt"
             />
           </label>
         </div>
         <div className="row">
-          <label
-            className="field grow"
-            htmlFor="metsys-calendar-event-form-field-97"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-location`}>
             <span>Location</span>
             <WorkspaceInput
               className="input"
               maxLength={160}
               name="location"
-              id="metsys-calendar-event-form-field-97"
+              id={`${fieldId}-location`}
             />
           </label>
-          <label
-            className="field grow"
-            htmlFor="metsys-calendar-event-form-field-101"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-description`}>
             <span>Description</span>
             <WorkspaceInput
               className="input"
               maxLength={1000}
               name="description"
-              id="metsys-calendar-event-form-field-101"
+              id={`${fieldId}-description`}
             />
           </label>
         </div>

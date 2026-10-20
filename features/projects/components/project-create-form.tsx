@@ -4,7 +4,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
@@ -29,6 +29,7 @@ const templates = [
 ] as const;
 
 const ProjectCreateForm = () => {
+  const fieldId = useId();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -82,10 +83,7 @@ const ProjectCreateForm = () => {
         }}
       >
         <div className="row">
-          <label
-            className="field grow"
-            htmlFor="metsys-project-create-form-field-84"
-          >
+          <label className="field grow" htmlFor={`${fieldId}-name`}>
             <span>Project name</span>
             <WorkspaceInput
               autoComplete="off"
@@ -93,13 +91,10 @@ const ProjectCreateForm = () => {
               maxLength={120}
               name="name"
               required
-              id="metsys-project-create-form-field-84"
+              id={`${fieldId}-name`}
             />
           </label>
-          <label
-            className="field"
-            htmlFor="metsys-project-create-form-field-94"
-          >
+          <label className="field" htmlFor={`${fieldId}-key`}>
             <span>Project key</span>
             <WorkspaceInput
               autoComplete="off"
@@ -107,27 +102,27 @@ const ProjectCreateForm = () => {
               maxLength={12}
               name="key"
               required
-              id="metsys-project-create-form-field-94"
+              id={`${fieldId}-key`}
             />
           </label>
         </div>
-        <label className="field" htmlFor="metsys-project-create-form-field-113">
+        <label className="field" htmlFor={`${fieldId}-description`}>
           <span>Description</span>
           <WorkspaceTextarea
             className="input"
             maxLength={1000}
             name="description"
             rows={2}
-            id="metsys-project-create-form-field-113"
+            id={`${fieldId}-description`}
           />
         </label>
-        <label className="field" htmlFor="metsys-project-create-form-field-114">
+        <label className="field" htmlFor={`${fieldId}-templateId`}>
           <span>Template</span>
           <WorkspaceSelect
             className="input"
             defaultValue="blank"
             name="templateId"
-            id="metsys-project-create-form-field-114"
+            id={`${fieldId}-templateId`}
           >
             {templates.map(([id, label]) => (
               <WorkspaceSelectItem key={id} value={id}>
