@@ -8,6 +8,7 @@ import { admin } from "better-auth/plugins/admin";
 import { db } from "@/src/prisma/db";
 
 import { recordAuditEvent } from "../audit/audit-log";
+import { RESOLVED_CLIENT_IP_HEADER } from "../core/client-ip";
 import { authPool } from "./database";
 import {
   LOGIN_LOCK_MINUTES,
@@ -135,6 +136,11 @@ const unrestrictedAuthPaths = new Set([
 ]);
 
 export const auth = betterAuth({
+  // Rate limits key on the address the auth route resolved from the trusted
+  // proxy header, never on a client-controlled X-Forwarded-For.
+  advanced: {
+    ipAddress: { ipAddressHeaders: [RESOLVED_CLIENT_IP_HEADER] },
+  },
   appName: "Metsys",
   baseURL: process.env["BETTER_AUTH_URL"],
   database: authPool,

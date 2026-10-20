@@ -22,6 +22,8 @@ mock.module("next/headers", () => ({
 export { revalidatedPaths, updatedTags } from "./next-cache-mock";
 
 const { auth } = await import("../../../src/server/auth/auth");
+const { withResolvedClientIp } =
+  await import("../../../src/server/core/client-ip");
 const { authPool } = await import("../../../src/server/auth/database");
 const { UserManagement, UserManagementLive } =
   await import("../../../src/server/people/user-management");
@@ -183,14 +185,16 @@ export const createPersona = async (
   }
   signInCounter = (signInCounter % 254) + 1;
   const signIn = await auth.handler(
-    new Request("http://localhost:3000/api/auth/sign-in/email", {
-      body: JSON.stringify({ email, password: created.temporaryPassword }),
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": `198.51.100.${signInCounter}`,
-      },
-      method: "POST",
-    })
+    withResolvedClientIp(
+      new Request("http://localhost:3000/api/auth/sign-in/email", {
+        body: JSON.stringify({ email, password: created.temporaryPassword }),
+        headers: {
+          "content-type": "application/json",
+          "x-forwarded-for": `198.51.100.${signInCounter}`,
+        },
+        method: "POST",
+      })
+    )
   );
   if (signIn.status !== 200) {
     throw new Error(`Sign-in failed for ${label}: ${signIn.status}`);

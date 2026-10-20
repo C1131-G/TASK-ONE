@@ -4,6 +4,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { resolveClientIp } from "../core/client-ip";
 
 export const AUDIT_EVENT_TYPES = [
   "login_succeeded",
@@ -35,13 +36,12 @@ export interface RequestMetadata {
   readonly userAgent: string | null;
 }
 
-// Where a request came from, for the audit trail. The proxy's forwarded
-// address wins; an empty value reads as unknown.
+// Where a request came from, for the audit trail. The address comes from the
+// trusted proxy header only; a missing or invalid value reads as unknown.
 export const requestMetadata = (
   headers: Headers | undefined | null
 ): RequestMetadata => {
-  const forwarded = headers?.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const ip = forwarded || headers?.get("x-real-ip")?.trim() || null;
+  const ip = resolveClientIp(headers) ?? null;
   const userAgent = headers?.get("user-agent")?.trim() || null;
   return {
     ip: ip ? ip.slice(0, MAX_IP_LENGTH) : null,

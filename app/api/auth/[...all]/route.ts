@@ -2,6 +2,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 
 import { db } from "@/src/prisma/db";
 import { auth } from "@/src/server/auth/auth";
+import { withResolvedClientIp } from "@/src/server/core/client-ip";
 
 const handlers = toNextJsHandler(auth);
 const allowedPaths = new Set(["/sign-in/email", "/sign-out", "/get-session"]);
@@ -47,7 +48,7 @@ const handleAuthRequest = async (
 };
 
 export const GET = (request: Request): Promise<Response> =>
-  handleAuthRequest(request, handlers.GET);
+  handleAuthRequest(withResolvedClientIp(request), handlers.GET);
 
 export const POST = (request: Request): Promise<Response> =>
-  handleAuthRequest(request, handlers.POST);
+  handleAuthRequest(withResolvedClientIp(request), handlers.POST);
