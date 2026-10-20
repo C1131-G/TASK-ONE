@@ -28,30 +28,39 @@ export const validateEvent = (input: CalendarEventInput): void => {
   if (!input.title.trim() || input.title.length > 200) {
     throw new AppError({
       code: "VALIDATION_FAILED",
-      message: "Invalid event title.",
+      field: "title",
+      message: "Enter an event title of up to 200 characters.",
+    });
+  }
+  if (!Number.isFinite(input.startsAt.getTime())) {
+    throw new AppError({
+      code: "VALIDATION_FAILED",
+      field: "startsAt",
+      message: "Choose a valid start time.",
     });
   }
   if (
-    !Number.isFinite(input.startsAt.getTime()) ||
-    (input.endsAt &&
-      (!Number.isFinite(input.endsAt.getTime()) ||
-        input.endsAt < input.startsAt))
+    input.endsAt &&
+    (!Number.isFinite(input.endsAt.getTime()) || input.endsAt < input.startsAt)
   ) {
     throw new AppError({
       code: "VALIDATION_FAILED",
-      message: "Invalid event date range.",
+      field: "endsAt",
+      message: "Choose an end time after the start.",
     });
   }
   if (input.description && input.description.length > 10_000) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "description",
       message: "Event description is too long.",
     });
   }
   if (input.location && input.location.length > 300) {
     throw new AppError({
       code: "VALIDATION_FAILED",
-      message: "Invalid location.",
+      field: "location",
+      message: "Locations can be up to 300 characters.",
     });
   }
   if (

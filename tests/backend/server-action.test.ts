@@ -23,6 +23,7 @@ it("validates untrusted input before running a Server Action", async () => {
   expect(result).toEqual({
     error: {
       code: "VALIDATION_FAILED",
+      fieldErrors: { title: "Enter a valid value." },
       message: "The request data is invalid.",
       requestId: "req-invalid-action",
     },

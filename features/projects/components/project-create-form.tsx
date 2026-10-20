@@ -4,13 +4,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import {
   WorkspaceSelect,
@@ -28,11 +33,24 @@ const templates = [
   ["personal", "Personal project"],
 ] as const;
 
-const ProjectCreateForm = () => {
-  const fieldId = useId();
+const PROJECT_FIELDS = ["name", "key", "description", "templateId"] as const;
+
+const ProjectCreateForm = ({
+  triggerLabel = "New project",
+}: {
+  // Empty states reuse the form with their own call to action.
+  readonly triggerLabel?: string;
+}) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const {
+    clearErrors,
+    errors,
+    fieldProps,
+    formId: fieldId,
+    formRef,
+    showFailure,
+  } = useFormErrors(PROJECT_FIELDS);
   const [open, setOpen] = useState(false);
 
   const createProject = (formData: FormData) => {
@@ -42,7 +60,7 @@ const ProjectCreateForm = () => {
       .toUpperCase();
     const description = String(formData.get("description") ?? "").trim();
     const templateId = String(formData.get("templateId") ?? "blank");
-    setError(null);
+    clearErrors();
     startTransition(async () => {
       const result = await createProjectAction({
         description: description || null,
@@ -53,7 +71,7 @@ const ProjectCreateForm = () => {
         templateId,
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
       setOpen(false);
@@ -71,20 +89,22 @@ const ProjectCreateForm = () => {
       title="New project"
       trigger={
         <WorkspaceButton className="btn btn-primary" type="button">
-          New project
+          {triggerLabel}
         </WorkspaceButton>
       }
     >
       <form
+        aria-busy={pending || undefined}
         className="stack"
+        ref={formRef}
         onSubmit={(event) => {
           event.preventDefault();
           createProject(new FormData(event.currentTarget));
         }}
       >
         <div className="row">
-          <label className="field grow" htmlFor={`${fieldId}-name`}>
-            <span>Project name</span>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-name`}>Project name</label>
             <WorkspaceInput
               autoComplete="off"
               className="input"
@@ -92,10 +112,16 @@ const ProjectCreateForm = () => {
               name="name"
               required
               id={`${fieldId}-name`}
+              {...fieldProps("name")}
             />
-          </label>
-          <label className="field" htmlFor={`${fieldId}-key`}>
-            <span>Project key</span>
+            <WorkspaceFieldError
+              errors={errors}
+              field="name"
+              formId={fieldId}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor={`${fieldId}-key`}>Project key</label>
             <WorkspaceInput
               autoComplete="off"
               className="input mono"
@@ -103,19 +129,27 @@ const ProjectCreateForm = () => {
               name="key"
               required
               id={`${fieldId}-key`}
+              {...fieldProps("key")}
             />
-          </label>
+            <WorkspaceFieldError errors={errors} field="key" formId={fieldId} />
+          </div>
         </div>
-        <label className="field" htmlFor={`${fieldId}-description`}>
-          <span>Description</span>
+        <div className="field">
+          <label htmlFor={`${fieldId}-description`}>Description</label>
           <WorkspaceTextarea
             className="input"
             maxLength={1000}
             name="description"
             rows={2}
             id={`${fieldId}-description`}
+            {...fieldProps("description")}
           />
-        </label>
+          <WorkspaceFieldError
+            errors={errors}
+            field="description"
+            formId={fieldId}
+          />
+        </div>
         <label className="field" htmlFor={`${fieldId}-templateId`}>
           <span>Template</span>
           <WorkspaceSelect
@@ -131,13 +165,10 @@ const ProjectCreateForm = () => {
             ))}
           </WorkspaceSelect>
         </label>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <WorkspaceFormError errors={errors} />
         <div className="acts">
           <WorkspaceButton
+            aria-busy={pending || undefined}
             className="btn btn-primary"
             disabled={pending}
             size="sm"

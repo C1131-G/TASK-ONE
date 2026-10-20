@@ -5,9 +5,10 @@
 
 import { Plus } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceCombobox } from "@/components/workspace/workspace-combobox";
 import {
@@ -15,6 +16,10 @@ import {
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import {
   WorkspaceSelect,
@@ -28,6 +33,13 @@ interface ProjectOption {
 }
 
 const EMPTY_ASSIGNEE_IDS: readonly string[] = [];
+const QUICK_TASK_FIELDS = [
+  "title",
+  "projectId",
+  "description",
+  "priority",
+  "dueDate",
+] as const;
 
 export const QuickTaskForm = ({
   onOpenChange,
@@ -46,10 +58,16 @@ export const QuickTaskForm = ({
   readonly projects: readonly ProjectOption[];
   readonly trigger?: ReactNode | null;
 }) => {
-  const fieldId = useId();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const {
+    clearErrors,
+    errors,
+    fieldProps,
+    formId: fieldId,
+    formRef,
+    showFailure,
+  } = useFormErrors(QUICK_TASK_FIELDS);
   const [localOpen, setLocalOpen] = useState(false);
   const open = controlledOpen ?? localOpen;
   const setOpen = onOpenChange ?? setLocalOpen;
@@ -66,10 +84,10 @@ export const QuickTaskForm = ({
         title: String(formData.get("title") ?? "").trim(),
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
-      setError(null);
+      clearErrors();
       setOpen(false);
       router.push(`/projects/${result.data.projectId}?view=board`);
     });
@@ -93,9 +111,14 @@ export const QuickTaskForm = ({
         )
       }
     >
-      <form action={create} className="stack">
-        <label className="field" htmlFor={`${fieldId}-title`}>
-          <span>Task name</span>
+      <form
+        action={create}
+        aria-busy={pending || undefined}
+        className="stack"
+        ref={formRef}
+      >
+        <div className="field">
+          <label htmlFor={`${fieldId}-title`}>Task name</label>
           <WorkspaceInput
             autoComplete="off"
             className="input"
@@ -103,10 +126,12 @@ export const QuickTaskForm = ({
             name="title"
             required
             id={`${fieldId}-title`}
+            {...fieldProps("title")}
           />
-        </label>
-        <label className="field" htmlFor={`${fieldId}-projectId`}>
-          <span>Project</span>
+          <WorkspaceFieldError errors={errors} field="title" formId={fieldId} />
+        </div>
+        <div className="field">
+          <label htmlFor={`${fieldId}-projectId`}>Project</label>
           <WorkspaceCombobox
             ariaLabel="Choose a project"
             className="input"
@@ -122,17 +147,28 @@ export const QuickTaskForm = ({
             placeholder="Choose project"
             searchPlaceholder="Search projects"
           />
-        </label>
-        <label className="field" htmlFor={`${fieldId}-description`}>
-          <span>Description</span>
+          <WorkspaceFieldError
+            errors={errors}
+            field="projectId"
+            formId={fieldId}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor={`${fieldId}-description`}>Description</label>
           <WorkspaceTextarea
             className="input"
             maxLength={10_000}
             name="description"
             rows={2}
             id={`${fieldId}-description`}
+            {...fieldProps("description")}
           />
-        </label>
+          <WorkspaceFieldError
+            errors={errors}
+            field="description"
+            formId={fieldId}
+          />
+        </div>
         <div className="row">
           <label className="field" htmlFor={`${fieldId}-priority`}>
             <span>Priority</span>
@@ -151,8 +187,8 @@ export const QuickTaskForm = ({
               </WorkspaceSelectItem>
             </WorkspaceSelect>
           </label>
-          <label className="field" htmlFor={`${fieldId}-dueDate`}>
-            <span>Due date</span>
+          <div className="field">
+            <label htmlFor={`${fieldId}-dueDate`}>Due date</label>
             <WorkspaceDatePicker
               className="input"
               {...(defaultDueDate === undefined
@@ -160,15 +196,18 @@ export const QuickTaskForm = ({
                 : { defaultValue: defaultDueDate })}
               name="dueDate"
               id={`${fieldId}-dueDate`}
+              {...fieldProps("dueDate")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="dueDate"
+              formId={fieldId}
+            />
+          </div>
         </div>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <WorkspaceFormError errors={errors} />
         <WorkspaceButton
+          aria-busy={pending || undefined}
           className="btn btn-primary"
           disabled={pending}
           type="submit"

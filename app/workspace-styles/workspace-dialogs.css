@@ -32,6 +32,14 @@
   color: var(--muted-foreground);
   font-size: 12.5px;
 }
+[data-slot="dialog-content"][data-workspace] .err,
+[data-slot="dialog-content"][data-workspace] .error {
+  color: var(--red);
+  font-size: 12px;
+}
+[data-slot="dialog-content"][data-workspace] [aria-invalid="true"] {
+  border-color: var(--red);
+}
 [data-slot="dialog-content"][data-workspace] form.stack {
   display: grid;
   gap: 16px;

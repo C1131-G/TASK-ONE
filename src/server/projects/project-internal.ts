@@ -107,6 +107,7 @@ export const mapError = (error: unknown): AppError => {
   if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
+      field: "key",
       message: "A project with that key already exists.",
     });
   }
@@ -159,6 +160,7 @@ export const validateProjectTeam = async (
   if (!team) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "teamId",
       message: "Choose an existing team for the project.",
     });
   }
@@ -172,12 +174,14 @@ export const validateProjectDetails = (
   if (!name || name.length > 120) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "name",
       message: "Enter a project name between 1 and 120 characters.",
     });
   }
   if (description && description.length > 5000) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "description",
       message: "Project descriptions can contain up to 5000 characters.",
     });
   }
@@ -191,6 +195,7 @@ export const validateCreateProjectInput = (
   if (!Schema.is(ProjectKeySchema)(key)) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "key",
       message:
         "Use a project key of 2 to 12 letters, numbers, underscores, or hyphens.",
     });

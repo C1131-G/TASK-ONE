@@ -25,9 +25,19 @@ interface UndoNotice extends UndoNoticeInput {
   readonly error: string | null;
 }
 
+// A confirmation with nothing to undo, such as "Settings saved".
+interface SavedNotice {
+  readonly id: string;
+  readonly label: string;
+}
+
 interface WorkspaceUndoContextValue {
   readonly addUndo: (notice: UndoNoticeInput) => void;
+  readonly notifySaved: (label: string) => void;
 }
+
+// Saved confirmations need no action, so they leave on their own.
+const SAVED_NOTICE_MS = 4000;
 
 const WorkspaceUndoContext = createContext<WorkspaceUndoContextValue | null>(
   null
@@ -36,24 +46,45 @@ const WorkspaceUndoContext = createContext<WorkspaceUndoContextValue | null>(
 const WorkspaceUndoNotices = ({
   items,
   onDismiss,
+  onDismissSaved,
   onUndo,
   pendingId,
   announcement,
+  savedNotices,
 }: {
   readonly items: readonly UndoNotice[];
   readonly onDismiss: (id: string) => void;
+  readonly onDismissSaved: (id: string) => void;
   readonly onUndo: (id: string) => void;
   readonly pendingId: string | null;
   readonly announcement: string;
+  readonly savedNotices: readonly SavedNotice[];
 }) => (
   <>
     <output aria-atomic="true" aria-live="polite" className="sr-only">
       {announcement}
     </output>
-    {items.length ? (
+    {items.length || savedNotices.length ? (
       <section aria-label="Recent actions" className="workspace-undo-stack">
         {/* oxlint-disable-next-line jsx-a11y/no-redundant-roles -- Safari drops list semantics when list-style is none. */}
         <ul className="workspace-undo-list" role="list">
+          {savedNotices.map(({ id, label }) => (
+            <li className="workspace-undo-item" key={id}>
+              <div className="workspace-undo-copy">
+                <span>{label}</span>
+              </div>
+              <Button
+                aria-label={`Dismiss ${label}`}
+                className="workspace-undo-dismiss"
+                onClick={() => onDismissSaved(id)}
+                size="icon-sm"
+                type="button"
+                variant="ghost"
+              >
+                <X aria-hidden="true" size={14} />
+              </Button>
+            </li>
+          ))}
           {items.map(({ error, expiresAt, id, label }) => (
             <li className="workspace-undo-item" key={id}>
               <div className="workspace-undo-copy">
@@ -98,8 +129,23 @@ const WorkspaceUndoProvider = ({
   readonly children: ReactNode;
 }) => {
   const [items, setItems] = useState<readonly UndoNotice[]>([]);
+  const [savedNotices, setSavedNotices] = useState<readonly SavedNotice[]>([]);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
+
+  const dismissSaved = useCallback((id: string) => {
+    setSavedNotices((current) => current.filter((notice) => notice.id !== id));
+  }, []);
+
+  const notifySaved = useCallback(
+    (label: string) => {
+      const id = crypto.randomUUID();
+      setSavedNotices((current) => [...current, { id, label }]);
+      setAnnouncement(label);
+      setTimeout(() => dismissSaved(id), SAVED_NOTICE_MS);
+    },
+    [dismissSaved]
+  );
 
   const addUndo = useCallback((notice: UndoNoticeInput) => {
     setItems((current) => [
@@ -142,7 +188,10 @@ const WorkspaceUndoProvider = ({
     setPendingId(null);
   };
 
-  const contextValue = useMemo(() => ({ addUndo }), [addUndo]);
+  const contextValue = useMemo(
+    () => ({ addUndo, notifySaved }),
+    [addUndo, notifySaved]
+  );
 
   return (
     <WorkspaceUndoContext.Provider value={contextValue}>
@@ -151,8 +200,10 @@ const WorkspaceUndoProvider = ({
         announcement={announcement}
         items={items}
         onDismiss={dismiss}
+        onDismissSaved={dismissSaved}
         onUndo={runUndo}
         pendingId={pendingId}
+        savedNotices={savedNotices}
       />
     </WorkspaceUndoContext.Provider>
   );

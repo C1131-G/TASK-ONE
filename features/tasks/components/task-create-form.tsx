@@ -3,21 +3,28 @@
 
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   WorkspaceInput,
   WorkspaceTextarea,
 } from "@/components/workspace/workspace-controls";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import { createTaskAction } from "@/features/tasks/tasks-actions";
+
+const TASK_FIELDS = ["title", "description", "priority", "dueDate"] as const;
 
 const TaskCreateForm = ({
   projectId,
@@ -32,9 +39,15 @@ const TaskCreateForm = ({
   readonly onOpenChange?: (open: boolean) => void;
   readonly trigger?: ReactNode | null;
 }) => {
-  const fieldId = useId();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const {
+    clearErrors,
+    errors,
+    fieldProps,
+    formId: fieldId,
+    formRef,
+    showFailure,
+  } = useFormErrors(TASK_FIELDS);
   const [open, setOpen] = useState(false);
   const isOpen = controlledOpen ?? open;
   const updateOpen = onOpenChange ?? setOpen;
@@ -44,7 +57,7 @@ const TaskCreateForm = ({
     const dueDate = String(formData.get("dueDate") ?? "");
     const description = String(formData.get("description") ?? "").trim();
     const priority = String(formData.get("priority") ?? "none");
-    setError(null);
+    clearErrors();
     startTransition(async () => {
       const result = await createTaskAction({
         assigneeIds: [],
@@ -56,7 +69,7 @@ const TaskCreateForm = ({
         title,
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
       updateOpen(false);
@@ -83,14 +96,16 @@ const TaskCreateForm = ({
       }
     >
       <form
+        aria-busy={pending || undefined}
         className="stack"
+        ref={formRef}
         onSubmit={(event) => {
           event.preventDefault();
           createTask(new FormData(event.currentTarget));
         }}
       >
-        <label className="field" htmlFor={`${fieldId}-title`}>
-          <span>Task name</span>
+        <div className="field">
+          <label htmlFor={`${fieldId}-title`}>Task name</label>
           <WorkspaceInput
             autoComplete="off"
             className="input"
@@ -98,18 +113,26 @@ const TaskCreateForm = ({
             name="title"
             required
             id={`${fieldId}-title`}
+            {...fieldProps("title")}
           />
-        </label>
-        <label className="field" htmlFor={`${fieldId}-description`}>
-          <span>Description</span>
+          <WorkspaceFieldError errors={errors} field="title" formId={fieldId} />
+        </div>
+        <div className="field">
+          <label htmlFor={`${fieldId}-description`}>Description</label>
           <WorkspaceTextarea
             className="input"
             maxLength={10_000}
             name="description"
             rows={3}
             id={`${fieldId}-description`}
+            {...fieldProps("description")}
           />
-        </label>
+          <WorkspaceFieldError
+            errors={errors}
+            field="description"
+            formId={fieldId}
+          />
+        </div>
         <div className="row">
           <label className="field" htmlFor={`${fieldId}-priority`}>
             <span>Priority</span>
@@ -128,8 +151,8 @@ const TaskCreateForm = ({
               </WorkspaceSelectItem>
             </WorkspaceSelect>
           </label>
-          <label className="field" htmlFor={`${fieldId}-dueDate`}>
-            <span>Due date</span>
+          <div className="field">
+            <label htmlFor={`${fieldId}-dueDate`}>Due date</label>
             <WorkspaceDatePicker
               className="input"
               {...(defaultDueDate === undefined
@@ -137,16 +160,19 @@ const TaskCreateForm = ({
                 : { defaultValue: defaultDueDate })}
               name="dueDate"
               id={`${fieldId}-dueDate`}
+              {...fieldProps("dueDate")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="dueDate"
+              formId={fieldId}
+            />
+          </div>
         </div>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <WorkspaceFormError errors={errors} />
         <div className="acts">
           <WorkspaceButton
+            aria-busy={pending || undefined}
             className="btn btn-primary"
             disabled={pending}
             type="submit"

@@ -7,18 +7,17 @@ import { useOptimistic, useState, useTransition } from "react";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
-import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
 import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
+import { EmployeeDetailsForm } from "@/features/people/components/employee-details-form";
 import { TemporaryPasswordReveal } from "@/features/people/components/temporary-password-reveal";
 import {
   changeEmployeeRoleAction,
   deactivateEmployeeAction,
   resetEmployeePasswordAction,
-  updateEmployeeDetailsAction,
 } from "@/features/people/people-actions";
 
 type EmployeeRole = "admin" | "employee";
@@ -59,22 +58,6 @@ export const EmployeeAdminControls = ({
   const [optimisticRole, setOptimisticRole] = useOptimistic(employee.role);
   // The role picked in the select, held until the admin confirms or cancels.
   const [requestedRole, setRequestedRole] = useState<EmployeeRole | null>(null);
-
-  const saveDetails = (formData: FormData) =>
-    startTransition(async () => {
-      const result = await updateEmployeeDetailsAction({
-        email: String(formData.get("email") ?? "").trim(),
-        employeeId: employee.id,
-        idempotencyKey: crypto.randomUUID(),
-        jobTitle: String(formData.get("jobTitle") ?? "").trim() || null,
-        teamId: String(formData.get("teamId") ?? "") || null,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-      setError(null);
-    });
 
   const changeRole = (role: EmployeeRole) =>
     startTransition(async () => {
@@ -133,63 +116,7 @@ export const EmployeeAdminControls = ({
             {error}
           </p>
         ) : null}
-        <form action={saveDetails} className="stack">
-          <label
-            className="field"
-            htmlFor={`employee-${employee.id}-field-126`}
-          >
-            <span>Login email</span>
-            <WorkspaceInput
-              autoComplete="email"
-              className="input"
-              defaultValue={employee.email}
-              maxLength={254}
-              name="email"
-              required
-              type="email"
-              id={`employee-${employee.id}-field-126`}
-            />
-          </label>
-          <label
-            className="field"
-            htmlFor={`employee-${employee.id}-field-138`}
-          >
-            <span>Job title</span>
-            <WorkspaceInput
-              className="input"
-              defaultValue={employee.jobTitle ?? ""}
-              maxLength={120}
-              name="jobTitle"
-              id={`employee-${employee.id}-field-138`}
-            />
-          </label>
-          <label
-            className="field"
-            htmlFor={`employee-${employee.id}-field-147`}
-          >
-            <span>Team</span>
-            <WorkspaceSelect
-              className="input"
-              defaultValue={employee.teamId ?? ""}
-              name="teamId"
-              id={`employee-${employee.id}-field-147`}
-            >
-              <WorkspaceSelectItem value="">No team</WorkspaceSelectItem>
-              {teams.map((team) => (
-                <WorkspaceSelectItem key={team.id} value={team.id}>
-                  {team.name}
-                </WorkspaceSelectItem>
-              ))}
-            </WorkspaceSelect>
-          </label>
-          <WorkspaceButton
-            className="btn btn-sm btn-secondary"
-            disabled={pending}
-            type="submit"
-          >
-            Save details
-          </WorkspaceButton>
-        </form>
+        <EmployeeDetailsForm employee={employee} teams={teams} />
         <label className="field" htmlFor={`employee-${employee.id}-field-170`}>
           <span>Role</span>
           <WorkspaceSelect

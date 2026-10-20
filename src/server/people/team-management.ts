@@ -63,18 +63,21 @@ const validateInput = (input: TeamInput): TeamInput => {
   if (!name || name.length > 80) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "name",
       message: "Team names must be between 1 and 80 characters.",
     });
   }
   if (description && description.length > 500) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "description",
       message: "Team descriptions must be 500 characters or fewer.",
     });
   }
   if (!Schema.is(HexColorSchema)(input.color)) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "color",
       message: "Choose a six-digit hex color.",
     });
   }

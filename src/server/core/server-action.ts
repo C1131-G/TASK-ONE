@@ -1,7 +1,7 @@
-import { Effect, Schema } from "effect";
+import { Effect, Schema, SchemaIssue } from "effect";
 
 import { AppError, runEffectResult } from "./action-result";
-import type { ActionResult } from "./action-result";
+import type { ActionResult, FieldErrors } from "./action-result";
 
 const ServerActionOutputTreeSchema = Schema.Tree(
   Schema.Union([
@@ -16,6 +16,37 @@ const ServerActionOutputTreeSchema = Schema.Tree(
 export const ServerActionOutputSchema = Schema.UndefinedOr(
   ServerActionOutputTreeSchema
 );
+
+const formatIssue = SchemaIssue.makeFormatterStandardSchemaV1();
+const GENERIC_FIELD_MESSAGE = "Enter a valid value.";
+
+// Built-in schema messages ("Expected string") describe types, not what the
+// person should do; checks with their own message keep it.
+const readableMessage = (message: string): string =>
+  message.startsWith("Expected") || message.startsWith("Missing")
+    ? GENERIC_FIELD_MESSAGE
+    : message;
+
+// The first failure for each top-level input key, keyed like the form field.
+const fieldErrorsFromIssue = (issue: SchemaIssue.Issue): FieldErrors => {
+  const fieldErrors: Record<string, string> = {};
+  for (const { message, path } of formatIssue(issue).issues) {
+    const [field] = path ?? [];
+    if (typeof field === "string" && !(field in fieldErrors)) {
+      fieldErrors[field] = readableMessage(message);
+    }
+  }
+  return fieldErrors;
+};
+
+const invalidInput = (error: Schema.SchemaError): AppError => {
+  const fieldErrors = fieldErrorsFromIssue(error.issue);
+  return new AppError({
+    code: "VALIDATION_FAILED",
+    message: "The request data is invalid.",
+    ...(Object.keys(fieldErrors).length ? { fieldErrors } : {}),
+  });
+};
 
 export function runServerAction<
   InputSchema extends Schema.Codec<unknown, unknown, never, never>,
@@ -57,14 +88,8 @@ export function runServerAction<
   const program: Effect.Effect<
     { readonly result: Result; readonly validatedOutput: OutputSchema["Type"] },
     unknown
-  > = Schema.decodeUnknownEffect(schema)(input).pipe(
-    Effect.mapError(
-      () =>
-        new AppError({
-          code: "VALIDATION_FAILED",
-          message: "The request data is invalid.",
-        })
-    ),
+  > = Schema.decodeUnknownEffect(schema)(input, { errors: "all" }).pipe(
+    Effect.mapError(invalidInput),
     Effect.flatMap(execute),
     Effect.flatMap((result) =>
       Schema.decodeUnknownEffect(Schema.toType(outputSchema))(result).pipe(

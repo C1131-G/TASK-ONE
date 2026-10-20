@@ -53,6 +53,7 @@ export const validateInput = (input: CreateTaskInput): CreateTaskInput => {
   if (!input.projectId || !title || title.length > 240) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "title",
       message: "Enter a task title between 1 and 240 characters.",
     });
   }
@@ -65,6 +66,7 @@ export const validateInput = (input: CreateTaskInput): CreateTaskInput => {
   if (input.dueDate !== null && !Schema.is(CalendarDateSchema)(input.dueDate)) {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "dueDate",
       message: "Enter a valid due date.",
     });
   }
