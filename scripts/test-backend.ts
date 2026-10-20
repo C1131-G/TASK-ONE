@@ -126,6 +126,8 @@ try {
       [
         "test",
         "--max-concurrency=1",
+        // Database fixtures create and sign in several users before each file.
+        "--timeout=30000",
         "--preload",
         path.join(testDirectory, "support/server-only-stub.ts"),
         path.join(testDirectory, testFile),
