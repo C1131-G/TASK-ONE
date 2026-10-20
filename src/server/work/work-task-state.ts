@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 
 import type { ResultType } from "@prisma/orm-postgres/components/runtime";
 import { Schema } from "effect";
-import sanitizeHtml from "sanitize-html";
 
 import type { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { sanitizeDescription } from "./sanitize-description";
 import type {
   CreateTaskInput,
   TaskRecurrenceInput,
@@ -15,6 +15,7 @@ import type {
 } from "./work-contracts";
 import { TaskRecurrenceInputSchema } from "./work-contracts";
 import type { Transaction } from "./work-internal";
+import { assertTaskDescriptionLength } from "./work-internal";
 import { allocateTaskNumber } from "./work-task-creation";
 import { nextRecurrenceDate } from "./work-task-recurrence";
 
@@ -29,28 +30,8 @@ export const prepareTaskUpdate = (
   expectedVersion: number
 ): PreparedTaskUpdate => {
   const title = rawInput.title.trim();
-  const description = rawInput.description
-    ? sanitizeHtml(rawInput.description, {
-        allowedAttributes: { a: ["href", "title"] },
-        allowedSchemes: ["https", "http", "mailto"],
-        allowedTags: [
-          "a",
-          "b",
-          "br",
-          "code",
-          "em",
-          "i",
-          "li",
-          "ol",
-          "p",
-          "pre",
-          "s",
-          "strong",
-          "u",
-          "ul",
-        ],
-      })
-    : null;
+  assertTaskDescriptionLength(rawInput.description);
+  const description = sanitizeDescription(rawInput.description);
   const assigneeIds = [...new Set(rawInput.assigneeIds)];
 
   if (!title || title.length > 240 || assigneeIds.length > 100) {

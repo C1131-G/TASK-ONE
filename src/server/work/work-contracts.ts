@@ -27,9 +27,15 @@ export const decodeTaskPriority = (
 ): CreateTaskInput["priority"] =>
   Schema.decodeUnknownSync(TaskPrioritySchema)(priority);
 
+export const TASK_DESCRIPTION_MAX_LENGTH = 20_000;
+
+export const TaskDescriptionSchema = Schema.NullOr(
+  Schema.String.check(Schema.isMaxLength(TASK_DESCRIPTION_MAX_LENGTH))
+);
+
 export const UpdateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
-  description: Schema.NullOr(Schema.String),
+  description: TaskDescriptionSchema,
   dueDate: Schema.NullOr(CalendarDateSchema),
   estimate: Schema.optional(
     Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))
@@ -44,7 +50,7 @@ export type UpdateTaskInput = typeof UpdateTaskInputSchema.Type;
 
 export const CreateTaskInputSchema = Schema.Struct({
   assigneeIds: Schema.Array(Schema.String.check(Schema.isUUID())),
-  description: Schema.NullOr(Schema.String),
+  description: TaskDescriptionSchema,
   dueDate: Schema.NullOr(CalendarDateSchema),
   estimate: Schema.optional(
     Schema.NullOr(Schema.String.check(Schema.isMaxLength(40)))

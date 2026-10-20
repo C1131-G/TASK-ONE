@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 
 import type { ResultType } from "@prisma/orm-postgres/components/runtime";
 import { Schema } from "effect";
-import sanitizeHtml from "sanitize-html";
 
 import type { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { isUniqueConstraintViolation } from "../core/prisma-errors";
+import { sanitizeDescription } from "../work/sanitize-description";
 import {
   SubtaskFieldsSchema,
   UpdateSubtaskInputSchema,
@@ -36,30 +36,6 @@ export const mapError = (error: unknown): AppError => {
     message: "The subtask request could not be completed.",
   });
 };
-
-const sanitizeDescription = (description: string | null): string | null =>
-  description
-    ? sanitizeHtml(description, {
-        allowedAttributes: { a: ["href", "title"] },
-        allowedSchemes: ["https", "http", "mailto"],
-        allowedTags: [
-          "a",
-          "b",
-          "br",
-          "code",
-          "em",
-          "i",
-          "li",
-          "ol",
-          "p",
-          "pre",
-          "s",
-          "strong",
-          "u",
-          "ul",
-        ],
-      })
-    : null;
 
 export const decodeSubtaskFields = (input: unknown): SubtaskFields => {
   try {
