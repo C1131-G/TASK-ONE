@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 import { ADMIN_STATE, EMPLOYEE_STATE } from "./auth-state";
+import { settleAnimations } from "./settle-animations";
 
 const THEMES = ["light", "dark"] as const;
 
@@ -67,6 +68,8 @@ const checkRoutes = async (page: Page, routes: readonly string[]) => {
     for (const width of [1024, 390]) {
       // oxlint-disable-next-line no-await-in-loop
       await page.setViewportSize({ height: 900, width });
+      // oxlint-disable-next-line no-await-in-loop
+      await settleAnimations(page);
       // oxlint-disable-next-line no-await-in-loop
       const result = await new AxeBuilder({ page })
         .withTags(WCAG_TAGS)

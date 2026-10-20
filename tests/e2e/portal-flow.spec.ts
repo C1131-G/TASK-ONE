@@ -13,6 +13,7 @@ import {
   HANDLER_TWO_STATE,
   PORTAL_ACCOUNTS,
 } from "./auth-state";
+import { settleAnimations } from "./settle-animations";
 
 // The plan's walkthrough, end to end: first sign-in, a report with a
 // screenshot, the pick race, an internal note, a needs-info round trip, a
@@ -36,6 +37,7 @@ let bugUrl = "";
 test.describe.configure({ mode: "serial" });
 
 const expectNoViolations = async (page: Page, where: string) => {
+  await settleAnimations(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   // Name the element and the measured values, so a failure says what to fix.
   const summary = results.violations.flatMap((violation) =>

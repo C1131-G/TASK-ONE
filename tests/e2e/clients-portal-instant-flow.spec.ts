@@ -18,6 +18,16 @@ const expectShellMarker = async (page: Page, path: string) => {
   await expect(marker.first()).toBeVisible();
 };
 
+// The portal frame paints before the session check, so an expired saved
+// login would still pass the lock and only then redirect to /login.
+test.beforeEach(async ({ page }) => {
+  const response = await page.request.get(`${BASE_URL}/api/auth/get-session`);
+  expect(
+    await response.json(),
+    "saved login expired; rerun the setup project"
+  ).not.toBeNull();
+});
+
 const guard = (shells: readonly Shell[]) => {
   for (const { loading, path } of shells) {
     test(`${path} frame and skeleton commit on initial load`, async ({

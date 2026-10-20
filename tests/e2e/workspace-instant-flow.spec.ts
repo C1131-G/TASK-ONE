@@ -2,6 +2,8 @@ import { instant } from "@next/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+import { settleAnimations } from "./settle-animations";
+
 const BASE_URL = process.env["E2E_BASE_URL"] ?? "http://localhost:3000";
 
 interface RouteShell {
@@ -260,6 +262,10 @@ for (const detail of DETAIL_ROUTES) {
       .filter(Boolean);
     const title = detailTitle(detail.list, lines);
     await expect(record).toBeVisible();
+    // The list page streams its header slots separately; a click during their
+    // reveal transition lands on the view-transition overlay, so let it settle.
+    await page.waitForLoadState("networkidle");
+    await settleAnimations(page);
 
     await instant(page, async () => {
       await record.click();

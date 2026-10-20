@@ -3,12 +3,15 @@ import { expect, test } from "@playwright/test";
 
 import { ADMIN_STATE, EMPLOYEE_STATE } from "./auth-state";
 
+// The topbar link reads "Notifications, 42 unread", or "Open notifications"
+// once nothing is unread.
 const unreadCount = async (page: Page): Promise<number> => {
   const label = await page
-    .getByRole("link", { name: /^Notifications, \d+ unread$/u })
+    .getByRole("link", {
+      name: /^(?:Notifications, \d+ unread|Open notifications)$/u,
+    })
     .first()
     .getAttribute("aria-label");
-  // The label reads "Notifications, 42 unread", so its only digits are the count.
   return Number((label ?? "").replaceAll(/\D/gu, "") || "0");
 };
 

@@ -113,8 +113,16 @@ const checkTrigger = async (
 const checkRoute = async (page: Page, route: string) => {
   await page.goto(route);
   await page.waitForLoadState("networkidle");
+  // Streamed sections replace their skeletons after network idle; collect the
+  // triggers only once every loading surface has resolved.
+  await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+  await expect
+    .poll(async () => {
+      const found = await findTriggers(page);
+      return found.length;
+    })
+    .toBeGreaterThan(0);
   const triggers = await findTriggers(page);
-  expect(triggers.length).toBeGreaterThan(0);
   const problems: string[] = [];
   for (const trigger of triggers) {
     // A clean page for each trigger, so one failure cannot affect the next.
