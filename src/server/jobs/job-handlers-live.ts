@@ -27,9 +27,20 @@ import {
   UNPICKED_REMINDER_JOB,
   remindUnpickedClientBug,
 } from "../work/bug-workflow-pick";
+import { DATA_RETENTION_JOB, purgeExpiredData } from "./data-retention";
 import { JobHandlers } from "./job-handlers";
+import type { JsonValue } from "./job-handlers";
 
 const EmptyPayloadSchema = Schema.Struct({});
+const decodeEmptyPayload = (payload: JsonValue, jobLabel: string) =>
+  Effect.try({
+    catch: () =>
+      new AppError({
+        code: "VALIDATION_FAILED",
+        message: `The ${jobLabel} job payload is invalid.`,
+      }),
+    try: () => Schema.decodeUnknownSync(EmptyPayloadSchema)(payload),
+  });
 const DailyDueSummaryPayloadSchema = Schema.Struct({
   scheduledAt: Schema.DateFromString,
 });
@@ -120,15 +131,14 @@ export const JobHandlersLive = Layer.effect(
     return JobHandlers.of({
       handle: (kind, payload) => {
         if (kind === "storage.cleanup-expired-uploads") {
-          return Effect.try({
-            catch: () =>
-              new AppError({
-                code: "VALIDATION_FAILED",
-                message: "The upload cleanup job payload is invalid.",
-              }),
-            try: () => Schema.decodeUnknownSync(EmptyPayloadSchema)(payload),
-          }).pipe(
+          return decodeEmptyPayload(payload, "upload cleanup").pipe(
             Effect.flatMap(() => uploads.cleanupExpiredUploads()),
+            Effect.asVoid
+          );
+        }
+        if (kind === DATA_RETENTION_JOB) {
+          return decodeEmptyPayload(payload, "data-retention").pipe(
+            Effect.flatMap(() => purgeExpiredData({ now: new Date() })),
             Effect.asVoid
           );
         }

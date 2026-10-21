@@ -141,16 +141,14 @@ export const setHandlers = (
         })
       )
     );
-    for (const handler of removed) {
-      // Sequential: each flagging pass reads bugs the previous one may touch.
-      // eslint-disable-next-line no-await-in-loop, react-doctor/async-await-in-loop
-      await flagHandlerBugsForReassignment(transaction, {
-        actorId,
-        companyId: company.id,
-        employeeId: handler.employeeId,
-        now,
-      });
-    }
+    // One pass for every removed handler, so a bug they shared is flagged
+    // and announced once.
+    await flagHandlerBugsForReassignment(transaction, {
+      actorId,
+      companyId: company.id,
+      employeeIds: removed.map(({ employeeId }) => employeeId),
+      now,
+    });
     await addActivity(transaction, actorId, "client_company.handlers_set", {
       added: added.length,
       companyId: company.id,

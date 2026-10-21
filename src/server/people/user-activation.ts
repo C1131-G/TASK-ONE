@@ -67,7 +67,7 @@ export const deactivateEmployee = (
         await flagHandlerBugsForReassignment(transaction, {
           actorId: administratorId,
           companyId: null,
-          employeeId,
+          employeeIds: [employeeId],
           now: new Date(),
         });
       });

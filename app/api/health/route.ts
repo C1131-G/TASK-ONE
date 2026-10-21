@@ -1,22 +1,13 @@
-import { Effect } from "effect";
+import { connection } from "next/server";
 
-import { db } from "@/src/prisma/db";
-import { runEffectResult } from "@/src/server/core/action-result";
+import { liveReadinessProbes } from "@/src/server/health/live-probes";
+import { readinessResponse } from "@/src/server/health/readiness";
 
-export const GET = async () => {
-  const result = await runEffectResult(
-    Effect.tryPromise({
-      catch: () => new Error("Database health check failed."),
-      try: () => db.orm.public.User.select("id").limit(1).all(),
-    })
-  );
-  const healthy = result.ok;
-
-  return Response.json(
-    { status: healthy ? "ok" : "unavailable" },
-    {
-      headers: { "cache-control": "no-store" },
-      status: healthy ? 200 : 503,
-    }
-  );
+// Readiness: the instance can serve traffic only while its database (and
+// private storage, when configured) answer. The Docker HEALTHCHECK uses this
+// path; `/api/health/ready` is the same check under an explicit name.
+export const GET = async (): Promise<Response> => {
+  // Never prerender a health answer at build time.
+  await connection();
+  return readinessResponse(liveReadinessProbes);
 };

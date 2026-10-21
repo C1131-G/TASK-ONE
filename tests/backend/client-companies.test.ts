@@ -304,6 +304,53 @@ it("flags a removed handler's open client bugs for reassignment and tells admins
   expect(recipients).not.toContain(personaId("admin"));
 });
 
+it("flags a bug shared by several removed handlers once, with one notice per admin", async () => {
+  const created = await createCompany("Shared handlers");
+  const handlers = [personaId("outsider"), personaId("owner")];
+  const withHandlers = await callAs(
+    "admin",
+    clients.setClientCompanyHandlersAction,
+    {
+      companyId: created.companyId,
+      employeeIds: handlers,
+      expectedVersion: created.version,
+      idempotencyKey: nextKey(),
+    }
+  );
+  if (!withHandlers.ok) {
+    throw new Error(withHandlers.error.message);
+  }
+  const bugId = await insertClientBug(created.companyId, personaId("outsider"));
+  await authPool.query(
+    'INSERT INTO task_assignee ("taskId", "userId", "assignedById") SELECT "taskId", $2, $2 FROM bug_report WHERE id = $1',
+    [bugId, personaId("owner")]
+  );
+
+  const removed = await callAs(
+    "admin",
+    clients.setClientCompanyHandlersAction,
+    {
+      companyId: created.companyId,
+      employeeIds: [],
+      expectedVersion: withHandlers.data.version,
+      idempotencyKey: nextKey(),
+    }
+  );
+
+  expect(removed).toMatchObject({ ok: true });
+  const notices = await authPool.query<{ userId: string; count: number }>(
+    'SELECT n."userId", count(*)::int AS count FROM notification n JOIN bug_report b ON b."taskId" = n."taskId" WHERE b.id = $1 AND n.type = \'client_bug\' GROUP BY n."userId"',
+    [bugId]
+  );
+  expect(notices.rows.length).toBeGreaterThan(0);
+  expect(notices.rows.every(({ count }) => count === 1)).toBe(true);
+  const bug = await authPool.query<{ needsReassignment: boolean }>(
+    'SELECT "needsReassignment" FROM bug_report WHERE id = $1',
+    [bugId]
+  );
+  expect(bug.rows[0]?.needsReassignment).toBe(true);
+});
+
 it("flags a deactivated employee's open client bugs", async () => {
   const created = await createCompany("Departing");
   const bugId = await insertClientBug(created.companyId, personaId("owner"));
@@ -314,7 +361,7 @@ it("flags a deactivated employee's open client bugs", async () => {
     flagHandlerBugsForReassignment(transaction, {
       actorId: personaId("admin"),
       companyId: null,
-      employeeId: personaId("owner"),
+      employeeIds: [personaId("owner")],
       now: new Date(),
     })
   );

@@ -5,6 +5,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { enqueueSlaSweep } from "../work/bug-sla-sweep";
+import { DATA_RETENTION_JOB } from "./data-retention";
 import type { DeadJobSummary } from "./processor-contracts";
 
 export const enqueueMaintenance = (
@@ -51,6 +52,18 @@ export const enqueueMaintenance = (
             id: crypto.randomUUID(),
             kind: "notifications.daily-due-summary",
             payload: { scheduledAt: scheduledAt.toISOString() },
+            updatedAt: scheduledAt,
+          },
+          update: { updatedAt: scheduledAt },
+        }),
+        db.orm.public.Job.upsert({
+          conflictOn: { dedupeKey: `${DATA_RETENTION_JOB}:${dayKey}` },
+          create: {
+            availableAt: scheduledAt,
+            dedupeKey: `${DATA_RETENTION_JOB}:${dayKey}`,
+            id: crypto.randomUUID(),
+            kind: DATA_RETENTION_JOB,
+            payload: {},
             updatedAt: scheduledAt,
           },
           update: { updatedAt: scheduledAt },

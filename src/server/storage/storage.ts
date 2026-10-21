@@ -3,6 +3,7 @@ import {
   CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadBucketCommand,
   HeadObjectCommand,
   paginateListObjectsV2,
   PutObjectCommand,
@@ -80,6 +81,21 @@ const createS3Client = (clientEndpoint?: string): S3Client =>
 const s3 = createS3Client(endpoint);
 const signingS3 =
   publicEndpoint === endpoint ? s3 : createS3Client(publicEndpoint);
+
+// The bucket name has a default, so storage counts as configured only when an
+// endpoint, credentials or an explicit bucket is set.
+export const isStorageConfigured = Boolean(
+  endpoint || accessKeyId || process.env["S3_BUCKET"]
+);
+
+/** Readiness probe: confirms the private bucket exists and is reachable. */
+export const probeStorageBucket = async (
+  signal: AbortSignal
+): Promise<void> => {
+  await s3.send(new HeadBucketCommand({ Bucket: bucket }), {
+    abortSignal: signal,
+  });
+};
 
 const encodeDispositionFileName = (fileName: string): string => {
   const sanitized = [...fileName]
