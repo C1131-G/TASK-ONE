@@ -26,6 +26,8 @@ model Task {
   uploadIntents UploadIntent[]
   bugReport BugReport?
   files FileAsset[]
+  timeEntries TimeEntry[]
+  timeTimers TimeTimer[]
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
   createdBy User    @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Restrict)

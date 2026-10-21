@@ -1,0 +1,23 @@
+// use prisma-8
+
+// Time a person logged on a task or bug: either typed in by hand or recorded
+// by stopping the running timer. Clients never read this table.
+model TimeEntry {
+  id        Uuid @id @default(uuid())
+  userId    String
+  taskId    Uuid
+  workDate  DateString
+  minutes   Int
+  note      String?
+  billable  Boolean @default(false)
+  createdAt TimestamptzJsDate @default(now())
+  updatedAt TimestamptzJsDate @default(now())
+
+  user User @relation("TimeEntryUser", fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@check(expression: "\"minutes\" > 0 AND \"minutes\" <= 1440", name: "time_entry_minutes_in_day")
+  @@index([userId, workDate])
+  @@index([taskId])
+  @@map("time_entry")
+}

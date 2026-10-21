@@ -1,0 +1,174 @@
+/* Time tracking: the task drawer section, My time and the project report. */
+.workspace-app .time-section-head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  justify-content: space-between;
+}
+.workspace-app .time-totals {
+  margin: 0;
+}
+.workspace-app .timer-control {
+  display: grid;
+  gap: var(--s-2);
+}
+.workspace-app .timer-running {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+}
+.workspace-app .timer-task {
+  flex: 1 1 160px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.workspace-app .timer-clock {
+  font-size: var(--fs-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.workspace-app .timer-start {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.workspace-app .timer-start > :first-child:not(button) {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.workspace-app .time-form {
+  align-items: end;
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.workspace-app .time-form-note,
+.workspace-app .time-form-actions {
+  grid-column: 1 / -1;
+}
+.workspace-app .time-form-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  justify-content: flex-end;
+}
+.workspace-app .time-billable {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--s-2);
+  margin-right: auto;
+}
+.workspace-app .time-entries {
+  display: grid;
+  gap: var(--s-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.workspace-app .time-entry {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+}
+.workspace-app .time-entry-minutes {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 56px;
+}
+.workspace-app .time-entry-body {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.workspace-app .time-entry-actions {
+  display: inline-flex;
+  gap: var(--s-1);
+}
+.workspace-app .my-time-weeks {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+.workspace-app .my-time-week-label {
+  font-size: var(--fs-md);
+  margin: 0;
+}
+.workspace-app .my-time-week-total {
+  margin: 0 0 0 auto;
+}
+.workspace-app .my-time-days {
+  display: grid;
+  gap: var(--s-2);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.workspace-app .my-time-day {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: grid;
+  gap: var(--s-1);
+  justify-items: center;
+  padding: var(--s-2);
+}
+.workspace-app .my-time-day[data-today] {
+  border-color: var(--text-2);
+}
+.workspace-app .time-range {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+.workspace-app .time-summary {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin: 0;
+}
+.workspace-app .time-summary > div {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: grid;
+  gap: var(--s-1);
+  padding: var(--s-3);
+}
+.workspace-app .time-summary dt {
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+}
+.workspace-app .time-summary dd {
+  font-size: var(--fs-xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin: 0;
+}
+.workspace-app .time-table {
+  table-layout: auto;
+}
+@media (max-width: 640px) {
+  .workspace-app .my-time-days {
+    gap: var(--s-1);
+  }
+  .workspace-app .my-time-week-total {
+    margin-left: 0;
+    width: 100%;
+  }
+  .workspace-app .time-entry {
+    flex-wrap: wrap;
+  }
+}
