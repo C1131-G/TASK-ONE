@@ -8,7 +8,7 @@ import type { FormEvent } from "react";
 import {
   confirmClientFixAction,
   reopenClientFixAction,
-} from "@/features/portal/portal-actions";
+} from "@/features/portal/portal-bug-actions";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
 
 import { FieldError, SatisfactionPicker } from "./portal-lifecycle-fields";

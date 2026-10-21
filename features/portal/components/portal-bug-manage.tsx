@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
-import { withdrawClientBugAction } from "@/features/portal/portal-actions";
+import { withdrawClientBugAction } from "@/features/portal/portal-bug-actions";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
 
 // Edit and withdraw controls for a bug that is still Submitted. The read-only

@@ -1,5 +1,5 @@
 /* dialogs render in a portal outside .workspace-app, so they are scoped to the
-   workspace dialog surface and use its literal palette */
+   workspace dialog surface and use its portal palette tokens (light and dark) */
 [data-slot="dialog-content"][data-workspace] .clients-dialog-body {
   display: grid;
   min-width: 0;
@@ -14,7 +14,7 @@
 }
 [data-slot="dialog-content"][data-workspace] .clients-dialog-body .muted {
   margin: 0;
-  color: #6b6760;
+  color: var(--workspace-portal-text-subtle);
   font-size: 12.5px;
 }
 [data-slot="dialog-content"][data-workspace] .clients-form-row {
@@ -24,18 +24,18 @@
 }
 [data-slot="dialog-content"][data-workspace] .clients-note {
   margin: 0;
-  border: 1px solid #e9e7e2;
+  border: 1px solid var(--workspace-portal-border);
   border-radius: 6px;
-  background: #f7f6f3;
+  background: var(--workspace-portal-sunken);
   padding: 8px 10px;
-  color: #57544e;
+  color: var(--workspace-portal-text-muted);
   font-size: 12.5px;
 }
 [data-slot="dialog-content"][data-workspace] .clients-checklist {
   display: grid;
   max-height: min(44dvh, 340px);
   margin: 0;
-  border: 1px solid #e9e7e2;
+  border: 1px solid var(--workspace-portal-border);
   border-radius: 6px;
   padding: 4px;
   overflow-y: auto;
@@ -51,7 +51,7 @@
   cursor: pointer;
 }
 [data-slot="dialog-content"][data-workspace] .clients-check-row:hover {
-  background: #f6f5f2;
+  background: var(--workspace-portal-muted);
 }
 [data-slot="dialog-content"][data-workspace] .clients-check-copy {
   display: grid;
@@ -64,7 +64,7 @@
 }
 [data-slot="dialog-content"][data-workspace] .clients-check-copy span {
   overflow: hidden;
-  color: #8a867e;
+  color: var(--workspace-portal-text-subtle);
   font-size: 11.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,31 +88,12 @@
   .temp-password-value {
   flex: 1;
   min-width: 0;
-  border: 1px solid #e9e7e2;
+  border: 1px solid var(--workspace-portal-border);
   border-radius: 6px;
-  background: #f7f6f3;
+  background: var(--workspace-portal-sunken);
   padding: 6px 10px;
   overflow-wrap: anywhere;
   user-select: all;
-}
-.dark [data-slot="dialog-content"][data-workspace] .clients-dialog-body .muted,
-.dark [data-slot="dialog-content"][data-workspace] .clients-note {
-  color: #b5b2ab;
-}
-.dark [data-slot="dialog-content"][data-workspace] .clients-note,
-.dark [data-slot="dialog-content"][data-workspace] .clients-checklist,
-.dark
-  [data-slot="dialog-content"][data-workspace]
-  .clients-dialog-body
-  .temp-password-value {
-  border-color: #2c2b29;
-  background: #1d1d1c;
-}
-.dark [data-slot="dialog-content"][data-workspace] .clients-check-row:hover {
-  background: #252524;
-}
-.dark [data-slot="dialog-content"][data-workspace] .clients-check-copy span {
-  color: #9a968f;
 }
 
 /* bugs summary */

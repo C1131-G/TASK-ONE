@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { PortalTime } from "@/features/portal/components/portal-time";
-import { addClientCommentAction } from "@/features/portal/portal-actions";
+import { addClientCommentAction } from "@/features/portal/portal-bug-actions";
 import type { PortalComment } from "@/src/server/portal/portal-contracts";
 
 const BODY_MAX = 10_000;

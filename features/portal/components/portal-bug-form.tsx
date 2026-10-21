@@ -32,7 +32,7 @@ import { PortalFilePicker } from "@/features/portal/components/portal-file-picke
 import {
   editClientBugAction,
   submitClientBugAction,
-} from "@/features/portal/portal-actions";
+} from "@/features/portal/portal-bug-actions";
 import {
   environmentServerSnapshot,
   environmentSnapshot,

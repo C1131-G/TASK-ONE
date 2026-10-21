@@ -16,9 +16,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .workspace-app:not([data-motion="reduce"]) .topbar,
+  .workspace-app .topbar,
   :root:not([data-workspace-revealed])
-    .workspace-app:not([data-motion="reduce"])
+    .workspace-app
     :is(
       .shell > .side .side-top,
       .shell > .side .sitem,

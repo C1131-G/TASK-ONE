@@ -17,10 +17,11 @@ import {
   teardownHarness,
 } from "./support/action-harness";
 
-const portal = await import("../../features/portal/portal-actions");
-const portalUploads = await import("../../features/portal/portal-actions");
+const portal = await import("../../features/portal/portal-bug-actions");
+const portalUploads =
+  await import("../../features/portal/portal-upload-actions");
 const portalNotifications =
-  await import("../../features/portal/portal-actions");
+  await import("../../features/portal/portal-notification-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
 const comments = await import("../../features/tasks/actions/tasks-comments");
 

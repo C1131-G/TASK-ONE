@@ -45,7 +45,6 @@ import "./auth-onboarding.css";
 import "./design-system-page.css";
 import "./motion.css";
 import "./reveal.css";
-import "./motion-reduced.css";
 import "./responsive-wide.css";
 import "./responsive-phone.css";
 import "./responsive-phone-tasks.css";

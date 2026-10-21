@@ -2,7 +2,7 @@ import { putWithProgress } from "@/features/files/upload-transport";
 import {
   finalizePortalUploadAction,
   requestPortalUploadAction,
-} from "@/features/portal/portal-actions";
+} from "@/features/portal/portal-upload-actions";
 
 export type PortalUploadResult =
   | { readonly ok: true }

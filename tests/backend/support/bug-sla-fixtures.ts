@@ -14,7 +14,8 @@ import {
   teardownHarness,
 } from "./action-harness";
 
-export const portal = await import("../../../features/portal/portal-actions");
+export const portal =
+  await import("../../../features/portal/portal-bug-actions");
 export const portalQueries =
   await import("../../../features/portal/portal-queries");
 export const bugActions = await import("../../../features/bugs/bugs-actions");

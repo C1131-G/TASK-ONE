@@ -10,6 +10,8 @@
   --workspace-portal-input: #dad7d0;
   --workspace-portal-text: #1d1c1a;
   --workspace-portal-text-muted: #57544e;
+  --workspace-portal-text-subtle: #6b6760;
+  --workspace-portal-sunken: #f7f6f3;
   --workspace-portal-accent: #4b5bd6;
   --workspace-portal-on-accent: #ffffff;
   --workspace-portal-danger: #b23c30;
@@ -23,6 +25,8 @@
   --workspace-portal-input: #41403d;
   --workspace-portal-text: #eceae5;
   --workspace-portal-text-muted: #b2aea5;
+  --workspace-portal-text-subtle: #9a968f;
+  --workspace-portal-sunken: #1d1d1c;
   --workspace-portal-accent: #8e9af3;
   --workspace-portal-on-accent: #12131c;
   --workspace-portal-danger: #e57d70;
@@ -86,6 +90,7 @@
   --r-sm: 6px;
   --r: 8px;
   --r-lg: 10px;
+  --r-xl: 12px;
   --r-full: 999px;
   /* spacing (4pt scale) */
   --s-1: 4px;
@@ -111,6 +116,13 @@
   --fs-lg: 16px;
   --fs-xl: 19px;
   --fs-2xl: 23px;
+  --lh-tight: 1.25;
+  --lh-body: 1.5;
+  /* breakpoints: custom properties cannot appear in @media, so these name the
+     widths the media queries use. Keep new queries on these values. */
+  --bp-phone: 640px;
+  --bp-tablet: 900px;
+  --bp-wide: 1100px;
   /* component sizes */
   --h-xs: 22px;
   --h-sm: 26px;

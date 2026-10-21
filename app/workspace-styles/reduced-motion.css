@@ -1,11 +1,5 @@
-@media (prefers-reduced-motion: reduce) {
-  .dark .workspace-app {
-    --reduce: 1;
-  }
-}
-.workspace-app[data-motion="reduce"] {
-  --reduce: 1;
-}
+/* Reduced motion: swap movement for a short fade and drop decorative
+   transitions. Imported after every file that defines the motion it tames. */
 @keyframes fadeOnly {
   from {
     opacity: 0;
@@ -14,17 +8,22 @@
     opacity: 1;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .workspace-app .modal,
   .workspace-app .drawer,
   .workspace-app .pop,
-  .workspace-app .toast,
-  .workspace-app .bulkbar,
-  .workspace-app .tab.on::after {
+  .workspace-app .toast {
     animation-name: fadeOnly !important;
     animation-duration: 0.12s !important;
   }
-  .workspace-app .btn:active:not(:disabled) {
+  .workspace-app .drawer.enter .drawer-b > * {
+    animation: fadeOnly 0.12s both !important;
+  }
+  .workspace-app .btn:active:not(:disabled),
+  .workspace-app .check:active,
+  .workspace-app .pcard:hover,
+  .workspace-app .kcard:hover {
     transform: none;
   }
   .workspace-app .prog > i,
@@ -37,24 +36,4 @@
     animation: none;
     opacity: 0.85;
   }
-}
-.workspace-app[data-motion="reduce"] .modal,
-.workspace-app[data-motion="reduce"] .drawer,
-.workspace-app[data-motion="reduce"] .pop,
-.workspace-app[data-motion="reduce"] .toast,
-.workspace-app[data-motion="reduce"] .bulkbar,
-.workspace-app[data-motion="reduce"] .tab.on::after {
-  animation-name: fadeOnly !important;
-  animation-duration: 0.12s !important;
-}
-.workspace-app[data-motion="reduce"] .btn:active:not(:disabled) {
-  transform: none;
-}
-.workspace-app[data-motion="reduce"] .prog > i,
-.workspace-app[data-motion="reduce"] .toggle::after {
-  transition: none;
-}
-.workspace-app[data-motion="reduce"] .sk {
-  animation: none;
-  opacity: 0.85;
 }

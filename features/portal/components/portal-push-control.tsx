@@ -7,7 +7,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   registerPortalPushAction,
   removePortalPushAction,
-} from "@/features/portal/portal-actions";
+} from "@/features/portal/portal-push-actions";
 
 const decodeApplicationServerKey = (encoded: string): ArrayBuffer => {
   const padding = "=".repeat((4 - (encoded.length % 4)) % 4);

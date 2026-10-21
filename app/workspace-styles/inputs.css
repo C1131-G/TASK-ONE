@@ -285,23 +285,10 @@
   border-radius: 2px;
   background: var(--text);
 }
-.workspace-app .fx-tabs .tab.on::after {
-  animation: tabIn 0.26s var(--ease);
-}
 .workspace-app .tab .cnt {
   font-size: var(--fs-2xs);
   color: var(--text-3);
   font-weight: 500;
-}
-@keyframes tabIn {
-  from {
-    transform: scaleX(0.4);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
 }
 
 /* Tab strips that slide their underline render it as an element (see
