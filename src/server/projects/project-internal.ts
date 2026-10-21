@@ -77,6 +77,7 @@ export const toSummary = (
     | "status"
     | "version"
     | "archivedAt"
+    | "clientVisible"
     | "color"
     | "dueDate"
     | "icon"
@@ -86,6 +87,7 @@ export const toSummary = (
   >
 ): ProjectSummary => ({
   archivedAt: project.archivedAt?.toISOString() ?? null,
+  clientVisible: project.clientVisible,
   color: project.color,
   description: project.description,
   dueDate: project.dueDate,

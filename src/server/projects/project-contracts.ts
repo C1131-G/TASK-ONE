@@ -58,6 +58,7 @@ export const ProjectStatusSchema = Schema.Literals([
 
 export const ProjectSummarySchema = Schema.Struct({
   archivedAt: Schema.NullOr(Schema.String),
+  clientVisible: Schema.Boolean,
   color: Schema.String,
   description: Schema.NullOr(Schema.String),
   dueDate: Schema.NullOr(Schema.String),
@@ -102,6 +103,13 @@ export const ProjectMilestonesResultSchema = Schema.Struct({
   version: Schema.Number,
 });
 
+export const ProjectClientVisibilitySchema = Schema.Struct({
+  clientVisible: Schema.Boolean,
+  id: Schema.String,
+  version: Schema.Number,
+});
+export type ProjectClientVisibility = typeof ProjectClientVisibilitySchema.Type;
+
 export interface ProjectSummary {
   readonly id: string;
   readonly key: string;
@@ -110,6 +118,7 @@ export interface ProjectSummary {
   readonly status: CreateProjectInput["status"];
   readonly version: number;
   readonly archivedAt: string | null;
+  readonly clientVisible: boolean;
   readonly color: string;
   readonly dueDate: string | null;
   readonly icon: string;
@@ -192,6 +201,12 @@ export class ProjectManagement extends Context.Service<
       projectId: string,
       expectedVersion: number
     ) => Effect.Effect<ProjectSummary, AppError>;
+    readonly setProjectClientVisibility: (
+      actorId: string,
+      projectId: string,
+      expectedVersion: number,
+      visible: boolean
+    ) => Effect.Effect<ProjectClientVisibility, AppError>;
     readonly setProjectPeople: (
       actorId: string,
       projectId: string,

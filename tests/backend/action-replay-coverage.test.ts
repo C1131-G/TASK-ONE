@@ -86,6 +86,8 @@ const replayedMutations = new Set([
   "setEmailDigestAction",
   "setNotificationPreferenceAction",
   "setProjectPeopleAction",
+  "setProjectClientVisibilityAction",
+  "setTaskClientVisibilityAction",
   "setTaskRecurrenceAction",
   "setTaskRelationsAction",
   "toggleCommentReactionAction",

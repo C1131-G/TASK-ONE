@@ -21,6 +21,7 @@ import {
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { ProjectAdminControls } from "@/features/projects/components/project-admin-controls";
+import { ProjectClientVisibility } from "@/features/projects/components/project-client-visibility";
 import { ProjectIcon } from "@/features/projects/components/project-icon";
 import { ProjectMemberAvatars } from "@/features/projects/components/project-list-layouts";
 import { ProjectSavedViews } from "@/features/projects/components/project-saved-views";
@@ -73,11 +74,18 @@ const ProjectHeader = async ({
           />
         ) : null}
         {isAdmin ? (
-          <ProjectAdminControls
-            employees={employees}
-            project={project}
-            teams={teams}
-          />
+          <>
+            <ProjectAdminControls
+              employees={employees}
+              project={project}
+              teams={teams}
+            />
+            <ProjectClientVisibility
+              clientVisible={project.clientVisible}
+              projectId={project.id}
+              version={project.version}
+            />
+          </>
         ) : null}
       </div>
       <ProjectViewTabs projectId={project.id} selected={view} />

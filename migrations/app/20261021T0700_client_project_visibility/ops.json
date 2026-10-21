@@ -1,0 +1,86 @@
+[
+  {
+    "id": "column.public.project.clientVisible",
+    "label": "Add column \"clientVisible\" to \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientVisible",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientVisible\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "project",
+          "clientVisible"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientVisible\"",
+        "sql": "ALTER TABLE \"public\".\"project\" ADD COLUMN \"clientVisible\" bool DEFAULT false NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientVisible\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "project",
+          "clientVisible"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.task.clientVisible",
+    "label": "Add column \"clientVisible\" to \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientVisible",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientVisible\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "task",
+          "clientVisible"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientVisible\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD COLUMN \"clientVisible\" bool DEFAULT false NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientVisible\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "task",
+          "clientVisible"
+        ]
+      }
+    ]
+  }
+]

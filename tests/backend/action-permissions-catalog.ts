@@ -31,6 +31,7 @@ export const adminOnlyNames: readonly string[] = [
   "createProjectAction",
   "duplicateProjectAction",
   "updateProjectAction",
+  "setProjectClientVisibilityAction",
   "archiveProjectAction",
   "restoreProjectAction",
   "setProjectPeopleAction",

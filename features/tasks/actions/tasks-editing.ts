@@ -16,6 +16,7 @@ import {
 } from "@/src/server/core/server-action";
 import {
   CreatedTaskSchema,
+  TaskClientVisibilitySchema,
   TaskVersionResultSchema,
   WorkManagement,
   WorkManagementLive,
@@ -231,6 +232,57 @@ export async function rescheduleTaskAction(input: unknown) {
     revalidatePath("/timeline");
     revalidatePath("/my-tasks");
     revalidatePath("/tasks");
+    refresh();
+  }
+  return result;
+}
+
+// Marks one task as shown (or not) in the client portal's project view. It
+// changes nothing else, so it needs no title, assignee or status.
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function setTaskClientVisibilityAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    Schema.Struct({
+      expectedVersion: Schema.Number,
+      idempotencyKey: IdempotencyKeySchema,
+      taskId: UUIDSchema,
+      visible: Schema.Boolean,
+    }),
+    (validated) =>
+      Effect.gen(function* setTaskClientVisibility() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const work = yield* WorkManagement;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...visibility } = validated;
+        return yield* idempotency.run({
+          actorId: actor.id,
+          execute: () =>
+            work.setTaskClientVisibility(
+              actor.id,
+              visibility.taskId,
+              visibility.expectedVersion,
+              visibility.visible
+            ),
+          input: visibility,
+          key: idempotencyKey,
+          operation: "task.setClientVisibility",
+          resultSchema: TaskClientVisibilitySchema,
+        });
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(WorkManagementLive),
+        Effect.provide(IdempotencyLive)
+      ),
+    undefined,
+    ServerActionOutputSchema
+  );
+  if (result.ok) {
+    revalidatePath("/tasks");
+    revalidatePath("/my-tasks");
     refresh();
   }
   return result;

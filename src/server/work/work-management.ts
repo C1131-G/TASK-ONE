@@ -3,6 +3,7 @@ import { Layer } from "effect";
 import { WorkManagement } from "./work-contracts";
 import { archiveTask, undoTaskArchive } from "./work-task-archive";
 import { bulkUpdateTasks } from "./work-task-bulk";
+import { setTaskClientVisibility } from "./work-task-client-visibility";
 import { undoTaskCompletion, restoreTask } from "./work-task-completion";
 import { createTask } from "./work-task-creation";
 import { duplicateTask } from "./work-task-duplicate";
@@ -17,6 +18,7 @@ export {
   CreatedTaskSchema,
   ProjectTaskListItemSchema,
   TaskArchiveUndoReceiptSchema,
+  TaskClientVisibilitySchema,
   TaskRecurrenceInputSchema,
   TaskVersionResultSchema,
   UpdateTaskInputSchema,
@@ -46,6 +48,7 @@ export const WorkManagementLive = Layer.succeed(
     moveTask,
     rescheduleTask,
     restoreTask,
+    setTaskClientVisibility,
     setTaskRecurrence,
     undoTaskArchive,
     undoTaskCompletion,

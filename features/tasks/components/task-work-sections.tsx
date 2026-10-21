@@ -4,6 +4,7 @@
 
 import type { ComponentProps } from "react";
 
+import { TaskClientVisibility } from "@/features/tasks/components/task-client-visibility";
 import {
   TaskDetailsForm,
   TaskDetailsFormSkeleton,
@@ -90,6 +91,14 @@ export const TaskWorkSections = ({
       />
       {task ? (
         <>
+          <TaskClientVisibility
+            clientVisible={task.clientVisible ?? false}
+            editable={editable}
+            onReload={onReload}
+            onVersionChange={onVersionChange}
+            taskId={taskId}
+            version={version}
+          />
           <TaskRelationsEditor
             dependencyIds={task.dependencyIds}
             editable={editable}

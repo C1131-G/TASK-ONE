@@ -28,6 +28,7 @@ import {
   changeTaskColumnAction as changeTaskColumnImpl,
   createTaskAction as createTaskImpl,
   rescheduleTaskAction as rescheduleTaskImpl,
+  setTaskClientVisibilityAction as setTaskClientVisibilityImpl,
   updateTaskAction as updateTaskImpl,
 } from "./actions/tasks-editing";
 import {
@@ -97,6 +98,10 @@ export async function changeTaskColumnAction(input: unknown) {
 
 export async function rescheduleTaskAction(input: unknown) {
   return await rescheduleTaskImpl(input);
+}
+
+export async function setTaskClientVisibilityAction(input: unknown) {
+  return await setTaskClientVisibilityImpl(input);
 }
 
 export async function setTaskRecurrenceAction(input: unknown) {

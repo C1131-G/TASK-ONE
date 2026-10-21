@@ -15,11 +15,18 @@ import type {
   PortalActor,
   PortalBugs,
 } from "@/src/server/portal/portal-contracts";
+import type { PortalProjects } from "@/src/server/portal/portal-project-contracts";
+import { PortalProjectsLive } from "@/src/server/portal/portal-projects";
 import { StorageLive } from "@/src/server/storage/storage";
 import { UploadsLive } from "@/src/server/storage/uploads";
 import type { Uploads } from "@/src/server/storage/uploads-contracts";
 
-export type PortalServices = PortalBugs | Idempotency | Notifications | Uploads;
+export type PortalServices =
+  | PortalBugs
+  | PortalProjects
+  | Idempotency
+  | Notifications
+  | Uploads;
 
 export const toPortalActor = (user: PortalUser): PortalActor => ({
   clientCompanyId: user.clientCompanyId,
@@ -55,6 +62,7 @@ export const runPortalAction = <
           : sessions.requirePortalAccess(requestHeaders);
         return yield* execute(user, validated).pipe(
           Effect.provide(PortalBugsLive),
+          Effect.provide(PortalProjectsLive),
           Effect.provide(NotificationsLive),
           Effect.provide(Layer.provide(UploadsLive, StorageLive)),
           Effect.provide(IdempotencyLive)

@@ -37,6 +37,19 @@ const bugFields = () => ({
 
 const portalActions: readonly ActionEntry[] = [
   entry("listPortalProjects", portalQueries.listPortalProjects, () => ({})),
+  entry(
+    "listPortalSharedProjects",
+    portalQueries.listPortalSharedProjects,
+    () => ({})
+  ),
+  entry("getPortalSharedProject", portalQueries.getPortalSharedProject, () => ({
+    projectId: ids.projectId,
+  })),
+  entry(
+    "getPortalSharedProjectById",
+    async () => await portalQueries.getPortalSharedProjectById(ids.random),
+    () => ({})
+  ),
   entry("listPortalBugs", portalQueries.listPortalBugs, () => ({})),
   entry("getPortalBug", portalQueries.getPortalBug, bug),
   entry(
@@ -175,6 +188,7 @@ it("covers every portal action and query", () => {
     // Unwraps getPortalBugById for the page and renders not-found instead of
     // returning a result; getPortalBugById is checked above.
     "getPortalBugRecord",
+    "getPortalSharedProjectRecord",
   ]);
   expect(exported.filter((name) => !covered.has(name))).toEqual([]);
 });
