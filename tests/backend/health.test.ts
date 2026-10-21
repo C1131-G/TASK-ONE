@@ -10,6 +10,8 @@ process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 
 const passing = () => Promise.resolve();
+const SLOW_PROBE_MS = 200;
+const slow = () => Bun.sleep(SLOW_PROBE_MS);
 const SECRET_DETAIL = "password authentication failed for user metsys";
 
 it("reports liveness without touching any dependency", async () => {
@@ -98,4 +100,48 @@ it("fails a dependency that does not answer within the timeout", async () => {
   });
   expect(aborted).toBe(true);
   expect(Date.now() - startedAt).toBeLessThan(1000);
+});
+
+it("is unavailable when only storage fails", async () => {
+  const response = await readinessResponse({
+    database: passing,
+    storage: () => Promise.reject(new Error(SECRET_DETAIL)),
+  });
+  const body = await response.text();
+
+  expect(response.status).toBe(503);
+  expect(response.headers.get("cache-control")).toBe("no-store");
+  expect(JSON.parse(body)).toEqual({
+    checks: { database: "ok", storage: "unavailable" },
+    status: "unavailable",
+  });
+  expect(body).not.toContain(SECRET_DETAIL);
+});
+
+it("reports every failing dependency when several are down", async () => {
+  const response = await readinessResponse({
+    database: () => Promise.reject(new Error(SECRET_DETAIL)),
+    storage: () => Promise.reject(new Error(SECRET_DETAIL)),
+  });
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({
+    checks: { database: "unavailable", storage: "unavailable" },
+    status: "unavailable",
+  });
+});
+
+it("probes dependencies concurrently so slow checks do not stack", async () => {
+  const startedAt = Date.now();
+  const response = await readinessResponse({ database: slow, storage: slow });
+
+  expect(response.status).toBe(200);
+  expect(Date.now() - startedAt).toBeLessThan(380);
+});
+
+it("keeps liveness answering 200 on repeated calls", async () => {
+  const { GET } = await import("../../app/api/health/live/route");
+  const responses = await Promise.all([GET(), GET(), GET()]);
+
+  expect(responses.map(({ status }) => status)).toEqual([200, 200, 200]);
 });
