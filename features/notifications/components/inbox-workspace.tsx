@@ -2,9 +2,9 @@
 
 "use client";
 
-import { Bell, Check, EnvelopeOpen } from "@phosphor-icons/react";
+import { Bell, Check, EnvelopeOpen, Tray } from "@phosphor-icons/react";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -16,8 +16,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/workspace/empty-state";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { InboxDetailContent } from "@/features/notifications/components/inbox-detail-content";
+import { useInboxReadState } from "@/features/notifications/hooks/use-inbox-read-state";
 import {
   DATE_FORMATTER,
   FILTERS,
@@ -25,10 +27,6 @@ import {
   getInitials,
   typeMatchesFilter,
 } from "@/features/notifications/inbox-format";
-import {
-  markAllNotificationsReadAction,
-  markNotificationReadAction,
-} from "@/features/notifications/notifications-actions";
 import type { NotificationItem } from "@/src/server/notifications/contracts";
 
 const updateUrl = (key: string, value: string | null) => {
@@ -54,16 +52,16 @@ export const InboxWorkspace = ({
   const unreadOnly = searchParams.get("unread") === "1";
   const selectedId = searchParams.get("notification") ?? items[0]?.id ?? null;
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const { error, markAllRead, markRead, pending, shownItems, shownUnread } =
+    useInboxReadState(items, unreadCount);
   const visibleItems = useMemo(
     () =>
-      items.filter(
+      shownItems.filter(
         (notification) =>
           typeMatchesFilter(notification.type, filter) &&
           (!unreadOnly || notification.readAt === null)
       ),
-    [filter, items, unreadOnly]
+    [filter, shownItems, unreadOnly]
   );
   const selectedItem = visibleItems.find(({ id }) => id === selectedId) ?? null;
   const counts = useMemo(
@@ -78,31 +76,6 @@ export const InboxWorkspace = ({
       ),
     [items]
   );
-
-  const markRead = (notificationId: string) =>
-    startTransition(async () => {
-      const result = await markNotificationReadAction({
-        idempotencyKey: crypto.randomUUID(),
-        notificationId,
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-      setError(null);
-    });
-
-  const markAllRead = () =>
-    startTransition(async () => {
-      const result = await markAllNotificationsReadAction({
-        idempotencyKey: crypto.randomUUID(),
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-      setError(null);
-    });
 
   const selectNotification = (notificationId: string) => {
     updateUrl("notification", notificationId);
@@ -129,7 +102,7 @@ export const InboxWorkspace = ({
               />
               Unread
             </label>
-            {unreadCount > 0 ? (
+            {shownUnread > 0 ? (
               <WorkspaceButton
                 aria-label="Mark all as read"
                 className="inbox-mark-all"
@@ -247,9 +220,25 @@ export const InboxWorkspace = ({
             })}
           </ul>
         ) : (
-          <div className="panel-b muted inbox-empty">
-            No notifications match this filter.
-          </div>
+          <EmptyState
+            action={
+              filter !== "all" || unreadOnly ? (
+                <WorkspaceButton
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    updateUrl("type", null);
+                    updateUrl("unread", null);
+                  }}
+                  type="button"
+                >
+                  Clear filters
+                </WorkspaceButton>
+              ) : null
+            }
+            description="New mentions, assignments and updates land here."
+            icon={Tray}
+            title="No notifications match this filter"
+          />
         )}
       </div>
       <aside aria-label="Selected notification" className="panel inbox-detail">

@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import {
   WorkspaceSelect,
@@ -37,13 +37,17 @@ const TaskStatusSelect = ({
   const { addUndo } = useWorkspaceUndo();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // The select shows the new status at once; the action's refresh brings the
+  // saved status, and a refused change falls back to it with the error shown.
+  const [shownStatus, setShownStatus] = useOptimistic(status);
 
   const changeStatus = (nextStatus: TaskStatus) => {
-    if (pending || nextStatus === status) {
+    if (pending || nextStatus === shownStatus) {
       return;
     }
     setError(null);
     startTransition(async () => {
+      setShownStatus(nextStatus);
       const result = await changeTaskColumnAction({
         expectedVersion: version,
         idempotencyKey: crypto.randomUUID(),
@@ -90,8 +94,8 @@ const TaskStatusSelect = ({
               changeStatus(selectedStatus);
             }
           }}
-          status={status}
-          value={status}
+          status={shownStatus}
+          value={shownStatus}
         >
           {statuses.map(([value, label]) => (
             <WorkspaceSelectItem key={value} value={value}>

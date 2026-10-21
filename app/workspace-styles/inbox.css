@@ -224,7 +224,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.workspace-app .inbox-empty {
+.workspace-app .inbox-list-panel > .empty-state {
   margin: auto 0;
-  padding: 24px;
 }
