@@ -56,6 +56,7 @@ const retentionFields = {
   RETENTION_COMPLETED_JOB_DAYS: retentionDays,
   RETENTION_DEAD_JOB_DAYS: retentionDays,
   RETENTION_PUSH_DELIVERY_DAYS: retentionDays,
+  RETENTION_WEBHOOK_DELIVERY_DAYS: retentionDays,
 };
 
 const emailFields = {
@@ -88,6 +89,7 @@ const serverFields = {
   VAPID_SUBJECT: Schema.optional(
     urlString(["mailto:", "https:"], "Expected a mailto: or https: URL")
   ),
+  WEBHOOK_ENCRYPTION_KEY: Schema.optional(secretString),
   WEB_PUSH_ALLOWED_HOSTS: Schema.optional(Schema.String),
 };
 

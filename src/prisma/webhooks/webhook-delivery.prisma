@@ -1,0 +1,26 @@
+// use prisma-8
+
+// One attempt series to deliver one event to one endpoint. The unique pair
+// makes a retried or duplicated enqueue create the delivery at most once.
+model WebhookDelivery {
+  id Uuid @id @default(uuid())
+  endpointId Uuid
+  eventId Uuid
+  eventType String
+  payload Json
+  status String @default("pending")
+  attempts Int @default(0)
+  responseCode Int?
+  responseBody String?
+  lastError String?
+  createdAt TimestamptzJsDate @default(now())
+  updatedAt TimestamptzJsDate @default(now())
+  deliveredAt TimestamptzJsDate?
+
+  endpoint WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@unique([endpointId, eventId])
+  @@index([endpointId, createdAt])
+  @@index([createdAt])
+  @@map("webhook_delivery")
+}

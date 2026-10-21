@@ -216,6 +216,7 @@ it("is idempotent when the purge runs again", async () => {
     rateLimits: 0,
     sessions: 0,
     verifications: 0,
+    webhookDeliveries: 0,
   });
 });
 

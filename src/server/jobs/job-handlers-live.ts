@@ -21,6 +21,9 @@ import { Notifications, NotificationsLive } from "../notifications/service";
 import { Storage } from "../storage/storage";
 import { UploadsLive } from "../storage/uploads";
 import { Uploads } from "../storage/uploads-contracts";
+import { WEBHOOK_DELIVERY_JOB } from "../webhooks/webhook-contracts";
+import { deliverWebhook, liveDeliveryDeps } from "../webhooks/webhook-delivery";
+import { decodeWebhookJob } from "../webhooks/webhook-job";
 import { SLA_SWEEP_JOB } from "../work/bug-sla";
 import { runSlaSweep } from "../work/bug-sla-sweep";
 import {
@@ -306,6 +309,13 @@ export const JobHandlersLive = Layer.effect(
           }).pipe(
             Effect.flatMap(({ scheduledAt }) => email.sendDigests(scheduledAt)),
             Effect.asVoid
+          );
+        }
+        if (kind === WEBHOOK_DELIVERY_JOB) {
+          return decodeWebhookJob(payload).pipe(
+            Effect.flatMap(({ deliveryId }) =>
+              deliverWebhook(deliveryId, liveDeliveryDeps())
+            )
           );
         }
         if (kind === "notifications.daily-due-summary") {

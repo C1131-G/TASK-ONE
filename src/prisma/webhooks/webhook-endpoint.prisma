@@ -1,0 +1,23 @@
+// use prisma-8
+
+// An admin-managed destination for outgoing event notifications. Generic
+// endpoints are signed with a per-endpoint secret, kept encrypted because
+// signing needs the raw value. Slack endpoints carry no secret.
+model WebhookEndpoint {
+  id Uuid @id @default(uuid())
+  name String
+  kind String
+  url String
+  events String[] @default([])
+  enabled Boolean @default(true)
+  secretCiphertext String?
+  secretHint String?
+  createdById String
+  createdAt TimestamptzJsDate @default(now())
+  updatedAt TimestamptzJsDate @default(now())
+
+  deliveries WebhookDelivery[]
+
+  @@index([enabled])
+  @@map("webhook_endpoint")
+}

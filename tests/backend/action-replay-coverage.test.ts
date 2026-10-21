@@ -20,10 +20,16 @@ const excludedByDesign = new Set([
   "revokeCalendarFeedAction",
   // A replay would store the one-time secret in the idempotency table.
   "rotateCalendarFeedAction",
+  // Returns the one-time signing secret, like the calendar feed rotation.
+  "createWebhookEndpointAction",
+  "rotateWebhookSecretAction",
   // Clearing a lockout is naturally idempotent; a repeat records nothing.
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "redeliverWebhookAction",
+  "removeWebhookEndpointAction",
+  "updateWebhookEndpointAction",
   "addTimeEntryAction",
   "deleteTimeEntryAction",
   "startTimerAction",

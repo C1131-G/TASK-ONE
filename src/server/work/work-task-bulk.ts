@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { enqueueTaskChange } from "../webhooks/webhook-task-event";
 import type {
   BulkTaskChanges,
   BulkTaskTarget,
@@ -182,6 +183,17 @@ const finishBulkTaskUpdate = async (
   });
   const completionTransition =
     task.status !== "done" && changes.status === "done";
+  await enqueueTaskChange(transaction, {
+    dueDate: updated.dueDate,
+    id: task.id,
+    now,
+    previousStatus: task.status,
+    priority: updated.priority,
+    projectId: task.projectId,
+    projectTaskNumber: task.projectTaskNumber,
+    status: updated.status,
+    title: task.title,
+  });
   const successorId = completionTransition
     ? await createRecurrenceSuccessor(
         transaction,

@@ -4,6 +4,7 @@ import { Schema } from "effect";
 
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
+import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import { BugWorkflowStatusSchema } from "./bug-contracts";
 import { slaOnStatusChange } from "./bug-sla";
 import type { Transaction } from "./work-internal";
@@ -249,6 +250,16 @@ export const updateBugStatus = async (
     now: input.now,
     projectId: input.bug.projectId,
     taskId: input.bug.taskId,
+  });
+  await enqueueWebhookEvent(transaction, "bug.status_changed", {
+    data: {
+      bugId: input.bug.id,
+      from: input.bug.status,
+      projectId: input.bug.projectId,
+      taskId: input.bug.taskId,
+      to: input.nextStatus,
+    },
+    now: input.now,
   });
   return Schema.decodeUnknownSync(BugWorkflowReceiptSchema)({
     bugId: input.bug.id,
