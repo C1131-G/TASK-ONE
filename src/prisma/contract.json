@@ -80,6 +80,14 @@
       "model": "CompanySettings",
       "namespace": "public"
     },
+    "email_delivery": {
+      "model": "EmailDelivery",
+      "namespace": "public"
+    },
+    "email_setting": {
+      "model": "EmailSetting",
+      "namespace": "public"
+    },
     "favorite_project": {
       "model": "FavoriteProject",
       "namespace": "public"
@@ -3856,6 +3864,142 @@
               },
               "namespaceId": "public",
               "table": "company_settings"
+            }
+          },
+          "EmailDelivery": {
+            "fields": {
+              "dedupeKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "sentAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "dedupeKey": {
+                  "column": "dedupeKey"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "sentAt": {
+                  "column": "sentAt"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "email_delivery"
+            }
+          },
+          "EmailSetting": {
+            "fields": {
+              "digest": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastDigestAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "digest": {
+                  "column": "digest"
+                },
+                "lastDigestAt": {
+                  "column": "lastDigestAt"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "email_setting"
             }
           },
           "FavoriteProject": {
@@ -7724,6 +7868,37 @@
                   "namespace": "public"
                 }
               },
+              "emailDeliveries": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "EmailDelivery",
+                  "namespace": "public"
+                }
+              },
+              "emailSetting": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "EmailSetting",
+                  "namespace": "public"
+                }
+              },
               "idempotencyKeys": {
                 "cardinality": "1:N",
                 "on": {
@@ -11313,6 +11488,150 @@
                   ]
                 }
               ]
+            },
+            "email_delivery": {
+              "columns": {
+                "dedupeKey": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "sentAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "email_delivery"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "sentAt"
+                  ],
+                  "name": "email_delivery_sentAt_idx_143b1b4c",
+                  "prefix": "email_delivery_sentAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "email_delivery_userId_idx_a489d58a",
+                  "prefix": "email_delivery_userId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId",
+                    "sentAt"
+                  ],
+                  "name": "email_delivery_userId_sentAt_idx_3005d120",
+                  "prefix": "email_delivery_userId_sentAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "dedupeKey"
+                  ]
+                }
+              ]
+            },
+            "email_setting": {
+              "columns": {
+                "digest": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "lastDigestAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "email_setting"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "userId"
+                ]
+              },
+              "uniques": []
             },
             "favorite_project": {
               "columns": {
@@ -15252,10 +15571,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "c975f8e5e1b1bf358a69ade14324983fb685a95315b23370c96ff4a4c9899b0a"
+    "storageHash": "3e713382f93ef90aed7ac12d94e199668022017aae9b3e4f2bc1180c7a4fe6d6"
   },
   "execution": {
-    "executionHash": "dcff2b75a26b19e59a7bfadf9580ba990c914d83d0e5b76fc1790c50bf73bccb",
+    "executionHash": "399f8d751db94c3b892411df8f39c309abb750861c678d48365b84a628042941",
     "mutations": {
       "defaults": [
         {
@@ -15408,6 +15727,17 @@
           },
           "ref": {
             "entry": "comment",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "email_delivery",
             "field": "id",
             "namespace": "public"
           }

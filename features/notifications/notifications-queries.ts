@@ -1,9 +1,15 @@
 import "server-only";
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
+import {
+  EmailNotifications,
+  EmailSettingsSchema,
+} from "@/src/server/email/email-contracts";
+import { EmailNotificationsLive } from "@/src/server/email/email-notifications";
+import { MailTransportLive } from "@/src/server/email/mail-transport";
 import {
   InboxSchema,
   NotificationPreferencesSchema,
@@ -54,4 +60,23 @@ export const getNotificationPreferences = async (input: unknown) =>
       ),
     undefined,
     NotificationPreferencesSchema
+  );
+
+export const getEmailSettings = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getEmailSettingsProgram() {
+        const requestHeaders = yield* requestHeadersOrFail;
+        const sessions = yield* AuthSession;
+        const user = yield* sessions.requireWorkspaceAccess(requestHeaders);
+        const email = yield* EmailNotifications;
+        return yield* email.getSettings(user.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(Layer.provide(EmailNotificationsLive, MailTransportLive))
+      ),
+    undefined,
+    EmailSettingsSchema
   );

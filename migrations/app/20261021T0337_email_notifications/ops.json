@@ -1,0 +1,323 @@
+[
+  {
+    "id": "table.email_delivery",
+    "label": "Create table \"email_delivery\"",
+    "summary": "Creates table \"email_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"email_delivery\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"email_delivery\"",
+        "sql": "CREATE TABLE \"public\".\"email_delivery\" (\n  \"dedupeKey\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"sentAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"email_delivery\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.email_setting",
+    "label": "Create table \"email_setting\"",
+    "summary": "Creates table \"email_setting\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "email_setting"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"email_setting\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_setting\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"email_setting\"",
+        "sql": "CREATE TABLE \"public\".\"email_setting\" (\n  \"digest\" bool DEFAULT false NOT NULL,\n  \"lastDigestAt\" timestamptz,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"userId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"email_setting\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_setting\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.email_delivery.email_delivery_dedupeKey_key",
+    "label": "Add unique constraint on \"email_delivery\" (dedupeKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "email_delivery_dedupeKey_key",
+        "table": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"email_delivery_dedupeKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_delivery_dedupeKey_key",
+          "public",
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"email_delivery_dedupeKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"email_delivery\" ADD CONSTRAINT \"email_delivery_dedupeKey_key\" UNIQUE (\"dedupeKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"email_delivery_dedupeKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_delivery_dedupeKey_key",
+          "public",
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.email_delivery.email_delivery_sentAt_idx_143b1b4c",
+    "label": "Create index \"email_delivery_sentAt_idx_143b1b4c\" on \"email_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "email_delivery_sentAt_idx_143b1b4c",
+        "table": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"email_delivery_sentAt_idx_143b1b4c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_sentAt_idx_143b1b4c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"email_delivery_sentAt_idx_143b1b4c\"",
+        "sql": "CREATE INDEX \"email_delivery_sentAt_idx_143b1b4c\" ON \"public\".\"email_delivery\" (\"sentAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"email_delivery_sentAt_idx_143b1b4c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_sentAt_idx_143b1b4c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.email_delivery.email_delivery_userId_idx_a489d58a",
+    "label": "Create index \"email_delivery_userId_idx_a489d58a\" on \"email_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "email_delivery_userId_idx_a489d58a",
+        "table": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"email_delivery_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"email_delivery_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"email_delivery_userId_idx_a489d58a\" ON \"public\".\"email_delivery\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"email_delivery_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.email_delivery.email_delivery_userId_sentAt_idx_3005d120",
+    "label": "Create index \"email_delivery_userId_sentAt_idx_3005d120\" on \"email_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "email_delivery_userId_sentAt_idx_3005d120",
+        "table": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"email_delivery_userId_sentAt_idx_3005d120\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_userId_sentAt_idx_3005d120\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"email_delivery_userId_sentAt_idx_3005d120\"",
+        "sql": "CREATE INDEX \"email_delivery_userId_sentAt_idx_3005d120\" ON \"public\".\"email_delivery\" (\"userId\", \"sentAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"email_delivery_userId_sentAt_idx_3005d120\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_userId_sentAt_idx_3005d120\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.email_delivery.email_delivery_userId_fkey",
+    "label": "Add foreign key \"email_delivery_userId_fkey\" on \"email_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "email_delivery_userId_fkey",
+        "table": "email_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"email_delivery_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_delivery_userId_fkey",
+          "public",
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"email_delivery_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"email_delivery\"\nADD CONSTRAINT \"email_delivery_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"email_delivery_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_delivery_userId_fkey",
+          "public",
+          "\"public\".\"email_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.email_setting.email_setting_userId_fkey",
+    "label": "Add foreign key \"email_setting_userId_fkey\" on \"email_setting\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "email_setting_userId_fkey",
+        "table": "email_setting"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"email_setting_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_setting_userId_fkey",
+          "public",
+          "\"public\".\"email_setting\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"email_setting_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"email_setting\"\nADD CONSTRAINT \"email_setting_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"email_setting_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "email_setting_userId_fkey",
+          "public",
+          "\"public\".\"email_setting\""
+        ]
+      }
+    ]
+  }
+]

@@ -3,12 +3,18 @@
 import { SkeletonRows } from "@/components/workspace/skeleton-shapes";
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalChangePassword } from "@/features/portal/components/portal-change-password";
+import { PortalEmailControl } from "@/features/portal/components/portal-email-control";
 import { PortalPushControl } from "@/features/portal/components/portal-push-control";
 import { PortalSignOut } from "@/features/portal/components/portal-sign-out";
 import { getPortalCompany } from "@/features/portal/portal-company";
+import { getPortalEmailUpdates } from "@/features/portal/portal-queries";
+import { readOrThrow } from "@/lib/read-result";
 
 const PortalAccount = async () => {
   const company = await getPortalCompany();
+  const emailUpdates = company?.preview
+    ? false
+    : readOrThrow(await getPortalEmailUpdates({}), "Email updates");
   return (
     <div className="portal-account">
       <section
@@ -57,6 +63,15 @@ const PortalAccount = async () => {
             />
           </section>
           <section
+            aria-labelledby="portal-email-h"
+            className="panel portal-panel"
+          >
+            <h2 className="sec" id="portal-email-h">
+              Email updates
+            </h2>
+            <PortalEmailControl enabled={emailUpdates} />
+          </section>
+          <section
             aria-labelledby="portal-out-h"
             className="panel portal-panel"
           >
@@ -74,14 +89,18 @@ const PortalAccount = async () => {
 const PortalAccountSkeleton = () => (
   <SkelterSurface label="Loading account">
     <div className="portal-account">
-      {["Profile", "Change password", "Push notifications", "Sign out"].map(
-        (title) => (
-          <div className="panel portal-panel" key={title}>
-            <h2 className="sec">{title}</h2>
-            <SkeletonRows rows={title === "Change password" ? 3 : 1} />
-          </div>
-        )
-      )}
+      {[
+        "Profile",
+        "Change password",
+        "Push notifications",
+        "Email updates",
+        "Sign out",
+      ].map((title) => (
+        <div className="panel portal-panel" key={title}>
+          <h2 className="sec">{title}</h2>
+          <SkeletonRows rows={title === "Change password" ? 3 : 1} />
+        </div>
+      ))}
     </div>
   </SkelterSurface>
 );

@@ -1,0 +1,16 @@
+// use prisma-8
+
+// A receipt for an email the provider accepted. The unique dedupe key makes a
+// retried or duplicated job send at most one email per notification or digest.
+model EmailDelivery {
+  id        Uuid @id @default(uuid())
+  dedupeKey String @unique
+  userId    String
+  sentAt    TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([sentAt])
+  @@map("email_delivery")
+}

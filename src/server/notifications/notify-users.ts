@@ -4,6 +4,8 @@ import { and } from "@prisma/orm-postgres/orm-client";
 
 import type { db } from "@/src/prisma/db";
 
+import { enqueueEmails } from "../email/email-enqueue";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export type NotificationEventType =
@@ -64,8 +66,10 @@ export const notifyUsers = async (
     disabled.map(({ channel, userId }) => `${userId}:${channel}`)
   );
   const writes: Promise<unknown>[] = [];
+  const issued: { userId: string; notificationId: string }[] = [];
   for (const userId of activeIds) {
     const notificationId = randomUUID();
+    issued.push({ notificationId, userId });
     if (!disabledChannels.has(`${userId}:in-app`)) {
       writes.push(
         transaction.orm.public.Notification.create({
@@ -104,6 +108,15 @@ export const notifyUsers = async (
       );
     }
   }
+  writes.push(
+    enqueueEmails(transaction, issued, {
+      body: notification.snippet ?? "",
+      eventType: notification.type,
+      now: notification.now,
+      title: notification.text,
+      url: notification.url,
+    })
+  );
   await Promise.all(writes);
 };
 

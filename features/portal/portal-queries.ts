@@ -4,6 +4,7 @@ import { cache } from "react";
 
 import { HIDDEN_RECORD_CODES, readRecordOrNotFound } from "@/lib/read-result";
 import { UUIDSchema } from "@/src/server/core/input-schemas";
+import { Notifications } from "@/src/server/notifications/service";
 import {
   PortalBugDetailSchema,
   PortalBugListSchema,
@@ -112,4 +113,20 @@ export const getPortalFilePreviewUrl = async (fileId: string) =>
       }),
     Schema.String,
     { preview: true }
+  );
+
+export const getPortalEmailUpdates = async (input: unknown) =>
+  await runPortalAction(
+    input,
+    Schema.Struct({}),
+    (user) =>
+      Effect.gen(function* getPortalEmailUpdatesProgram() {
+        const notifications = yield* Notifications;
+        const preferences = yield* notifications.listPreferences(user.id);
+        return preferences.some(
+          ({ channel, enabled, eventType }) =>
+            channel === "email" && eventType === "status" && enabled
+        );
+      }),
+    Schema.Boolean
   );

@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { EMAIL_DIGEST_JOB } from "../email/email-contracts";
 import { enqueueSlaSweep } from "../work/bug-sla-sweep";
 import { DATA_RETENTION_JOB } from "./data-retention";
 import type { DeadJobSummary } from "./processor-contracts";
@@ -29,6 +30,7 @@ export const enqueueMaintenance = (
       const dayKey = scheduledAt.toISOString().slice(0, 10);
       const dedupeKey = `storage.cleanup-expired-uploads:${dayKey}`;
       const dueSummaryHour = scheduledAt.toISOString().slice(0, 13);
+      const digestKey = `${EMAIL_DIGEST_JOB}:${dueSummaryHour}`;
       const [job] = await Promise.all([
         db.orm.public.Job.upsert({
           conflictOn: { dedupeKey },
@@ -51,6 +53,18 @@ export const enqueueMaintenance = (
             dedupeKey: `notifications.daily-due-summary:${dueSummaryHour}`,
             id: crypto.randomUUID(),
             kind: "notifications.daily-due-summary",
+            payload: { scheduledAt: scheduledAt.toISOString() },
+            updatedAt: scheduledAt,
+          },
+          update: { updatedAt: scheduledAt },
+        }),
+        db.orm.public.Job.upsert({
+          conflictOn: { dedupeKey: digestKey },
+          create: {
+            availableAt: scheduledAt,
+            dedupeKey: digestKey,
+            id: crypto.randomUUID(),
+            kind: EMAIL_DIGEST_JOB,
             payload: { scheduledAt: scheduledAt.toISOString() },
             updatedAt: scheduledAt,
           },

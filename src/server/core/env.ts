@@ -48,6 +48,7 @@ const databaseFields = {
 
 const httpUrl = urlString(["http:", "https:"], "Expected an http(s) URL");
 
+const MAX_PORT = 65_535;
 const MAX_RETENTION_DAYS = 3650;
 const retentionDays = Schema.optional(integerFromString(1, MAX_RETENTION_DAYS));
 
@@ -57,8 +58,18 @@ const retentionFields = {
   RETENTION_PUSH_DELIVERY_DAYS: retentionDays,
 };
 
+const emailFields = {
+  EMAIL_FROM: Schema.optional(Schema.String),
+  SMTP_HOST: Schema.optional(Schema.String),
+  SMTP_PASSWORD: Schema.optional(Schema.String),
+  SMTP_PORT: Schema.optional(integerFromString(1, MAX_PORT)),
+  SMTP_SECURE: Schema.optional(Schema.Literals(["true", "false"])),
+  SMTP_USER: Schema.optional(Schema.String),
+};
+
 const serverFields = {
   ...databaseFields,
+  ...emailFields,
   ...retentionFields,
   BETTER_AUTH_SECRET: secretString,
   BETTER_AUTH_URL: Schema.optional(httpUrl),
@@ -84,8 +95,31 @@ const configuredTogether = (values: readonly (string | undefined)[]) =>
   values.every((value) => value === undefined) ||
   values.every((value) => value !== undefined);
 
+const smtpHostWithSender = Schema.makeFilter(
+  (env: {
+    readonly SMTP_HOST?: string | undefined;
+    readonly EMAIL_FROM?: string | undefined;
+  }) =>
+    configuredTogether([env.SMTP_HOST, env.EMAIL_FROM])
+      ? undefined
+      : "SMTP_HOST and EMAIL_FROM must be configured together"
+);
+const smtpCredentialPair = Schema.makeFilter(
+  (env: {
+    readonly SMTP_USER?: string | undefined;
+    readonly SMTP_PASSWORD?: string | undefined;
+  }) =>
+    configuredTogether([env.SMTP_USER, env.SMTP_PASSWORD])
+      ? undefined
+      : "SMTP_USER and SMTP_PASSWORD must be configured together"
+);
+
 export const DatabaseEnvSchema = Schema.Struct(databaseFields);
 export const RetentionEnvSchema = Schema.Struct(retentionFields);
+export const EmailEnvSchema = Schema.Struct(emailFields).check(
+  smtpHostWithSender,
+  smtpCredentialPair
+);
 
 export const ServerEnvSchema = Schema.Struct(serverFields).check(
   Schema.makeFilter((env) =>
@@ -93,6 +127,8 @@ export const ServerEnvSchema = Schema.Struct(serverFields).check(
       ? undefined
       : "S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY must be configured together"
   ),
+  smtpHostWithSender,
+  smtpCredentialPair,
   Schema.makeFilter((env) =>
     configuredTogether([
       env.VAPID_PUBLIC_KEY,
@@ -114,6 +150,7 @@ export const ServerEnvSchema = Schema.Struct(serverFields).check(
 export type DatabaseEnv = typeof DatabaseEnvSchema.Type;
 export type ServerEnv = typeof ServerEnvSchema.Type;
 export type RetentionEnv = typeof RetentionEnvSchema.Type;
+export type EmailEnv = typeof EmailEnvSchema.Type;
 
 // An empty assignment such as `S3_ENDPOINT=` in .env means "not configured".
 const withoutBlankValues = (source: EnvironmentSource): EnvironmentSource =>
@@ -153,3 +190,8 @@ export const parseDatabaseEnv = (
 export const parseRetentionEnv = (
   source: EnvironmentSource = process.env
 ): RetentionEnv => decodeOrThrow(RetentionEnvSchema, source);
+
+/** Validates only the SMTP group; every field is optional (no SMTP = log only). */
+export const parseEmailEnv = (
+  source: EnvironmentSource = process.env
+): EmailEnv => decodeOrThrow(EmailEnvSchema, source);

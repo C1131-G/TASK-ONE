@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'c975f8e5e1b1bf358a69ade14324983fb685a95315b23370c96ff4a4c9899b0a'>;
+  StorageHashBase<'3e713382f93ef90aed7ac12d94e199668022017aae9b3e4f2bc1180c7a4fe6d6'>;
 export type ExecutionHash =
-  ExecutionHashBase<'dcff2b75a26b19e59a7bfadf9580ba990c914d83d0e5b76fc1790c50bf73bccb'>;
+  ExecutionHashBase<'399f8d751db94c3b892411df8f39c309abb750861c678d48365b84a628042941'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -501,6 +501,18 @@ export type FieldOutputTypes = {
       readonly slug: CodecTypes['pg/text@1']['output'];
       readonly timeZone: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly EmailDelivery: {
+      readonly dedupeKey: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly sentAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+    };
+    readonly EmailSetting: {
+      readonly digest: CodecTypes['pg/bool@1']['output'];
+      readonly lastDigestAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
     };
     readonly FavoriteProject: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -1086,6 +1098,18 @@ export type FieldInputTypes = {
       readonly timeZone: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
     };
+    readonly EmailDelivery: {
+      readonly dedupeKey: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly sentAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+    };
+    readonly EmailSetting: {
+      readonly digest: CodecTypes['pg/bool@1']['input'];
+      readonly lastDigestAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+    };
     readonly FavoriteProject: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
@@ -1670,6 +1694,18 @@ export type StorageColumnTypes = {
       readonly timeZone: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     };
+    readonly email_delivery: {
+      readonly dedupeKey: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly sentAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+    };
+    readonly email_setting: {
+      readonly digest: CodecTypes['pg/bool@1']['output'];
+      readonly lastDigestAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+    };
     readonly favorite_project: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
@@ -2253,6 +2289,18 @@ export type StorageColumnInputTypes = {
       readonly slug: CodecTypes['pg/text@1']['input'];
       readonly timeZone: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly email_delivery: {
+      readonly dedupeKey: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly sentAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+    };
+    readonly email_setting: {
+      readonly digest: CodecTypes['pg/bool@1']['input'];
+      readonly lastDigestAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
     };
     readonly favorite_project: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
@@ -2927,6 +2975,22 @@ export namespace Models {
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     readonly [RelationKeys]?: never;
   };
+  export type public_EmailDelivery = {
+    dedupeKey: CodecTypes['pg/text@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    sentAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'];
+    user: public_User;
+    readonly [RelationKeys]?: 'user';
+  };
+  export type public_EmailSetting = {
+    digest: CodecTypes['pg/bool@1']['output'];
+    lastDigestAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'];
+    user: public_User;
+    readonly [RelationKeys]?: 'user';
+  };
   export type public_FavoriteProject = {
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
     projectId: CodecTypes['pg/uuid@1']['output'];
@@ -3341,6 +3405,8 @@ export namespace Models {
     deactivatedBy: public_User | null;
     deactivatedClientCompanies: public_ClientCompany[];
     deactivatedUsers: public_User[];
+    emailDeliveries: public_EmailDelivery[];
+    emailSetting: public_EmailSetting | null;
     idempotencyKeys: public_IdempotencyKey[];
     pickedBugs: public_BugReport[];
     pushDeliveries: public_PushDelivery[];
@@ -3368,6 +3434,8 @@ export namespace Models {
       | 'deactivatedBy'
       | 'deactivatedClientCompanies'
       | 'deactivatedUsers'
+      | 'emailDeliveries'
+      | 'emailSetting'
       | 'idempotencyKeys'
       | 'pickedBugs'
       | 'pushDeliveries'
@@ -3418,6 +3486,8 @@ export declare const models: {
     Comment: Models.public_Comment;
     CommentReaction: Models.public_CommentReaction;
     CompanySettings: Models.public_CompanySettings;
+    EmailDelivery: Models.public_EmailDelivery;
+    EmailSetting: Models.public_EmailSetting;
     FavoriteProject: Models.public_FavoriteProject;
     FavoriteTask: Models.public_FavoriteTask;
     FileAsset: Models.public_FileAsset;
@@ -5979,6 +6049,121 @@ type ContractBase = Omit<
               uniques: readonly [{ readonly columns: readonly ['slug'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
+            };
+            readonly email_delivery: {
+              columns: {
+                readonly dedupeKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly sentAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['dedupeKey'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'email_delivery_sentAt_idx_143b1b4c';
+                  readonly prefix: 'email_delivery_sentAt_idx';
+                  readonly columns: readonly ['sentAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'email_delivery_userId_idx_a489d58a';
+                  readonly prefix: 'email_delivery_userId_idx';
+                  readonly columns: readonly ['userId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'email_delivery_userId_sentAt_idx_3005d120';
+                  readonly prefix: 'email_delivery_userId_sentAt_idx';
+                  readonly columns: readonly ['userId', 'sentAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'email_delivery';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly email_setting: {
+              columns: {
+                readonly digest: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly lastDigestAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['userId'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'email_setting';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly favorite_project: {
               columns: {
@@ -9208,6 +9393,14 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'CompanySettings';
     };
+    readonly email_delivery: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'EmailDelivery';
+    };
+    readonly email_setting: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'EmailSetting';
+    };
     readonly favorite_project: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'FavoriteProject';
@@ -11274,6 +11467,97 @@ type ContractBase = Omit<
                 readonly slug: { readonly column: 'slug' };
                 readonly timeZone: { readonly column: 'timeZone' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly EmailDelivery: {
+            readonly fields: {
+              readonly dedupeKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly sentAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'email_delivery';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly dedupeKey: { readonly column: 'dedupeKey' };
+                readonly id: { readonly column: 'id' };
+                readonly sentAt: { readonly column: 'sentAt' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly EmailSetting: {
+            readonly fields: {
+              readonly digest: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly lastDigestAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'email_setting';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly digest: { readonly column: 'digest' };
+                readonly lastDigestAt: { readonly column: 'lastDigestAt' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly userId: { readonly column: 'userId' };
               };
             };
           };
@@ -13723,6 +14007,29 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['deactivatedById'];
                 };
               };
+              readonly emailDeliveries: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'EmailDelivery';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly emailSetting: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'EmailSetting';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
               readonly idempotencyKeys: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -14266,6 +14573,14 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'comment';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'email_delivery';
             readonly field: 'id';
             readonly namespace: 'public';
           };

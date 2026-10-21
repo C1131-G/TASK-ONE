@@ -4,6 +4,16 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import {
+  EMAIL_DELIVERY_JOB,
+  EMAIL_DIGEST_JOB,
+  EmailJobPayloadSchema,
+} from "../email/email-contracts";
+import {
+  EmailNotifications,
+  EmailNotificationsLive,
+} from "../email/email-notifications";
+import { MailTransportLive } from "../email/mail-transport";
+import {
   PushNotifications,
   PushNotificationsLive,
 } from "../notifications/push";
@@ -128,6 +138,7 @@ export const JobHandlersLive = Layer.effect(
     const storage = yield* Storage;
     const push = yield* PushNotifications;
     const notifications = yield* Notifications;
+    const email = yield* EmailNotifications;
     return JobHandlers.of({
       handle: (kind, payload) => {
         if (kind === "storage.cleanup-expired-uploads") {
@@ -270,6 +281,33 @@ export const JobHandlersLive = Layer.effect(
             Effect.asVoid
           );
         }
+        if (kind === EMAIL_DELIVERY_JOB) {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The email delivery job payload is invalid.",
+              }),
+            try: () => Schema.decodeUnknownSync(EmailJobPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap((message) => email.deliverNotification(message)),
+            Effect.asVoid
+          );
+        }
+        if (kind === EMAIL_DIGEST_JOB) {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The email digest job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(DailyDueSummaryPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ scheduledAt }) => email.sendDigests(scheduledAt)),
+            Effect.asVoid
+          );
+        }
         if (kind === "notifications.daily-due-summary") {
           return Effect.try({
             catch: () =>
@@ -298,4 +336,6 @@ export const JobHandlersLive = Layer.effect(
 )
   .pipe(Layer.provide(UploadsLive))
   .pipe(Layer.provide(NotificationsLive))
-  .pipe(Layer.provide(PushNotificationsLive));
+  .pipe(Layer.provide(PushNotificationsLive))
+  .pipe(Layer.provide(EmailNotificationsLive))
+  .pipe(Layer.provide(MailTransportLive));

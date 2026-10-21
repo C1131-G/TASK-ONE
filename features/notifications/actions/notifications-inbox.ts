@@ -122,7 +122,7 @@ export async function setNotificationPreferenceAction(input: unknown) {
   const result = await runNotificationAction(
     input,
     Schema.Struct({
-      channel: Schema.Literals(["in-app", "web-push"]),
+      channel: Schema.Literals(["in-app", "web-push", "email"]),
       enabled: Schema.Boolean,
       eventType: Schema.Literals([
         "mention",
@@ -130,6 +130,7 @@ export async function setNotificationPreferenceAction(input: unknown) {
         "comment",
         "update",
         "due",
+        "status",
       ]),
       idempotencyKey: IdempotencyKeySchema,
     }),
