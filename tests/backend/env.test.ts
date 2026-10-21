@@ -45,6 +45,7 @@ describe("parseServerEnv", () => {
       BETTER_AUTH_SECRET: "too-short-secret",
       DATABASE_POOL_MAX: "0",
       DATABASE_URL: "mysql://localhost/metsys",
+      INTAKE_EMAIL_SECRET: "short-intake",
       SCHEDULER_TOKEN: "short-token",
     });
 
@@ -53,6 +54,7 @@ describe("parseServerEnv", () => {
       "BETTER_AUTH_SECRET",
       "DATABASE_POOL_MAX",
       "DATABASE_URL",
+      "INTAKE_EMAIL_SECRET",
       "SCHEDULER_TOKEN",
     ]) {
       expect(message).toContain(name);

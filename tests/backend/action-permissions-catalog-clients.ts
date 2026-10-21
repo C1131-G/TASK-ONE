@@ -5,6 +5,8 @@ import { ids, nextKey } from "./support/action-harness";
 const clientLogos = await import("../../features/clients/clients-actions");
 const clients = await import("../../features/clients/clients-actions");
 const clientQueries = await import("../../features/clients/clients-queries");
+const intake = await import("../../features/intake/intake-actions");
+const intakeQueries = await import("../../features/intake/intake-queries");
 const slaActions = await import("../../features/settings/settings-actions");
 const slaQueries = await import("../../features/settings/settings-queries");
 
@@ -96,6 +98,28 @@ export const clientActionCatalog: readonly ActionEntry[] = [
   })),
   entry("listAuditEvents", clientQueries.listAuditEvents, () => ({})),
   entry("listLockedAccounts", clientQueries.listLockedAccounts, () => ({})),
+  entry("listIntakeForms", intakeQueries.listIntakeForms, () => ({})),
+  entry("createIntakeFormAction", intake.createIntakeFormAction, () => ({
+    clientCompanyId: ids.clientCompanyId,
+    idempotencyKey: nextKey(),
+    name: "Permission intake form",
+    projectId: ids.projectId,
+  })),
+  entry("rotateIntakeFormAction", intake.rotateIntakeFormAction, () => ({
+    expectedVersion: 1,
+    formId: ids.random,
+    idempotencyKey: nextKey(),
+  })),
+  entry(
+    "setIntakeFormEnabledAction",
+    intake.setIntakeFormEnabledAction,
+    () => ({
+      enabled: false,
+      expectedVersion: 1,
+      formId: ids.random,
+      idempotencyKey: nextKey(),
+    })
+  ),
   entry("getSlaSettings", slaQueries.getSlaSettings, () => ({})),
   entry("updateSlaSettingsAction", slaActions.updateSlaSettingsAction, () => ({
     businessDays: [1, 2, 3, 4, 5],

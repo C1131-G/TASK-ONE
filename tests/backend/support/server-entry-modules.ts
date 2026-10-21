@@ -9,6 +9,8 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/settings/settings-queries"),
   import("../../../features/discovery/discovery-actions"),
   import("../../../features/files/files-actions"),
+  import("../../../features/intake/intake-actions"),
+  import("../../../features/intake/intake-queries"),
   import("../../../features/notifications/notifications-actions"),
   import("../../../features/people/people-actions"),
   import("../../../features/projects/projects-actions"),

@@ -48,6 +48,7 @@ model BugReport {
   clientCompany ClientCompany? @relation(fields: [clientCompanyId], references: [id], onDelete: Restrict)
   pickedBy User? @relation("BugPicker", fields: [pickedById], references: [id], onDelete: Restrict)
   sla BugSla?
+  intakeSubmission IntakeSubmission?
 
   @@index([projectId, status, severity, discoveredAt])
   @@index([reporterId, discoveredAt])

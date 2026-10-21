@@ -1,0 +1,692 @@
+[
+  {
+    "id": "table.intake_form",
+    "label": "Create table \"intake_form\"",
+    "summary": "Creates table \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"intake_form\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"intake_form\"",
+        "sql": "CREATE TABLE \"public\".\"intake_form\" (\n  \"clientCompanyId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" text NOT NULL,\n  \"enabled\" bool DEFAULT true NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"slug\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"version\" int4 DEFAULT 1 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"intake_form\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.intake_submission",
+    "label": "Create table \"intake_submission\"",
+    "summary": "Creates table \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"intake_submission\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"intake_submission\"",
+        "sql": "CREATE TABLE \"public\".\"intake_submission\" (\n  \"bugReportId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"formId\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"messageId\" text,\n  \"referenceId\" text NOT NULL,\n  \"reporterEmail\" text NOT NULL,\n  \"senderHash\" text,\n  \"source\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"intake_submission_source_valid_8448c890\" CHECK (\"source\" IN ('web', 'email'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"intake_submission\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.intake_form.intake_form_slug_key",
+    "label": "Add unique constraint on \"intake_form\" (slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "intake_form_slug_key",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"intake_form_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_slug_key",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"intake_form_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"intake_form\" ADD CONSTRAINT \"intake_form_slug_key\" UNIQUE (\"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"intake_form_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_slug_key",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.intake_submission.intake_submission_referenceId_key",
+    "label": "Add unique constraint on \"intake_submission\" (referenceId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "intake_submission_referenceId_key",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"intake_submission_referenceId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_referenceId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"intake_submission_referenceId_key\"",
+        "sql": "ALTER TABLE \"public\".\"intake_submission\" ADD CONSTRAINT \"intake_submission_referenceId_key\" UNIQUE (\"referenceId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"intake_submission_referenceId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_referenceId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.intake_submission.intake_submission_bugReportId_key",
+    "label": "Add unique constraint on \"intake_submission\" (bugReportId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "intake_submission_bugReportId_key",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"intake_submission_bugReportId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_bugReportId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"intake_submission_bugReportId_key\"",
+        "sql": "ALTER TABLE \"public\".\"intake_submission\" ADD CONSTRAINT \"intake_submission_bugReportId_key\" UNIQUE (\"bugReportId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"intake_submission_bugReportId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_bugReportId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.intake_submission.intake_submission_formId_messageId_key",
+    "label": "Add unique constraint on \"intake_submission\" (formId, messageId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "intake_submission_formId_messageId_key",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"intake_submission_formId_messageId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_formId_messageId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"intake_submission_formId_messageId_key\"",
+        "sql": "ALTER TABLE \"public\".\"intake_submission\" ADD CONSTRAINT \"intake_submission_formId_messageId_key\" UNIQUE (\"formId\", \"messageId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"intake_submission_formId_messageId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_formId_messageId_key",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_form.intake_form_clientCompanyId_idx_157c8ca5",
+    "label": "Create index \"intake_form_clientCompanyId_idx_157c8ca5\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_form_clientCompanyId_idx_157c8ca5",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_form_clientCompanyId_idx_157c8ca5\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_form_clientCompanyId_idx_157c8ca5\"",
+        "sql": "CREATE INDEX \"intake_form_clientCompanyId_idx_157c8ca5\" ON \"public\".\"intake_form\" (\"clientCompanyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_form_clientCompanyId_idx_157c8ca5\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_clientCompanyId_idx_157c8ca5\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_form.intake_form_createdById_idx_8bf640ed",
+    "label": "Create index \"intake_form_createdById_idx_8bf640ed\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_form_createdById_idx_8bf640ed",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_form_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_form_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"intake_form_createdById_idx_8bf640ed\" ON \"public\".\"intake_form\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_form_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_form.intake_form_projectId_idx_a96e4d92",
+    "label": "Create index \"intake_form_projectId_idx_a96e4d92\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_form_projectId_idx_a96e4d92",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_form_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_form_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"intake_form_projectId_idx_a96e4d92\" ON \"public\".\"intake_form\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_form_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_form_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_submission.intake_submission_formId_createdAt_idx_70828f6f",
+    "label": "Create index \"intake_submission_formId_createdAt_idx_70828f6f\" on \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_submission_formId_createdAt_idx_70828f6f",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_submission_formId_createdAt_idx_70828f6f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_formId_createdAt_idx_70828f6f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_submission_formId_createdAt_idx_70828f6f\"",
+        "sql": "CREATE INDEX \"intake_submission_formId_createdAt_idx_70828f6f\" ON \"public\".\"intake_submission\" (\"formId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_submission_formId_createdAt_idx_70828f6f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_formId_createdAt_idx_70828f6f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_submission.intake_submission_formId_idx_3c13a9fa",
+    "label": "Create index \"intake_submission_formId_idx_3c13a9fa\" on \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_submission_formId_idx_3c13a9fa",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_submission_formId_idx_3c13a9fa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_formId_idx_3c13a9fa\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_submission_formId_idx_3c13a9fa\"",
+        "sql": "CREATE INDEX \"intake_submission_formId_idx_3c13a9fa\" ON \"public\".\"intake_submission\" (\"formId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_submission_formId_idx_3c13a9fa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_formId_idx_3c13a9fa\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.intake_submission.intake_submission_senderHash_createdAt_idx_3726379b",
+    "label": "Create index \"intake_submission_senderHash_createdAt_idx_3726379b\" on \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "intake_submission_senderHash_createdAt_idx_3726379b",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"intake_submission_senderHash_createdAt_idx_3726379b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_senderHash_createdAt_idx_3726379b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"intake_submission_senderHash_createdAt_idx_3726379b\"",
+        "sql": "CREATE INDEX \"intake_submission_senderHash_createdAt_idx_3726379b\" ON \"public\".\"intake_submission\" (\"senderHash\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"intake_submission_senderHash_createdAt_idx_3726379b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"intake_submission_senderHash_createdAt_idx_3726379b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.intake_form.intake_form_clientCompanyId_fkey",
+    "label": "Add foreign key \"intake_form_clientCompanyId_fkey\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "intake_form_clientCompanyId_fkey",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"intake_form_clientCompanyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"intake_form_clientCompanyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"intake_form\"\nADD CONSTRAINT \"intake_form_clientCompanyId_fkey\"\nFOREIGN KEY (\"clientCompanyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"intake_form_clientCompanyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_clientCompanyId_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.intake_form.intake_form_projectId_fkey",
+    "label": "Add foreign key \"intake_form_projectId_fkey\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "intake_form_projectId_fkey",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"intake_form_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_projectId_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"intake_form_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"intake_form\"\nADD CONSTRAINT \"intake_form_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"intake_form_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_projectId_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.intake_form.intake_form_createdById_fkey",
+    "label": "Add foreign key \"intake_form_createdById_fkey\" on \"intake_form\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "intake_form_createdById_fkey",
+        "table": "intake_form"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"intake_form_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_createdById_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"intake_form_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"intake_form\"\nADD CONSTRAINT \"intake_form_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"intake_form_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_form_createdById_fkey",
+          "public",
+          "\"public\".\"intake_form\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.intake_submission.intake_submission_formId_fkey",
+    "label": "Add foreign key \"intake_submission_formId_fkey\" on \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "intake_submission_formId_fkey",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"intake_submission_formId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_formId_fkey",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"intake_submission_formId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"intake_submission\"\nADD CONSTRAINT \"intake_submission_formId_fkey\"\nFOREIGN KEY (\"formId\")\nREFERENCES \"public\".\"intake_form\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"intake_submission_formId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_formId_fkey",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.intake_submission.intake_submission_bugReportId_fkey",
+    "label": "Add foreign key \"intake_submission_bugReportId_fkey\" on \"intake_submission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "intake_submission_bugReportId_fkey",
+        "table": "intake_submission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"intake_submission_bugReportId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_bugReportId_fkey",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"intake_submission_bugReportId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"intake_submission\"\nADD CONSTRAINT \"intake_submission_bugReportId_fkey\"\nFOREIGN KEY (\"bugReportId\")\nREFERENCES \"public\".\"bug_report\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"intake_submission_bugReportId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "intake_submission_bugReportId_fkey",
+          "public",
+          "\"public\".\"intake_submission\""
+        ]
+      }
+    ]
+  }
+]

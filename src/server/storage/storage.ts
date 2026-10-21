@@ -226,3 +226,26 @@ export const StorageLive = Layer.succeed(
       }),
   })
 );
+
+// Server-side writes for callers that have no browser to hand a signed URL to,
+// such as the public intake form. The object is private like every other.
+export const putPrivateObject = (
+  key: string,
+  contentType: string,
+  body: Uint8Array
+): Effect.Effect<void, AppError> =>
+  Effect.tryPromise({
+    catch: storageError,
+    try: async () => {
+      await s3.send(
+        new PutObjectCommand({
+          Body: body,
+          Bucket: bucket,
+          ContentLength: body.byteLength,
+          ContentType: contentType,
+          IfNoneMatch: "*",
+          Key: key,
+        })
+      );
+    },
+  });

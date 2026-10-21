@@ -60,6 +60,7 @@ model User {
   clientCompanyHandlerships ClientCompanyHandler[] @relation("ClientCompanyHandlerEmployee")
   assignedClientCompanyHandlers ClientCompanyHandler[] @relation("ClientCompanyHandlerAssigner")
   pickedBugs BugReport[] @relation("BugPicker")
+  createdIntakeForms IntakeForm[] @relation("IntakeFormCreator")
   auditEventsAsActor AuditEvent[] @relation("AuditEventActor")
   auditEventsAsSubject AuditEvent[] @relation("AuditEventSubject")
 
