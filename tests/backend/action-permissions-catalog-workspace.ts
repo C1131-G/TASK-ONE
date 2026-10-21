@@ -208,6 +208,7 @@ export const workspaceActionCatalog: readonly ActionEntry[] = [
     notificationsQueries.getNotificationPreferences,
     () => ({})
   ),
+  entry("getEmailSettings", notificationsQueries.getEmailSettings, () => ({})),
   entry(
     "markNotificationReadAction",
     notifications.markNotificationReadAction,

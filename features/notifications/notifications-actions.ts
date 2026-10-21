@@ -2,6 +2,7 @@
 
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
+import { setEmailDigestAction as setEmailDigestImpl } from "./actions/notifications-email";
 import {
   markAllNotificationsReadAction as markAllNotificationsReadImpl,
   markNotificationReadAction as markNotificationReadImpl,
@@ -22,6 +23,10 @@ export async function markAllNotificationsReadAction(input: unknown) {
 
 export async function setNotificationPreferenceAction(input: unknown) {
   return await setNotificationPreferenceImpl(input);
+}
+
+export async function setEmailDigestAction(input: unknown) {
+  return await setEmailDigestImpl(input);
 }
 
 export async function registerPushSubscriptionAction(input: unknown) {

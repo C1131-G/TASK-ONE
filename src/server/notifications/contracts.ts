@@ -28,10 +28,19 @@ export interface InboxOptions {
   readonly limit: number;
 }
 
+export type NotificationChannel = "in-app" | "web-push" | "email";
+export type NotificationPreferenceEvent =
+  | "mention"
+  | "assignment"
+  | "comment"
+  | "update"
+  | "due"
+  | "status";
+
 export interface NotificationPreferenceValue {
-  readonly channel: "in-app" | "web-push";
+  readonly channel: NotificationChannel;
   readonly enabled: boolean;
-  readonly eventType: "mention" | "assignment" | "comment" | "update" | "due";
+  readonly eventType: NotificationPreferenceEvent;
 }
 
 export const InboxSchema = Schema.Struct({
@@ -56,7 +65,7 @@ export const InboxSchema = Schema.Struct({
 
 export const NotificationPreferencesSchema = Schema.Array(
   Schema.Struct({
-    channel: Schema.Literals(["in-app", "web-push"]),
+    channel: Schema.Literals(["in-app", "web-push", "email"]),
     enabled: Schema.Boolean,
     eventType: Schema.Literals([
       "mention",
@@ -64,6 +73,7 @@ export const NotificationPreferencesSchema = Schema.Array(
       "comment",
       "update",
       "due",
+      "status",
     ]),
   })
 );
@@ -85,8 +95,8 @@ export class Notifications extends Context.Service<
     readonly markAllRead: (userId: string) => Effect.Effect<number, AppError>;
     readonly setPreference: (
       userId: string,
-      channel: "in-app" | "web-push",
-      eventType: "mention" | "assignment" | "comment" | "update" | "due",
+      channel: NotificationChannel,
+      eventType: NotificationPreferenceEvent,
       enabled: boolean
     ) => Effect.Effect<void, AppError>;
     readonly sendDailyDueSummaries: (

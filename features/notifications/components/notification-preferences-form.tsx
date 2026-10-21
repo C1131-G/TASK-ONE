@@ -6,7 +6,16 @@
 import { useOptimistic } from "react";
 
 import { Switch } from "@/components/ui/switch";
-import { setNotificationPreferenceAction } from "@/features/notifications/notifications-actions";
+import {
+  isChannelAvailable,
+  preferenceKey,
+  preferenceMap,
+  preferenceOn,
+} from "@/features/notifications/notification-preference-state";
+import {
+  setEmailDigestAction,
+  setNotificationPreferenceAction,
+} from "@/features/notifications/notifications-actions";
 import { useSaveState } from "@/features/settings/hooks/use-settings-save";
 import type { NotificationPreferenceValue } from "@/src/server/notifications/contracts";
 
@@ -20,13 +29,16 @@ const NOTIFICATION_EVENTS = [
 const NOTIFICATION_CHANNELS = [
   { id: "in-app", label: "In app" },
   { id: "web-push", label: "Browser push" },
+  { id: "email", label: "Email" },
 ] as const;
 type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[number]["id"];
 type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number]["id"];
 
 const NotificationPreferencesForm = ({
+  emailDigest,
   values,
 }: {
+  readonly emailDigest: boolean;
   readonly values: readonly NotificationPreferenceValue[];
 }) => {
   const {
@@ -36,10 +48,7 @@ const NotificationPreferencesForm = ({
     setError,
     startTransition,
   } = useSaveState();
-  const saved = new Map<string, boolean>();
-  for (const { channel, enabled: isEnabled, eventType } of values) {
-    saved.set(`${channel}:${eventType}`, isEnabled);
-  }
+  const saved = preferenceMap(values);
   // The switch flips at once; the saved values come back with the action's
   // revalidation, and a failed save falls back to them.
   const [enabled, setOptimisticPreference] = useOptimistic(
@@ -48,6 +57,30 @@ const NotificationPreferencesForm = ({
       new Map(current).set(change.key, change.value)
   );
 
+  const [digestOn, setOptimisticDigest] = useOptimistic(
+    emailDigest,
+    (_current, next: boolean) => next
+  );
+
+  const updateDigest = (nextDigest: boolean) => {
+    startTransition(async () => {
+      setOptimisticDigest(nextDigest);
+      try {
+        const result = await setEmailDigestAction({
+          digest: nextDigest,
+          idempotencyKey: crypto.randomUUID(),
+        });
+        if (result.ok) {
+          notifyPreferenceSaved("Email delivery saved");
+        } else {
+          setError(result.error.message);
+        }
+      } catch {
+        setError("Your preference could not be saved. Try again.");
+      }
+    });
+  };
+
   const updatePreference = (
     channel: NotificationChannel,
     eventType: NotificationEvent,
@@ -55,7 +88,7 @@ const NotificationPreferencesForm = ({
   ) => {
     startTransition(async () => {
       setOptimisticPreference({
-        key: `${channel}:${eventType}`,
+        key: preferenceKey(channel, eventType),
         value: nextEnabled,
       });
       try {
@@ -95,7 +128,17 @@ const NotificationPreferencesForm = ({
             {NOTIFICATION_CHANNELS.map(
               ({ id: channel, label: channelLabel }) => {
                 const controlId = `notification-${channel}-${id}`;
-                const preferenceKey = `${channel}:${id}`;
+                if (!isChannelAvailable(channel, id)) {
+                  return (
+                    <span
+                      aria-hidden="true"
+                      className="notification-preference-control"
+                      key={channel}
+                    >
+                      –
+                    </span>
+                  );
+                }
                 return (
                   <label
                     className="notification-preference-control"
@@ -106,7 +149,7 @@ const NotificationPreferencesForm = ({
                       {label} notifications {channelLabel.toLowerCase()}
                     </span>
                     <Switch
-                      checked={enabled.get(preferenceKey) ?? true}
+                      checked={preferenceOn(enabled, channel, id)}
                       disabled={pending}
                       id={controlId}
                       onCheckedChange={(checked) =>
@@ -119,6 +162,24 @@ const NotificationPreferencesForm = ({
             )}
           </div>
         ))}
+        <label
+          className="notification-email-digest"
+          htmlFor="notification-email-digest"
+        >
+          <span>
+            <strong>Daily email digest</strong>
+            <small>
+              Send the email updates you chose as one message each morning
+              instead of one by one.
+            </small>
+          </span>
+          <Switch
+            checked={digestOn}
+            disabled={pending}
+            id="notification-email-digest"
+            onCheckedChange={updateDigest}
+          />
+        </label>
         {error ? (
           <p className="error" role="alert">
             {error}

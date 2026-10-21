@@ -132,6 +132,60 @@ test.describe("Settings (/settings)", () => {
       }
     });
 
+    test("email switches start off, persist, and are offered only for emailable updates", async ({
+      page,
+    }) => {
+      await openSettings(page, "Preferences");
+      const toggle = page.locator("#notification-email-assignment");
+      await expect(toggle).toBeVisible();
+      await expect(page.locator("#notification-email-due")).toHaveCount(0);
+      await expect(page.locator("#notification-email-update")).toHaveCount(0);
+      const before = await toggle.getAttribute("aria-checked");
+      expect(before).toBe("false");
+      await toggle.click();
+      try {
+        await expect(async () => {
+          await page.reload();
+          await page.waitForLoadState("networkidle");
+          await page.getByRole("tab", { name: "Preferences" }).click();
+          await expect(
+            page.locator("#notification-email-assignment")
+          ).toHaveAttribute("aria-checked", "true", { timeout: 2000 });
+        }).toPass({ timeout: 30_000 });
+      } finally {
+        const current = page.locator("#notification-email-assignment");
+        if ((await current.getAttribute("aria-checked")) !== "false") {
+          await current.click();
+          await expect(current).toHaveAttribute("aria-checked", "false");
+        }
+      }
+    });
+
+    test("the daily email digest switch persists across a reload", async ({
+      page,
+    }) => {
+      await openSettings(page, "Preferences");
+      const digest = page.locator("#notification-email-digest");
+      await expect(digest).toHaveAttribute("aria-checked", "false");
+      await digest.click();
+      try {
+        await expect(async () => {
+          await page.reload();
+          await page.waitForLoadState("networkidle");
+          await page.getByRole("tab", { name: "Preferences" }).click();
+          await expect(
+            page.locator("#notification-email-digest")
+          ).toHaveAttribute("aria-checked", "true", { timeout: 2000 });
+        }).toPass({ timeout: 30_000 });
+      } finally {
+        const current = page.locator("#notification-email-digest");
+        if ((await current.getAttribute("aria-checked")) !== "false") {
+          await current.click();
+          await expect(current).toHaveAttribute("aria-checked", "false");
+        }
+      }
+    });
+
     test("a failed notification save puts the switch back and says why", async ({
       page,
     }) => {

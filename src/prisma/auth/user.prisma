@@ -49,6 +49,8 @@ model User {
   createdBugRelations BugRelation[]
   pushSubscriptions PushSubscription[]
   pushDeliveries PushDelivery[]
+  emailSetting EmailSetting?
+  emailDeliveries EmailDelivery[]
   clientCompany ClientCompany? @relation("ClientCompanyUsers", fields: [clientCompanyId], references: [id], onDelete: Restrict)
   createdClientCompanies ClientCompany[] @relation("ClientCompanyCreator")
   deactivatedClientCompanies ClientCompany[] @relation("ClientCompanyDeactivatedBy")

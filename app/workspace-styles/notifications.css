@@ -181,7 +181,24 @@
   align-items: center;
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(0, 1fr) 84px 104px;
+  grid-template-columns: minmax(0, 1fr) 84px 104px 64px;
+}
+.workspace-app .notification-email-digest {
+  align-items: center;
+  border-top: 1px solid var(--border);
+  display: flex;
+  font-size: 13px;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 4px 6px;
+}
+.workspace-app .notification-email-digest span {
+  display: grid;
+  gap: 2px;
+}
+.workspace-app .notification-email-digest small {
+  color: var(--text-3);
+  font-size: 11px;
 }
 .workspace-app .notification-preferences-header {
   border-bottom: 1px solid var(--border);
@@ -233,7 +250,7 @@
   .workspace-app .notification-preferences-header,
   .workspace-app .notification-preference-row {
     gap: 6px;
-    grid-template-columns: minmax(0, 1fr) 68px 78px;
+    grid-template-columns: minmax(0, 1fr) 60px 74px 48px;
   }
   .workspace-app .notification-preferences-header {
     font-size: 10px;

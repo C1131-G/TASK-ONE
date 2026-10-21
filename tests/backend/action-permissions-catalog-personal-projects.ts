@@ -41,6 +41,10 @@ export const personalProjectActionCatalog: readonly ActionEntry[] = [
       idempotencyKey: nextKey(),
     })
   ),
+  entry("setEmailDigestAction", notifications.setEmailDigestAction, () => ({
+    digest: true,
+    idempotencyKey: nextKey(),
+  })),
   entry(
     "registerPushSubscriptionAction",
     notifications.registerPushSubscriptionAction,

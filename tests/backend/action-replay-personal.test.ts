@@ -134,6 +134,12 @@ it("replays personal, notification, and favorite mutations", async () => {
     notifications.setNotificationPreferenceAction,
     { channel: "in-app", enabled: true, eventType: "mention" }
   );
+  await replay(
+    "setEmailDigestAction",
+    "owner",
+    notifications.setEmailDigestAction,
+    { digest: true }
+  );
   const endpoint = `https://fcm.googleapis.com/${randomUUID()}`;
   await replay(
     "registerPushSubscriptionAction",

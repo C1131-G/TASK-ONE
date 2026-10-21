@@ -4,9 +4,12 @@ import { Effect, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { isEmailEventType } from "../email/email-contracts";
 import type {
   InboxOptions,
   InboxPage,
+  NotificationChannel,
+  NotificationPreferenceEvent,
   NotificationPreferenceValue,
 } from "./contracts";
 import { NotificationPreferencesSchema } from "./contracts";
@@ -128,14 +131,20 @@ export const markAllRead = (userId: string): Effect.Effect<number, AppError> =>
 
 export const setPreference = (
   userId: string,
-  channel: "in-app" | "web-push",
-  eventType: "mention" | "assignment" | "comment" | "update" | "due",
+  channel: NotificationChannel,
+  eventType: NotificationPreferenceEvent,
   enabled: boolean
 ): Effect.Effect<void, AppError> =>
   Effect.tryPromise({
     catch: mapError,
     try: async () => {
       await verifyUser(userId);
+      if (channel === "email" && !isEmailEventType(eventType)) {
+        throw new AppError({
+          code: "VALIDATION_FAILED",
+          message: "Email is not available for that kind of update.",
+        });
+      }
       await db.orm.public.NotificationPreference.upsert({
         conflictOn: { channel, eventType, userId },
         create: {

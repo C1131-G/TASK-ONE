@@ -134,6 +134,16 @@ const portalActions: readonly ActionEntry[] = [
     () => ({})
   ),
   entry(
+    "setPortalEmailUpdatesAction",
+    portalNotifications.setPortalEmailUpdatesAction,
+    () => ({ enabled: true, idempotencyKey: nextKey() })
+  ),
+  entry(
+    "getPortalEmailUpdates",
+    portalQueries.getPortalEmailUpdates,
+    () => ({})
+  ),
+  entry(
     "registerPortalPushAction",
     portalPush.registerPortalPushAction,
     () => ({

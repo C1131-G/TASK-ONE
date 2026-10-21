@@ -3,7 +3,10 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
-import { getNotificationPreferences } from "@/features/notifications/notifications-queries";
+import {
+  getEmailSettings,
+  getNotificationPreferences,
+} from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
 import {
   CompanySettingsForm,
@@ -42,6 +45,7 @@ const SettingsPanel = async ({
     employees,
     sessions,
     notificationPrefs,
+    emailSettings,
   ] = await Promise.all([
     getPageSession(),
     getPersonalPreferences({}),
@@ -49,6 +53,7 @@ const SettingsPanel = async ({
     listAllEmployees(),
     listMySessions({}),
     getNotificationPreferences({}),
+    getEmailSettings({}),
   ]);
   const user = session.kind === "authenticated" ? session.user : null;
   const employee =
@@ -66,7 +71,10 @@ const SettingsPanel = async ({
       initialSection={initialSection}
       notificationPreferences={
         notificationPrefs.ok ? (
-          <NotificationPreferencesForm values={notificationPrefs.data} />
+          <NotificationPreferencesForm
+            emailDigest={emailSettings.ok ? emailSettings.data.digest : false}
+            values={notificationPrefs.data}
+          />
         ) : (
           <div className="panel-b muted">
             Notification preferences could not be loaded.

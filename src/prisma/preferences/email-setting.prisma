@@ -1,0 +1,15 @@
+// use prisma-8
+
+// One row per person who has changed an email delivery option. A missing row
+// means instant emails only, with no digest. lastDigestAt is the watermark the
+// daily digest reads unread notifications from.
+model EmailSetting {
+  userId       String @id
+  digest       Boolean @default(false)
+  lastDigestAt TimestamptzJsDate?
+  updatedAt    TimestamptzJsDate @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_setting")
+}
