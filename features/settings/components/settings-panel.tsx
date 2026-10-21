@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
 import { getNotificationPreferences } from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
+import { CalendarFeedCard } from "@/features/settings/components/calendar-feed-card";
 import {
   CompanySettingsForm,
   NotificationPreferencesForm,
@@ -14,6 +15,7 @@ import {
 import { SettingsWorkspace } from "@/features/settings/components/settings-workspace";
 import { SlaSettingsForm } from "@/features/settings/components/sla-settings-form";
 import {
+  getCalendarFeedStatus,
   getCompanySettings,
   getSlaSettings,
 } from "@/features/settings/settings-queries";
@@ -42,6 +44,7 @@ const SettingsPanel = async ({
     employees,
     sessions,
     notificationPrefs,
+    calendarFeed,
   ] = await Promise.all([
     getPageSession(),
     getPersonalPreferences({}),
@@ -49,6 +52,7 @@ const SettingsPanel = async ({
     listAllEmployees(),
     listMySessions({}),
     getNotificationPreferences({}),
+    getCalendarFeedStatus({}),
   ]);
   const user = session.kind === "authenticated" ? session.user : null;
   const employee =
@@ -65,13 +69,22 @@ const SettingsPanel = async ({
       canManageWorkspace={isAdmin}
       initialSection={initialSection}
       notificationPreferences={
-        notificationPrefs.ok ? (
-          <NotificationPreferencesForm values={notificationPrefs.data} />
-        ) : (
-          <div className="panel-b muted">
-            Notification preferences could not be loaded.
-          </div>
-        )
+        <>
+          {notificationPrefs.ok ? (
+            <NotificationPreferencesForm values={notificationPrefs.data} />
+          ) : (
+            <div className="panel-b muted">
+              Notification preferences could not be loaded.
+            </div>
+          )}
+          {calendarFeed.ok ? (
+            <CalendarFeedCard status={calendarFeed.data} />
+          ) : (
+            <div className="panel-b muted">
+              The calendar feed could not be loaded.
+            </div>
+          )}
+        </>
       }
       preferences={
         preferences.ok ? (

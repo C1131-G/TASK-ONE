@@ -1,0 +1,15 @@
+// use prisma-8
+
+// One secret calendar-feed link per user. Only the SHA-256 hash of the token
+// is stored; the token itself is shown once when it is created or rotated.
+model CalendarFeedToken {
+  id         Uuid @id @default(uuid())
+  userId     String @unique
+  tokenHash  String @unique
+  createdAt  TimestamptzJsDate @default(now())
+  lastUsedAt TimestamptzJsDate?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("calendar_feed_token")
+}

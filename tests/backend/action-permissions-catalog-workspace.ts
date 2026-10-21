@@ -99,6 +99,27 @@ export const workspaceActionCatalog: readonly ActionEntry[] = [
   ),
   entry("getCompanySettings", companyQueries.getCompanySettings, () => ({})),
   entry(
+    "getCalendarFeedStatus",
+    companyQueries.getCalendarFeedStatus,
+    () => ({})
+  ),
+  entry(
+    "rotateCalendarFeedAction",
+    companySettings.rotateCalendarFeedAction,
+    () => ({})
+  ),
+  entry(
+    "revokeCalendarFeedAction",
+    companySettings.revokeCalendarFeedAction,
+    () => ({})
+  ),
+  entry("getTasksCsvExportAction", tasks.getTasksCsvExportAction, () => ({})),
+  entry("importTasksCsvAction", tasks.importTasksCsvAction, () => ({
+    idempotencyKey: nextKey(),
+    projectId: ids.projectId,
+    text: "title\nImported by permission test\n",
+  })),
+  entry(
     "updateCompanySettingsAction",
     companySettings.updateCompanySettingsAction,
     () => ({

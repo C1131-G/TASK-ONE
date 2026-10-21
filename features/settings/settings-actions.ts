@@ -4,6 +4,10 @@ import { Effect, Schema } from "effect";
 import { refresh, revalidatePath, updateTag } from "next/cache";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
+import {
+  CalendarFeed,
+  CalendarFeedLive,
+} from "@/src/server/calendar/calendar-feed";
 import { companySettingsTag } from "@/src/server/company/company-cache";
 import {
   CompanySettingsInputSchema,
@@ -100,6 +104,66 @@ export async function updateSlaSettingsAction(input: unknown) {
   if (result.ok) {
     revalidatePath("/settings");
     revalidatePath("/bugs");
+    refresh();
+  }
+  return result;
+}
+
+const RotatedFeedSchema = Schema.Struct({
+  createdAt: Schema.String,
+  token: Schema.String,
+});
+
+// Not replayed through the idempotency store: that table would keep the
+// one-time secret. The settings card disables the button while it runs.
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function rotateCalendarFeedAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* rotateFeed() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const feed = yield* CalendarFeed;
+        return yield* feed.rotate(actor.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(CalendarFeedLive)
+      ),
+    undefined,
+    RotatedFeedSchema
+  );
+  if (result.ok) {
+    refresh();
+  }
+  return result;
+}
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function revokeCalendarFeedAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* revokeFeed() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const feed = yield* CalendarFeed;
+        yield* feed.revoke(actor.id);
+        return { done: true as const };
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(CalendarFeedLive)
+      ),
+    undefined,
+    Schema.Struct({ done: Schema.Literal(true) })
+  );
+  if (result.ok) {
     refresh();
   }
   return result;

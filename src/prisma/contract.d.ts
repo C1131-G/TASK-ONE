@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'528b7cf51b0cd2ed9244a8c489cebe1c38cc3e470114a3762bee79d8f4eff192'>;
+  StorageHashBase<'c975f8e5e1b1bf358a69ade14324983fb685a95315b23370c96ff4a4c9899b0a'>;
 export type ExecutionHash =
-  ExecutionHashBase<'eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651'>;
+  ExecutionHashBase<'dcff2b75a26b19e59a7bfadf9580ba990c914d83d0e5b76fc1790c50bf73bccb'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -436,6 +436,13 @@ export type FieldOutputTypes = {
     readonly CalendarEventAttendee: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly eventId: CodecTypes['pg/uuid@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+    };
+    readonly CalendarFeedToken: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly lastUsedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly tokenHash: CodecTypes['pg/text@1']['output'];
       readonly userId: CodecTypes['pg/text@1']['output'];
     };
     readonly ClientCompany: {
@@ -1015,6 +1022,13 @@ export type FieldInputTypes = {
       readonly eventId: CodecTypes['pg/uuid@1']['input'];
       readonly userId: CodecTypes['pg/text@1']['input'];
     };
+    readonly CalendarFeedToken: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly lastUsedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly tokenHash: CodecTypes['pg/text@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+    };
     readonly ClientCompany: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly createdById: CodecTypes['pg/text@1']['input'];
@@ -1592,6 +1606,13 @@ export type StorageColumnTypes = {
       readonly eventId: CodecTypes['pg/uuid@1']['output'];
       readonly userId: CodecTypes['pg/text@1']['output'];
     };
+    readonly calendar_feed_token: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly lastUsedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly tokenHash: CodecTypes['pg/text@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+    };
     readonly client_company: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly createdById: CodecTypes['pg/text@1']['output'];
@@ -2167,6 +2188,13 @@ export type StorageColumnInputTypes = {
     readonly calendar_event_attendee: {
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly eventId: CodecTypes['pg/uuid@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+    };
+    readonly calendar_feed_token: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly lastUsedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly tokenHash: CodecTypes['pg/text@1']['input'];
       readonly userId: CodecTypes['pg/text@1']['input'];
     };
     readonly client_company: {
@@ -2810,6 +2838,15 @@ export namespace Models {
     user: public_User;
     readonly [RelationKeys]?: 'event' | 'user';
   };
+  export type public_CalendarFeedToken = {
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    lastUsedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    tokenHash: CodecTypes['pg/text@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'];
+    user: public_User;
+    readonly [RelationKeys]?: 'user';
+  };
   export type public_ClientCompany = {
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
     createdById: CodecTypes['pg/text@1']['output'];
@@ -3296,6 +3333,7 @@ export namespace Models {
     bugFixAttempts: public_BugFixAttempt[];
     bugReleases: public_BugRelease[];
     bugVerifications: public_BugFixAttempt[];
+    calendarFeedToken: public_CalendarFeedToken | null;
     clientCompany: public_ClientCompany | null;
     clientCompanyHandlerships: public_ClientCompanyHandler[];
     createdBugRelations: public_BugRelation[];
@@ -3322,6 +3360,7 @@ export namespace Models {
       | 'bugFixAttempts'
       | 'bugReleases'
       | 'bugVerifications'
+      | 'calendarFeedToken'
       | 'clientCompany'
       | 'clientCompanyHandlerships'
       | 'createdBugRelations'
@@ -3372,6 +3411,7 @@ export declare const models: {
     BugSla: Models.public_BugSla;
     CalendarEvent: Models.public_CalendarEvent;
     CalendarEventAttendee: Models.public_CalendarEventAttendee;
+    CalendarFeedToken: Models.public_CalendarFeedToken;
     ClientCompany: Models.public_ClientCompany;
     ClientCompanyHandler: Models.public_ClientCompanyHandler;
     ClientCompanyProject: Models.public_ClientCompanyProject;
@@ -5239,6 +5279,61 @@ type ContractBase = Omit<
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'calendar_event_attendee';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly calendar_feed_token: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly lastUsedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly tokenHash: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['userId'] },
+                { readonly columns: readonly ['tokenHash'] },
+              ];
+              indexes: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'calendar_feed_token';
                     readonly columns: readonly ['userId'];
                   };
                   readonly target: {
@@ -9088,6 +9183,10 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'CalendarEventAttendee';
     };
+    readonly calendar_feed_token: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'CalendarFeedToken';
+    };
     readonly client_company: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'ClientCompany';
@@ -10631,6 +10730,58 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly eventId: { readonly column: 'eventId' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly CalendarFeedToken: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly lastUsedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly tokenHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'calendar_feed_token';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly lastUsedAt: { readonly column: 'lastUsedAt' };
+                readonly tokenHash: { readonly column: 'tokenHash' };
                 readonly userId: { readonly column: 'userId' };
               };
             };
@@ -13487,6 +13638,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['verifiedById'];
                 };
               };
+              readonly calendarFeedToken: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'CalendarFeedToken';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
               readonly clientCompany: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -14063,6 +14226,14 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'calendar_event';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'calendar_feed_token';
             readonly field: 'id';
             readonly namespace: 'public';
           };

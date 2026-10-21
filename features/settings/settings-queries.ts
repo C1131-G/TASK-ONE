@@ -3,6 +3,11 @@ import { Effect, Layer, Schema } from "effect";
 
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import {
+  CalendarFeed,
+  CalendarFeedLive,
+  CalendarFeedStatusSchema,
+} from "@/src/server/calendar/calendar-feed";
+import {
   CompanySettingsManagement,
   CompanySettingsManagementLive,
   CompanySettingsValuesSchema,
@@ -89,3 +94,23 @@ export const listDeadJobs = async (input: unknown) => {
   );
   return result;
 };
+
+export const getCalendarFeedStatus = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* getFeedStatus() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const feed = yield* CalendarFeed;
+        return yield* feed.status(actor.id);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(CalendarFeedLive)
+      ),
+    undefined,
+    CalendarFeedStatusSchema
+  );

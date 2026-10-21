@@ -16,6 +16,10 @@ const excludedByDesign = new Set([
   "requestTaskUploadAction",
   "resetEmployeePasswordAction",
   "revokeSessionAction",
+  // Naturally idempotent: revoking a link that is already gone changes nothing.
+  "revokeCalendarFeedAction",
+  // A replay would store the one-time secret in the idempotency table.
+  "rotateCalendarFeedAction",
   // Clearing a lockout is naturally idempotent; a repeat records nothing.
   "unlockUserAction",
 ]);
@@ -43,6 +47,7 @@ const replayedMutations = new Set([
   "createSavedViewAction",
   "createSubtaskAction",
   "createTaskAction",
+  "importTasksCsvAction",
   "createTeamAction",
   "deactivateEmployeeAction",
   "deleteCalendarEventAction",

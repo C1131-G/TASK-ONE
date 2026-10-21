@@ -21,6 +21,10 @@ import {
   undoCommentRemovalAction as undoCommentRemovalImpl,
 } from "./actions/tasks-comments";
 import {
+  getTasksCsvExportAction as getTasksCsvExportImpl,
+  importTasksCsvAction as importTasksCsvImpl,
+} from "./actions/tasks-csv";
+import {
   changeTaskColumnAction as changeTaskColumnImpl,
   createTaskAction as createTaskImpl,
   rescheduleTaskAction as rescheduleTaskImpl,
@@ -69,6 +73,14 @@ export async function listLabelsAction(input: unknown) {
 
 export async function listProjectTasksAction(input: unknown) {
   return await listProjectTasks(input);
+}
+
+export async function getTasksCsvExportAction(input: unknown) {
+  return await getTasksCsvExportImpl(input);
+}
+
+export async function importTasksCsvAction(input: unknown) {
+  return await importTasksCsvImpl(input);
 }
 
 export async function createTaskAction(input: unknown) {

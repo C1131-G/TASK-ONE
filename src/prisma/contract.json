@@ -52,6 +52,10 @@
       "model": "CalendarEventAttendee",
       "namespace": "public"
     },
+    "calendar_feed_token": {
+      "model": "CalendarFeedToken",
+      "namespace": "public"
+    },
     "client_company": {
       "model": "ClientCompany",
       "namespace": "public"
@@ -2992,6 +2996,84 @@
               },
               "namespaceId": "public",
               "table": "calendar_event_attendee"
+            }
+          },
+          "CalendarFeedToken": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastUsedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "tokenHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "lastUsedAt": {
+                  "column": "lastUsedAt"
+                },
+                "tokenHash": {
+                  "column": "tokenHash"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "calendar_feed_token"
             }
           },
           "ClientCompany": {
@@ -7519,6 +7601,22 @@
                   "namespace": "public"
                 }
               },
+              "calendarFeedToken": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "CalendarFeedToken",
+                  "namespace": "public"
+                }
+              },
               "clientCompany": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -10346,6 +10444,76 @@
                 ]
               },
               "uniques": []
+            },
+            "calendar_feed_token": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "lastUsedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "tokenHash": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "calendar_feed_token"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "userId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "tokenHash"
+                  ]
+                }
+              ]
             },
             "client_company": {
               "checks": [
@@ -15084,10 +15252,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "528b7cf51b0cd2ed9244a8c489cebe1c38cc3e470114a3762bee79d8f4eff192"
+    "storageHash": "c975f8e5e1b1bf358a69ade14324983fb685a95315b23370c96ff4a4c9899b0a"
   },
   "execution": {
-    "executionHash": "eaf548a469667b1a3ce4add2166ddc980b543cef73743d47e2e63cbcc8c85651",
+    "executionHash": "dcff2b75a26b19e59a7bfadf9580ba990c914d83d0e5b76fc1790c50bf73bccb",
     "mutations": {
       "defaults": [
         {
@@ -15185,6 +15353,17 @@
           },
           "ref": {
             "entry": "calendar_event",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "calendar_feed_token",
             "field": "id",
             "namespace": "public"
           }

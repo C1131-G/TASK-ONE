@@ -8,6 +8,7 @@ import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { GlobalTaskFilterBar } from "@/features/tasks/components/global-task-filter-bar";
 import { GlobalTaskRows } from "@/features/tasks/components/global-task-rows";
 import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
+import { TaskCsvTools } from "@/features/tasks/components/task-csv-tools";
 import {
   GLOBAL_TASK_VIEWS,
   filterGlobalTasks,
@@ -15,6 +16,7 @@ import {
   sortGlobalTasks,
 } from "@/features/tasks/global-task-view-state";
 import { useGlobalTaskView } from "@/features/tasks/hooks/use-global-task-view";
+import { exportFiltersFromSearch } from "@/features/tasks/task-csv-view";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -82,7 +84,14 @@ export const GlobalTasksWorkspace = ({
             {taskDescription(search.status, search.overdue, projects.length)}
           </p>
         </div>
-        <QuickTaskForm projects={projects} />
+        <div className="row">
+          <TaskCsvTools
+            filters={exportFiltersFromSearch(search)}
+            projects={projects}
+            today={today}
+          />
+          <QuickTaskForm projects={projects} />
+        </div>
       </div>
       <GlobalTaskFilterBar
         idPrefix="tasks"

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "table.calendar_feed_token",
+    "label": "Create table \"calendar_feed_token\"",
+    "summary": "Creates table \"calendar_feed_token\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "calendar_feed_token"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"calendar_feed_token\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"calendar_feed_token\"",
+        "sql": "CREATE TABLE \"public\".\"calendar_feed_token\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"lastUsedAt\" timestamptz,\n  \"tokenHash\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"calendar_feed_token\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.calendar_feed_token.calendar_feed_token_userId_key",
+    "label": "Add unique constraint on \"calendar_feed_token\" (userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "calendar_feed_token_userId_key",
+        "table": "calendar_feed_token"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"calendar_feed_token_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_userId_key",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"calendar_feed_token_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"calendar_feed_token\" ADD CONSTRAINT \"calendar_feed_token_userId_key\" UNIQUE (\"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"calendar_feed_token_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_userId_key",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.calendar_feed_token.calendar_feed_token_tokenHash_key",
+    "label": "Add unique constraint on \"calendar_feed_token\" (tokenHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "calendar_feed_token_tokenHash_key",
+        "table": "calendar_feed_token"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"calendar_feed_token_tokenHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_tokenHash_key",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"calendar_feed_token_tokenHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"calendar_feed_token\" ADD CONSTRAINT \"calendar_feed_token_tokenHash_key\" UNIQUE (\"tokenHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"calendar_feed_token_tokenHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_tokenHash_key",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.calendar_feed_token.calendar_feed_token_userId_fkey",
+    "label": "Add foreign key \"calendar_feed_token_userId_fkey\" on \"calendar_feed_token\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "calendar_feed_token_userId_fkey",
+        "table": "calendar_feed_token"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"calendar_feed_token_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_userId_fkey",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"calendar_feed_token_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"calendar_feed_token\"\nADD CONSTRAINT \"calendar_feed_token_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"calendar_feed_token_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "calendar_feed_token_userId_fkey",
+          "public",
+          "\"public\".\"calendar_feed_token\""
+        ]
+      }
+    ]
+  }
+]

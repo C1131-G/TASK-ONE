@@ -107,6 +107,21 @@ it("replays every task mutation", async () => {
     }
   );
   state.taskId = task.id;
+  const imported = await replay(
+    "importTasksCsvAction",
+    "owner",
+    tasks.importTasksCsvAction,
+    {
+      projectId: ids.projectId,
+      text: "title,priority\nReplay import,high\n",
+    }
+  );
+  expect(imported).toEqual({ created: 1, errors: [] });
+  const importedRows = await authPool.query(
+    "SELECT 1 FROM task WHERE \"projectId\" = $1 AND title = 'Replay import'",
+    [ids.projectId]
+  );
+  expect(importedRows.rowCount).toBe(1);
   const updated = await replay(
     "updateTaskAction",
     "owner",
