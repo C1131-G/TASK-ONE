@@ -122,3 +122,50 @@ it("navigates an existing same-origin client to a safe path", async () => {
     "https://workspace.example/tasks/123?tab=activity",
   ]);
 });
+
+const deliver = async (
+  parse: () => unknown
+): Promise<{ options: Record<string, unknown>; title: string }[]> => {
+  const { listeners, notifications } = loadWorker();
+  let completion: Promise<unknown> | undefined;
+  listeners.get("push")?.({
+    data: { json: parse },
+    waitUntil: (promise) => {
+      completion = promise;
+    },
+  });
+  await completion;
+  return notifications;
+};
+
+it("falls back to a shared tag and title when the payload has none", async () => {
+  const notifications = await deliver(() => ({ url: "/tasks" }));
+
+  expect(notifications).toEqual([
+    {
+      options: { body: "", data: { url: "/tasks" }, tag: "metsys-update" },
+      title: "Metsys update",
+    },
+  ]);
+});
+
+it("does not pass a non string tag through to the notification", async () => {
+  const notifications = await deliver(() => ({ tag: 42, title: "Hi" }));
+
+  expect(notifications[0]?.options["tag"]).toBe("metsys-update");
+});
+
+it("shows nothing for a payload that is not valid JSON", async () => {
+  const notifications = await deliver(() => {
+    throw new SyntaxError("Unexpected token");
+  });
+
+  expect(notifications).toEqual([]);
+});
+
+it("shows nothing for a push without data", () => {
+  const { listeners, notifications } = loadWorker();
+  listeners.get("push")?.({});
+
+  expect(notifications).toEqual([]);
+});
