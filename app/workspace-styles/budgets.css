@@ -1,0 +1,100 @@
+/* Project budgets: the burn bar, its numbers, the edit form and the admin list. */
+.workspace-app .budget-burn {
+  display: grid;
+  gap: var(--s-3);
+  --budget-color: var(--green);
+}
+.workspace-app .budget-burn[data-level="warning"] {
+  --budget-color: var(--amber);
+}
+.workspace-app .budget-burn[data-level="overrun"] {
+  --budget-color: var(--red);
+}
+.workspace-app .budget-burn-head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  justify-content: space-between;
+}
+.workspace-app .budget-level {
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.workspace-app .budget-track {
+  background: var(--sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  height: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.workspace-app .budget-progress {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.workspace-app .budget-progress::-webkit-progress-bar {
+  background: transparent;
+}
+.workspace-app .budget-progress::-webkit-progress-value {
+  background: var(--budget-color);
+}
+.workspace-app .budget-progress::-moz-progress-bar {
+  background: var(--budget-color);
+}
+.workspace-app .budget-threshold {
+  background: var(--text-2);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 2px;
+}
+.workspace-app .budget-numbers {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  margin: 0;
+}
+.workspace-app .budget-numbers dt {
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+}
+.workspace-app .budget-numbers dd {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin: 0;
+}
+.workspace-app .budget-note {
+  margin: 0;
+}
+.workspace-app .budget-panel-actions {
+  margin-top: var(--s-3);
+}
+.workspace-app .budget-form {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.workspace-app .budget-billable,
+.workspace-app .budget-form-actions {
+  grid-column: 1 / -1;
+}
+.workspace-app .budget-billable {
+  align-items: center;
+  display: flex;
+  gap: var(--s-2);
+}
+.workspace-app .budget-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  justify-content: flex-end;
+}
+.workspace-app .budget-list-bar {
+  min-width: 120px;
+}

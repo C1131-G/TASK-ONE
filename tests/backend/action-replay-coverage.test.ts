@@ -24,6 +24,8 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "clearProjectBudgetAction",
+  "saveProjectBudgetAction",
   "addTimeEntryAction",
   "deleteTimeEntryAction",
   "startTimerAction",

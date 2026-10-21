@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import type { listActivity } from "@/features/activity/activity-queries";
 import { ProjectActivityFeed } from "@/features/activity/components/project-activity-feed";
 import type { listBugs } from "@/features/bugs/bugs-queries";
@@ -10,6 +11,10 @@ import type { listCalendarEvents } from "@/features/calendar/calendar-queries";
 import { ProjectFiles } from "@/features/files/components/project-files";
 import type { listProjectFiles } from "@/features/files/files-queries";
 import { ProjectBoard } from "@/features/projects/components/project-board";
+import {
+  ProjectBudgetPanel,
+  ProjectBudgetPanelSkeleton,
+} from "@/features/projects/components/project-budget-panel";
 import { ProjectOverview } from "@/features/projects/components/project-overview";
 import { ProjectTaskViews } from "@/features/projects/components/project-task-views";
 import type { listProjects } from "@/features/projects/projects-queries";
@@ -117,6 +122,11 @@ const renderProjectOverview = ({
     <ProjectOverview
       activity={activityResult?.ok ? activityResult.data : []}
       activityUnavailable={!activityResult?.ok}
+      budget={
+        <SuspenseReveal fallback={<ProjectBudgetPanelSkeleton />}>
+          <ProjectBudgetPanel editable={isAdmin} projectId={project.id} />
+        </SuspenseReveal>
+      }
       currentUserId={currentUserId}
       employees={employees}
       isAdmin={isAdmin}
