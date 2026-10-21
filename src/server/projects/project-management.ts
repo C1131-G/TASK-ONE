@@ -1,5 +1,6 @@
 import { Layer } from "effect";
 
+import { setProjectClientVisibility } from "./project-client-visibility";
 import { ProjectManagement } from "./project-contracts";
 import { createProject } from "./project-create";
 import { duplicateProject } from "./project-duplicate";
@@ -25,6 +26,7 @@ export const ProjectManagementLive = Layer.succeed(
     listProjects,
     restoreProject,
     saveProjectMilestones,
+    setProjectClientVisibility,
     setProjectPeople,
     updateProject,
   })

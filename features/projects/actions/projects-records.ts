@@ -11,6 +11,7 @@ import {
   runServerAction,
 } from "@/src/server/core/server-action";
 import {
+  ProjectClientVisibilitySchema,
   ProjectManagement,
   ProjectSummarySchema,
 } from "@/src/server/projects/project-contracts";
@@ -21,6 +22,7 @@ import {
   VersionedProjectActionInputSchema,
   DuplicateProjectActionInputSchema,
   CreateProjectActionInputSchema,
+  SetProjectClientVisibilityActionInputSchema,
 } from "./projects-action-schemas";
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
@@ -202,3 +204,45 @@ export async function archiveProjectAction(input: unknown) {
 }
 
 // eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+
+// eslint-disable-next-line func-style -- Next Server Actions stay named declarations.
+export async function setProjectClientVisibilityAction(input: unknown) {
+  const result = await runServerAction(
+    input,
+    SetProjectClientVisibilityActionInputSchema,
+    (validated) =>
+      Effect.gen(function* setProjectClientVisibility() {
+        const requestHeaders = yield* requestHeadersOrFail;
+        const administrator = yield* requireAdmin(requestHeaders);
+        const projects = yield* ProjectManagement;
+        const idempotency = yield* Idempotency;
+        const { idempotencyKey, ...visibilityInput } = validated;
+        return yield* idempotency.run({
+          actorId: administrator.id,
+          execute: () =>
+            projects.setProjectClientVisibility(
+              administrator.id,
+              visibilityInput.projectId,
+              visibilityInput.expectedVersion,
+              visibilityInput.visible
+            ),
+          input: visibilityInput,
+          key: idempotencyKey,
+          operation: "project.setClientVisibility",
+          resultSchema: ProjectClientVisibilitySchema,
+        });
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(ProjectManagementLive),
+        Effect.provide(IdempotencyLive)
+      ),
+    undefined,
+    ServerActionOutputSchema
+  );
+  if (result.ok) {
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${result.data.id}`);
+    refresh();
+  }
+  return result;
+}

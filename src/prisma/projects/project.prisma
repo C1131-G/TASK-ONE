@@ -13,6 +13,7 @@ model Project {
   teamId      Uuid?
   leadId      String?
   position    Int @default(0)
+  clientVisible Boolean @default(false)
   archivedAt  TimestamptzJsDate?
   archivedById String?
   createdAt   TimestamptzJsDate @default(now())

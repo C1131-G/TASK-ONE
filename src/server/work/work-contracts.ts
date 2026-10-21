@@ -136,6 +136,12 @@ export const TaskVersionResultSchema = Schema.Struct({
   version: Schema.Number,
 });
 
+export const TaskClientVisibilitySchema = Schema.Struct({
+  clientVisible: Schema.Boolean,
+  version: Schema.Number,
+});
+export type TaskClientVisibility = typeof TaskClientVisibilitySchema.Type;
+
 export interface TaskArchiveUndoReceipt {
   readonly undoId: string;
   readonly expiresAt: string;
@@ -155,6 +161,7 @@ export interface BulkTaskChanges {
 
 export interface ProjectTaskListItem extends CreatedTask {
   readonly archivedAt: string | null;
+  readonly clientVisible: boolean;
   readonly completedAt: string | null;
   readonly estimate: string | null;
   readonly position: number;
@@ -174,6 +181,7 @@ export const ProjectTaskListItemSchema = Schema.Struct({
   assignees: Schema.Array(
     Schema.Struct({ id: Schema.String, name: Schema.String })
   ),
+  clientVisible: Schema.Boolean,
   completedAt: Schema.NullOr(Schema.String),
   completedSubtaskCount: Schema.Number,
   dependencyIds: Schema.Array(Schema.String),
@@ -213,6 +221,12 @@ export class WorkManagement extends Context.Service<
         readonly startDate: string | null;
       }
     ) => Effect.Effect<{ readonly version: number }, AppError>;
+    readonly setTaskClientVisibility: (
+      actorId: string,
+      taskId: string,
+      expectedVersion: number,
+      visible: boolean
+    ) => Effect.Effect<TaskClientVisibility, AppError>;
     readonly updateTask: (
       actorId: string,
       taskId: string,

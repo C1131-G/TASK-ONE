@@ -2,7 +2,13 @@
 
 /* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
 
-import { Bell, Bug, ListChecks, UserCircle } from "@phosphor-icons/react";
+import {
+  Bell,
+  Bug,
+  FolderOpen,
+  ListChecks,
+  UserCircle,
+} from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import type { Route } from "next";
 import type { ReactNode } from "react";
@@ -22,6 +28,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     icon: ListChecks,
     label: "Company bugs",
     match: (path) => path === "/portal" || path.startsWith("/portal/bugs"),
+  },
+  {
+    href: "/portal/projects",
+    icon: FolderOpen,
+    label: "Projects",
+    match: (path) => path.startsWith("/portal/projects"),
   },
   {
     href: "/portal/new",

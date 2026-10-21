@@ -182,6 +182,7 @@ export const listProjectTasks = (
             id: user.id,
             name: user.name,
           })),
+          clientVisible: task.clientVisible,
           completedAt: task.completedAt?.toISOString() ?? null,
           completedSubtaskCount: taskSubtasks.filter(
             ({ isCompleted }) => isCompleted

@@ -34,6 +34,13 @@ export const VersionedProjectActionInputSchema = Schema.Struct({
   projectId: UUIDSchema,
 });
 
+export const SetProjectClientVisibilityActionInputSchema = Schema.Struct({
+  expectedVersion: Schema.Number,
+  idempotencyKey: IdempotencyKeySchema,
+  projectId: UUIDSchema,
+  visible: Schema.Boolean,
+});
+
 export const SetProjectPeopleActionInputSchema = Schema.Struct({
   expectedVersion: Schema.Number,
   idempotencyKey: IdempotencyKeySchema,

@@ -17,6 +17,8 @@ export interface EditableTask {
   readonly labelIds: readonly string[];
   readonly dependencyIds: readonly string[];
   readonly recurrence: TaskRecurrenceInput | null;
+  // Whether the task is shown in the client portal's project view.
+  readonly clientVisible?: boolean;
 }
 
 // The fields the details section edits. Assignees are kept sorted so the dirty

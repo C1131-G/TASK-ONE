@@ -5,6 +5,7 @@ export interface ProjectControlsData {
   readonly description: string | null;
   readonly status: "planning" | "active" | "risk" | "hold" | "complete";
   readonly version: number;
+  readonly clientVisible: boolean;
   readonly memberIds: readonly string[];
   readonly leadId: string | null;
   readonly color: string;

@@ -112,6 +112,16 @@ export const personalProjectActionCatalog: readonly ActionEntry[] = [
     projectId: ids.projectId,
     status: "planning",
   })),
+  entry(
+    "setProjectClientVisibilityAction",
+    projects.setProjectClientVisibilityAction,
+    () => ({
+      expectedVersion: 1,
+      idempotencyKey: nextKey(),
+      projectId: ids.projectId,
+      visible: true,
+    })
+  ),
   entry("archiveProjectAction", projects.archiveProjectAction, () => ({
     expectedVersion: 1,
     idempotencyKey: nextKey(),
@@ -221,6 +231,16 @@ export const personalProjectActionCatalog: readonly ActionEntry[] = [
     startDate: "2026-03-10",
     taskId: ids.taskId,
   })),
+  entry(
+    "setTaskClientVisibilityAction",
+    tasks.setTaskClientVisibilityAction,
+    () => ({
+      expectedVersion: 1,
+      idempotencyKey: nextKey(),
+      taskId: ids.taskId,
+      visible: true,
+    })
+  ),
   entry("updateTaskAction", tasks.updateTaskAction, () => ({
     ...taskBody(),
     expectedVersion: 1,

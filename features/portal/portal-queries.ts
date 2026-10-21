@@ -17,6 +17,12 @@ import {
   ClientBugIdInputSchema,
   ListCompanyBugsInputSchema,
 } from "@/src/server/portal/portal-input-contracts";
+import {
+  PortalProjects,
+  PortalSharedProjectDetailSchema,
+  PortalSharedProjectInputSchema,
+  PortalSharedProjectListSchema,
+} from "@/src/server/portal/portal-project-contracts";
 import { Uploads } from "@/src/server/storage/uploads-contracts";
 
 import { runPortalAction, toPortalActor } from "./portal-action-runner";
@@ -32,6 +38,50 @@ export const listPortalProjects = async (input: unknown) =>
       }),
     Schema.Array(PortalProjectSchema),
     { preview: true }
+  );
+
+// Projects shared with the signed-in client's company, read only.
+export const listPortalSharedProjects = async (input: unknown) =>
+  await runPortalAction(
+    input,
+    Schema.Struct({}),
+    (user) =>
+      Effect.gen(function* listPortalSharedProjectsProgram() {
+        const projects = yield* PortalProjects;
+        return yield* projects.listSharedProjects(toPortalActor(user));
+      }),
+    PortalSharedProjectListSchema,
+    { preview: true }
+  );
+
+export const getPortalSharedProject = async (input: unknown) =>
+  await runPortalAction(
+    input,
+    PortalSharedProjectInputSchema,
+    (user, validated) =>
+      Effect.gen(function* getPortalSharedProjectProgram() {
+        const projects = yield* PortalProjects;
+        return yield* projects.getSharedProject(
+          toPortalActor(user),
+          validated.projectId
+        );
+      }),
+    PortalSharedProjectDetailSchema,
+    { preview: true }
+  );
+
+// Keyed by id so page metadata and the page body share one fetch per request.
+export const getPortalSharedProjectById = cache(
+  async (projectId: string) => await getPortalSharedProject({ projectId })
+);
+
+// The portal project page's record. A project the company may not see reads
+// as missing so its existence is never confirmed.
+export const getPortalSharedProjectRecord = async (projectId: string) =>
+  readRecordOrNotFound(
+    await getPortalSharedProjectById(projectId),
+    "This project",
+    HIDDEN_RECORD_CODES
   );
 
 export const listPortalBugs = async (input: unknown) =>

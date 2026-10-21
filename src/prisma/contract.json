@@ -4967,6 +4967,13 @@
                   "kind": "scalar"
                 }
               },
+              "clientVisible": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "color": {
                 "nullable": false,
                 "type": {
@@ -5212,6 +5219,9 @@
                 },
                 "archivedById": {
                   "column": "archivedById"
+                },
+                "clientVisible": {
+                  "column": "clientVisible"
                 },
                 "color": {
                   "column": "color"
@@ -6196,6 +6206,13 @@
                   "kind": "scalar"
                 }
               },
+              "clientVisible": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "completedAt": {
                 "nullable": true,
                 "type": {
@@ -6468,6 +6485,9 @@
                 },
                 "archivedById": {
                   "column": "archivedById"
+                },
+                "clientVisible": {
+                  "column": "clientVisible"
                 },
                 "completedAt": {
                   "column": "completedAt"
@@ -12596,6 +12616,15 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
+                "clientVisible": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
                 "color": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -13764,6 +13793,15 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "clientVisible": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
                 },
                 "completedAt": {
                   "codecId": "pg/timestamptz-date@1",
@@ -15571,7 +15609,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3e713382f93ef90aed7ac12d94e199668022017aae9b3e4f2bc1180c7a4fe6d6"
+    "storageHash": "e7b1156b738c8d25360fcb7707ac099494c734290b5f24b863edb6e9e67379c2"
   },
   "execution": {
     "executionHash": "399f8d751db94c3b892411df8f39c309abb750861c678d48365b84a628042941",

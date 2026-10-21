@@ -11,6 +11,7 @@ import {
   archiveProjectAction as archiveProjectImpl,
   createProjectAction as createProjectImpl,
   duplicateProjectAction as duplicateProjectImpl,
+  setProjectClientVisibilityAction as setProjectClientVisibilityImpl,
   updateProjectAction as updateProjectImpl,
 } from "./actions/projects-records";
 import {
@@ -37,6 +38,10 @@ export async function archiveProjectAction(input: unknown) {
 
 export async function restoreProjectAction(input: unknown) {
   return await restoreProjectImpl(input);
+}
+
+export async function setProjectClientVisibilityAction(input: unknown) {
+  return await setProjectClientVisibilityImpl(input);
 }
 
 export async function setProjectPeopleAction(input: unknown) {
