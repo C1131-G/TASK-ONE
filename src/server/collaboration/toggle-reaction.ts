@@ -3,6 +3,7 @@ import { Effect, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { queueRealtimeEvents } from "../realtime/publisher";
 import { mapError, uuidSchema } from "./internal";
 
 export const toggleReaction = (
@@ -62,6 +63,13 @@ export const toggleReaction = (
           emoji: value,
           userId: actorId,
         }).delete();
+        queueRealtimeEvents([
+          {
+            kind: "comment",
+            taskId: comment.taskId,
+            visibility: comment.visibility === "public" ? "public" : "internal",
+          },
+        ]);
         if (existing) {
           return { active: false };
         }
