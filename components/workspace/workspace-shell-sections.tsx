@@ -192,7 +192,7 @@ export const WorkspaceTopbarActions = ({ framePromise }: SectionProps) => {
   const { name, projects, role, unreadNotificationCount } = data;
   return (
     <>
-      <WorkspaceSearchPalette projects={projects} />
+      <WorkspaceSearchPalette projects={projects} role={role} />
       <Link
         aria-label={
           unreadNotificationCount > 0

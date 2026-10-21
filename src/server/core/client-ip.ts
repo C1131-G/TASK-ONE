@@ -68,13 +68,21 @@ export const withResolvedClientIp = (
   request: Request,
   config: ClientIpConfig = clientIpConfig
 ): Request => {
-  // Edit the copy's own headers: Bun keeps the original headers when the
-  // init passes a Headers object that ended up without the deleted entry.
-  const copy = new Request(request);
-  copy.headers.delete(RESOLVED_CLIENT_IP_HEADER);
+  // Build the copy from plain parts: `new Request(request)` throws under
+  // Node when the incoming request comes from Next's own Request class.
+  const headers = new Headers(request.headers);
+  headers.delete(RESOLVED_CLIENT_IP_HEADER);
   const ip = resolveClientIp(request.headers, config);
   if (ip) {
-    copy.headers.set(RESOLVED_CLIENT_IP_HEADER, ip);
+    headers.set(RESOLVED_CLIENT_IP_HEADER, ip);
   }
+  const hasBody = request.method !== "GET" && request.method !== "HEAD";
+  const copy = new Request(request.url, {
+    body: hasBody ? request.body : null,
+    duplex: "half",
+    headers,
+    method: request.method,
+    signal: request.signal,
+  } as RequestInit);
   return copy;
 };

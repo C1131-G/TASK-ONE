@@ -175,6 +175,8 @@ export const TaskDetailsPanel = ({
         )}
         <SheetContent
           className="workspace-app"
+          data-task-drawer=""
+          data-task-editable={editable || undefined}
           data-workspace-sheet=""
           side="right"
         >
