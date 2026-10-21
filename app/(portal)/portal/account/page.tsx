@@ -21,7 +21,7 @@ const Page = () => (
           <p>Your details, password and notification settings.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="account could not be loaded">
+      <SectionErrorBoundary title="Account couldn't load">
         <SuspenseReveal fallback={<PortalAccountSkeleton />}>
           <PortalAccount />
         </SuspenseReveal>

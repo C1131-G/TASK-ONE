@@ -28,6 +28,8 @@ const toDateValue = (date: Date | undefined) => {
 
 const WorkspaceDatePicker = ({
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
   className,
   defaultValue,
   disabled,
@@ -38,6 +40,9 @@ const WorkspaceDatePicker = ({
   value,
 }: {
   readonly ariaLabel?: string;
+  // Inline validation: the trigger is the control a field error describes.
+  readonly "aria-describedby"?: string | undefined;
+  readonly "aria-invalid"?: boolean | undefined;
   readonly className?: string;
   readonly defaultValue?: string | null;
   readonly disabled?: boolean;
@@ -78,6 +83,8 @@ const WorkspaceDatePicker = ({
       <Popover onOpenChange={setOpen} open={open}>
         <PopoverTrigger asChild>
           <Button
+            aria-describedby={ariaDescribedBy}
+            aria-invalid={ariaInvalid}
             aria-label={ariaLabel}
             aria-required={required || undefined}
             className={cn("w-full justify-between", className)}

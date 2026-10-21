@@ -7,8 +7,8 @@ import {
   SkeletonBone,
 } from "@/components/workspace/skeleton-shapes";
 import { SkelterSurface } from "@/components/workspace/skelter-surface";
-import { TeamCreateForm } from "@/features/people/components/people-admin-forms";
 import { TeamAdminControls } from "@/features/people/components/team-admin-controls";
+import { TeamCreateForm } from "@/features/people/components/team-create-form";
 import { listTeams } from "@/features/people/people-queries";
 import { getPageSession } from "@/src/server/auth/page-session";
 

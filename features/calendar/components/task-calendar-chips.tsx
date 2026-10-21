@@ -5,6 +5,7 @@
 import { useId, useOptimistic, useState } from "react";
 import type { DragEvent } from "react";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import { useTouchChipDrag } from "@/components/workspace/use-touch-chip-drag";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
@@ -203,15 +204,11 @@ export const CalendarEventChip = ({
   >
     <div className="panel-b stack calendar-event-details">
       <p>
-        <time dateTime={event.startsAt.toISOString()}>
-          {event.startsAt.toLocaleString()}
-        </time>
+        <LocalTime value={event.startsAt} />
         {event.endsAt ? (
           <>
             {" – "}
-            <time dateTime={event.endsAt.toISOString()}>
-              {event.endsAt.toLocaleString()}
-            </time>
+            <LocalTime value={event.endsAt} />
           </>
         ) : null}
       </p>

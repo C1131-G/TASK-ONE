@@ -22,13 +22,13 @@ const OverviewPage = () => (
           <h1>Workspace overview</h1>
           <p>Health of every project in Metsys.</p>
         </div>
-        <SectionErrorBoundary title="Overview actions could not be loaded">
+        <SectionErrorBoundary title="Overview actions couldn't load">
           <SuspenseReveal fallback={<WorkspaceOverviewActionsSkeleton />}>
             <WorkspaceOverviewActions />
           </SuspenseReveal>
         </SectionErrorBoundary>
       </div>
-      <SectionErrorBoundary title="Workspace overview could not be loaded">
+      <SectionErrorBoundary title="Workspace overview couldn't load">
         <SuspenseReveal
           fallback={
             <PanelSkeleton

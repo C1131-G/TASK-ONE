@@ -11,8 +11,12 @@ import type { CreateEmployeeInput, CreatedEmployee } from "./user-contracts";
 
 export type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-export const validationError = (message: string) =>
-  new AppError({ code: "VALIDATION_FAILED", message });
+export const validationError = (message: string, field?: string) =>
+  new AppError({
+    code: "VALIDATION_FAILED",
+    message,
+    ...(field ? { field } : {}),
+  });
 
 export const databaseError = (error: unknown): AppError => {
   if (error instanceof AppError) {
@@ -21,6 +25,7 @@ export const databaseError = (error: unknown): AppError => {
   if (isUniqueConstraintViolation(error)) {
     return new AppError({
       code: "CONFLICT",
+      field: "email",
       message: "An account with that email already exists.",
     });
   }
@@ -89,13 +94,16 @@ export const validatePerson = (
   const email = emailInput.trim().toLowerCase();
   const jobTitle = jobTitleInput?.trim() || null;
   if (!name || name.length > 160) {
-    throw validationError("Enter a name between 1 and 160 characters.");
+    throw validationError("Enter a name between 1 and 160 characters.", "name");
   }
   if (!Schema.is(EmailAddressSchema)(email)) {
-    throw validationError("Enter a valid email address.");
+    throw validationError("Enter a valid email address.", "email");
   }
   if (jobTitle && jobTitle.length > 120) {
-    throw validationError("Job titles must be 120 characters or fewer.");
+    throw validationError(
+      "Job titles must be 120 characters or fewer.",
+      "jobTitle"
+    );
   }
   return { email, jobTitle, name };
 };

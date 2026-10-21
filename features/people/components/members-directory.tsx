@@ -3,7 +3,7 @@
 
 "use client";
 
-import { Check, Minus } from "@phosphor-icons/react";
+import { Check, Minus, UsersThree } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -20,6 +20,7 @@ import {
   TableRow,
   TableRowHeader,
 } from "@/components/ui/table";
+import { EmptyState } from "@/components/workspace/empty-state";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { EmployeeAdminControls } from "@/features/people/components/employee-admin-controls";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
@@ -108,6 +109,36 @@ const RolePermissions = () => (
     </Table>
   </section>
 );
+
+const MembersEmptyState = ({
+  filtered,
+  onClearFilters,
+}: {
+  readonly filtered: boolean;
+  readonly onClearFilters: () => void;
+}) =>
+  filtered ? (
+    <EmptyState
+      action={
+        <WorkspaceButton
+          className="btn btn-secondary btn-sm"
+          onClick={onClearFilters}
+          type="button"
+        >
+          Clear filters
+        </WorkspaceButton>
+      }
+      description="Try another name or show every role."
+      icon={UsersThree}
+      title="No members match these filters"
+    />
+  ) : (
+    <EmptyState
+      description="People appear here once an admin adds their accounts."
+      icon={UsersThree}
+      title="No members yet"
+    />
+  );
 
 const MembersDirectory = ({
   canManageMembers,
@@ -270,11 +301,13 @@ const MembersDirectory = ({
               </TableBody>
             </Table>
           ) : (
-            <div className="members-empty panel-b muted">
-              {search || role !== "all"
-                ? "No members match these filters."
-                : "No members found."}
-            </div>
+            <MembersEmptyState
+              filtered={Boolean(search) || role !== "all"}
+              onClearFilters={() => {
+                setSearch("");
+                setRole("all");
+              }}
+            />
           )}
         </section>
       )}

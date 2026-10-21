@@ -18,7 +18,7 @@ const InboxPage = () => (
           <h1>Inbox</h1>
         </div>
       </div>
-      <SectionErrorBoundary title="inbox could not be loaded">
+      <SectionErrorBoundary title="Inbox couldn't load">
         <SuspenseReveal
           fallback={
             <PanelSkeleton label="Loading inbox…" rows={5} variant="inbox" />

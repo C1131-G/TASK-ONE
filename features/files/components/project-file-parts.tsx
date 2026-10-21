@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import type { ProjectFile } from "@/features/files/types/project-file-types";
@@ -71,7 +72,8 @@ const ProjectFileCard = ({
         {file.originalName}
       </strong>
       <span className="file-card-details">
-        {formatBytes(file.sizeBytes)} · {file.createdAt.slice(0, 10)}
+        {formatBytes(file.sizeBytes)} ·{" "}
+        <LocalTime format="date" value={file.createdAt} />
       </span>
       <span className={`file-copy-state ${file.copyState}`}>
         {FILE_COPY_STATE_LABELS[file.copyState]}

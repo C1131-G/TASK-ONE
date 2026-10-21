@@ -45,6 +45,8 @@ const toLocalDateTime = (date: Date | undefined, time: string) => {
 
 const WorkspaceDateTimePicker = ({
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
   className,
   defaultValue,
   id,
@@ -52,6 +54,9 @@ const WorkspaceDateTimePicker = ({
   required,
 }: {
   readonly ariaLabel: string;
+  // Inline validation: the trigger is the control a field error describes.
+  readonly "aria-describedby"?: string | undefined;
+  readonly "aria-invalid"?: boolean | undefined;
   readonly className?: string;
   readonly defaultValue?: string;
   readonly id: string;
@@ -88,6 +93,8 @@ const WorkspaceDateTimePicker = ({
       <Popover onOpenChange={setOpen} open={open}>
         <PopoverTrigger asChild>
           <Button
+            aria-describedby={ariaDescribedBy}
+            aria-invalid={ariaInvalid}
             aria-label={ariaLabel}
             aria-required={required || undefined}
             className={cn("w-full justify-between", className)}

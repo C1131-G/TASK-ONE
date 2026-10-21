@@ -5,30 +5,13 @@
 import { Archive, FolderOpen } from "@phosphor-icons/react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/workspace/empty-state";
+import { LocalTime } from "@/components/workspace/local-time";
 import { ArchiveRestoreButton } from "@/features/archive/components/archive-restore-button";
 import type {
   ArchivedProject,
   ArchivedTask,
 } from "@/features/archive/types/archive-workspace-types";
-
-const ArchiveEmptyState = ({
-  description,
-  title,
-  type,
-}: {
-  readonly description: string;
-  readonly title: string;
-  readonly type: "project" | "task";
-}) => {
-  const Icon = type === "task" ? Archive : FolderOpen;
-  return (
-    <div className="archive-empty-state">
-      <Icon aria-hidden="true" size={24} />
-      <h2>{title}</h2>
-      <p>{description}</p>
-    </div>
-  );
-};
 
 const ArchiveWorkspace = ({
   canRestore,
@@ -54,9 +37,12 @@ const ArchiveWorkspace = ({
                   <strong>{task.title}</strong>
                   <span>
                     {task.projectName}
-                    {task.archivedAt
-                      ? ` · Archived ${task.archivedAt.slice(0, 10)}`
-                      : ""}
+                    {task.archivedAt ? (
+                      <>
+                        {" · Archived "}
+                        <LocalTime format="date" value={task.archivedAt} />
+                      </>
+                    ) : null}
                   </span>
                 </div>
                 {canRestore ? (
@@ -70,10 +56,12 @@ const ArchiveWorkspace = ({
             ))}
           </div>
         ) : (
-          <ArchiveEmptyState
+          <EmptyState
             description="Archive finished or abandoned tasks to keep boards focused. They wait here until you restore them."
+            headingLevel={2}
+            icon={Archive}
+            size="panel"
             title="No archived tasks"
-            type="task"
           />
         )}
       </TabsContent>
@@ -85,9 +73,14 @@ const ArchiveWorkspace = ({
                 <div className="archive-row-main">
                   <strong>{project.name}</strong>
                   <span>
-                    {project.archivedAt
-                      ? `Archived ${project.archivedAt.slice(0, 10)}`
-                      : "Archived project"}
+                    {project.archivedAt ? (
+                      <>
+                        {"Archived "}
+                        <LocalTime format="date" value={project.archivedAt} />
+                      </>
+                    ) : (
+                      "Archived project"
+                    )}
                   </span>
                 </div>
                 {canRestore ? (
@@ -101,10 +94,12 @@ const ArchiveWorkspace = ({
             ))}
           </div>
         ) : (
-          <ArchiveEmptyState
+          <EmptyState
             description="Archived projects stay hidden from the workspace until an admin restores them."
+            headingLevel={2}
+            icon={FolderOpen}
+            size="panel"
             title="No archived projects"
-            type="project"
           />
         )}
       </TabsContent>

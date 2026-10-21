@@ -23,7 +23,7 @@ export { NotificationPreferencesForm } from "@/features/notifications/components
 
 const ProfileForm = ({ name }: { readonly name: string }) => {
   const fieldId = useId();
-  const { error, pending, setError, startTransition } = useSaveState();
+  const { error, pending, saved, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const result = await updateOwnProfileAction({
@@ -34,7 +34,7 @@ const ProfileForm = ({ name }: { readonly name: string }) => {
         setError(result.error.message);
         return;
       }
-      setError(null);
+      saved("Profile saved");
     });
   return (
     <form action={save} className="panel panel-b stack">
@@ -56,6 +56,7 @@ const ProfileForm = ({ name }: { readonly name: string }) => {
         </p>
       ) : null}
       <WorkspaceButton
+        aria-busy={pending || undefined}
         className="btn btn-primary"
         disabled={pending}
         type="submit"
@@ -72,7 +73,7 @@ const PreferencesForm = ({
   readonly values: PersonalPreferenceValues;
 }) => {
   const fieldId = useId();
-  const { error, pending, setError, startTransition } = useSaveState();
+  const { error, pending, saved, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const density = String(formData.get("density"));
@@ -93,7 +94,7 @@ const PreferencesForm = ({
         setError(result.error.message);
         return;
       }
-      setError(null);
+      saved("Preferences saved");
     });
   return (
     <form action={save} className="panel panel-b stack">
@@ -152,6 +153,7 @@ const PreferencesForm = ({
         </p>
       ) : null}
       <WorkspaceButton
+        aria-busy={pending || undefined}
         className="btn btn-primary"
         disabled={pending}
         type="submit"
@@ -168,7 +170,7 @@ const CompanySettingsForm = ({
   readonly values: CompanySettingsValues;
 }) => {
   const fieldId = useId();
-  const { error, pending, setError, startTransition } = useSaveState();
+  const { error, pending, saved, setError, startTransition } = useSaveState();
   const save = (formData: FormData) =>
     startTransition(async () => {
       const result = await updateCompanySettingsAction({
@@ -183,7 +185,7 @@ const CompanySettingsForm = ({
         setError(result.error.message);
         return;
       }
-      setError(null);
+      saved("Company settings saved");
     });
   return (
     <form action={save} className="panel panel-b stack">
@@ -257,6 +259,7 @@ const CompanySettingsForm = ({
         </p>
       ) : null}
       <WorkspaceButton
+        aria-busy={pending || undefined}
         className="btn btn-primary"
         disabled={pending}
         type="submit"

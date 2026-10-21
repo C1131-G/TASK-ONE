@@ -4,12 +4,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import {
   createClientCompanyAction,
   deactivateClientCompanyAction,
@@ -28,11 +33,13 @@ interface CompanyRef {
 type VersionSink = (version: number) => void;
 
 const COMPANY_NAME_MAX = 160;
+const COMPANY_FIELDS = ["name"] as const;
 
 const ClientCompanyCreateForm = () => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { clearErrors, errors, fieldProps, formId, formRef, showFailure } =
+    useFormErrors(COMPANY_FIELDS);
   const create = (formData: FormData) =>
     startTransition(async () => {
       const result = await createClientCompanyAction({
@@ -40,10 +47,10 @@ const ClientCompanyCreateForm = () => {
         name: String(formData.get("name") ?? "").trim(),
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
-      setError(null);
+      clearErrors();
       router.push(`/clients/${result.data.companyId}`, {
         transitionTypes: ["nav-forward"],
       });
@@ -59,30 +66,31 @@ const ClientCompanyCreateForm = () => {
       }
     >
       <form
+        aria-busy={pending || undefined}
         className="panel-b stack clients-dialog-body"
+        ref={formRef}
         onSubmit={(event) => {
           event.preventDefault();
           create(new FormData(event.currentTarget));
         }}
       >
-        <label className="field" htmlFor="client-company-create-name">
-          <span>Company name</span>
+        <div className="field">
+          <label htmlFor={`${formId}-name`}>Company name</label>
           <WorkspaceInput
             autoComplete="organization"
             className="input"
-            id="client-company-create-name"
+            id={`${formId}-name`}
             maxLength={COMPANY_NAME_MAX}
             name="name"
             required
+            {...fieldProps("name")}
           />
-        </label>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+          <WorkspaceFieldError errors={errors} field="name" formId={formId} />
+        </div>
+        <WorkspaceFormError errors={errors} />
         <div className="acts">
           <WorkspaceButton
+            aria-busy={pending || undefined}
             className="btn btn-primary"
             disabled={pending}
             type="submit"
@@ -105,7 +113,8 @@ const ClientCompanyRenameForm = ({
   readonly version: number;
 }) => {
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { clearErrors, errors, fieldProps, formId, formRef, showFailure } =
+    useFormErrors(COMPANY_FIELDS);
   const rename = (formData: FormData, close: () => void) =>
     startTransition(async () => {
       const result = await updateClientCompanyAction({
@@ -115,10 +124,10 @@ const ClientCompanyRenameForm = ({
         name: String(formData.get("name") ?? "").trim(),
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
-      setError(null);
+      clearErrors();
       onVersion(result.data.version);
       close();
     });
@@ -134,34 +143,32 @@ const ClientCompanyRenameForm = ({
     >
       {(close) => (
         <form
+          aria-busy={pending || undefined}
           className="panel-b stack clients-dialog-body"
+          ref={formRef}
           onSubmit={(event) => {
             event.preventDefault();
             rename(new FormData(event.currentTarget), close);
           }}
         >
-          <label
-            className="field"
-            htmlFor={`client-company-${company.id}-name`}
-          >
-            <span>Company name</span>
+          <div className="field">
+            <label htmlFor={`${formId}-name`}>Company name</label>
             <WorkspaceInput
               autoComplete="organization"
               className="input"
               defaultValue={company.name}
-              id={`client-company-${company.id}-name`}
+              id={`${formId}-name`}
               maxLength={COMPANY_NAME_MAX}
               name="name"
               required
+              {...fieldProps("name")}
             />
-          </label>
-          {error ? (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          ) : null}
+            <WorkspaceFieldError errors={errors} field="name" formId={formId} />
+          </div>
+          <WorkspaceFormError errors={errors} />
           <div className="acts">
             <WorkspaceButton
+              aria-busy={pending || undefined}
               className="btn btn-primary"
               disabled={pending}
               type="submit"

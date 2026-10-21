@@ -4,6 +4,7 @@
 
 import { useId, useRef, useState } from "react";
 
+import { useHydrated } from "@/components/workspace/use-hydrated";
 import { WorkspaceTimelineChart } from "@/features/projects/components/workspace-timeline-chart";
 import { WorkspaceTimelineControls } from "@/features/projects/components/workspace-timeline-controls";
 import { useMilestoneReschedule } from "@/features/projects/hooks/use-milestone-reschedule";
@@ -17,6 +18,7 @@ import type {
 } from "@/features/projects/types/workspace-timeline-types";
 import { useTaskReschedule } from "@/features/tasks/hooks/use-task-reschedule";
 import { useSearchParamState } from "@/hooks/use-search-param-state";
+import { dayKeyIn } from "@/lib/format-date";
 
 const DAY_MS = 86_400_000;
 const DAY_WIDTH = { month: 12, week: 32 } as const;
@@ -117,6 +119,7 @@ export const WorkspaceTimeline = ({
 }) => {
   const id = useId();
   const viewportRef = useRef<HTMLDivElement>(null);
+  const viewerTimeZone = useHydrated() ? undefined : "UTC";
   const [query, setQuery] = useState("");
   const [status, setStatus] = useSearchParamState(
     "tlStatus",
@@ -224,8 +227,13 @@ export const WorkspaceTimeline = ({
       rows.push({ key: task.id, task, type: "task" });
     }
   }
-  // eslint-disable-next-line react/purity -- The marker represents today's date.
-  const today = getOffset(new Date().toISOString().slice(0, 10), start);
+  // The marker is the viewer's local today; the server render uses UTC so
+  // hydration matches, then the client moves it to the viewer's zone.
+  const today = getOffset(
+    // eslint-disable-next-line react/purity -- The marker represents today's date.
+    dayKeyIn(new Date(), viewerTimeZone),
+    start
+  );
   const jumpToToday = () => {
     if (today < 0 || today >= dayCount) {
       return;

@@ -22,6 +22,15 @@
   align-items: center;
   gap: 4px;
 }
+.workspace-app .error {
+  color: var(--red);
+  font-size: var(--fs-sm);
+}
+.workspace-app .input[aria-invalid="true"],
+.workspace-app .select[aria-invalid="true"],
+.workspace-app .textarea[aria-invalid="true"] {
+  border-color: var(--red);
+}
 .workspace-app .input,
 .workspace-app .select,
 .workspace-app .textarea {

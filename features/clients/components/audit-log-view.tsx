@@ -1,5 +1,7 @@
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-restyle -- Workspace classes are defined in app/workspace-styles. */
 
+import { ListMagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
@@ -10,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EmptyState } from "@/components/workspace/empty-state";
 import {
   SkeletonBone,
   SkeletonDataGrid,
@@ -109,7 +112,16 @@ const AuditLogView = async ({
             </table>
           </section>
         ) : (
-          <p className="panel-b muted">No audit events match these filters.</p>
+          <EmptyState
+            action={
+              <Link className="btn btn-secondary btn-sm" href="/clients/audit">
+                Clear filters
+              </Link>
+            }
+            description="Widen the date range or clear the person and event filters."
+            icon={ListMagnifyingGlass}
+            title="No audit events match these filters"
+          />
         )}
       </section>
     </>

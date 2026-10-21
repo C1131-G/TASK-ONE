@@ -3,18 +3,37 @@
 
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDateTimePicker } from "@/components/workspace/workspace-date-time-picker";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import { WorkspaceModal } from "@/components/workspace/workspace-modal";
 import { createCalendarEventAction } from "@/features/calendar/calendar-actions";
 
+const EVENT_FIELDS = [
+  "title",
+  "startsAt",
+  "endsAt",
+  "location",
+  "description",
+] as const;
+
 const CalendarEventForm = () => {
-  const fieldId = useId();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const {
+    clearErrors,
+    errors,
+    fieldProps,
+    formId: fieldId,
+    formRef,
+    showFailure,
+  } = useFormErrors(EVENT_FIELDS);
   const [open, setOpen] = useState(false);
 
   const createEvent = (formData: FormData) => {
@@ -24,10 +43,13 @@ const CalendarEventForm = () => {
     const startValue = String(formData.get("startsAt") ?? "");
     const endValue = String(formData.get("endsAt") ?? "");
     if (!startValue) {
-      setError("Choose a start time.");
+      showFailure({
+        fieldErrors: { startsAt: "Choose a start time." },
+        message: "Choose a start time.",
+      });
       return;
     }
-    setError(null);
+    clearErrors();
     startTransition(async () => {
       const result = await createCalendarEventAction({
         attendeeIds: [],
@@ -40,7 +62,7 @@ const CalendarEventForm = () => {
         title: String(formData.get("title") ?? "").trim(),
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
       setOpen(false);
@@ -60,14 +82,16 @@ const CalendarEventForm = () => {
       }
     >
       <form
+        aria-busy={pending || undefined}
         className="stack"
+        ref={formRef}
         onSubmit={(event) => {
           event.preventDefault();
           createEvent(new FormData(event.currentTarget));
         }}
       >
-        <label className="field" htmlFor={`${fieldId}-title`}>
-          <span>Event title</span>
+        <div className="field">
+          <label htmlFor={`${fieldId}-title`}>Event title</label>
           <WorkspaceInput
             autoComplete="off"
             className="input"
@@ -75,61 +99,84 @@ const CalendarEventForm = () => {
             name="title"
             required
             id={`${fieldId}-title`}
+            {...fieldProps("title")}
           />
-        </label>
+          <WorkspaceFieldError errors={errors} field="title" formId={fieldId} />
+        </div>
         <div className="row">
-          <label className="field" htmlFor={`${fieldId}-startsAt`}>
-            <span>Starts</span>
+          <div className="field">
+            <label htmlFor={`${fieldId}-startsAt`}>Starts</label>
             <WorkspaceDateTimePicker
               ariaLabel="Choose event start date and time"
               className="input"
               id={`${fieldId}-startsAt`}
               name="startsAt"
               required
+              {...fieldProps("startsAt")}
             />
-          </label>
-          <label className="field" htmlFor={`${fieldId}-endsAt`}>
-            <span>Ends</span>
+            <WorkspaceFieldError
+              errors={errors}
+              field="startsAt"
+              formId={fieldId}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor={`${fieldId}-endsAt`}>Ends</label>
             <WorkspaceDateTimePicker
               ariaLabel="Choose event end date and time"
               className="input"
               id={`${fieldId}-endsAt`}
               name="endsAt"
+              {...fieldProps("endsAt")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="endsAt"
+              formId={fieldId}
+            />
+          </div>
         </div>
         <div className="row">
-          <label className="field grow" htmlFor={`${fieldId}-location`}>
-            <span>Location</span>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-location`}>Location</label>
             <WorkspaceInput
               className="input"
               maxLength={160}
               name="location"
               id={`${fieldId}-location`}
+              {...fieldProps("location")}
             />
-          </label>
-          <label className="field grow" htmlFor={`${fieldId}-description`}>
-            <span>Description</span>
+            <WorkspaceFieldError
+              errors={errors}
+              field="location"
+              formId={fieldId}
+            />
+          </div>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-description`}>Description</label>
             <WorkspaceInput
               className="input"
               maxLength={1000}
               name="description"
               id={`${fieldId}-description`}
+              {...fieldProps("description")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="description"
+              formId={fieldId}
+            />
+          </div>
         </div>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <WorkspaceFormError errors={errors} />
         <div className="acts">
           <WorkspaceButton
+            aria-busy={pending || undefined}
             className="btn btn-primary"
             disabled={pending}
             type="submit"
           >
-            {pending ? "Saving…" : "Create event"}
+            {pending ? "Creating…" : "Create event"}
           </WorkspaceButton>
         </div>
       </form>

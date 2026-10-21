@@ -21,7 +21,7 @@ const FavoritesPage = () => (
           <p>Projects and tasks you&apos;ve starred for quick access.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="favorites could not be loaded">
+      <SectionErrorBoundary title="Favorites couldn't load">
         <SuspenseReveal fallback={<FavoriteWorkSkeleton />}>
           <FavoriteWork />
         </SuspenseReveal>

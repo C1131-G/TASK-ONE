@@ -1,7 +1,10 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
+import { Pulse } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
+import { EmptyState } from "@/components/workspace/empty-state";
+import { LocalTime } from "@/components/workspace/local-time";
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
 
 const RecentActivityPanel = ({
@@ -27,13 +30,20 @@ const RecentActivityPanel = ({
               <strong>{activity.actorName}</strong>
               <p className="muted">{activity.action.replaceAll("_", " ")}</p>
             </div>
-            <time className="muted" dateTime={activity.createdAt}>
-              {activity.createdAt.slice(0, 10)}
-            </time>
+            <LocalTime
+              className="muted"
+              format="relative"
+              value={activity.createdAt}
+            />
           </article>
         ))
       ) : (
-        <p className="muted">No recent activity.</p>
+        <EmptyState
+          description="Changes to projects and tasks show up here as they happen."
+          icon={Pulse}
+          size="compact"
+          title="No recent activity"
+        />
       )}
     </div>
   </section>

@@ -21,7 +21,7 @@ export const generateMetadata = async ({
 const TeamPage = ({ params }: PageProps<"/teams/[teamId]">) => (
   <PageTransition>
     <div className="page">
-      <SectionErrorBoundary title="Team details could not be loaded">
+      <SectionErrorBoundary title="Team details couldn't load">
         <SuspenseReveal fallback={<TeamDetailSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {params.then(({ teamId }) => (

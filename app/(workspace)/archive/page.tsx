@@ -24,7 +24,7 @@ const ArchivePage = () => (
           </p>
         </div>
       </div>
-      <SectionErrorBoundary title="archive could not be loaded">
+      <SectionErrorBoundary title="Archive couldn't load">
         <SuspenseReveal fallback={<ArchivedWorkSkeleton />}>
           <ArchivedWork />
         </SuspenseReveal>

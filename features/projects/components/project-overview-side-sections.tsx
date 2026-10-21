@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { LocalTime } from "@/components/workspace/local-time";
 import type { ActivityEntry } from "@/src/server/activity/activity-management";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
@@ -125,9 +126,7 @@ const ProjectRecentActivity = ({
                 <span className="muted">{entry.taskTitle}</span>
               ) : null}
             </div>
-            <time dateTime={entry.createdAt}>
-              {entry.createdAt.slice(0, 10)}
-            </time>
+            <LocalTime format="relative" value={entry.createdAt} />
           </li>
         ))}
       </ul>

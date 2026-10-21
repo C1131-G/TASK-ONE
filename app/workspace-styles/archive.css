@@ -41,30 +41,6 @@
 .workspace-app .archive-workspace [data-slot="tabs-content"] {
   margin-top: 14px;
 }
-.workspace-app .archive-empty-state {
-  display: grid;
-  min-height: 220px;
-  align-content: center;
-  justify-items: center;
-  gap: 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  padding: 24px;
-  color: var(--text-3);
-  text-align: center;
-}
-.workspace-app .archive-empty-state h2 {
-  margin: 0;
-  color: var(--text);
-  font-size: var(--fs-md);
-}
-.workspace-app .archive-empty-state p {
-  max-width: 390px;
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.55;
-}
 .workspace-app .archive-list {
   overflow: hidden;
   border: 1px solid var(--border);

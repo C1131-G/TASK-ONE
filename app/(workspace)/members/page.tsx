@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { SuspenseReveal } from "@/components/ui/suspense-reveal";
+import { HeaderActionPlaceholder } from "@/components/workspace/header-action-placeholder";
 import { SkeletonBone } from "@/components/workspace/skeleton-shapes";
 import {
   MembersActions,
@@ -35,11 +36,11 @@ const MembersPage = ({ searchParams }: PageProps<"/members">) => (
             </Suspense>
           </p>
         </div>
-        <Suspense fallback={null}>
+        <Suspense fallback={<HeaderActionPlaceholder label="Add employee" />}>
           <MembersActions />
         </Suspense>
       </div>
-      <SectionErrorBoundary title="members could not be loaded">
+      <SectionErrorBoundary title="Members couldn't load">
         <SuspenseReveal fallback={<MembersSectionSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

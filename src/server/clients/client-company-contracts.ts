@@ -10,9 +10,11 @@ const VersionSchema = Schema.Number.check(
   Schema.isInt(),
   Schema.isGreaterThan(0)
 );
+const COMPANY_NAME_MESSAGE =
+  "Enter a company name between 1 and 160 characters.";
 const CompanyNameSchema = Schema.Trim.check(
-  Schema.isMinLength(1),
-  Schema.isMaxLength(160)
+  Schema.isMinLength(1, { message: COMPANY_NAME_MESSAGE }),
+  Schema.isMaxLength(160, { message: COMPANY_NAME_MESSAGE })
 );
 
 export const CreateClientCompanyInputSchema = Schema.Struct({

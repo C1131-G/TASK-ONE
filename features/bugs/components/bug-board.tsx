@@ -2,6 +2,9 @@
 
 "use client";
 
+import { Bug } from "@phosphor-icons/react";
+
+import { EmptyState } from "@/components/workspace/empty-state";
 import { BugCard } from "@/features/bugs/components/bug-list";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
@@ -44,7 +47,11 @@ export const BugBoard = ({ bugs }: { readonly bugs: readonly BugItem[] }) => (
                 <BugCard bugEntry={bugEntry} key={bugEntry.bug.id} />
               ))
             ) : (
-              <p className="muted bug-board-empty">No bugs</p>
+              <EmptyState
+                icon={Bug}
+                size="compact"
+                title="No bugs in this stage"
+              />
             )}
           </div>
         </section>

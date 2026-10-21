@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Home | Metsys" };
 
 const HomePage = ({ searchParams }: PageProps<"/">) => (
   <PageTransition>
-    <SectionErrorBoundary title="Your workspace could not be loaded">
+    <SectionErrorBoundary title="Your workspace couldn't load">
       <SuspenseReveal fallback={<WorkspaceHomeSkeleton />}>
         {/* oxlint-disable-next-line promise/prefer-await-to-then -- Resolve URL state at the route boundary while keeping the page synchronous. */}
         {searchParams.then((params) => (

@@ -22,7 +22,7 @@ const SearchPage = ({ searchParams }: PageProps<"/search">) => (
           <p>Find projects and tasks in Metsys.</p>
         </div>
       </div>
-      <SectionErrorBoundary title="search could not be loaded">
+      <SectionErrorBoundary title="Search couldn't load">
         <SuspenseReveal fallback={<SearchPanelSkeleton />}>
           {/* oxlint-disable-next-line promise/prefer-await-to-then -- The page stays synchronous so its chrome paints in the static shell. */}
           {searchParams.then((params) => (

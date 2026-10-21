@@ -3,25 +3,29 @@
 
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
+import { useFormErrors } from "@/components/workspace/use-form-errors";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import {
+  WorkspaceFieldError,
+  WorkspaceFormError,
+} from "@/components/workspace/workspace-field-error";
 import {
   WorkspaceSelect,
   WorkspaceSelectItem,
 } from "@/components/workspace/workspace-select";
 import { TemporaryPasswordReveal } from "@/features/people/components/temporary-password-reveal";
-import {
-  createEmployeeAction,
-  createTeamAction,
-} from "@/features/people/people-actions";
+import { createEmployeeAction } from "@/features/people/people-actions";
 
 interface TeamOption {
   readonly id: string;
   readonly name: string;
 }
+
+const EMPLOYEE_FIELDS = ["name", "email", "jobTitle"] as const;
 
 const EmployeeCreateForm = ({
   defaultTeamId,
@@ -32,14 +36,20 @@ const EmployeeCreateForm = ({
   readonly triggerLabel?: string;
   readonly teams: readonly TeamOption[];
 }) => {
-  const fieldId = useId();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const {
+    clearErrors,
+    errors,
+    fieldProps,
+    formId: fieldId,
+    formRef,
+    showFailure,
+  } = useFormErrors(EMPLOYEE_FIELDS);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
     null
   );
   const create = (formData: FormData) => {
-    setError(null);
+    clearErrors();
     setTemporaryPassword(null);
     startTransition(async () => {
       const result = await createEmployeeAction({
@@ -51,7 +61,7 @@ const EmployeeCreateForm = ({
         teamId: String(formData.get("teamId") ?? "") || null,
       });
       if (!result.ok) {
-        setError(result.error.message);
+        showFailure(result.error);
         return;
       }
       setTemporaryPassword(result.data.temporaryPassword);
@@ -68,15 +78,17 @@ const EmployeeCreateForm = ({
       }
     >
       <form
+        aria-busy={pending || undefined}
         className="panel-b stack"
+        ref={formRef}
         onSubmit={(event) => {
           event.preventDefault();
           create(new FormData(event.currentTarget));
         }}
       >
         <div className="row">
-          <label className="field grow" htmlFor={`${fieldId}-name`}>
-            <span>Name</span>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-name`}>Name</label>
             <WorkspaceInput
               autoComplete="name"
               className="input"
@@ -84,10 +96,16 @@ const EmployeeCreateForm = ({
               name="name"
               required
               id={`${fieldId}-name`}
+              {...fieldProps("name")}
             />
-          </label>
-          <label className="field grow" htmlFor={`${fieldId}-email`}>
-            <span>Work email</span>
+            <WorkspaceFieldError
+              errors={errors}
+              field="name"
+              formId={fieldId}
+            />
+          </div>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-email`}>Work email</label>
             <WorkspaceInput
               autoComplete="email"
               className="input"
@@ -96,20 +114,32 @@ const EmployeeCreateForm = ({
               required
               type="email"
               id={`${fieldId}-email`}
+              {...fieldProps("email")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="email"
+              formId={fieldId}
+            />
+          </div>
         </div>
         <div className="row">
-          <label className="field grow" htmlFor={`${fieldId}-jobTitle`}>
-            <span>Job title</span>
+          <div className="field grow">
+            <label htmlFor={`${fieldId}-jobTitle`}>Job title</label>
             <WorkspaceInput
               autoComplete="organization-title"
               className="input"
               maxLength={120}
               name="jobTitle"
               id={`${fieldId}-jobTitle`}
+              {...fieldProps("jobTitle")}
             />
-          </label>
+            <WorkspaceFieldError
+              errors={errors}
+              field="jobTitle"
+              formId={fieldId}
+            />
+          </div>
           <label className="field" htmlFor={`${fieldId}-role`}>
             <span>Role</span>
             <WorkspaceSelect
@@ -141,11 +171,7 @@ const EmployeeCreateForm = ({
             </WorkspaceSelect>
           </label>
         </div>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <WorkspaceFormError errors={errors} />
         {temporaryPassword ? (
           <TemporaryPasswordReveal
             note="It is shown once. The employee must change it at sign in."
@@ -155,6 +181,7 @@ const EmployeeCreateForm = ({
         ) : null}
         <div className="acts">
           <WorkspaceButton
+            aria-busy={pending || undefined}
             className="btn btn-primary"
             disabled={pending}
             type="submit"
@@ -167,90 +194,4 @@ const EmployeeCreateForm = ({
   );
 };
 
-const TeamCreateForm = () => {
-  const fieldId = useId();
-  const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const create = (formData: FormData, close: () => void) =>
-    startTransition(async () => {
-      const result = await createTeamAction({
-        color: String(formData.get("color")),
-        description: String(formData.get("description") ?? "").trim() || null,
-        idempotencyKey: crypto.randomUUID(),
-        name: String(formData.get("name") ?? "").trim(),
-      });
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-      setError(null);
-      close();
-    });
-  return (
-    <WorkspaceDisclosure
-      description="Create a team to organize employees."
-      title="New team"
-      trigger={
-        <WorkspaceButton className="btn btn-primary btn-sm" type="button">
-          New team
-        </WorkspaceButton>
-      }
-    >
-      {(close) => (
-        <form
-          className="panel-b stack"
-          onSubmit={(event) => {
-            event.preventDefault();
-            create(new FormData(event.currentTarget), close);
-          }}
-        >
-          <div className="row">
-            <label className="field grow" htmlFor={`${fieldId}-name`}>
-              <span>Team name</span>
-              <WorkspaceInput
-                className="input"
-                maxLength={80}
-                name="name"
-                required
-                id={`${fieldId}-name`}
-              />
-            </label>
-            <label className="field" htmlFor={`${fieldId}-color`}>
-              <span>Color</span>
-              <WorkspaceInput
-                className="input"
-                defaultValue="#4b5bd6"
-                name="color"
-                type="color"
-                id={`${fieldId}-color`}
-              />
-            </label>
-          </div>
-          <label className="field" htmlFor={`${fieldId}-description`}>
-            <span>Description</span>
-            <WorkspaceInput
-              className="input"
-              maxLength={500}
-              name="description"
-              id={`${fieldId}-description`}
-            />
-          </label>
-          {error ? (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <WorkspaceButton
-            className="btn btn-primary"
-            disabled={pending}
-            type="submit"
-          >
-            {pending ? "Creating…" : "Create team"}
-          </WorkspaceButton>
-        </form>
-      )}
-    </WorkspaceDisclosure>
-  );
-};
-
-export { EmployeeCreateForm, TeamCreateForm };
+export { EmployeeCreateForm };

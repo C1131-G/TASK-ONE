@@ -3,13 +3,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useOptimistic, useRef, useState, useTransition } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { FavoriteToggle } from "@/features/discovery/components/favorite-toggle";
 import { BoardCardTransition } from "@/features/tasks/components/board-card-transition";
 import { TaskManageControls } from "@/features/tasks/components/task-manage-controls";
 import { TaskStatusSelect } from "@/features/tasks/components/task-status-select";
+import { withTaskStatus } from "@/features/tasks/task-status-move";
 import { changeTaskColumnAction } from "@/features/tasks/tasks-actions";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
@@ -56,7 +57,11 @@ export const GlobalTaskBoard = ({
   const moveInFlight = useRef(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const tasks = taskGroups.flatMap((group) => group.tasks);
+  // A dropped card sits in its new column at once; a refused move falls back.
+  const [tasks, showMove] = useOptimistic(
+    taskGroups.flatMap((group) => group.tasks),
+    withTaskStatus<GlobalTask>
+  );
   const moveTask = (status: (typeof TASK_STATUSES)[number]["id"]) => {
     if (pending || moveInFlight.current) {
       return;
@@ -68,6 +73,7 @@ export const GlobalTaskBoard = ({
     }
     moveInFlight.current = true;
     startTransition(async () => {
+      showMove({ status, taskId: task.id });
       try {
         const result = await changeTaskColumnAction({
           expectedVersion: task.version,
