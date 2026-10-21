@@ -24,6 +24,11 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "addTimeEntryAction",
+  "deleteTimeEntryAction",
+  "startTimerAction",
+  "stopTimerAction",
+  "updateTimeEntryAction",
   "saveTaskTableColumnWidthsAction",
   "archiveProjectAction",
   "archiveTaskAction",

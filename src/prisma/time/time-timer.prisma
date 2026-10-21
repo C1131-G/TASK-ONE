@@ -1,0 +1,17 @@
+// use prisma-8
+
+// The one timer a person may have running. The primary key on userId is what
+// guarantees a single active timer; stopping it turns the row into a TimeEntry.
+model TimeTimer {
+  userId    String @id
+  taskId    Uuid
+  startedAt TimestamptzJsDate @default(now())
+  billable  Boolean @default(false)
+  note      String?
+
+  user User @relation("TimeTimerUser", fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("time_timer")
+}

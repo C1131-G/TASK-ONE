@@ -50,6 +50,8 @@ model User {
   pushSubscriptions PushSubscription[]
   pushDeliveries PushDelivery[]
   calendarFeedToken CalendarFeedToken?
+  timeEntries TimeEntry[] @relation("TimeEntryUser")
+  timeTimer TimeTimer? @relation("TimeTimerUser")
   emailSetting EmailSetting?
   emailDeliveries EmailDelivery[]
   clientCompany ClientCompany? @relation("ClientCompanyUsers", fields: [clientCompanyId], references: [id], onDelete: Restrict)

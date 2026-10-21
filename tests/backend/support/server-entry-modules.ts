@@ -13,6 +13,7 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/people/people-actions"),
   import("../../../features/projects/projects-actions"),
   import("../../../features/tasks/tasks-actions"),
+  import("../../../features/time/time-actions"),
   import("../../../features/activity/activity-queries"),
   import("../../../features/calendar/calendar-queries"),
   import("../../../features/dashboard/dashboard-queries"),
@@ -22,5 +23,6 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/people/people-queries"),
   import("../../../features/projects/projects-queries"),
   import("../../../features/tasks/tasks-queries"),
+  import("../../../features/time/time-queries"),
   import("../../../features/user/user-queries"),
 ]);

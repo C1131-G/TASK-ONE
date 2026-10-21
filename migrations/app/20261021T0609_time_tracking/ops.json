@@ -1,0 +1,404 @@
+[
+  {
+    "id": "table.time_entry",
+    "label": "Create table \"time_entry\"",
+    "summary": "Creates table \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"time_entry\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"time_entry\"",
+        "sql": "CREATE TABLE \"public\".\"time_entry\" (\n  \"billable\" bool DEFAULT false NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"minutes\" int4 NOT NULL,\n  \"note\" text,\n  \"taskId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userId\" text NOT NULL,\n  \"workDate\" date NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"time_entry_minutes_in_day_00206769\" CHECK (\"minutes\" > 0 AND \"minutes\" <= 1440)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"time_entry\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.time_timer",
+    "label": "Create table \"time_timer\"",
+    "summary": "Creates table \"time_timer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "time_timer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"time_timer\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"time_timer\"",
+        "sql": "CREATE TABLE \"public\".\"time_timer\" (\n  \"billable\" bool DEFAULT false NOT NULL,\n  \"note\" text,\n  \"startedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"taskId\" uuid NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"userId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"time_timer\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.time_entry.time_entry_taskId_idx_4965c936",
+    "label": "Create index \"time_entry_taskId_idx_4965c936\" on \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "time_entry_taskId_idx_4965c936",
+        "table": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"time_entry_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"time_entry_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"time_entry_taskId_idx_4965c936\" ON \"public\".\"time_entry\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"time_entry_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.time_entry.time_entry_userId_idx_a489d58a",
+    "label": "Create index \"time_entry_userId_idx_a489d58a\" on \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "time_entry_userId_idx_a489d58a",
+        "table": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"time_entry_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"time_entry_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"time_entry_userId_idx_a489d58a\" ON \"public\".\"time_entry\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"time_entry_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.time_entry.time_entry_userId_workDate_idx_3e48748b",
+    "label": "Create index \"time_entry_userId_workDate_idx_3e48748b\" on \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "time_entry_userId_workDate_idx_3e48748b",
+        "table": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"time_entry_userId_workDate_idx_3e48748b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_userId_workDate_idx_3e48748b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"time_entry_userId_workDate_idx_3e48748b\"",
+        "sql": "CREATE INDEX \"time_entry_userId_workDate_idx_3e48748b\" ON \"public\".\"time_entry\" (\"userId\", \"workDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"time_entry_userId_workDate_idx_3e48748b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_entry_userId_workDate_idx_3e48748b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.time_timer.time_timer_taskId_idx_4965c936",
+    "label": "Create index \"time_timer_taskId_idx_4965c936\" on \"time_timer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "time_timer_taskId_idx_4965c936",
+        "table": "time_timer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"time_timer_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_timer_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"time_timer_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"time_timer_taskId_idx_4965c936\" ON \"public\".\"time_timer\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"time_timer_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"time_timer_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.time_entry.time_entry_userId_fkey",
+    "label": "Add foreign key \"time_entry_userId_fkey\" on \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "time_entry_userId_fkey",
+        "table": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"time_entry_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_entry_userId_fkey",
+          "public",
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"time_entry_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"time_entry\"\nADD CONSTRAINT \"time_entry_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"time_entry_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_entry_userId_fkey",
+          "public",
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.time_entry.time_entry_taskId_fkey",
+    "label": "Add foreign key \"time_entry_taskId_fkey\" on \"time_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "time_entry_taskId_fkey",
+        "table": "time_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"time_entry_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_entry_taskId_fkey",
+          "public",
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"time_entry_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"time_entry\"\nADD CONSTRAINT \"time_entry_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"time_entry_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_entry_taskId_fkey",
+          "public",
+          "\"public\".\"time_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.time_timer.time_timer_userId_fkey",
+    "label": "Add foreign key \"time_timer_userId_fkey\" on \"time_timer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "time_timer_userId_fkey",
+        "table": "time_timer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"time_timer_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_timer_userId_fkey",
+          "public",
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"time_timer_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"time_timer\"\nADD CONSTRAINT \"time_timer_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"time_timer_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_timer_userId_fkey",
+          "public",
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.time_timer.time_timer_taskId_fkey",
+    "label": "Add foreign key \"time_timer_taskId_fkey\" on \"time_timer\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "time_timer_taskId_fkey",
+        "table": "time_timer"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"time_timer_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_timer_taskId_fkey",
+          "public",
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"time_timer_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"time_timer\"\nADD CONSTRAINT \"time_timer_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"time_timer_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "time_timer_taskId_fkey",
+          "public",
+          "\"public\".\"time_timer\""
+        ]
+      }
+    ]
+  }
+]

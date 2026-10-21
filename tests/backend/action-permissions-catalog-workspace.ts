@@ -27,6 +27,8 @@ const notificationsQueries =
   await import("../../features/notifications/notifications-queries");
 const peopleQueries = await import("../../features/people/people-queries");
 const tasks = await import("../../features/tasks/tasks-actions");
+const timeActions = await import("../../features/time/time-actions");
+const timeQueries = await import("../../features/time/time-queries");
 const tasksQueries = await import("../../features/tasks/tasks-queries");
 
 export const workspaceActionCatalog: readonly ActionEntry[] = [
@@ -238,4 +240,55 @@ export const workspaceActionCatalog: readonly ActionEntry[] = [
       notificationId: ids.random,
     })
   ),
+  entry("getRunningTimer", timeQueries.getRunningTimer, () => ({})),
+  entry("getTaskTime", timeQueries.getTaskTime, () => ({
+    taskId: ids.taskId,
+  })),
+  entry("getWeeklyTime", timeQueries.getWeeklyTime, () => ({
+    date: "2026-10-19",
+  })),
+  entry(
+    "listAssignedTaskOptions",
+    timeQueries.listAssignedTaskOptions,
+    () => ({})
+  ),
+  entry("getProjectTimeReport", timeQueries.getProjectTimeReport, () => ({
+    from: "2026-10-19",
+    projectId: ids.projectId,
+    to: "2026-10-25",
+  })),
+  entry("getProjectTimeCsvAction", timeActions.getProjectTimeCsvAction, () => ({
+    from: "2026-10-19",
+    projectId: ids.projectId,
+    to: "2026-10-25",
+  })),
+  entry("startTimerAction", timeActions.startTimerAction, () => ({
+    billable: false,
+    idempotencyKey: nextKey(),
+    note: null,
+    taskId: ids.taskId,
+  })),
+  entry("stopTimerAction", timeActions.stopTimerAction, () => ({
+    idempotencyKey: nextKey(),
+  })),
+  entry("addTimeEntryAction", timeActions.addTimeEntryAction, () => ({
+    billable: false,
+    idempotencyKey: nextKey(),
+    minutes: 30,
+    note: null,
+    taskId: ids.taskId,
+    workDate: "2026-10-20",
+  })),
+  entry("updateTimeEntryAction", timeActions.updateTimeEntryAction, () => ({
+    billable: false,
+    entryId: ids.random,
+    idempotencyKey: nextKey(),
+    minutes: 30,
+    note: null,
+    workDate: "2026-10-20",
+  })),
+  entry("deleteTimeEntryAction", timeActions.deleteTimeEntryAction, () => ({
+    entryId: ids.random,
+    idempotencyKey: nextKey(),
+  })),
 ];

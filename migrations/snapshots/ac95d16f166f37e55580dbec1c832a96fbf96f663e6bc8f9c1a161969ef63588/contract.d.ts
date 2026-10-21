@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e7b1156b738c8d25360fcb7707ac099494c734290b5f24b863edb6e9e67379c2'>;
+  StorageHashBase<'ac95d16f166f37e55580dbec1c832a96fbf96f663e6bc8f9c1a161969ef63588'>;
 export type ExecutionHash =
-  ExecutionHashBase<'399f8d751db94c3b892411df8f39c309abb750861c678d48365b84a628042941'>;
+  ExecutionHashBase<'01f3ac651fcd9dfd9d680e2fde0864ed30c7c2c94c376d82294cdb3ada01ac91'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -595,7 +595,6 @@ export type FieldOutputTypes = {
     readonly Project: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['output'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['output'];
       readonly color: CodecTypes['pg/text@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly description: CodecTypes['pg/text@1']['output'] | null;
@@ -695,7 +694,6 @@ export type FieldOutputTypes = {
     readonly Task: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['output'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['output'];
       readonly completedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly createdById: CodecTypes['pg/text@1']['output'];
@@ -760,6 +758,24 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly TimeEntry: {
+      readonly billable: CodecTypes['pg/bool@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly minutes: CodecTypes['pg/int4@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+      readonly workDate: CodecTypes['pg/date-string@1']['output'];
+    };
+    readonly TimeTimer: {
+      readonly billable: CodecTypes['pg/bool@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly startedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
     };
     readonly UndoRecord: {
       readonly action: CodecTypes['pg/text@1']['output'];
@@ -1193,7 +1209,6 @@ export type FieldInputTypes = {
     readonly Project: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['input'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['input'];
       readonly color: CodecTypes['pg/text@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly description: CodecTypes['pg/text@1']['input'] | null;
@@ -1293,7 +1308,6 @@ export type FieldInputTypes = {
     readonly Task: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['input'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['input'];
       readonly completedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly createdById: CodecTypes['pg/text@1']['input'];
@@ -1358,6 +1372,24 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly TimeEntry: {
+      readonly billable: CodecTypes['pg/bool@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly minutes: CodecTypes['pg/int4@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+      readonly workDate: CodecTypes['pg/date-string@1']['input'];
+    };
+    readonly TimeTimer: {
+      readonly billable: CodecTypes['pg/bool@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly startedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
     };
     readonly UndoRecord: {
       readonly action: CodecTypes['pg/text@1']['input'];
@@ -1791,7 +1823,6 @@ export type StorageColumnTypes = {
     readonly project: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['output'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['output'];
       readonly color: CodecTypes['pg/text@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly description: CodecTypes['pg/text@1']['output'] | null;
@@ -1891,7 +1922,6 @@ export type StorageColumnTypes = {
     readonly task: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['output'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['output'];
       readonly completedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly createdById: CodecTypes['pg/text@1']['output'];
@@ -1956,6 +1986,24 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly time_entry: {
+      readonly billable: CodecTypes['pg/bool@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly minutes: CodecTypes['pg/int4@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
+      readonly workDate: CodecTypes['pg/date-string@1']['output'];
+    };
+    readonly time_timer: {
+      readonly billable: CodecTypes['pg/bool@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly startedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'];
     };
     readonly undo_record: {
       readonly action: CodecTypes['pg/text@1']['output'];
@@ -2389,7 +2437,6 @@ export type StorageColumnInputTypes = {
     readonly project: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['input'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['input'];
       readonly color: CodecTypes['pg/text@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly description: CodecTypes['pg/text@1']['input'] | null;
@@ -2489,7 +2536,6 @@ export type StorageColumnInputTypes = {
     readonly task: {
       readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['input'] | null;
-      readonly clientVisible: CodecTypes['pg/bool@1']['input'];
       readonly completedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly createdById: CodecTypes['pg/text@1']['input'];
@@ -2554,6 +2600,24 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly time_entry: {
+      readonly billable: CodecTypes['pg/bool@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly minutes: CodecTypes['pg/int4@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
+      readonly workDate: CodecTypes['pg/date-string@1']['input'];
+    };
+    readonly time_timer: {
+      readonly billable: CodecTypes['pg/bool@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly startedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'];
     };
     readonly undo_record: {
       readonly action: CodecTypes['pg/text@1']['input'];
@@ -3102,7 +3166,6 @@ export namespace Models {
   export type public_Project = {
     archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     archivedById: CodecTypes['pg/text@1']['output'] | null;
-    clientVisible: CodecTypes['pg/bool@1']['output'];
     color: CodecTypes['pg/text@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
     description: CodecTypes['pg/text@1']['output'] | null;
@@ -3241,7 +3304,6 @@ export namespace Models {
   export type public_Task = {
     archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     archivedById: CodecTypes['pg/text@1']['output'] | null;
-    clientVisible: CodecTypes['pg/bool@1']['output'];
     completedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
     createdById: CodecTypes['pg/text@1']['output'];
@@ -3266,6 +3328,8 @@ export namespace Models {
     project: public_Project;
     recurrenceSources: public_RecurrenceGeneration[];
     recurrenceSuccessor: public_RecurrenceGeneration | null;
+    timeEntries: public_TimeEntry[];
+    timeTimers: public_TimeTimer[];
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
       | 'archivedBy'
@@ -3275,6 +3339,8 @@ export namespace Models {
       | 'project'
       | 'recurrenceSources'
       | 'recurrenceSuccessor'
+      | 'timeEntries'
+      | 'timeTimers'
       | 'uploadIntents';
   };
   export type public_TaskAssignee = {
@@ -3339,6 +3405,30 @@ export namespace Models {
     name: CodecTypes['pg/text@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     readonly [RelationKeys]?: never;
+  };
+  export type public_TimeEntry = {
+    billable: CodecTypes['pg/bool@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    minutes: CodecTypes['pg/int4@1']['output'];
+    note: CodecTypes['pg/text@1']['output'] | null;
+    taskId: CodecTypes['pg/uuid@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'];
+    workDate: CodecTypes['pg/date-string@1']['output'];
+    task: public_Task;
+    user: public_User;
+    readonly [RelationKeys]?: 'task' | 'user';
+  };
+  export type public_TimeTimer = {
+    billable: CodecTypes['pg/bool@1']['output'];
+    note: CodecTypes['pg/text@1']['output'] | null;
+    startedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    taskId: CodecTypes['pg/uuid@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'];
+    task: public_Task;
+    user: public_User;
+    readonly [RelationKeys]?: 'task' | 'user';
   };
   export type public_UndoRecord = {
     action: CodecTypes['pg/text@1']['output'];
@@ -3423,6 +3513,8 @@ export namespace Models {
     pushSubscriptions: public_PushSubscription[];
     reportedBugs: public_BugReport[];
     team: public_Team | null;
+    timeEntries: public_TimeEntry[];
+    timeTimer: public_TimeTimer | null;
     undoRecords: public_UndoRecord[];
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
@@ -3452,6 +3544,8 @@ export namespace Models {
       | 'pushSubscriptions'
       | 'reportedBugs'
       | 'team'
+      | 'timeEntries'
+      | 'timeTimer'
       | 'undoRecords'
       | 'uploadIntents';
   };
@@ -3524,6 +3618,8 @@ export declare const models: {
     TaskRecurrence: Models.public_TaskRecurrence;
     TaskSubtask: Models.public_TaskSubtask;
     Team: Models.public_Team;
+    TimeEntry: Models.public_TimeEntry;
+    TimeTimer: Models.public_TimeTimer;
     UndoRecord: Models.public_UndoRecord;
     UploadIntent: Models.public_UploadIntent;
     User: Models.public_User;
@@ -6955,16 +7051,6 @@ type ContractBase = Omit<
                   readonly nullable: true;
                   readonly many: false;
                 };
-                readonly clientVisible: {
-                  readonly dataType: 'pg/bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
-                  };
-                  readonly many: false;
-                };
                 readonly color: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -7911,16 +7997,6 @@ type ContractBase = Omit<
                   readonly nullable: true;
                   readonly many: false;
                 };
-                readonly clientVisible: {
-                  readonly dataType: 'pg/bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
-                  };
-                  readonly many: false;
-                };
                 readonly completedAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
@@ -8610,6 +8686,193 @@ type ContractBase = Omit<
               uniques: readonly [{ readonly columns: readonly ['name'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
+            };
+            readonly time_entry: {
+              columns: {
+                readonly billable: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly minutes: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly note: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly workDate: {
+                  readonly dataType: 'pg/date';
+                  readonly codecId: 'pg/date-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'time_entry_taskId_idx_4965c936';
+                  readonly prefix: 'time_entry_taskId_idx';
+                  readonly columns: readonly ['taskId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'time_entry_userId_idx_a489d58a';
+                  readonly prefix: 'time_entry_userId_idx';
+                  readonly columns: readonly ['userId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'time_entry_userId_workDate_idx_3e48748b';
+                  readonly prefix: 'time_entry_userId_workDate_idx';
+                  readonly columns: readonly ['userId', 'workDate'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'time_entry';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'time_entry';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly time_timer: {
+              columns: {
+                readonly billable: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly note: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly startedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['userId'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'time_timer_taskId_idx_4965c936';
+                  readonly prefix: 'time_timer_taskId_idx';
+                  readonly columns: readonly ['taskId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'time_timer';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'time_timer';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly undo_record: {
               columns: {
@@ -9514,6 +9777,14 @@ type ContractBase = Omit<
       readonly model: 'TaskSubtask';
     };
     readonly team: { readonly namespace: 'public' & NamespaceId; readonly model: 'Team' };
+    readonly time_entry: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'TimeEntry';
+    };
+    readonly time_timer: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'TimeTimer';
+    };
     readonly undo_record: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'UndoRecord';
@@ -12197,10 +12468,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly clientVisible: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
               readonly color: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -12359,7 +12626,6 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly archivedAt: { readonly column: 'archivedAt' };
                 readonly archivedById: { readonly column: 'archivedById' };
-                readonly clientVisible: { readonly column: 'clientVisible' };
                 readonly color: { readonly column: 'color' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly description: { readonly column: 'description' };
@@ -12975,10 +13241,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly clientVisible: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
               readonly completedAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -13134,6 +13396,28 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['successorTaskId'];
                 };
               };
+              readonly timeEntries: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TimeEntry';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
+                };
+              };
+              readonly timeTimers: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TimeTimer';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
+                };
+              };
               readonly uploadIntents: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -13152,7 +13436,6 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly archivedAt: { readonly column: 'archivedAt' };
                 readonly archivedById: { readonly column: 'archivedById' };
-                readonly clientVisible: { readonly column: 'clientVisible' };
                 readonly completedAt: { readonly column: 'completedAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly createdById: { readonly column: 'createdById' };
@@ -13533,6 +13816,145 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly name: { readonly column: 'name' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly TimeEntry: {
+            readonly fields: {
+              readonly billable: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly minutes: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly note: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly taskId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly workDate: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/date-string@1' };
+              };
+            };
+            readonly relations: {
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'time_entry';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly billable: { readonly column: 'billable' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly minutes: { readonly column: 'minutes' };
+                readonly note: { readonly column: 'note' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly userId: { readonly column: 'userId' };
+                readonly workDate: { readonly column: 'workDate' };
+              };
+            };
+          };
+          readonly TimeTimer: {
+            readonly fields: {
+              readonly billable: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly note: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly startedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly taskId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'time_timer';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly billable: { readonly column: 'billable' };
+                readonly note: { readonly column: 'note' };
+                readonly startedAt: { readonly column: 'startedAt' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly userId: { readonly column: 'userId' };
               };
             };
           };
@@ -14132,6 +14554,29 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['teamId'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly timeEntries: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TimeEntry';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly timeTimer: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TimeTimer';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
                 };
               };
               readonly undoRecords: {
@@ -14757,6 +15202,14 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'team';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'time_entry';
             readonly field: 'id';
             readonly namespace: 'public';
           };

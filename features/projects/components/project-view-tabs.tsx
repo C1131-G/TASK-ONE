@@ -6,6 +6,7 @@ import {
   CalendarBlank,
   Bug,
   ChartLineUp,
+  Clock,
   Files,
   List,
   SquaresFour,
@@ -48,5 +49,9 @@ export const ProjectViewTabs = ({
         {selected === id ? <TabUnderline name="project-view-tab" /> : null}
       </Link>
     ))}
+    <Link className="tab" href={`/projects/${projectId}/time`}>
+      <Clock aria-hidden="true" size={14} />
+      Time
+    </Link>
   </nav>
 );

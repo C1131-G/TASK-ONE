@@ -4,6 +4,7 @@ import { listTaskFilesAction } from "@/features/files/actions/files-upload-reque
 import { listTaskCommentsAction } from "@/features/tasks/actions/tasks-comments";
 import { listTaskSubtasksAction } from "@/features/tasks/actions/tasks-subtasks";
 import { getProjectTask } from "@/features/tasks/tasks-queries";
+import { getRunningTimer, getTaskTime } from "@/features/time/time-queries";
 
 export interface TaskFile {
   readonly id: string;
@@ -28,14 +29,17 @@ export const readTaskBundle = async (
   taskId: string,
   bugId?: string
 ) => {
-  const [task, comments, subtasks, files, bugHistory] = await Promise.all([
-    getProjectTask({ projectId, taskId }),
-    listTaskCommentsAction({ taskId }),
-    listTaskSubtasksAction({ taskId }),
-    listTaskFilesAction({ taskId }),
-    bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
-  ]);
-  return { bugHistory, comments, files, subtasks, task };
+  const [task, comments, subtasks, files, bugHistory, time, timer] =
+    await Promise.all([
+      getProjectTask({ projectId, taskId }),
+      listTaskCommentsAction({ taskId }),
+      listTaskSubtasksAction({ taskId }),
+      listTaskFilesAction({ taskId }),
+      bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
+      getTaskTime({ taskId }),
+      getRunningTimer({}),
+    ]);
+  return { bugHistory, comments, files, subtasks, task, time, timer };
 };
 
 export type TaskBundle = Awaited<ReturnType<typeof readTaskBundle>>;

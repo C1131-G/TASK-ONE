@@ -10,6 +10,7 @@ import type {
   TaskFile,
 } from "@/features/tasks/task-details-panel-data";
 import { getTaskBundleAction } from "@/features/tasks/tasks-actions";
+import type { RunningTimer, TaskTime } from "@/src/server/time/time-tracking";
 
 // Reads everything the task panel shows while it is open, and owns the panel's
 // error so the reads and the comment actions report into one place. A deep link
@@ -34,6 +35,8 @@ export const useTaskBundle = ({
         initialBundle.comments,
         initialBundle.subtasks,
         initialBundle.files,
+        initialBundle.time,
+        initialBundle.timer,
         ...(initialBundle.bugHistory ? [initialBundle.bugHistory] : []),
       ].find((result) => !result.ok)
     : undefined;
@@ -59,6 +62,12 @@ export const useTaskBundle = ({
   const [files, setFiles] = useState<readonly TaskFile[]>(
     initialBundle?.files.ok ? initialBundle.files.data : []
   );
+  const [time, setTime] = useState<TaskTime | null>(
+    initialBundle?.time.ok ? initialBundle.time.data : null
+  );
+  const [timer, setTimer] = useState<RunningTimer | null>(
+    initialBundle?.timer.ok ? initialBundle.timer.data : null
+  );
   const requestSequence = useRef(0);
 
   // The first failing read is reported; the reads that succeeded still show.
@@ -69,6 +78,8 @@ export const useTaskBundle = ({
         bundle.comments,
         bundle.subtasks,
         bundle.files,
+        bundle.time,
+        bundle.timer,
         ...(bundle.bugHistory ? [bundle.bugHistory] : []),
       ].find((result) => !result.ok);
       setError(failure && !failure.ok ? failure.error.message : null);
@@ -86,6 +97,12 @@ export const useTaskBundle = ({
       }
       if (bundle.bugHistory?.ok) {
         setBugHistory(bundle.bugHistory.data);
+      }
+      if (bundle.time.ok) {
+        setTime(bundle.time.data);
+      }
+      if (bundle.timer.ok) {
+        setTimer(bundle.timer.data);
       }
     },
     [setComments]
@@ -121,5 +138,7 @@ export const useTaskBundle = ({
     setSubtasks,
     subtasks,
     task,
+    time,
+    timer,
   };
 };

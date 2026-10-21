@@ -20,6 +20,7 @@ import type {
   EmployeeOption,
   TaskBundle,
 } from "@/features/tasks/task-details-panel-data";
+import { TaskTimeSection } from "@/features/time/components/task-time-section";
 
 const TaskPanelError = ({
   loading,
@@ -108,6 +109,8 @@ export const TaskDetailsPanel = ({
     setSubtasks,
     subtasks,
     task,
+    time,
+    timer,
   } = useTaskBundle({
     initialBundle,
     projectId,
@@ -219,6 +222,15 @@ export const TaskDetailsPanel = ({
                 }
               />
             )}
+            <TaskTimeSection
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              onChanged={refresh}
+              taskId={taskId}
+              taskTitle={taskTitle}
+              time={time}
+              timer={timer}
+            />
             <TaskCommentsSection
               body={comments.body}
               comments={comments.comments}

@@ -17,6 +17,7 @@ import {
   getTasksCsvExportAction,
   importTasksCsvAction,
 } from "@/features/tasks/tasks-actions";
+import { saveCsv } from "@/lib/save-csv";
 import type { TaskCsvFilters } from "@/src/server/tasks/task-csv";
 
 interface ProjectOption {
@@ -24,22 +25,7 @@ interface ProjectOption {
   readonly name: string;
 }
 
-// Excel needs the byte order mark to read UTF-8 names and accents correctly.
-const BYTE_ORDER_MARK = "﻿";
 const MAX_FILE_BYTES = 1_000_000;
-
-const saveCsv = (text: string, fileName: string) => {
-  const url = URL.createObjectURL(
-    new Blob([BYTE_ORDER_MARK, text], { type: "text/csv;charset=utf-8" })
-  );
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-};
 
 const ExportButton = ({
   filters,
