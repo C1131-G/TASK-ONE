@@ -137,4 +137,63 @@ test.describe("Project (/projects/[projectId])", () => {
       );
     });
   });
+
+  test.describe("project budget", () => {
+    test.beforeEach(() => {
+      test.skip(
+        !process.env["E2E_ADMIN_PASSWORD"],
+        "E2E_ADMIN_PASSWORD is not set"
+      );
+    });
+
+    test("an administrator sets a budget, sees its burn on the overview and the time report, then removes it", async ({
+      page,
+    }) => {
+      await openPopulatedProject(page, "overview");
+      const budget = page.getByRole("region", { name: "Budget" });
+      await expect(budget).toBeVisible({ timeout: 15_000 });
+
+      // Retry until the page has hydrated and the dialog opens.
+      await expect(async () => {
+        await budget.getByRole("button", { name: /budget/iu }).click();
+        await expect(page.getByLabel("Budget (hours)")).toBeVisible({
+          timeout: 2000,
+        });
+      }).toPass({ timeout: 60_000 });
+      await page.getByLabel("Budget (hours)").fill("40");
+      await page.getByLabel("Warn at (%)").fill("75");
+      await page.getByRole("button", { name: "Save budget" }).click();
+
+      await expect(budget.getByRole("progressbar")).toBeVisible();
+      await expect(budget.getByText("of 40h")).toBeVisible();
+      await expect(budget.getByText("On track")).toBeVisible();
+
+      await page.goto(page.url().replace(/\?.*$/u, "/time"));
+      const reportBudget = page.getByRole("region", { name: "Budget" });
+      await expect(reportBudget.getByText("of 40h")).toBeVisible({
+        timeout: 15_000,
+      });
+
+      await page.goto("/budgets");
+      await expect(
+        page.getByRole("link", { name: /UI Fixture Populated/u })
+      ).toBeVisible();
+
+      await page.goBack();
+      await page.goBack();
+      await expect(async () => {
+        await page
+          .getByRole("region", { name: "Budget" })
+          .getByRole("button", { name: "Edit budget" })
+          .click();
+        await expect(
+          page.getByRole("button", { name: "Remove budget" })
+        ).toBeVisible({ timeout: 2000 });
+      }).toPass({ timeout: 60_000 });
+      await page.getByRole("button", { name: "Remove budget" }).click();
+      await expect(
+        page.getByText("No hours budget has been set for this project.")
+      ).toBeVisible();
+    });
+  });
 });

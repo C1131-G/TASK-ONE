@@ -20,7 +20,7 @@ const MONTHS = [
   "Nov",
   "Dec",
 ] as const;
-const MONTH_KEY = /^(?<year>\d{4})-(?<month>\d{2})$/u;
+const MONTH_KEY = /^\d{4}-(?:0[1-9]|1[0-2])$/u;
 const RATE_TEXT = /^\d+(?:\.\d{1,2})?$/u;
 
 export const hoursToMinutes = (hours: number): number =>
@@ -52,9 +52,11 @@ export const parseRateToCents = (
 };
 
 export const periodLabel = (key: string): string => {
-  const parts = MONTH_KEY.exec(key)?.groups;
-  const month = parts ? MONTHS[Number(parts["month"]) - 1] : undefined;
-  return parts && month ? `${month} ${parts["year"]}` : "All time";
+  if (!MONTH_KEY.test(key)) {
+    return "All time";
+  }
+  const [year, month] = key.split("-");
+  return `${MONTHS[Number(month) - 1] ?? ""} ${year}`;
 };
 
 export const levelLabel = (level: BurnLevel): string => {
