@@ -40,8 +40,10 @@ function CommandDialog({
   className,
   showCloseButton = false,
   workspace = false,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof Dialog> & {
+  onCloseAutoFocus?: React.ComponentProps<typeof DialogContent>["onCloseAutoFocus"]
   title?: string
   description?: string
   className?: string
@@ -60,6 +62,7 @@ function CommandDialog({
           workspace ? "rounded-[10px]!" : "rounded-4xl!",
           className
         )}
+        onCloseAutoFocus={onCloseAutoFocus}
         showCloseButton={showCloseButton}
         workspace={workspace}
       >
