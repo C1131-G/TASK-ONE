@@ -12,17 +12,20 @@ import {
   FolderOpen,
   GearSix,
   House,
+  Keyboard,
   ListChecks,
   MagnifyingGlass,
+  Plus,
   Pulse,
   SquaresFour,
   Star,
   Tray,
+  UserPlus,
   UsersThree,
 } from "@phosphor-icons/react";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +38,26 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command";
+import {
+  readViewer,
+  useIsMac,
+  useWorkspaceShortcuts,
+} from "@/components/workspace/use-workspace-shortcuts";
+import {
+  getAvailableCommands,
+  getPaletteToggleKeys,
+} from "@/components/workspace/workspace-commands";
+import type {
+  CommandId,
+  Viewer,
+  WorkspaceCommand,
+} from "@/components/workspace/workspace-commands";
 import { getNavigationTransitionType } from "@/components/workspace/workspace-navigation-data";
+import {
+  ShortcutKeys,
+  WorkspaceShortcutsHelp,
+} from "@/components/workspace/workspace-shortcuts-help";
+import { QuickTaskForm } from "@/features/tasks/components/quick-task-form";
 
 const pages = [
   { Icon: House, href: "/", label: "Home" },
@@ -56,8 +78,44 @@ const pages = [
   { Icon: GearSix, href: "/settings", label: "Settings" },
 ] as const;
 
+const COMMAND_ICONS = {
+  "assign-task": UsersThree,
+  "create-task": Plus,
+  "go-home": House,
+  "go-inbox": Tray,
+  "go-projects": FolderOpen,
+  "go-tasks": ListChecks,
+  "invite-member": UserPlus,
+  "new-project": FolderOpen,
+  "set-status": CheckCircle,
+  "show-shortcuts": Keyboard,
+} as const satisfies Record<CommandId, unknown>;
+
+// Task actions land on a control inside the open task drawer.
+const TASK_CONTROL_SELECTORS = {
+  "assign-task": '[data-task-drawer] [id$="-assignee-search"]',
+  "set-status": '[data-task-drawer] [id$="-status"]',
+} as const;
+
+type TaskControlId = keyof typeof TASK_CONTROL_SELECTORS;
+
+const focusTaskControl = (id: TaskControlId) => {
+  const control = document.querySelector(TASK_CONTROL_SELECTORS[id]);
+  if (control instanceof HTMLElement) {
+    control.focus();
+  }
+};
+
+const isTaskControlId = (id: CommandId): id is TaskControlId =>
+  id in TASK_CONTROL_SELECTORS;
+
+// Navigation commands that have a "Go to" key show it beside their page below.
+const isPageShortcut = (command: WorkspaceCommand) =>
+  command.group === "Navigate";
+
 const WorkspaceSearchPalette = ({
   projects,
+  role,
 }: {
   readonly projects: readonly {
     readonly color: string;
@@ -65,22 +123,33 @@ const WorkspaceSearchPalette = ({
     readonly id: string;
     readonly name: string;
   }[];
+  readonly role: Viewer["role"];
 }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const [taskDrawer, setTaskDrawer] = useState<Viewer["taskDrawer"]>("none");
+  // A task action picked in the palette focuses its control once the palette
+  // has handed focus back, so the dialog's own restore does not win.
+  const pendingFocus = useRef<TaskControlId | null>(null);
+  const isMac = useIsMac();
+  const base = { canCreateTask: projects.length > 0, role };
+  const viewer: Viewer = { ...base, taskDrawer };
+  const commands = getAvailableCommands(viewer);
+  const keysByHref = new Map(
+    commands.flatMap(({ href, keys }) =>
+      href && keys.length > 0 ? [[href, keys] as const] : []
+    )
+  );
+  const toggleKeys = getPaletteToggleKeys(isMac);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setOpen(true);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  const openPalette = () => {
+    setTaskDrawer(readViewer(base).taskDrawer);
+    setOpen(true);
+  };
 
   const navigate = <Href extends string>(href: Route<Href>) => {
     setOpen(false);
@@ -90,22 +159,65 @@ const WorkspaceSearchPalette = ({
     });
   };
 
+  const run = (command: WorkspaceCommand) => {
+    if (command.href) {
+      navigate(command.href);
+      return;
+    }
+    setOpen(false);
+    setQuery("");
+    if (command.id === "create-task") {
+      setTaskFormOpen(true);
+    } else if (command.id === "show-shortcuts") {
+      setHelpOpen(true);
+    } else if (isTaskControlId(command.id)) {
+      if (open) {
+        pendingFocus.current = command.id;
+      } else {
+        focusTaskControl(command.id);
+      }
+    }
+  };
+
+  useWorkspaceShortcuts({
+    base,
+    isMac,
+    onRun: run,
+    onTogglePalette: () => (open ? setOpen(false) : openPalette()),
+  });
+
+  const commandGroups = (["Actions", "Help"] as const).map((group) => ({
+    commands: commands.filter(
+      (command) => command.group === group && !isPageShortcut(command)
+    ),
+    group,
+  }));
+
   return (
     <>
       <Button
+        aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
         aria-label="Search and jump to a page or project"
         className="topsearch"
         data-workspace-search-trigger=""
-        onClick={() => setOpen(true)}
+        onClick={openPalette}
         type="button"
         variant="outline"
       >
         <MagnifyingGlass aria-hidden="true" size={14} />
         <span className="lbltxt">Search or jump to…</span>
-        <kbd className="kbd">Ctrl K</kbd>
+        <kbd className="kbd">{toggleKeys.join(" ")}</kbd>
       </Button>
       <CommandDialog
-        description="Search workspace pages and projects, or open workspace search."
+        description="Search workspace pages and projects, run a command, or open workspace search."
+        onCloseAutoFocus={(event) => {
+          const pending = pendingFocus.current;
+          pendingFocus.current = null;
+          if (pending) {
+            event.preventDefault();
+            focusTaskControl(pending);
+          }
+        }}
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
           if (!nextOpen) {
@@ -119,11 +231,37 @@ const WorkspaceSearchPalette = ({
         <Command>
           <CommandInput
             onValueChange={setQuery}
-            placeholder="Search pages and projects…"
+            placeholder="Search commands, pages and projects…"
             value={query}
           />
           <CommandList>
-            <CommandEmpty>No matching pages or projects.</CommandEmpty>
+            <CommandEmpty>
+              No matching commands, pages or projects.
+            </CommandEmpty>
+            {commandGroups.map(({ commands: groupCommands, group }) =>
+              groupCommands.length ? (
+                <CommandGroup heading={group} key={group}>
+                  {groupCommands.map((command) => {
+                    const Icon = COMMAND_ICONS[command.id];
+                    return (
+                      <CommandItem
+                        key={command.id}
+                        onSelect={() => run(command)}
+                        value={`${command.label} ${command.id}`}
+                      >
+                        <Icon aria-hidden="true" size={16} />
+                        {command.label}
+                        {command.keys.length ? (
+                          <CommandShortcut>
+                            <ShortcutKeys keys={command.keys} />
+                          </CommandShortcut>
+                        ) : null}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              ) : null
+            )}
             <CommandGroup heading="Pages">
               {pages.map(({ href, Icon, label }) => (
                 <CommandItem
@@ -133,9 +271,12 @@ const WorkspaceSearchPalette = ({
                 >
                   <Icon aria-hidden="true" size={16} />
                   {label}
-                  {pathname === href ? (
-                    <CommandShortcut>Current</CommandShortcut>
-                  ) : null}
+                  <CommandShortcut>
+                    {pathname === href ? (
+                      <span className="mr-2">Current</span>
+                    ) : null}
+                    <ShortcutKeys keys={keysByHref.get(href) ?? []} />
+                  </CommandShortcut>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -170,6 +311,18 @@ const WorkspaceSearchPalette = ({
           </CommandList>
         </Command>
       </CommandDialog>
+      <WorkspaceShortcutsHelp
+        isMac={isMac}
+        onOpenChange={setHelpOpen}
+        open={helpOpen}
+        viewer={viewer}
+      />
+      <QuickTaskForm
+        onOpenChange={setTaskFormOpen}
+        open={taskFormOpen}
+        projects={projects}
+        trigger={null}
+      />
     </>
   );
 };
