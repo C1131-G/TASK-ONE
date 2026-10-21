@@ -5,6 +5,7 @@ import { and } from "@prisma/orm-postgres/orm-client";
 import type { db } from "@/src/prisma/db";
 
 import { enqueueEmails } from "../email/email-enqueue";
+import { queueRealtimeEvents } from "../realtime/publisher";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -67,10 +68,12 @@ export const notifyUsers = async (
   );
   const writes: Promise<unknown>[] = [];
   const issued: { userId: string; notificationId: string }[] = [];
+  const issuedInApp: string[] = [];
   for (const userId of activeIds) {
     const notificationId = randomUUID();
     issued.push({ notificationId, userId });
     if (!disabledChannels.has(`${userId}:in-app`)) {
+      issuedInApp.push(userId);
       writes.push(
         transaction.orm.public.Notification.create({
           actorId: notification.actorId,
@@ -108,6 +111,11 @@ export const notifyUsers = async (
       );
     }
   }
+  // Held until the surrounding transaction commits, then sent to each
+  // recipient's open tabs so the inbox and unread count refresh.
+  queueRealtimeEvents(
+    issuedInApp.map((userId) => ({ kind: "inbox" as const, userId }))
+  );
   writes.push(
     enqueueEmails(transaction, issued, {
       body: notification.snippet ?? "",

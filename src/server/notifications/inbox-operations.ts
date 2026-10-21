@@ -5,6 +5,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { isEmailEventType } from "../email/email-contracts";
+import { queueRealtimeEvents } from "../realtime/publisher";
 import type {
   InboxOptions,
   InboxPage,
@@ -102,6 +103,8 @@ export const markRead = (
           id: notificationId,
           userId,
         }).update({ readAt: new Date() });
+        // The unread count changes in the person's other tabs too.
+        queueRealtimeEvents([{ kind: "inbox", userId }]);
       }
     },
   });
@@ -123,6 +126,7 @@ export const markAllRead = (userId: string): Effect.Effect<number, AppError> =>
             readAt: null,
             userId,
           }).updateAll({ readAt: new Date() });
+          queueRealtimeEvents([{ kind: "inbox", userId }]);
         }
         return pending.length;
       });
