@@ -29,7 +29,13 @@ const NotificationPreferencesForm = ({
 }: {
   readonly values: readonly NotificationPreferenceValue[];
 }) => {
-  const { error, pending, setError, startTransition } = useSaveState();
+  const {
+    error,
+    pending,
+    saved: notifyPreferenceSaved,
+    setError,
+    startTransition,
+  } = useSaveState();
   const saved = new Map<string, boolean>();
   for (const { channel, enabled: isEnabled, eventType } of values) {
     saved.set(`${channel}:${eventType}`, isEnabled);
@@ -59,7 +65,11 @@ const NotificationPreferencesForm = ({
           eventType,
           idempotencyKey: crypto.randomUUID(),
         });
-        setError(result.ok ? null : result.error.message);
+        if (result.ok) {
+          notifyPreferenceSaved("Notification preference saved");
+        } else {
+          setError(result.error.message);
+        }
       } catch {
         setError("Your preference could not be saved. Try again.");
       }

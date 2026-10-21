@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { SuspenseReveal } from "@/components/ui/suspense-reveal";
+import { HeaderActionPlaceholder } from "@/components/workspace/header-action-placeholder";
 import { SkeletonBone } from "@/components/workspace/skeleton-shapes";
 import {
   MembersActions,
@@ -35,7 +36,7 @@ const MembersPage = ({ searchParams }: PageProps<"/members">) => (
             </Suspense>
           </p>
         </div>
-        <Suspense fallback={null}>
+        <Suspense fallback={<HeaderActionPlaceholder label="Add employee" />}>
           <MembersActions />
         </Suspense>
       </div>

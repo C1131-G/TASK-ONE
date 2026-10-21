@@ -215,6 +215,7 @@ const SlaSettingsForm = ({
         <output className="sr-only" />
       )}
       <WorkspaceButton
+        aria-busy={pending || undefined}
         className="btn btn-primary"
         disabled={pending}
         type="submit"
