@@ -1,0 +1,26 @@
+// use prisma-8
+
+// An admin-defined field on every task of one project. Archiving hides the
+// field but keeps its values; the type never changes after creation. Select
+// options are plain labels kept in order, and a select value stores the label.
+model CustomField {
+  id         Uuid @id @default(uuid())
+  projectId  Uuid
+  name       String
+  type       String
+  options    Jsonb?
+  required   Boolean @default(false)
+  position   Int @default(0)
+  archivedAt TimestamptzJsDate?
+  createdAt  TimestamptzJsDate @default(now())
+  updatedAt  TimestamptzJsDate @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  values  CustomFieldValue[]
+
+  @@index([projectId, position])
+  @@check(expression: "\"type\" IN ('text', 'number', 'select', 'date', 'checkbox')", name: "custom_field_type_valid")
+  @@check(expression: "\"position\" >= 0", name: "custom_field_position_valid")
+  @@check(expression: "(\"type\" = 'select') = (\"options\" IS NOT NULL)", name: "custom_field_options_for_select")
+  @@map("custom_field")
+}

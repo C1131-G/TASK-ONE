@@ -145,6 +145,8 @@ it("refuses task, subtask, and file edits from an employee who neither owns nor 
     "bulkUpdateTasksAction",
     "setTaskRelationsAction",
     "reorderTasksAction",
+    "setCustomFieldValueAction",
+    "clearCustomFieldValueAction",
     "createSubtaskAction",
     "renameFileAction",
     "removeFileAction",

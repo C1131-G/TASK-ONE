@@ -1,6 +1,7 @@
 import "server-only";
 import { listTaskApprovals } from "@/features/approvals/approval-queries";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
+import { getTaskCustomFields } from "@/features/custom-fields/custom-field-queries";
 import { listTaskFilesAction } from "@/features/files/actions/files-upload-requests";
 import { getTaskLinkedPulls } from "@/features/github/github-queries";
 import { listTaskCommentsAction } from "@/features/tasks/actions/tasks-comments";
@@ -41,6 +42,7 @@ export const readTaskBundle = async (
     timer,
     pulls,
     approvals,
+    customFields,
   ] = await Promise.all([
     getProjectTask({ projectId, taskId }),
     listTaskCommentsAction({ taskId }),
@@ -51,11 +53,13 @@ export const readTaskBundle = async (
     getRunningTimer({}),
     getTaskLinkedPulls({ taskId }),
     listTaskApprovals({ taskId }),
+    getTaskCustomFields({ taskId }),
   ]);
   return {
     approvals,
     bugHistory,
     comments,
+    customFields,
     files,
     pulls,
     subtasks,

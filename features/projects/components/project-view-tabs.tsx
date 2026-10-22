@@ -9,6 +9,7 @@ import {
   Clock,
   Files,
   Lightning,
+  ListPlus,
   List,
   SquaresFour,
   Table,
@@ -37,6 +38,9 @@ const automationsView = {
   label: "Automations",
 } as const;
 
+// Custom fields have their own page, like the time report, for administrators.
+const fieldsView = { Icon: ListPlus, label: "Fields" } as const;
+
 export const ProjectViewTabs = ({
   isAdmin = false,
   projectId,
@@ -61,6 +65,12 @@ export const ProjectViewTabs = ({
         </Link>
       )
     )}
+    {isAdmin ? (
+      <Link className="tab" href={`/projects/${projectId}/fields`}>
+        <fieldsView.Icon aria-hidden="true" size={14} />
+        {fieldsView.label}
+      </Link>
+    ) : null}
     <Link className="tab" href={`/projects/${projectId}/time`}>
       <Clock aria-hidden="true" size={14} />
       Time

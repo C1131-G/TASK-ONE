@@ -30,6 +30,12 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "createCustomFieldAction",
+  "updateCustomFieldAction",
+  "archiveCustomFieldAction",
+  "reorderCustomFieldsAction",
+  "setCustomFieldValueAction",
+  "clearCustomFieldValueAction",
   "requestApprovalAction",
   "cancelApprovalAction",
   "createAutomationRuleAction",
