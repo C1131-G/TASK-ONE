@@ -1,0 +1,48 @@
+/* Workload: per-person weekly load grid with overload highlighting. */
+.workspace-app .workload {
+  display: grid;
+  gap: var(--s-3);
+}
+.workspace-app .workload-note {
+  margin: 0;
+}
+.workspace-app .workload-table th[scope="row"] {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.workspace-app .workload-table thead th {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.workspace-app .workload-overdue {
+  color: var(--red);
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+.workspace-app .workload-cell {
+  font-variant-numeric: tabular-nums;
+  min-width: 84px;
+  vertical-align: top;
+}
+.workspace-app .workload-cell strong,
+.workspace-app .workload-count,
+.workspace-app .workload-flag {
+  display: block;
+}
+.workspace-app .workload-count {
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+}
+.workspace-app .workload-empty {
+  color: var(--text-3);
+}
+.workspace-app .workload-cell[data-overloaded="true"] {
+  background: var(--red-soft);
+  box-shadow: inset 0 -2px 0 var(--red);
+}
+.workspace-app .workload-flag {
+  color: var(--red);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+}

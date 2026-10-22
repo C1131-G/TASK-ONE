@@ -5,6 +5,7 @@
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 
+import { TIMELINE_BAR_TOP } from "@/features/projects/timeline-geometry";
 import type { TimelineTask } from "@/features/projects/types/workspace-timeline-types";
 import { useTaskDrawer } from "@/features/tasks/components/task-drawer";
 import type { DragMode, TaskSpan } from "@/features/tasks/task-dates";
@@ -22,17 +23,25 @@ interface Drag {
 // A bar is one button: a click opens the task drawer, a drag moves or resizes it
 // by whole days, and the arrow keys do the same without a pointer.
 export const TimelineBar = ({
+  conflict,
   dayWidth,
   dayCount,
+  describedBy,
   editable,
   from,
+  onActivate,
   onMove,
   task,
 }: {
+  readonly conflict: boolean;
   readonly dayCount: number;
   readonly dayWidth: number;
+  // Id of the element that lists this task's dependencies in words.
+  readonly describedBy: string | undefined;
   readonly editable: boolean;
   readonly from: string;
+  // Hover and focus highlight the arrows that touch this bar.
+  readonly onActivate: (taskId: string | null) => void;
   readonly onMove: (task: TimelineTask, dates: TaskSpan) => void;
   readonly task: TimelineTask;
 }) => {
@@ -148,18 +157,23 @@ export const TimelineBar = ({
 
   return (
     <button
+      aria-describedby={describedBy}
       aria-label={`${label}. Arrow keys move. Shift with arrows changes the end date. Alt with arrows changes the start date.`}
-      className={`bar${task.status === "done" ? " done" : ""}${editable ? " movable" : ""}`}
+      className={`bar${task.status === "done" ? " done" : ""}${editable ? " movable" : ""}${conflict ? " dep-conflict" : ""}`}
+      onBlur={() => onActivate(null)}
       onClick={handleClick}
+      onFocus={() => onActivate(task.id)}
       onKeyDown={handleKeyDown}
       onPointerCancel={handlePointerCancel}
       onPointerDown={handlePointerDown}
+      onPointerEnter={() => onActivate(task.id)}
+      onPointerLeave={() => onActivate(null)}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       style={{
         "--c": "var(--accent)",
         left: clippedStart * dayWidth,
-        top: 6,
+        top: TIMELINE_BAR_TOP,
         width,
       }}
       title={`${task.title} · ${shownStart} → ${shownEnd}`}

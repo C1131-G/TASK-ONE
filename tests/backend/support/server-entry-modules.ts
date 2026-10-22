@@ -25,4 +25,5 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/tasks/tasks-queries"),
   import("../../../features/time/time-queries"),
   import("../../../features/user/user-queries"),
+  import("../../../features/workload/workload-queries"),
 ]);

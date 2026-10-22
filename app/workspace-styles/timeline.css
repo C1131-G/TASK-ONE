@@ -268,3 +268,55 @@
   cursor: grabbing;
   box-shadow: var(--shadow-drag);
 }
+
+/* Dependency arrows: a finish-to-start elbow from a blocker to its dependent. */
+.workspace-app .tl-deps {
+  inset: 0 auto auto 0;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+.workspace-app .tl-dep {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+.workspace-app .tl-dep.cyclic {
+  stroke-dasharray: 2 3;
+}
+.workspace-app .tl-dep.conflict {
+  stroke: var(--red);
+  stroke-dasharray: 5 3;
+  stroke-width: 2;
+}
+.workspace-app .tl-dep.active {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+.workspace-app .tl-dep.conflict.active {
+  stroke: var(--red);
+  stroke-dasharray: none;
+}
+.workspace-app .tl-dep-head {
+  fill: var(--text-3);
+}
+.workspace-app .tl-dep-head.active {
+  fill: var(--accent);
+}
+.workspace-app .tl-dep-head.conflict {
+  fill: var(--red);
+}
+.workspace-app .bar.dep-conflict {
+  border-color: var(--red);
+}
+.workspace-app .tl-dep-flag {
+  background: var(--red-soft);
+  border-radius: var(--r-xs);
+  color: var(--red);
+  flex-shrink: 0;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 1px var(--s-1);
+}

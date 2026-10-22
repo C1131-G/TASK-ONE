@@ -8,6 +8,8 @@ export interface TimelineTask {
   readonly status: string;
   readonly priority?: string;
   readonly assigneeIds?: readonly string[];
+  // Tasks that must finish before this one starts.
+  readonly dependencyIds?: readonly string[];
   readonly position?: number;
   readonly version: number;
 }
