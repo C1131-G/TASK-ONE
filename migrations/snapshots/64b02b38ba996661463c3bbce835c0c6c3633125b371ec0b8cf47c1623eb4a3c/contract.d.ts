@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'c082fd20dbb417e689a70ea5114f3ec4a0a32a1baac4891d31e479f845189d87'>;
+  StorageHashBase<'64b02b38ba996661463c3bbce835c0c6c3633125b371ec0b8cf47c1623eb4a3c'>;
 export type ExecutionHash =
-  ExecutionHashBase<'636ae0e2504cb1c17843540091b2f0e4382af07e3d1db16a86f93b36c471743a'>;
+  ExecutionHashBase<'01f3ac651fcd9dfd9d680e2fde0864ed30c7c2c94c376d82294cdb3ada01ac91'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -612,6 +612,23 @@ export type FieldOutputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
+    readonly ProjectBudget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['output'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly currency: CodecTypes['pg/text@1']['output'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly ProjectBudgetAlert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+    };
     readonly ProjectMember: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
@@ -845,34 +862,6 @@ export type FieldOutputTypes = {
       readonly identifier: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly value: CodecTypes['pg/text@1']['output'];
-    };
-    readonly WebhookDelivery: {
-      readonly attempts: CodecTypes['pg/int4@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly deliveredAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
-      readonly endpointId: CodecTypes['pg/uuid@1']['output'];
-      readonly eventId: CodecTypes['pg/uuid@1']['output'];
-      readonly eventType: CodecTypes['pg/text@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly lastError: CodecTypes['pg/text@1']['output'] | null;
-      readonly payload: CodecTypes['pg/json@1']['output'];
-      readonly responseBody: CodecTypes['pg/text@1']['output'] | null;
-      readonly responseCode: CodecTypes['pg/int4@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    };
-    readonly WebhookEndpoint: {
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly createdById: CodecTypes['pg/text@1']['output'];
-      readonly enabled: CodecTypes['pg/bool@1']['output'];
-      readonly events: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly kind: CodecTypes['pg/text@1']['output'];
-      readonly name: CodecTypes['pg/text@1']['output'];
-      readonly secretCiphertext: CodecTypes['pg/text@1']['output'] | null;
-      readonly secretHint: CodecTypes['pg/text@1']['output'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly url: CodecTypes['pg/text@1']['output'];
     };
   };
 };
@@ -1256,6 +1245,23 @@ export type FieldInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
+    readonly ProjectBudget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['input'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly currency: CodecTypes['pg/text@1']['input'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['input'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly ProjectBudgetAlert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+    };
     readonly ProjectMember: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
@@ -1489,34 +1495,6 @@ export type FieldInputTypes = {
       readonly identifier: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly value: CodecTypes['pg/text@1']['input'];
-    };
-    readonly WebhookDelivery: {
-      readonly attempts: CodecTypes['pg/int4@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly deliveredAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
-      readonly endpointId: CodecTypes['pg/uuid@1']['input'];
-      readonly eventId: CodecTypes['pg/uuid@1']['input'];
-      readonly eventType: CodecTypes['pg/text@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly lastError: CodecTypes['pg/text@1']['input'] | null;
-      readonly payload: CodecTypes['pg/json@1']['input'];
-      readonly responseBody: CodecTypes['pg/text@1']['input'] | null;
-      readonly responseCode: CodecTypes['pg/int4@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
-    };
-    readonly WebhookEndpoint: {
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly createdById: CodecTypes['pg/text@1']['input'];
-      readonly enabled: CodecTypes['pg/bool@1']['input'];
-      readonly events: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly kind: CodecTypes['pg/text@1']['input'];
-      readonly name: CodecTypes['pg/text@1']['input'];
-      readonly secretCiphertext: CodecTypes['pg/text@1']['input'] | null;
-      readonly secretHint: CodecTypes['pg/text@1']['input'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly url: CodecTypes['pg/text@1']['input'];
     };
   };
 };
@@ -1900,6 +1878,23 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
+    readonly project_budget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['output'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly currency: CodecTypes['pg/text@1']['output'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly project_budget_alert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+    };
     readonly project_member: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
@@ -2133,34 +2128,6 @@ export type StorageColumnTypes = {
       readonly identifier: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly value: CodecTypes['pg/text@1']['output'];
-    };
-    readonly webhook_delivery: {
-      readonly attempts: CodecTypes['pg/int4@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly deliveredAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
-      readonly endpointId: CodecTypes['pg/uuid@1']['output'];
-      readonly eventId: CodecTypes['pg/uuid@1']['output'];
-      readonly eventType: CodecTypes['pg/text@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly lastError: CodecTypes['pg/text@1']['output'] | null;
-      readonly payload: CodecTypes['pg/json@1']['output'];
-      readonly responseBody: CodecTypes['pg/text@1']['output'] | null;
-      readonly responseCode: CodecTypes['pg/int4@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    };
-    readonly webhook_endpoint: {
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly createdById: CodecTypes['pg/text@1']['output'];
-      readonly enabled: CodecTypes['pg/bool@1']['output'];
-      readonly events: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly kind: CodecTypes['pg/text@1']['output'];
-      readonly name: CodecTypes['pg/text@1']['output'];
-      readonly secretCiphertext: CodecTypes['pg/text@1']['output'] | null;
-      readonly secretHint: CodecTypes['pg/text@1']['output'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-      readonly url: CodecTypes['pg/text@1']['output'];
     };
   };
 };
@@ -2544,6 +2511,23 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
+    readonly project_budget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['input'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly currency: CodecTypes['pg/text@1']['input'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['input'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly project_budget_alert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+    };
     readonly project_member: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
@@ -2777,34 +2761,6 @@ export type StorageColumnInputTypes = {
       readonly identifier: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly value: CodecTypes['pg/text@1']['input'];
-    };
-    readonly webhook_delivery: {
-      readonly attempts: CodecTypes['pg/int4@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly deliveredAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
-      readonly endpointId: CodecTypes['pg/uuid@1']['input'];
-      readonly eventId: CodecTypes['pg/uuid@1']['input'];
-      readonly eventType: CodecTypes['pg/text@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly lastError: CodecTypes['pg/text@1']['input'] | null;
-      readonly payload: CodecTypes['pg/json@1']['input'];
-      readonly responseBody: CodecTypes['pg/text@1']['input'] | null;
-      readonly responseCode: CodecTypes['pg/int4@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
-    };
-    readonly webhook_endpoint: {
-      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly createdById: CodecTypes['pg/text@1']['input'];
-      readonly enabled: CodecTypes['pg/bool@1']['input'];
-      readonly events: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly kind: CodecTypes['pg/text@1']['input'];
-      readonly name: CodecTypes['pg/text@1']['input'];
-      readonly secretCiphertext: CodecTypes['pg/text@1']['input'] | null;
-      readonly secretHint: CodecTypes['pg/text@1']['input'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
-      readonly url: CodecTypes['pg/text@1']['input'];
     };
   };
 };
@@ -3303,6 +3259,7 @@ export namespace Models {
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
     archivedBy: public_User | null;
+    budget: public_ProjectBudget | null;
     bugReports: public_BugReport[];
     clientCompanies: public_ClientCompanyProject[];
     files: public_FileAsset[];
@@ -3312,6 +3269,7 @@ export namespace Models {
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
       | 'archivedBy'
+      | 'budget'
       | 'bugReports'
       | 'clientCompanies'
       | 'files'
@@ -3319,6 +3277,28 @@ export namespace Models {
       | 'taskCounter'
       | 'team'
       | 'uploadIntents';
+  };
+  export type public_ProjectBudget = {
+    billableOnly: CodecTypes['pg/bool@1']['output'];
+    budgetMinutes: CodecTypes['pg/int4@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    currency: CodecTypes['pg/text@1']['output'];
+    hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+    kind: 'one_off' | 'retainer';
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    warningPercent: CodecTypes['pg/int4@1']['output'];
+    alerts: public_ProjectBudgetAlert[];
+    project: public_Project;
+    readonly [RelationKeys]?: 'alerts' | 'project';
+  };
+  export type public_ProjectBudgetAlert = {
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    level: 'warning' | 'overrun';
+    periodKey: CodecTypes['pg/text@1']['output'];
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    budget: public_ProjectBudget;
+    readonly [RelationKeys]?: 'budget';
   };
   export type public_ProjectMember = {
     joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -3689,38 +3669,6 @@ export namespace Models {
     value: CodecTypes['pg/text@1']['output'];
     readonly [RelationKeys]?: never;
   };
-  export type public_WebhookDelivery = {
-    attempts: CodecTypes['pg/int4@1']['output'];
-    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    deliveredAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
-    endpointId: CodecTypes['pg/uuid@1']['output'];
-    eventId: CodecTypes['pg/uuid@1']['output'];
-    eventType: CodecTypes['pg/text@1']['output'];
-    id: CodecTypes['pg/uuid@1']['output'];
-    lastError: CodecTypes['pg/text@1']['output'] | null;
-    payload: CodecTypes['pg/json@1']['output'];
-    responseBody: CodecTypes['pg/text@1']['output'] | null;
-    responseCode: CodecTypes['pg/int4@1']['output'] | null;
-    status: CodecTypes['pg/text@1']['output'];
-    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    endpoint: public_WebhookEndpoint;
-    readonly [RelationKeys]?: 'endpoint';
-  };
-  export type public_WebhookEndpoint = {
-    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    createdById: CodecTypes['pg/text@1']['output'];
-    enabled: CodecTypes['pg/bool@1']['output'];
-    events: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
-    id: CodecTypes['pg/uuid@1']['output'];
-    kind: CodecTypes['pg/text@1']['output'];
-    name: CodecTypes['pg/text@1']['output'];
-    secretCiphertext: CodecTypes['pg/text@1']['output'] | null;
-    secretHint: CodecTypes['pg/text@1']['output'] | null;
-    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
-    url: CodecTypes['pg/text@1']['output'];
-    deliveries: public_WebhookDelivery[];
-    readonly [RelationKeys]?: 'deliveries';
-  };
 }
 
 export declare const models: {
@@ -3755,6 +3703,8 @@ export declare const models: {
     Notification: Models.public_Notification;
     NotificationPreference: Models.public_NotificationPreference;
     Project: Models.public_Project;
+    ProjectBudget: Models.public_ProjectBudget;
+    ProjectBudgetAlert: Models.public_ProjectBudgetAlert;
     ProjectMember: Models.public_ProjectMember;
     ProjectMilestone: Models.public_ProjectMilestone;
     ProjectTaskCounter: Models.public_ProjectTaskCounter;
@@ -3779,8 +3729,6 @@ export declare const models: {
     User: Models.public_User;
     UserPreference: Models.public_UserPreference;
     Verification: Models.public_Verification;
-    WebhookDelivery: Models.public_WebhookDelivery;
-    WebhookEndpoint: Models.public_WebhookEndpoint;
   };
 };
 
@@ -7403,6 +7351,152 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly project_budget: {
+              columns: {
+                readonly billableOnly: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly budgetMinutes: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly currency: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'USD'>;
+                  };
+                  readonly many: false;
+                };
+                readonly hourlyRateCents: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly kind: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'one_off'>;
+                  };
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly warningPercent: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 80>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['projectId'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly project_budget_alert: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly level: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly periodKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['projectId', 'periodKey', 'level'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'project_budget_alert_projectId_idx_a96e4d92';
+                  readonly prefix: 'project_budget_alert_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget_alert';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget';
+                    readonly columns: readonly ['projectId'];
+                  };
+                },
+              ];
+            };
             readonly project_member: {
               columns: {
                 readonly joinedAt: {
@@ -9673,227 +9767,16 @@ type ContractBase = Omit<
               ];
               foreignKeys: readonly [];
             };
-            readonly webhook_delivery: {
-              columns: {
-                readonly attempts: {
-                  readonly dataType: 'pg/int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                  readonly many: false;
-                };
-                readonly createdAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly many: false;
-                };
-                readonly deliveredAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly endpointId: {
-                  readonly dataType: 'pg/uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly eventId: {
-                  readonly dataType: 'pg/uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly eventType: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly id: {
-                  readonly dataType: 'pg/uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly lastError: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly payload: {
-                  readonly dataType: 'pg/json';
-                  readonly codecId: 'pg/json@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly responseBody: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly responseCode: {
-                  readonly dataType: 'pg/int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly status: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'pending'>;
-                  };
-                  readonly many: false;
-                };
-                readonly updatedAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly many: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['endpointId', 'eventId'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'webhook_delivery_createdAt_idx_9575dbd7';
-                  readonly prefix: 'webhook_delivery_createdAt_idx';
-                  readonly columns: readonly ['createdAt'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'webhook_delivery_endpointId_createdAt_idx_6af13a6b';
-                  readonly prefix: 'webhook_delivery_endpointId_createdAt_idx';
-                  readonly columns: readonly ['endpointId', 'createdAt'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'webhook_delivery_endpointId_idx_48273c15';
-                  readonly prefix: 'webhook_delivery_endpointId_idx';
-                  readonly columns: readonly ['endpointId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'webhook_delivery';
-                    readonly columns: readonly ['endpointId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'webhook_endpoint';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
-            readonly webhook_endpoint: {
-              columns: {
-                readonly createdAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly many: false;
-                };
-                readonly createdById: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly enabled: {
-                  readonly dataType: 'pg/bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
-                  };
-                  readonly many: false;
-                };
-                readonly events: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', readonly []>;
-                  };
-                  readonly many: { readonly elementNullable: false };
-                };
-                readonly id: {
-                  readonly dataType: 'pg/uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly kind: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly name: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly secretCiphertext: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly secretHint: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
-                readonly updatedAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly many: false;
-                };
-                readonly url: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
-              indexes: readonly [
-                {
-                  readonly name: 'webhook_endpoint_enabled_idx_7f014af8';
-                  readonly prefix: 'webhook_endpoint_enabled_idx';
-                  readonly columns: readonly ['enabled'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [];
-            };
           };
           readonly valueSet: {
+            readonly BudgetKind: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['one_off', 'retainer'];
+            };
+            readonly BudgetLevel: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['warning', 'overrun'];
+            };
             readonly BugApprovalStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['pending', 'approved', 'rejected'];
@@ -10116,6 +9999,14 @@ type ContractBase = Omit<
       readonly model: 'NotificationPreference';
     };
     readonly project: { readonly namespace: 'public' & NamespaceId; readonly model: 'Project' };
+    readonly project_budget: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ProjectBudget';
+    };
+    readonly project_budget_alert: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ProjectBudgetAlert';
+    };
     readonly project_member: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'ProjectMember';
@@ -10196,14 +10087,6 @@ type ContractBase = Omit<
     readonly verification: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'Verification';
-    };
-    readonly webhook_delivery: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'WebhookDelivery';
-    };
-    readonly webhook_endpoint: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'WebhookEndpoint';
     };
   };
   readonly domain: {
@@ -12952,6 +12835,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly budget: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudget';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
               readonly bugReports: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -13049,6 +12944,139 @@ type ContractBase = Omit<
                 readonly teamId: { readonly column: 'teamId' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly version: { readonly column: 'version' };
+              };
+            };
+          };
+          readonly ProjectBudget: {
+            readonly fields: {
+              readonly billableOnly: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly budgetMinutes: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly currency: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly hourlyRateCents: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly warningPercent: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly alerts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudgetAlert';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'project_budget';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly billableOnly: { readonly column: 'billableOnly' };
+                readonly budgetMinutes: { readonly column: 'budgetMinutes' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly currency: { readonly column: 'currency' };
+                readonly hourlyRateCents: { readonly column: 'hourlyRateCents' };
+                readonly kind: { readonly column: 'kind' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly warningPercent: { readonly column: 'warningPercent' };
+              };
+            };
+          };
+          readonly ProjectBudgetAlert: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly level: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly periodKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+            };
+            readonly relations: {
+              readonly budget: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudget';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'project_budget_alert';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly level: { readonly column: 'level' };
+                readonly periodKey: { readonly column: 'periodKey' };
+                readonly projectId: { readonly column: 'projectId' };
               };
             };
           };
@@ -15144,191 +15172,22 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly WebhookDelivery: {
-            readonly fields: {
-              readonly attempts: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                };
-              };
-              readonly deliveredAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                };
-              };
-              readonly endpointId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly eventId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly eventType: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly lastError: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly payload: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
-              };
-              readonly responseBody: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly responseCode: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly endpoint: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'WebhookEndpoint';
-                };
-                readonly cardinality: 'N:1';
-                readonly nullable: false;
-                readonly on: {
-                  readonly localFields: readonly ['endpointId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'webhook_delivery';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly attempts: { readonly column: 'attempts' };
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly deliveredAt: { readonly column: 'deliveredAt' };
-                readonly endpointId: { readonly column: 'endpointId' };
-                readonly eventId: { readonly column: 'eventId' };
-                readonly eventType: { readonly column: 'eventType' };
-                readonly id: { readonly column: 'id' };
-                readonly lastError: { readonly column: 'lastError' };
-                readonly payload: { readonly column: 'payload' };
-                readonly responseBody: { readonly column: 'responseBody' };
-                readonly responseCode: { readonly column: 'responseCode' };
-                readonly status: { readonly column: 'status' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-              };
-            };
-          };
-          readonly WebhookEndpoint: {
-            readonly fields: {
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                };
-              };
-              readonly createdById: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly enabled: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
-              readonly events: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-                readonly many: { readonly elementNullable: false };
-              };
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly kind: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly name: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly secretCiphertext: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly secretHint: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-date@1';
-                };
-              };
-              readonly url: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-            };
-            readonly relations: {
-              readonly deliveries: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'WebhookDelivery';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['endpointId'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'webhook_endpoint';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly createdById: { readonly column: 'createdById' };
-                readonly enabled: { readonly column: 'enabled' };
-                readonly events: { readonly column: 'events' };
-                readonly id: { readonly column: 'id' };
-                readonly kind: { readonly column: 'kind' };
-                readonly name: { readonly column: 'name' };
-                readonly secretCiphertext: { readonly column: 'secretCiphertext' };
-                readonly secretHint: { readonly column: 'secretHint' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-                readonly url: { readonly column: 'url' };
-              };
-            };
-          };
         };
         readonly enum: {
+          readonly BudgetKind: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'OneOff'; readonly value: 'one_off' },
+              { readonly name: 'Retainer'; readonly value: 'retainer' },
+            ];
+          };
+          readonly BudgetLevel: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Warning'; readonly value: 'warning' },
+              { readonly name: 'Overrun'; readonly value: 'overrun' },
+            ];
+          };
           readonly BugApprovalStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -15830,22 +15689,6 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'user_preference';
-            readonly field: 'id';
-            readonly namespace: 'public';
-          };
-        },
-        {
-          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
-          readonly ref: {
-            readonly entry: 'webhook_delivery';
-            readonly field: 'id';
-            readonly namespace: 'public';
-          };
-        },
-        {
-          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
-          readonly ref: {
-            readonly entry: 'webhook_endpoint';
             readonly field: 'id';
             readonly namespace: 'public';
           };

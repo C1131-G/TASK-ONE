@@ -30,6 +30,8 @@ const replayedMutations = new Set([
   "redeliverWebhookAction",
   "removeWebhookEndpointAction",
   "updateWebhookEndpointAction",
+  "clearProjectBudgetAction",
+  "saveProjectBudgetAction",
   "addTimeEntryAction",
   "deleteTimeEntryAction",
   "startTimerAction",

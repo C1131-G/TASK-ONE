@@ -5,6 +5,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { evaluateBudgetAlerts } from "../budgets/project-budgets";
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema, UUIDSchema } from "../core/input-schemas";
 import {
@@ -238,6 +239,21 @@ const viewOf = async (row: EntryRow): Promise<TimeEntryView> => {
   return view;
 };
 
+// Logging time can cross a project's budget threshold. The entry is already
+// saved, so a failed budget check must not fail the person's time.
+const checkBudget = async (taskId: string, now: Date): Promise<void> => {
+  try {
+    const task = await db.orm.public.Task.where({ id: taskId })
+      .select("projectId")
+      .first();
+    if (task) {
+      await evaluateBudgetAlerts(task.projectId, now);
+    }
+  } catch {
+    // The next logged entry evaluates the budget again.
+  }
+};
+
 const companyDate = async (at: Date): Promise<string> => {
   const settings = await db.orm.public.CompanySettings.where({ id: "company" })
     .select("timeZone")
@@ -284,6 +300,7 @@ const saveTimer = async (
       workDate: await companyDate(timer.startedAt),
     });
   });
+  await checkBudget(timer.taskId, now);
   return await viewOf(row);
 };
 
@@ -373,6 +390,7 @@ const addEntry = (actorId: string, input: TimeEntryInput) =>
         userId: actorId,
         workDate: input.workDate,
       });
+      await checkBudget(input.taskId, now);
       return await viewOf(row);
     },
   });
@@ -415,6 +433,7 @@ const updateEntry = (
       if (!row) {
         throw notFound("The time entry");
       }
+      await checkBudget(row.taskId, new Date());
       return await viewOf(row);
     },
   });

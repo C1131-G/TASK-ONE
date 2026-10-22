@@ -5,6 +5,15 @@ import { cache } from "react";
 
 import { readOrThrow } from "@/lib/read-result";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
+import {
+  BudgetListRowSchema,
+  ProjectBudgetViewSchema,
+  ProjectIdInputSchema,
+} from "@/src/server/budgets/budget-contracts";
+import {
+  ProjectBudgets,
+  ProjectBudgetsLive,
+} from "@/src/server/budgets/project-budgets";
 import { requestHeadersOrFail } from "@/src/server/core/request-headers";
 import { runServerAction } from "@/src/server/core/server-action";
 import {
@@ -60,6 +69,47 @@ export const listProjectMilestones = async (input: unknown) =>
       ),
     undefined,
     ProjectMilestonesResultSchema
+  );
+
+// Administrators and members of the project see its burn; clients never do.
+export const getProjectBudget = async (input: unknown) =>
+  await runServerAction(
+    input,
+    ProjectIdInputSchema,
+    ({ projectId }) =>
+      Effect.gen(function* getBudget() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const budgets = yield* ProjectBudgets;
+        return yield* budgets.get(actor.id, projectId, new Date());
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(ProjectBudgetsLive)
+      ),
+    undefined,
+    Schema.NullOr(ProjectBudgetViewSchema)
+  );
+
+export const listProjectBudgets = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({}),
+    () =>
+      Effect.gen(function* listBudgets() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const budgets = yield* ProjectBudgets;
+        return yield* budgets.list(actor.id, new Date());
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(ProjectBudgetsLive)
+      ),
+    undefined,
+    Schema.Array(BudgetListRowSchema)
   );
 
 export const listSavedViews = async (input: unknown) => {

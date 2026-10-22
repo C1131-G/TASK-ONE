@@ -139,6 +139,20 @@ enum BugApprovalStatus {
   Rejected = "rejected"
 }
 
+enum BudgetKind {
+  @@type("pg/text@1")
+
+  OneOff   = "one_off"
+  Retainer = "retainer"
+}
+
+enum BudgetLevel {
+  @@type("pg/text@1")
+
+  Warning = "warning"
+  Overrun = "overrun"
+}
+
 enum ProjectStatus {
   @@type("pg/text@1")
 

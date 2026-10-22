@@ -1,0 +1,16 @@
+// use prisma-8
+
+// One row per budget level crossed in a period. The primary key is the dedupe
+// key: inserting the same (project, period, level) twice is a no-op, so a
+// warning or overrun is announced exactly once.
+model ProjectBudgetAlert {
+  projectId Uuid
+  periodKey String
+  level     BudgetLevel
+  createdAt TimestamptzJsDate @default(now())
+
+  budget ProjectBudget @relation(fields: [projectId], references: [projectId], onDelete: Cascade)
+
+  @@id([projectId, periodKey, level])
+  @@map("project_budget_alert")
+}

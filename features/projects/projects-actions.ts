@@ -3,6 +3,10 @@
 /* eslint-disable func-style -- Next Server Actions require named declarations. */
 
 import {
+  clearProjectBudgetAction as clearProjectBudgetImpl,
+  saveProjectBudgetAction as saveProjectBudgetImpl,
+} from "./actions/projects-budgets";
+import {
   restoreProjectAction as restoreProjectImpl,
   saveProjectMilestonesAction as saveProjectMilestonesImpl,
   setProjectPeopleAction as setProjectPeopleImpl,
@@ -50,6 +54,14 @@ export async function setProjectPeopleAction(input: unknown) {
 
 export async function saveProjectMilestonesAction(input: unknown) {
   return await saveProjectMilestonesImpl(input);
+}
+
+export async function saveProjectBudgetAction(input: unknown) {
+  return await saveProjectBudgetImpl(input);
+}
+
+export async function clearProjectBudgetAction(input: unknown) {
+  return await clearProjectBudgetImpl(input);
 }
 
 export async function createSavedViewAction(input: unknown) {

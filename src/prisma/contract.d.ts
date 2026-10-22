@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'c082fd20dbb417e689a70ea5114f3ec4a0a32a1baac4891d31e479f845189d87'>;
+  StorageHashBase<'16a6a1b3b0c8b756c6b7f9eedae71077b9b7ffe4cc2956e85d0c5be805e4b496'>;
 export type ExecutionHash =
   ExecutionHashBase<'636ae0e2504cb1c17843540091b2f0e4382af07e3d1db16a86f93b36c471743a'>;
 export type ProfileHash =
@@ -611,6 +611,23 @@ export type FieldOutputTypes = {
       readonly teamId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly ProjectBudget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['output'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly currency: CodecTypes['pg/text@1']['output'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly ProjectBudgetAlert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
     };
     readonly ProjectMember: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -1256,6 +1273,23 @@ export type FieldInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
+    readonly ProjectBudget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['input'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly currency: CodecTypes['pg/text@1']['input'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['input'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly ProjectBudgetAlert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+    };
     readonly ProjectMember: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'];
@@ -1900,6 +1934,23 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
+    readonly project_budget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['output'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly currency: CodecTypes['pg/text@1']['output'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly project_budget_alert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+    };
     readonly project_member: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'];
@@ -2543,6 +2594,23 @@ export type StorageColumnInputTypes = {
       readonly teamId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
       readonly version: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly project_budget: {
+      readonly billableOnly: CodecTypes['pg/bool@1']['input'];
+      readonly budgetMinutes: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly currency: CodecTypes['pg/text@1']['input'];
+      readonly hourlyRateCents: CodecTypes['pg/int4@1']['input'] | null;
+      readonly kind: 'one_off' | 'retainer';
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly warningPercent: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly project_budget_alert: {
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly level: 'warning' | 'overrun';
+      readonly periodKey: CodecTypes['pg/text@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
     };
     readonly project_member: {
       readonly joinedAt: CodecTypes['pg/timestamptz-date@1']['input'];
@@ -3303,6 +3371,7 @@ export namespace Models {
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
     archivedBy: public_User | null;
+    budget: public_ProjectBudget | null;
     bugReports: public_BugReport[];
     clientCompanies: public_ClientCompanyProject[];
     files: public_FileAsset[];
@@ -3312,6 +3381,7 @@ export namespace Models {
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
       | 'archivedBy'
+      | 'budget'
       | 'bugReports'
       | 'clientCompanies'
       | 'files'
@@ -3319,6 +3389,28 @@ export namespace Models {
       | 'taskCounter'
       | 'team'
       | 'uploadIntents';
+  };
+  export type public_ProjectBudget = {
+    billableOnly: CodecTypes['pg/bool@1']['output'];
+    budgetMinutes: CodecTypes['pg/int4@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    currency: CodecTypes['pg/text@1']['output'];
+    hourlyRateCents: CodecTypes['pg/int4@1']['output'] | null;
+    kind: 'one_off' | 'retainer';
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    warningPercent: CodecTypes['pg/int4@1']['output'];
+    alerts: public_ProjectBudgetAlert[];
+    project: public_Project;
+    readonly [RelationKeys]?: 'alerts' | 'project';
+  };
+  export type public_ProjectBudgetAlert = {
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    level: 'warning' | 'overrun';
+    periodKey: CodecTypes['pg/text@1']['output'];
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    budget: public_ProjectBudget;
+    readonly [RelationKeys]?: 'budget';
   };
   export type public_ProjectMember = {
     joinedAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -3755,6 +3847,8 @@ export declare const models: {
     Notification: Models.public_Notification;
     NotificationPreference: Models.public_NotificationPreference;
     Project: Models.public_Project;
+    ProjectBudget: Models.public_ProjectBudget;
+    ProjectBudgetAlert: Models.public_ProjectBudgetAlert;
     ProjectMember: Models.public_ProjectMember;
     ProjectMilestone: Models.public_ProjectMilestone;
     ProjectTaskCounter: Models.public_ProjectTaskCounter;
@@ -7403,6 +7497,152 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly project_budget: {
+              columns: {
+                readonly billableOnly: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly budgetMinutes: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly currency: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'USD'>;
+                  };
+                  readonly many: false;
+                };
+                readonly hourlyRateCents: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly kind: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'one_off'>;
+                  };
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly warningPercent: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 80>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['projectId'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly project_budget_alert: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly level: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly periodKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['projectId', 'periodKey', 'level'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'project_budget_alert_projectId_idx_a96e4d92';
+                  readonly prefix: 'project_budget_alert_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget_alert';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project_budget';
+                    readonly columns: readonly ['projectId'];
+                  };
+                },
+              ];
+            };
             readonly project_member: {
               columns: {
                 readonly joinedAt: {
@@ -9894,6 +10134,14 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly BudgetKind: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['one_off', 'retainer'];
+            };
+            readonly BudgetLevel: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['warning', 'overrun'];
+            };
             readonly BugApprovalStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['pending', 'approved', 'rejected'];
@@ -10116,6 +10364,14 @@ type ContractBase = Omit<
       readonly model: 'NotificationPreference';
     };
     readonly project: { readonly namespace: 'public' & NamespaceId; readonly model: 'Project' };
+    readonly project_budget: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ProjectBudget';
+    };
+    readonly project_budget_alert: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ProjectBudgetAlert';
+    };
     readonly project_member: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'ProjectMember';
@@ -12952,6 +13208,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly budget: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudget';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
               readonly bugReports: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -13049,6 +13317,139 @@ type ContractBase = Omit<
                 readonly teamId: { readonly column: 'teamId' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly version: { readonly column: 'version' };
+              };
+            };
+          };
+          readonly ProjectBudget: {
+            readonly fields: {
+              readonly billableOnly: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly budgetMinutes: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly currency: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly hourlyRateCents: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly warningPercent: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly alerts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudgetAlert';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'project_budget';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly billableOnly: { readonly column: 'billableOnly' };
+                readonly budgetMinutes: { readonly column: 'budgetMinutes' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly currency: { readonly column: 'currency' };
+                readonly hourlyRateCents: { readonly column: 'hourlyRateCents' };
+                readonly kind: { readonly column: 'kind' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly warningPercent: { readonly column: 'warningPercent' };
+              };
+            };
+          };
+          readonly ProjectBudgetAlert: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly level: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly periodKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+            };
+            readonly relations: {
+              readonly budget: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBudget';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'project_budget_alert';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly level: { readonly column: 'level' };
+                readonly periodKey: { readonly column: 'periodKey' };
+                readonly projectId: { readonly column: 'projectId' };
               };
             };
           };
@@ -15329,6 +15730,20 @@ type ContractBase = Omit<
           };
         };
         readonly enum: {
+          readonly BudgetKind: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'OneOff'; readonly value: 'one_off' },
+              { readonly name: 'Retainer'; readonly value: 'retainer' },
+            ];
+          };
+          readonly BudgetLevel: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Warning'; readonly value: 'warning' },
+              { readonly name: 'Overrun'; readonly value: 'overrun' },
+            ];
+          };
           readonly BugApprovalStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [

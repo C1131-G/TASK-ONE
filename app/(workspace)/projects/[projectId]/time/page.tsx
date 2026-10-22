@@ -8,6 +8,10 @@ import { PageTransition } from "@/components/ui/page-transition";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import {
+  ProjectBudgetPanel,
+  ProjectBudgetPanelSkeleton,
+} from "@/features/projects/components/project-budget-panel";
+import {
   ProjectTimeReport,
   ProjectTimeReportSkeleton,
 } from "@/features/time/components/project-time-report";
@@ -44,6 +48,14 @@ const ProjectTimePage = ({
             <p>Logged hours by person and task, billable and not.</p>
           </div>
         </div>
+        <SectionErrorBoundary title="The budget couldn't load">
+          <SuspenseReveal fallback={<ProjectBudgetPanelSkeleton />}>
+            {/* oxlint-disable-next-line promise/prefer-await-to-then -- Route values resolve inside the boundary. */}
+            {route.then(({ projectId }) => (
+              <ProjectBudgetPanel editable={false} projectId={projectId} />
+            ))}
+          </SuspenseReveal>
+        </SectionErrorBoundary>
         <SectionErrorBoundary title="The time report couldn't load">
           <SuspenseReveal fallback={<ProjectTimeReportSkeleton />}>
             {/* oxlint-disable-next-line promise/prefer-await-to-then -- Route values resolve inside the boundary. */}
