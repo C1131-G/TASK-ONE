@@ -28,6 +28,7 @@ model Project {
   intakeForms IntakeForm[]
   automationRules AutomationRule[]
   automationRuns AutomationRun[]
+  githubConnections GithubConnection[]
   budget ProjectBudget?
 
   team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)

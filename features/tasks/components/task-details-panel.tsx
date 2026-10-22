@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { BugTaskDetail } from "@/features/bugs/components/bug-task-detail";
 import { ProjectFiles } from "@/features/files/components/project-files";
+import { TaskLinkedPulls } from "@/features/github/components/task-linked-pulls";
 import { TaskCommentsSection } from "@/features/tasks/components/task-details-comments";
 import { TaskDetailsHeading } from "@/features/tasks/components/task-details-heading";
 import { TaskDiscardDialog } from "@/features/tasks/components/task-discard-dialog";
@@ -104,6 +105,7 @@ export const TaskDetailsPanel = ({
     error,
     files,
     loading,
+    pulls,
     refresh,
     setFiles,
     setSubtasks,
@@ -231,6 +233,7 @@ export const TaskDetailsPanel = ({
               time={time}
               timer={timer}
             />
+            <TaskLinkedPulls pulls={pulls} />
             <TaskCommentsSection
               body={comments.body}
               comments={comments.comments}

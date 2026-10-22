@@ -90,6 +90,13 @@ const retentionTargets = {
     predicate: '"completedAt" IS NULL AND "deadAt" < $1',
     table: "job",
   },
+  // Delivery ids only need to outlive GitHub's redelivery window.
+  githubDeliveries: {
+    cutoff: (now, policy) => before(now, policy.webhookDeliveryDays),
+    key: "id",
+    predicate: '"createdAt" < $1',
+    table: "github_delivery",
+  },
   idempotencyKeys: {
     cutoff: (now) => now,
     key: "id",

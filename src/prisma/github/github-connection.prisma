@@ -1,0 +1,26 @@
+// use prisma-8
+
+// An admin-managed link between one GitHub repository and one project. The
+// shared secret is kept encrypted because verifying a delivery needs the raw
+// value. One repository maps to one connection, so a delivery has one owner.
+model GithubConnection {
+  id                  Uuid @id @default(uuid())
+  repoFullName        String @unique
+  projectId           Uuid
+  enabled             Boolean @default(true)
+  autoCompleteOnMerge Boolean @default(false)
+  secretCiphertext    String
+  secretHint          String
+  createdById         String
+  createdAt           TimestamptzJsDate @default(now())
+  updatedAt           TimestamptzJsDate @default(now())
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  createdBy  User @relation("GithubConnectionCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  deliveries GithubDelivery[]
+  pulls      GithubPullLink[]
+
+  @@index([projectId])
+  @@index([createdById])
+  @@map("github_connection")
+}

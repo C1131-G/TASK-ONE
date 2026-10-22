@@ -1,0 +1,689 @@
+[
+  {
+    "id": "table.github_connection",
+    "label": "Create table \"github_connection\"",
+    "summary": "Creates table \"github_connection\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"github_connection\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"github_connection\"",
+        "sql": "CREATE TABLE \"public\".\"github_connection\" (\n  \"autoCompleteOnMerge\" bool DEFAULT false NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" text NOT NULL,\n  \"enabled\" bool DEFAULT true NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"repoFullName\" text NOT NULL,\n  \"secretCiphertext\" text NOT NULL,\n  \"secretHint\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"github_connection\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.github_delivery",
+    "label": "Create table \"github_delivery\"",
+    "summary": "Creates table \"github_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "github_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"github_delivery\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"github_delivery\"",
+        "sql": "CREATE TABLE \"public\".\"github_delivery\" (\n  \"connectionId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deliveryId\" text NOT NULL,\n  \"event\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"github_delivery\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.github_pull_link",
+    "label": "Create table \"github_pull_link\"",
+    "summary": "Creates table \"github_pull_link\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"github_pull_link\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"github_pull_link\"",
+        "sql": "CREATE TABLE \"public\".\"github_pull_link\" (\n  \"authorLogin\" text,\n  \"connectionId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"mergedAt\" timestamptz,\n  \"prNumber\" int4 NOT NULL,\n  \"state\" text DEFAULT 'open' NOT NULL,\n  \"taskId\" uuid NOT NULL,\n  \"title\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"url\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"github_pull_link_number_positive_d72b835d\" CHECK (\"prNumber\" > 0),\n  CONSTRAINT \"github_pull_link_state_valid_57fa9413\" CHECK (\"state\" IN ('open', 'closed', 'merged'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"github_pull_link\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.github_connection.github_connection_repoFullName_key",
+    "label": "Add unique constraint on \"github_connection\" (repoFullName)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "github_connection_repoFullName_key",
+        "table": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"github_connection_repoFullName_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_repoFullName_key",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"github_connection_repoFullName_key\"",
+        "sql": "ALTER TABLE \"public\".\"github_connection\" ADD CONSTRAINT \"github_connection_repoFullName_key\" UNIQUE (\"repoFullName\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"github_connection_repoFullName_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_repoFullName_key",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.github_delivery.github_delivery_connectionId_deliveryId_key",
+    "label": "Add unique constraint on \"github_delivery\" (connectionId, deliveryId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "github_delivery_connectionId_deliveryId_key",
+        "table": "github_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"github_delivery_connectionId_deliveryId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_delivery_connectionId_deliveryId_key",
+          "public",
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"github_delivery_connectionId_deliveryId_key\"",
+        "sql": "ALTER TABLE \"public\".\"github_delivery\" ADD CONSTRAINT \"github_delivery_connectionId_deliveryId_key\" UNIQUE (\"connectionId\", \"deliveryId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"github_delivery_connectionId_deliveryId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_delivery_connectionId_deliveryId_key",
+          "public",
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.github_pull_link.github_pull_link_connectionId_taskId_prNumber_key",
+    "label": "Add unique constraint on \"github_pull_link\" (connectionId, taskId, prNumber)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "github_pull_link_connectionId_taskId_prNumber_key",
+        "table": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"github_pull_link_connectionId_taskId_prNumber_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_connectionId_taskId_prNumber_key",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"github_pull_link_connectionId_taskId_prNumber_key\"",
+        "sql": "ALTER TABLE \"public\".\"github_pull_link\" ADD CONSTRAINT \"github_pull_link_connectionId_taskId_prNumber_key\" UNIQUE (\"connectionId\", \"taskId\", \"prNumber\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"github_pull_link_connectionId_taskId_prNumber_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_connectionId_taskId_prNumber_key",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_connection.github_connection_createdById_idx_8bf640ed",
+    "label": "Create index \"github_connection_createdById_idx_8bf640ed\" on \"github_connection\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_connection_createdById_idx_8bf640ed",
+        "table": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_connection_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_connection_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"github_connection_createdById_idx_8bf640ed\" ON \"public\".\"github_connection\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_connection_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_connection.github_connection_projectId_idx_a96e4d92",
+    "label": "Create index \"github_connection_projectId_idx_a96e4d92\" on \"github_connection\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_connection_projectId_idx_a96e4d92",
+        "table": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_connection_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_connection_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"github_connection_projectId_idx_a96e4d92\" ON \"public\".\"github_connection\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_connection_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_connection_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_delivery.github_delivery_connectionId_idx_b3eeb6ac",
+    "label": "Create index \"github_delivery_connectionId_idx_b3eeb6ac\" on \"github_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_delivery_connectionId_idx_b3eeb6ac",
+        "table": "github_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_delivery_connectionId_idx_b3eeb6ac\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery_connectionId_idx_b3eeb6ac\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_delivery_connectionId_idx_b3eeb6ac\"",
+        "sql": "CREATE INDEX \"github_delivery_connectionId_idx_b3eeb6ac\" ON \"public\".\"github_delivery\" (\"connectionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_delivery_connectionId_idx_b3eeb6ac\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery_connectionId_idx_b3eeb6ac\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_delivery.github_delivery_createdAt_idx_9575dbd7",
+    "label": "Create index \"github_delivery_createdAt_idx_9575dbd7\" on \"github_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_delivery_createdAt_idx_9575dbd7",
+        "table": "github_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_delivery_createdAt_idx_9575dbd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_delivery_createdAt_idx_9575dbd7\"",
+        "sql": "CREATE INDEX \"github_delivery_createdAt_idx_9575dbd7\" ON \"public\".\"github_delivery\" (\"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_delivery_createdAt_idx_9575dbd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_delivery_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_pull_link.github_pull_link_connectionId_idx_b3eeb6ac",
+    "label": "Create index \"github_pull_link_connectionId_idx_b3eeb6ac\" on \"github_pull_link\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_pull_link_connectionId_idx_b3eeb6ac",
+        "table": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_pull_link_connectionId_idx_b3eeb6ac\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link_connectionId_idx_b3eeb6ac\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_pull_link_connectionId_idx_b3eeb6ac\"",
+        "sql": "CREATE INDEX \"github_pull_link_connectionId_idx_b3eeb6ac\" ON \"public\".\"github_pull_link\" (\"connectionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_pull_link_connectionId_idx_b3eeb6ac\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link_connectionId_idx_b3eeb6ac\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.github_pull_link.github_pull_link_taskId_idx_4965c936",
+    "label": "Create index \"github_pull_link_taskId_idx_4965c936\" on \"github_pull_link\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "github_pull_link_taskId_idx_4965c936",
+        "table": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"github_pull_link_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"github_pull_link_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"github_pull_link_taskId_idx_4965c936\" ON \"public\".\"github_pull_link\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"github_pull_link_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"github_pull_link_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.github_connection.github_connection_projectId_fkey",
+    "label": "Add foreign key \"github_connection_projectId_fkey\" on \"github_connection\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "github_connection_projectId_fkey",
+        "table": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"github_connection_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_projectId_fkey",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"github_connection_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"github_connection\"\nADD CONSTRAINT \"github_connection_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"github_connection_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_projectId_fkey",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.github_connection.github_connection_createdById_fkey",
+    "label": "Add foreign key \"github_connection_createdById_fkey\" on \"github_connection\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "github_connection_createdById_fkey",
+        "table": "github_connection"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"github_connection_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_createdById_fkey",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"github_connection_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"github_connection\"\nADD CONSTRAINT \"github_connection_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"github_connection_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_connection_createdById_fkey",
+          "public",
+          "\"public\".\"github_connection\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.github_delivery.github_delivery_connectionId_fkey",
+    "label": "Add foreign key \"github_delivery_connectionId_fkey\" on \"github_delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "github_delivery_connectionId_fkey",
+        "table": "github_delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"github_delivery_connectionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_delivery_connectionId_fkey",
+          "public",
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"github_delivery_connectionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"github_delivery\"\nADD CONSTRAINT \"github_delivery_connectionId_fkey\"\nFOREIGN KEY (\"connectionId\")\nREFERENCES \"public\".\"github_connection\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"github_delivery_connectionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_delivery_connectionId_fkey",
+          "public",
+          "\"public\".\"github_delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.github_pull_link.github_pull_link_connectionId_fkey",
+    "label": "Add foreign key \"github_pull_link_connectionId_fkey\" on \"github_pull_link\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "github_pull_link_connectionId_fkey",
+        "table": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"github_pull_link_connectionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_connectionId_fkey",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"github_pull_link_connectionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"github_pull_link\"\nADD CONSTRAINT \"github_pull_link_connectionId_fkey\"\nFOREIGN KEY (\"connectionId\")\nREFERENCES \"public\".\"github_connection\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"github_pull_link_connectionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_connectionId_fkey",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.github_pull_link.github_pull_link_taskId_fkey",
+    "label": "Add foreign key \"github_pull_link_taskId_fkey\" on \"github_pull_link\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "github_pull_link_taskId_fkey",
+        "table": "github_pull_link"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"github_pull_link_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_taskId_fkey",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"github_pull_link_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"github_pull_link\"\nADD CONSTRAINT \"github_pull_link_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"github_pull_link_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "github_pull_link_taskId_fkey",
+          "public",
+          "\"public\".\"github_pull_link\""
+        ]
+      }
+    ]
+  }
+]

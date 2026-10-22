@@ -62,6 +62,7 @@ model User {
   pickedBugs BugReport[] @relation("BugPicker")
   createdIntakeForms IntakeForm[] @relation("IntakeFormCreator")
   createdAutomationRules AutomationRule[] @relation("AutomationRuleCreator")
+  createdGithubConnections GithubConnection[] @relation("GithubConnectionCreator")
   auditEventsAsActor AuditEvent[] @relation("AuditEventActor")
   auditEventsAsSubject AuditEvent[] @relation("AuditEventSubject")
 

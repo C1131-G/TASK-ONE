@@ -212,6 +212,7 @@ it("is idempotent when the purge runs again", async () => {
     automationRuns: 0,
     completedJobs: 0,
     deadJobs: 0,
+    githubDeliveries: 0,
     idempotencyKeys: 0,
     pushDeliveries: 0,
     rateLimits: 0,

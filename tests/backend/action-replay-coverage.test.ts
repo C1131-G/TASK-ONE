@@ -23,6 +23,9 @@ const excludedByDesign = new Set([
   // Returns the one-time signing secret, like the calendar feed rotation.
   "createWebhookEndpointAction",
   "rotateWebhookSecretAction",
+  // Both return a one-time secret that a replay would store.
+  "createGithubConnectionAction",
+  "rotateGithubSecretAction",
   // Clearing a lockout is naturally idempotent; a repeat records nothing.
   "unlockUserAction",
 ]);
@@ -31,6 +34,7 @@ const replayedMutations = new Set([
   "removeAutomationRuleAction",
   "setAutomationRuleEnabledAction",
   "updateAutomationRuleAction",
+  "updateGithubConnectionAction",
   "createIntakeFormAction",
   "rotateIntakeFormAction",
   "setIntakeFormEnabledAction",

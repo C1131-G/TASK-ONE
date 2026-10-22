@@ -10,7 +10,11 @@ import type {
   TaskFile,
 } from "@/features/tasks/task-details-panel-data";
 import { getTaskBundleAction } from "@/features/tasks/tasks-actions";
+import type { LinkedPull } from "@/src/server/github/github-contracts";
 import type { RunningTimer, TaskTime } from "@/src/server/time/time-tracking";
+
+const linkedPullsOf = (bundle: TaskBundle | null): readonly LinkedPull[] =>
+  bundle?.pulls.ok ? bundle.pulls.data : [];
 
 // Reads everything the task panel shows while it is open, and owns the panel's
 // error so the reads and the comment actions report into one place. A deep link
@@ -68,6 +72,8 @@ export const useTaskBundle = ({
   const [timer, setTimer] = useState<RunningTimer | null>(
     initialBundle?.timer.ok ? initialBundle.timer.data : null
   );
+  // Linked pull requests are a read-only extra, so a failed read just hides them.
+  const [pulls, setPulls] = useState(() => linkedPullsOf(initialBundle));
   const requestSequence = useRef(0);
 
   // The first failing read is reported; the reads that succeeded still show.
@@ -104,6 +110,9 @@ export const useTaskBundle = ({
       if (bundle.timer.ok) {
         setTimer(bundle.timer.data);
       }
+      if (bundle.pulls.ok) {
+        setPulls(bundle.pulls.data);
+      }
     },
     [setComments]
   );
@@ -133,6 +142,7 @@ export const useTaskBundle = ({
     error,
     files,
     loading,
+    pulls,
     refresh,
     setFiles,
     setSubtasks,
