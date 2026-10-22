@@ -7,6 +7,7 @@ import {
   Bug,
   FolderOpen,
   ListChecks,
+  SealCheck,
   UserCircle,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
@@ -36,6 +37,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     match: (path) => path.startsWith("/portal/projects"),
   },
   {
+    href: "/portal/approvals",
+    icon: SealCheck,
+    label: "Approvals",
+    match: (path) => path.startsWith("/portal/approvals"),
+  },
+  {
     href: "/portal/new",
     icon: Bug,
     label: "Report bug",
@@ -59,8 +66,10 @@ const NAV_ITEMS: readonly NavItem[] = [
 // inactive. The unread badge streams in its own boundary, so the links never
 // wait on the count.
 const PortalNavLinks = ({
+  approvalBadge,
   notificationBadge,
 }: {
+  readonly approvalBadge: ReactNode;
   readonly notificationBadge: ReactNode;
 }) => (
   <nav aria-label="Client portal" className="portal-nav">
@@ -85,6 +94,7 @@ const PortalNavLinks = ({
                   {item.href === "/portal/notifications"
                     ? notificationBadge
                     : null}
+                  {item.href === "/portal/approvals" ? approvalBadge : null}
                 </>
               )}
             </NavLink>

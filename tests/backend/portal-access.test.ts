@@ -16,6 +16,10 @@ const portalUploads =
 const portalNotifications =
   await import("../../features/portal/portal-notification-actions");
 const portalQueries = await import("../../features/portal/portal-queries");
+const portalApprovals =
+  await import("../../features/portal/portal-approval-actions");
+const portalApprovalQueries =
+  await import("../../features/portal/portal-approval-queries");
 const portalPush = await import("../../features/portal/portal-push-actions");
 
 beforeAll(setupHarness);
@@ -50,6 +54,30 @@ const portalActions: readonly ActionEntry[] = [
     async () => await portalQueries.getPortalSharedProjectById(ids.random),
     () => ({})
   ),
+  entry(
+    "listPortalApprovals",
+    portalApprovalQueries.listPortalApprovals,
+    () => ({})
+  ),
+  entry(
+    "getPortalApprovalCount",
+    portalApprovalQueries.getPortalApprovalCount,
+    () => ({})
+  ),
+  entry("getPortalApproval", portalApprovalQueries.getPortalApproval, () => ({
+    approvalId: ids.random,
+  })),
+  entry(
+    "getPortalApprovalById",
+    async () => await portalApprovalQueries.getPortalApprovalById(ids.random),
+    () => ({})
+  ),
+  entry("decideApprovalAction", portalApprovals.decideApprovalAction, () => ({
+    comment: "",
+    decision: "approve",
+    idempotencyKey: nextKey(),
+    requestId: ids.random,
+  })),
   entry("listPortalBugs", portalQueries.listPortalBugs, () => ({})),
   entry("getPortalBug", portalQueries.getPortalBug, bug),
   entry(
@@ -182,6 +210,8 @@ it("covers every portal action and query", () => {
     ...Object.keys(portal),
     ...Object.keys(portalQueries),
     ...Object.keys(portalPush),
+    ...Object.keys(portalApprovals),
+    ...Object.keys(portalApprovalQueries),
   ];
   const covered = new Set([
     ...portalActions.map(({ name }) => name),
@@ -189,6 +219,7 @@ it("covers every portal action and query", () => {
     // returning a result; getPortalBugById is checked above.
     "getPortalBugRecord",
     "getPortalSharedProjectRecord",
+    "getPortalApprovalRecord",
   ]);
   expect(exported.filter((name) => !covered.has(name))).toEqual([]);
 });

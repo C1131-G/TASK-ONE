@@ -1,6 +1,8 @@
 import type { Schema } from "effect";
 import { Effect, Layer } from "effect";
 
+import { PortalApprovalsLive } from "@/src/server/approvals/approvals";
+import type { PortalApprovals } from "@/src/server/approvals/portal-approvals-service";
 import { AuthSession, AuthSessionLive } from "@/src/server/auth/session";
 import type { PortalUser } from "@/src/server/auth/session-types";
 import type { ActionResult, AppError } from "@/src/server/core/action-result";
@@ -24,6 +26,7 @@ import type { Uploads } from "@/src/server/storage/uploads-contracts";
 export type PortalServices =
   | PortalBugs
   | PortalProjects
+  | PortalApprovals
   | Idempotency
   | Notifications
   | Uploads;
@@ -63,6 +66,7 @@ export const runPortalAction = <
         return yield* execute(user, validated).pipe(
           Effect.provide(PortalBugsLive),
           Effect.provide(PortalProjectsLive),
+          Effect.provide(PortalApprovalsLive),
           Effect.provide(NotificationsLive),
           Effect.provide(Layer.provide(UploadsLive, StorageLive)),
           Effect.provide(IdempotencyLive)

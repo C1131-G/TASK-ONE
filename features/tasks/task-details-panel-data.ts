@@ -1,4 +1,5 @@
 import "server-only";
+import { listTaskApprovals } from "@/features/approvals/approval-queries";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
 import { listTaskFilesAction } from "@/features/files/actions/files-upload-requests";
 import { getTaskLinkedPulls } from "@/features/github/github-queries";
@@ -30,18 +31,38 @@ export const readTaskBundle = async (
   taskId: string,
   bugId?: string
 ) => {
-  const [task, comments, subtasks, files, bugHistory, time, timer, pulls] =
-    await Promise.all([
-      getProjectTask({ projectId, taskId }),
-      listTaskCommentsAction({ taskId }),
-      listTaskSubtasksAction({ taskId }),
-      listTaskFilesAction({ taskId }),
-      bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
-      getTaskTime({ taskId }),
-      getRunningTimer({}),
-      getTaskLinkedPulls({ taskId }),
-    ]);
-  return { bugHistory, comments, files, pulls, subtasks, task, time, timer };
+  const [
+    task,
+    comments,
+    subtasks,
+    files,
+    bugHistory,
+    time,
+    timer,
+    pulls,
+    approvals,
+  ] = await Promise.all([
+    getProjectTask({ projectId, taskId }),
+    listTaskCommentsAction({ taskId }),
+    listTaskSubtasksAction({ taskId }),
+    listTaskFilesAction({ taskId }),
+    bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
+    getTaskTime({ taskId }),
+    getRunningTimer({}),
+    getTaskLinkedPulls({ taskId }),
+    listTaskApprovals({ taskId }),
+  ]);
+  return {
+    approvals,
+    bugHistory,
+    comments,
+    files,
+    pulls,
+    subtasks,
+    task,
+    time,
+    timer,
+  };
 };
 
 export type TaskBundle = Awaited<ReturnType<typeof readTaskBundle>>;

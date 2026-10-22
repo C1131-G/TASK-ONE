@@ -27,6 +27,7 @@ model Task {
   uploadIntents UploadIntent[]
   bugReport BugReport?
   githubLinks GithubPullLink[]
+  approvalRequests ApprovalRequest[]
   files FileAsset[]
   timeEntries TimeEntry[]
   timeTimers TimeTimer[]

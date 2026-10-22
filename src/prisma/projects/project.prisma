@@ -27,6 +27,7 @@ model Project {
   clientCompanies ClientCompanyProject[]
   intakeForms IntakeForm[]
   githubConnections GithubConnection[]
+  approvalRequests ApprovalRequest[]
   budget ProjectBudget?
 
   team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)

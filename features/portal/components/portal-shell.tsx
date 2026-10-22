@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { PortalNavLinks } from "@/features/portal/components/portal-nav";
+import { getPortalApprovalCount } from "@/features/portal/portal-approval-queries";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import { listPortalNotifications } from "@/features/portal/portal-queries";
 
@@ -70,6 +71,26 @@ const PortalUnreadBadge = async () => {
   );
 };
 
+const PortalApprovalBadge = async () => {
+  const result = await getPortalApprovalCount({});
+  const waiting = result.ok ? result.data : 0;
+  if (waiting === 0) {
+    return null;
+  }
+  return (
+    <span className="portal-nav-badge">
+      <span aria-hidden="true">{waiting > 99 ? "99+" : waiting}</span>
+      <span className="sr-only">{waiting} waiting for review</span>
+    </span>
+  );
+};
+
+const approvalBadge = (
+  <Suspense fallback={null}>
+    <PortalApprovalBadge />
+  </Suspense>
+);
+
 // The fallback and the nav both carry the badge, so the count shows whether
 // or not the URL has been read yet.
 const unreadBadge = (
@@ -97,7 +118,10 @@ const PortalShell = ({ children }: { readonly children: ReactNode }) => (
         <Suspense fallback={<p className="portal-company" />}>
           <PortalCompanyName />
         </Suspense>
-        <PortalNavLinks notificationBadge={unreadBadge} />
+        <PortalNavLinks
+          approvalBadge={approvalBadge}
+          notificationBadge={unreadBadge}
+        />
       </div>
     </header>
     <Suspense

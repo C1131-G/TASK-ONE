@@ -12,6 +12,14 @@
       "model": "Activity",
       "namespace": "public"
     },
+    "approval_request": {
+      "model": "ApprovalRequest",
+      "namespace": "public"
+    },
+    "approval_request_file": {
+      "model": "ApprovalRequestFile",
+      "namespace": "public"
+    },
     "audit_event": {
       "model": "AuditEvent",
       "namespace": "public"
@@ -1014,6 +1022,373 @@
               },
               "namespaceId": "public",
               "table": "activity"
+            }
+          },
+          "ApprovalRequest": {
+            "fields": {
+              "cancelledAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "cancelledById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "companyId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "decidedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "decidedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "decisionComment": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "message": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "milestoneId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "projectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "requestedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "requestedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "subjectKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "subjectTitle": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "taskId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "cancelledBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "cancelledById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "company": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "companyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "decidedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "decidedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "files": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "requestId"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequestFile",
+                  "namespace": "public"
+                }
+              },
+              "project": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Project",
+                  "namespace": "public"
+                }
+              },
+              "requestedBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "requestedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "cancelledAt": {
+                  "column": "cancelledAt"
+                },
+                "cancelledById": {
+                  "column": "cancelledById"
+                },
+                "companyId": {
+                  "column": "companyId"
+                },
+                "decidedAt": {
+                  "column": "decidedAt"
+                },
+                "decidedById": {
+                  "column": "decidedById"
+                },
+                "decisionComment": {
+                  "column": "decisionComment"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "message": {
+                  "column": "message"
+                },
+                "milestoneId": {
+                  "column": "milestoneId"
+                },
+                "projectId": {
+                  "column": "projectId"
+                },
+                "requestedAt": {
+                  "column": "requestedAt"
+                },
+                "requestedById": {
+                  "column": "requestedById"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "subjectKey": {
+                  "column": "subjectKey"
+                },
+                "subjectTitle": {
+                  "column": "subjectTitle"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "approval_request"
+            }
+          },
+          "ApprovalRequestFile": {
+            "fields": {
+              "fileId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "requestId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "file": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fileId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "FileAsset",
+                  "namespace": "public"
+                }
+              },
+              "request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "requestId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "fileId": {
+                  "column": "fileId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "requestId": {
+                  "column": "requestId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "approval_request_file"
             }
           },
           "AuditEvent": {
@@ -3237,6 +3612,21 @@
               }
             },
             "relations": {
+              "approvalRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "companyId"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              },
               "bugReports": {
                 "cardinality": "1:N",
                 "on": {
@@ -4346,6 +4736,21 @@
               }
             },
             "relations": {
+              "approvalFiles": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fileId"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequestFile",
+                  "namespace": "public"
+                }
+              },
               "bugEvidence": {
                 "cardinality": "1:N",
                 "on": {
@@ -5903,6 +6308,21 @@
               }
             },
             "relations": {
+              "approvalRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              },
               "archivedBy": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -7427,6 +7847,21 @@
               }
             },
             "relations": {
+              "approvalRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              },
               "archivedBy": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -9129,6 +9564,21 @@
                   "namespace": "public"
                 }
               },
+              "cancelledApprovals": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "cancelledById"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              },
               "clientCompany": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -9266,6 +9716,21 @@
                   "namespace": "public"
                 }
               },
+              "decidedApprovals": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "decidedById"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
+                  "namespace": "public"
+                }
+              },
               "emailDeliveries": {
                 "cardinality": "1:N",
                 "on": {
@@ -9369,6 +9834,21 @@
                 },
                 "to": {
                   "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "requestedApprovals": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "requestedById"
+                  ]
+                },
+                "to": {
+                  "model": "ApprovalRequest",
                   "namespace": "public"
                 }
               },
@@ -10263,6 +10743,384 @@
                 ]
               },
               "uniques": []
+            },
+            "approval_request": {
+              "checks": [
+                {
+                  "expression": "(\"taskId\" IS NOT NULL) <> (\"milestoneId\" IS NOT NULL)",
+                  "name": "approval_request_one_subject_75cd91e2",
+                  "prefix": "approval_request_one_subject"
+                },
+                {
+                  "expression": "(\"status\" = 'pending' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"decisionComment\" IS NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'approved' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'changes_requested' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND length(trim(\"decisionComment\")) > 0 AND \"cancelledAt\" IS NULL) OR (\"status\" = 'cancelled' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"cancelledById\" IS NOT NULL AND \"cancelledAt\" IS NOT NULL)",
+                  "name": "approval_request_status_valid_a989b6ba",
+                  "prefix": "approval_request_status_valid"
+                },
+                {
+                  "expression": "\"version\" > 0",
+                  "name": "approval_request_version_positive_efca705d",
+                  "prefix": "approval_request_version_positive"
+                }
+              ],
+              "columns": {
+                "cancelledAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "cancelledById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "companyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "decidedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "decidedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "decisionComment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "message": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "milestoneId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "projectId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "requestedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "requestedById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "pending"
+                  },
+                  "nullable": false
+                },
+                "subjectKey": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "subjectTitle": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "taskId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "projectId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "project"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "companyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "requestedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "decidedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "cancelledById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "cancelledById"
+                  ],
+                  "name": "approval_request_cancelledById_idx_03ce7bea",
+                  "prefix": "approval_request_cancelledById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "companyId"
+                  ],
+                  "name": "approval_request_companyId_idx_33acc5ed",
+                  "prefix": "approval_request_companyId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "companyId",
+                    "status",
+                    "requestedAt"
+                  ],
+                  "name": "approval_request_companyId_status_requestedAt_idx_ce646468",
+                  "prefix": "approval_request_companyId_status_requestedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "decidedById"
+                  ],
+                  "name": "approval_request_decidedById_idx_8194d55f",
+                  "prefix": "approval_request_decidedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "projectId"
+                  ],
+                  "name": "approval_request_projectId_idx_a96e4d92",
+                  "prefix": "approval_request_projectId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "requestedById"
+                  ],
+                  "name": "approval_request_requestedById_idx_f9a56c66",
+                  "prefix": "approval_request_requestedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "taskId"
+                  ],
+                  "name": "approval_request_taskId_idx_4965c936",
+                  "prefix": "approval_request_taskId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "subjectKey",
+                    "companyId",
+                    "version"
+                  ]
+                }
+              ]
+            },
+            "approval_request_file": {
+              "columns": {
+                "fileId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "requestId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "requestId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request_file"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "fileId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "approval_request_file"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "file_asset"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "fileId"
+                  ],
+                  "name": "approval_request_file_fileId_idx_9a9e456b",
+                  "prefix": "approval_request_file_fileId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "requestId"
+                  ],
+                  "name": "approval_request_file_requestId_idx_fd667f92",
+                  "prefix": "approval_request_file_requestId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "requestId",
+                    "fileId"
+                  ]
+                }
+              ]
             },
             "audit_event": {
               "columns": {
@@ -18685,10 +19543,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "180e8f1b951bd4584f86f671b3214067323faf1a52fa4c9bdae669d11aeba5ad"
+    "storageHash": "261031b9074f70042580593b45ae00216718af3997a2e5d573fef4f2ddbe4d93"
   },
   "execution": {
-    "executionHash": "75ff55e8ab60d7d7c69af77d5bf64b46744ecfd22c5ca1ee26a6dcbf376e9451",
+    "executionHash": "5360f0339f72a67ecab79875e8d0787c2a315e5432d756b1c29830675a95dd0f",
     "mutations": {
       "defaults": [
         {
@@ -18698,6 +19556,28 @@
           },
           "ref": {
             "entry": "activity",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "approval_request",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "approval_request_file",
             "field": "id",
             "namespace": "public"
           }

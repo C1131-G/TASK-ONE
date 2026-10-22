@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'180e8f1b951bd4584f86f671b3214067323faf1a52fa4c9bdae669d11aeba5ad'>;
+  StorageHashBase<'261031b9074f70042580593b45ae00216718af3997a2e5d573fef4f2ddbe4d93'>;
 export type ExecutionHash =
-  ExecutionHashBase<'75ff55e8ab60d7d7c69af77d5bf64b46744ecfd22c5ca1ee26a6dcbf376e9451'>;
+  ExecutionHashBase<'5360f0339f72a67ecab79875e8d0787c2a315e5432d756b1c29830675a95dd0f'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -257,6 +257,30 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
+    };
+    readonly ApprovalRequest: {
+      readonly cancelledAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly cancelledById: CodecTypes['pg/text@1']['output'] | null;
+      readonly companyId: CodecTypes['pg/uuid@1']['output'];
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly decisionComment: CodecTypes['pg/text@1']['output'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly message: CodecTypes['pg/text@1']['output'];
+      readonly milestoneId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly requestedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly requestedById: CodecTypes['pg/text@1']['output'];
+      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly subjectKey: CodecTypes['pg/text@1']['output'];
+      readonly subjectTitle: CodecTypes['pg/text@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly version: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly ApprovalRequestFile: {
+      readonly fileId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly requestId: CodecTypes['pg/uuid@1']['output'];
     };
     readonly AuditEvent: {
       readonly actorId: CodecTypes['pg/text@1']['output'] | null;
@@ -974,6 +998,30 @@ export type FieldInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
     };
+    readonly ApprovalRequest: {
+      readonly cancelledAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly cancelledById: CodecTypes['pg/text@1']['input'] | null;
+      readonly companyId: CodecTypes['pg/uuid@1']['input'];
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly decisionComment: CodecTypes['pg/text@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly message: CodecTypes['pg/text@1']['input'];
+      readonly milestoneId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly requestedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly requestedById: CodecTypes['pg/text@1']['input'];
+      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly subjectKey: CodecTypes['pg/text@1']['input'];
+      readonly subjectTitle: CodecTypes['pg/text@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly version: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly ApprovalRequestFile: {
+      readonly fileId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly requestId: CodecTypes['pg/uuid@1']['input'];
+    };
     readonly AuditEvent: {
       readonly actorId: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
@@ -1690,6 +1738,30 @@ export type StorageColumnTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
     };
+    readonly approval_request: {
+      readonly cancelledAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly cancelledById: CodecTypes['pg/text@1']['output'] | null;
+      readonly companyId: CodecTypes['pg/uuid@1']['output'];
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['output'] | null;
+      readonly decisionComment: CodecTypes['pg/text@1']['output'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly message: CodecTypes['pg/text@1']['output'];
+      readonly milestoneId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly requestedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly requestedById: CodecTypes['pg/text@1']['output'];
+      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly subjectKey: CodecTypes['pg/text@1']['output'];
+      readonly subjectTitle: CodecTypes['pg/text@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly version: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly approval_request_file: {
+      readonly fileId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly requestId: CodecTypes['pg/uuid@1']['output'];
+    };
     readonly audit_event: {
       readonly actorId: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -2405,6 +2477,30 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
+    };
+    readonly approval_request: {
+      readonly cancelledAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly cancelledById: CodecTypes['pg/text@1']['input'] | null;
+      readonly companyId: CodecTypes['pg/uuid@1']['input'];
+      readonly decidedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly decidedById: CodecTypes['pg/text@1']['input'] | null;
+      readonly decisionComment: CodecTypes['pg/text@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly message: CodecTypes['pg/text@1']['input'];
+      readonly milestoneId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly requestedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly requestedById: CodecTypes['pg/text@1']['input'];
+      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly subjectKey: CodecTypes['pg/text@1']['input'];
+      readonly subjectTitle: CodecTypes['pg/text@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly version: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly approval_request_file: {
+      readonly fileId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly requestId: CodecTypes['pg/uuid@1']['input'];
     };
     readonly audit_event: {
       readonly actorId: CodecTypes['pg/text@1']['input'] | null;
@@ -3128,6 +3224,42 @@ export namespace Models {
     task: public_Task | null;
     readonly [RelationKeys]?: 'actor' | 'project' | 'task';
   };
+  export type public_ApprovalRequest = {
+    cancelledAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    cancelledById: CodecTypes['pg/text@1']['output'] | null;
+    companyId: CodecTypes['pg/uuid@1']['output'];
+    decidedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    decidedById: CodecTypes['pg/text@1']['output'] | null;
+    decisionComment: CodecTypes['pg/text@1']['output'] | null;
+    id: CodecTypes['pg/uuid@1']['output'];
+    message: CodecTypes['pg/text@1']['output'];
+    milestoneId: CodecTypes['pg/uuid@1']['output'] | null;
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    requestedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    requestedById: CodecTypes['pg/text@1']['output'];
+    status: CodecTypes['pg/text@1']['output'];
+    subjectKey: CodecTypes['pg/text@1']['output'];
+    subjectTitle: CodecTypes['pg/text@1']['output'];
+    taskId: CodecTypes['pg/uuid@1']['output'] | null;
+    version: CodecTypes['pg/int4@1']['output'];
+    cancelledBy: public_User | null;
+    company: public_ClientCompany;
+    decidedBy: public_User | null;
+    files: public_ApprovalRequestFile[];
+    project: public_Project;
+    requestedBy: public_User;
+    task: public_Task | null;
+    readonly [RelationKeys]?:
+      'cancelledBy' | 'company' | 'decidedBy' | 'files' | 'project' | 'requestedBy' | 'task';
+  };
+  export type public_ApprovalRequestFile = {
+    fileId: CodecTypes['pg/uuid@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    requestId: CodecTypes['pg/uuid@1']['output'];
+    file: public_FileAsset;
+    request: public_ApprovalRequest;
+    readonly [RelationKeys]?: 'file' | 'request';
+  };
   export type public_AuditEvent = {
     actorId: CodecTypes['pg/text@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -3387,6 +3519,7 @@ export namespace Models {
     name: CodecTypes['pg/text@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
+    approvalRequests: public_ApprovalRequest[];
     bugReports: public_BugReport[];
     createdBy: public_User;
     deactivatedBy: public_User | null;
@@ -3395,6 +3528,7 @@ export namespace Models {
     projects: public_ClientCompanyProject[];
     users: public_User[];
     readonly [RelationKeys]?:
+      | 'approvalRequests'
       | 'bugReports'
       | 'createdBy'
       | 'deactivatedBy'
@@ -3510,12 +3644,14 @@ export namespace Models {
     storageKey: CodecTypes['pg/text@1']['output'];
     taskId: CodecTypes['pg/uuid@1']['output'] | null;
     uploadedById: CodecTypes['pg/text@1']['output'];
+    approvalFiles: public_ApprovalRequestFile[];
     bugEvidence: public_BugEvidence[];
     deletedBy: public_User | null;
     project: public_Project;
     task: public_Task | null;
     uploadedBy: public_User;
-    readonly [RelationKeys]?: 'bugEvidence' | 'deletedBy' | 'project' | 'task' | 'uploadedBy';
+    readonly [RelationKeys]?:
+      'approvalFiles' | 'bugEvidence' | 'deletedBy' | 'project' | 'task' | 'uploadedBy';
   };
   export type public_GithubConnection = {
     autoCompleteOnMerge: CodecTypes['pg/bool@1']['output'];
@@ -3672,6 +3808,7 @@ export namespace Models {
     teamId: CodecTypes['pg/uuid@1']['output'] | null;
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
+    approvalRequests: public_ApprovalRequest[];
     archivedBy: public_User | null;
     budget: public_ProjectBudget | null;
     bugReports: public_BugReport[];
@@ -3684,6 +3821,7 @@ export namespace Models {
     team: public_Team | null;
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
+      | 'approvalRequests'
       | 'archivedBy'
       | 'budget'
       | 'bugReports'
@@ -3841,6 +3979,7 @@ export namespace Models {
     type: 'task' | 'bug';
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     version: CodecTypes['pg/int4@1']['output'];
+    approvalRequests: public_ApprovalRequest[];
     archivedBy: public_User | null;
     bugReport: public_BugReport | null;
     createdBy: public_User;
@@ -3853,6 +3992,7 @@ export namespace Models {
     timeTimers: public_TimeTimer[];
     uploadIntents: public_UploadIntent[];
     readonly [RelationKeys]?:
+      | 'approvalRequests'
       | 'archivedBy'
       | 'bugReport'
       | 'createdBy'
@@ -4020,6 +4160,7 @@ export namespace Models {
     bugReleases: public_BugRelease[];
     bugVerifications: public_BugFixAttempt[];
     calendarFeedToken: public_CalendarFeedToken | null;
+    cancelledApprovals: public_ApprovalRequest[];
     clientCompany: public_ClientCompany | null;
     clientCompanyHandlerships: public_ClientCompanyHandler[];
     createdBugRelations: public_BugRelation[];
@@ -4029,6 +4170,7 @@ export namespace Models {
     deactivatedBy: public_User | null;
     deactivatedClientCompanies: public_ClientCompany[];
     deactivatedUsers: public_User[];
+    decidedApprovals: public_ApprovalRequest[];
     emailDeliveries: public_EmailDelivery[];
     emailSetting: public_EmailSetting | null;
     idempotencyKeys: public_IdempotencyKey[];
@@ -4036,6 +4178,7 @@ export namespace Models {
     pushDeliveries: public_PushDelivery[];
     pushSubscriptions: public_PushSubscription[];
     reportedBugs: public_BugReport[];
+    requestedApprovals: public_ApprovalRequest[];
     team: public_Team | null;
     timeEntries: public_TimeEntry[];
     timeTimer: public_TimeTimer | null;
@@ -4053,6 +4196,7 @@ export namespace Models {
       | 'bugReleases'
       | 'bugVerifications'
       | 'calendarFeedToken'
+      | 'cancelledApprovals'
       | 'clientCompany'
       | 'clientCompanyHandlerships'
       | 'createdBugRelations'
@@ -4062,6 +4206,7 @@ export namespace Models {
       | 'deactivatedBy'
       | 'deactivatedClientCompanies'
       | 'deactivatedUsers'
+      | 'decidedApprovals'
       | 'emailDeliveries'
       | 'emailSetting'
       | 'idempotencyKeys'
@@ -4069,6 +4214,7 @@ export namespace Models {
       | 'pushDeliveries'
       | 'pushSubscriptions'
       | 'reportedBugs'
+      | 'requestedApprovals'
       | 'team'
       | 'timeEntries'
       | 'timeTimer'
@@ -4131,6 +4277,8 @@ export declare const models: {
   public: {
     Account: Models.public_Account;
     Activity: Models.public_Activity;
+    ApprovalRequest: Models.public_ApprovalRequest;
+    ApprovalRequestFile: Models.public_ApprovalRequestFile;
     AuditEvent: Models.public_AuditEvent;
     BugApproval: Models.public_BugApproval;
     BugEvidence: Models.public_BugEvidence;
@@ -4447,6 +4595,303 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly approval_request: {
+              columns: {
+                readonly cancelledAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly cancelledById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly companyId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly decidedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly decidedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly decisionComment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly message: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly milestoneId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly requestedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly requestedById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'pending'>;
+                  };
+                  readonly many: false;
+                };
+                readonly subjectKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly subjectTitle: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['subjectKey', 'companyId', 'version'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'approval_request_cancelledById_idx_03ce7bea';
+                  readonly prefix: 'approval_request_cancelledById_idx';
+                  readonly columns: readonly ['cancelledById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_companyId_idx_33acc5ed';
+                  readonly prefix: 'approval_request_companyId_idx';
+                  readonly columns: readonly ['companyId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_companyId_status_requestedAt_idx_ce646468';
+                  readonly prefix: 'approval_request_companyId_status_requestedAt_idx';
+                  readonly columns: readonly ['companyId', 'status', 'requestedAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_decidedById_idx_8194d55f';
+                  readonly prefix: 'approval_request_decidedById_idx';
+                  readonly columns: readonly ['decidedById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_projectId_idx_a96e4d92';
+                  readonly prefix: 'approval_request_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_requestedById_idx_f9a56c66';
+                  readonly prefix: 'approval_request_requestedById_idx';
+                  readonly columns: readonly ['requestedById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_taskId_idx_4965c936';
+                  readonly prefix: 'approval_request_taskId_idx';
+                  readonly columns: readonly ['taskId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['companyId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'client_company';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['requestedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['decidedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['cancelledById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly approval_request_file: {
+              columns: {
+                readonly fileId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly requestId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['requestId', 'fileId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'approval_request_file_fileId_idx_9a9e456b';
+                  readonly prefix: 'approval_request_file_fileId_idx';
+                  readonly columns: readonly ['fileId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'approval_request_file_requestId_idx_fd667f92';
+                  readonly prefix: 'approval_request_file_requestId_idx';
+                  readonly columns: readonly ['requestId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request_file';
+                    readonly columns: readonly ['requestId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'approval_request_file';
+                    readonly columns: readonly ['fileId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'file_asset';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -11130,6 +11575,14 @@ type ContractBase = Omit<
   readonly roots: {
     readonly account: { readonly namespace: 'public' & NamespaceId; readonly model: 'Account' };
     readonly activity: { readonly namespace: 'public' & NamespaceId; readonly model: 'Activity' };
+    readonly approval_request: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ApprovalRequest';
+    };
+    readonly approval_request_file: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ApprovalRequestFile';
+    };
     readonly audit_event: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'AuditEvent';
@@ -11524,6 +11977,234 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly projectId: { readonly column: 'projectId' };
                 readonly taskId: { readonly column: 'taskId' };
+              };
+            };
+          };
+          readonly ApprovalRequest: {
+            readonly fields: {
+              readonly cancelledAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly cancelledById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly companyId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly decidedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly decidedById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly decisionComment: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly message: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly milestoneId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly requestedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly requestedById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly subjectKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly subjectTitle: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly taskId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly cancelledBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['cancelledById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly company: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ClientCompany';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['companyId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly decidedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['decidedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly files: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequestFile';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['requestId'];
+                };
+              };
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly requestedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['requestedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'approval_request';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly cancelledAt: { readonly column: 'cancelledAt' };
+                readonly cancelledById: { readonly column: 'cancelledById' };
+                readonly companyId: { readonly column: 'companyId' };
+                readonly decidedAt: { readonly column: 'decidedAt' };
+                readonly decidedById: { readonly column: 'decidedById' };
+                readonly decisionComment: { readonly column: 'decisionComment' };
+                readonly id: { readonly column: 'id' };
+                readonly message: { readonly column: 'message' };
+                readonly milestoneId: { readonly column: 'milestoneId' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly requestedAt: { readonly column: 'requestedAt' };
+                readonly requestedById: { readonly column: 'requestedById' };
+                readonly status: { readonly column: 'status' };
+                readonly subjectKey: { readonly column: 'subjectKey' };
+                readonly subjectTitle: { readonly column: 'subjectTitle' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly version: { readonly column: 'version' };
+              };
+            };
+          };
+          readonly ApprovalRequestFile: {
+            readonly fields: {
+              readonly fileId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly requestId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+            };
+            readonly relations: {
+              readonly file: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'FileAsset';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['fileId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly request: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['requestId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'approval_request_file';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly fileId: { readonly column: 'fileId' };
+                readonly id: { readonly column: 'id' };
+                readonly requestId: { readonly column: 'requestId' };
               };
             };
           };
@@ -12883,6 +13564,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly approvalRequests: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['companyId'];
+                };
+              };
               readonly bugReports: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -13588,6 +14280,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly approvalFiles: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequestFile';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fileId'];
+                };
+              };
               readonly bugEvidence: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -14561,6 +15264,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly approvalRequests: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
               readonly archivedBy: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -15517,6 +16231,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly approvalRequests: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
+                };
+              };
               readonly archivedBy: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -16605,6 +17330,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['userId'];
                 };
               };
+              readonly cancelledApprovals: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['cancelledById'];
+                };
+              };
               readonly clientCompany: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -16700,6 +17436,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['deactivatedById'];
                 };
               };
+              readonly decidedApprovals: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['decidedById'];
+                };
+              };
               readonly emailDeliveries: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -16776,6 +17523,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['reporterId'];
+                };
+              };
+              readonly requestedApprovals: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ApprovalRequest';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['requestedById'];
                 };
               };
               readonly team: {
@@ -17382,6 +18140,22 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'activity';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'approval_request';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'approval_request_file';
             readonly field: 'id';
             readonly namespace: 'public';
           };

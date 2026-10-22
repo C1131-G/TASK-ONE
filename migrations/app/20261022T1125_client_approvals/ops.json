@@ -1,0 +1,851 @@
+[
+  {
+    "id": "table.approval_request",
+    "label": "Create table \"approval_request\"",
+    "summary": "Creates table \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"approval_request\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"approval_request\"",
+        "sql": "CREATE TABLE \"public\".\"approval_request\" (\n  \"cancelledAt\" timestamptz,\n  \"cancelledById\" text,\n  \"companyId\" uuid NOT NULL,\n  \"decidedAt\" timestamptz,\n  \"decidedById\" text,\n  \"decisionComment\" text,\n  \"id\" uuid NOT NULL,\n  \"message\" text NOT NULL,\n  \"milestoneId\" uuid,\n  \"projectId\" uuid NOT NULL,\n  \"requestedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"requestedById\" text NOT NULL,\n  \"status\" text DEFAULT 'pending' NOT NULL,\n  \"subjectKey\" text NOT NULL,\n  \"subjectTitle\" text NOT NULL,\n  \"taskId\" uuid,\n  \"version\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"approval_request_one_subject_75cd91e2\" CHECK ((\"taskId\" IS NOT NULL) <> (\"milestoneId\" IS NOT NULL)),\n  CONSTRAINT \"approval_request_status_valid_a989b6ba\" CHECK ((\"status\" = 'pending' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"decisionComment\" IS NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'approved' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'changes_requested' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND length(trim(\"decisionComment\")) > 0 AND \"cancelledAt\" IS NULL) OR (\"status\" = 'cancelled' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"cancelledById\" IS NOT NULL AND \"cancelledAt\" IS NOT NULL)),\n  CONSTRAINT \"approval_request_version_positive_efca705d\" CHECK (\"version\" > 0)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"approval_request\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.approval_request_file",
+    "label": "Create table \"approval_request_file\"",
+    "summary": "Creates table \"approval_request_file\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"approval_request_file\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"approval_request_file\"",
+        "sql": "CREATE TABLE \"public\".\"approval_request_file\" (\n  \"fileId\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"requestId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"approval_request_file\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.approval_request.approval_request_subjectKey_companyId_version_key",
+    "label": "Add unique constraint on \"approval_request\" (subjectKey, companyId, version)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "approval_request_subjectKey_companyId_version_key",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"approval_request_subjectKey_companyId_version_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_subjectKey_companyId_version_key",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"approval_request_subjectKey_companyId_version_key\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\" ADD CONSTRAINT \"approval_request_subjectKey_companyId_version_key\" UNIQUE (\"subjectKey\", \"companyId\", \"version\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"approval_request_subjectKey_companyId_version_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_subjectKey_companyId_version_key",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.approval_request_file.approval_request_file_requestId_fileId_key",
+    "label": "Add unique constraint on \"approval_request_file\" (requestId, fileId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "approval_request_file_requestId_fileId_key",
+        "table": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"approval_request_file_requestId_fileId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_requestId_fileId_key",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"approval_request_file_requestId_fileId_key\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request_file\" ADD CONSTRAINT \"approval_request_file_requestId_fileId_key\" UNIQUE (\"requestId\", \"fileId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"approval_request_file_requestId_fileId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_requestId_fileId_key",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_cancelledById_idx_03ce7bea",
+    "label": "Create index \"approval_request_cancelledById_idx_03ce7bea\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_cancelledById_idx_03ce7bea",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_cancelledById_idx_03ce7bea\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_cancelledById_idx_03ce7bea\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_cancelledById_idx_03ce7bea\"",
+        "sql": "CREATE INDEX \"approval_request_cancelledById_idx_03ce7bea\" ON \"public\".\"approval_request\" (\"cancelledById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_cancelledById_idx_03ce7bea\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_cancelledById_idx_03ce7bea\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_companyId_idx_33acc5ed",
+    "label": "Create index \"approval_request_companyId_idx_33acc5ed\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_companyId_idx_33acc5ed",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_companyId_idx_33acc5ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_companyId_idx_33acc5ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_companyId_idx_33acc5ed\"",
+        "sql": "CREATE INDEX \"approval_request_companyId_idx_33acc5ed\" ON \"public\".\"approval_request\" (\"companyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_companyId_idx_33acc5ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_companyId_idx_33acc5ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_companyId_status_requestedAt_idx_ce646468",
+    "label": "Create index \"approval_request_companyId_status_requestedAt_idx_ce646468\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_companyId_status_requestedAt_idx_ce646468",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_companyId_status_requestedAt_idx_ce646468\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_companyId_status_requestedAt_idx_ce646468\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_companyId_status_requestedAt_idx_ce646468\"",
+        "sql": "CREATE INDEX \"approval_request_companyId_status_requestedAt_idx_ce646468\" ON \"public\".\"approval_request\" (\"companyId\", \"status\", \"requestedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_companyId_status_requestedAt_idx_ce646468\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_companyId_status_requestedAt_idx_ce646468\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_decidedById_idx_8194d55f",
+    "label": "Create index \"approval_request_decidedById_idx_8194d55f\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_decidedById_idx_8194d55f",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_decidedById_idx_8194d55f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_decidedById_idx_8194d55f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_decidedById_idx_8194d55f\"",
+        "sql": "CREATE INDEX \"approval_request_decidedById_idx_8194d55f\" ON \"public\".\"approval_request\" (\"decidedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_decidedById_idx_8194d55f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_decidedById_idx_8194d55f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_projectId_idx_a96e4d92",
+    "label": "Create index \"approval_request_projectId_idx_a96e4d92\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_projectId_idx_a96e4d92",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"approval_request_projectId_idx_a96e4d92\" ON \"public\".\"approval_request\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_requestedById_idx_f9a56c66",
+    "label": "Create index \"approval_request_requestedById_idx_f9a56c66\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_requestedById_idx_f9a56c66",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_requestedById_idx_f9a56c66\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_requestedById_idx_f9a56c66\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_requestedById_idx_f9a56c66\"",
+        "sql": "CREATE INDEX \"approval_request_requestedById_idx_f9a56c66\" ON \"public\".\"approval_request\" (\"requestedById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_requestedById_idx_f9a56c66\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_requestedById_idx_f9a56c66\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request.approval_request_taskId_idx_4965c936",
+    "label": "Create index \"approval_request_taskId_idx_4965c936\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_taskId_idx_4965c936",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"approval_request_taskId_idx_4965c936\" ON \"public\".\"approval_request\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request_file.approval_request_file_fileId_idx_9a9e456b",
+    "label": "Create index \"approval_request_file_fileId_idx_9a9e456b\" on \"approval_request_file\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_file_fileId_idx_9a9e456b",
+        "table": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_file_fileId_idx_9a9e456b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file_fileId_idx_9a9e456b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_file_fileId_idx_9a9e456b\"",
+        "sql": "CREATE INDEX \"approval_request_file_fileId_idx_9a9e456b\" ON \"public\".\"approval_request_file\" (\"fileId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_file_fileId_idx_9a9e456b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file_fileId_idx_9a9e456b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.approval_request_file.approval_request_file_requestId_idx_fd667f92",
+    "label": "Create index \"approval_request_file_requestId_idx_fd667f92\" on \"approval_request_file\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "approval_request_file_requestId_idx_fd667f92",
+        "table": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"approval_request_file_requestId_idx_fd667f92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file_requestId_idx_fd667f92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"approval_request_file_requestId_idx_fd667f92\"",
+        "sql": "CREATE INDEX \"approval_request_file_requestId_idx_fd667f92\" ON \"public\".\"approval_request_file\" (\"requestId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"approval_request_file_requestId_idx_fd667f92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"approval_request_file_requestId_idx_fd667f92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_projectId_fkey",
+    "label": "Add foreign key \"approval_request_projectId_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_projectId_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_projectId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_projectId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_companyId_fkey",
+    "label": "Add foreign key \"approval_request_companyId_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_companyId_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_companyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_companyId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_companyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_companyId_fkey\"\nFOREIGN KEY (\"companyId\")\nREFERENCES \"public\".\"client_company\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_companyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_companyId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_taskId_fkey",
+    "label": "Add foreign key \"approval_request_taskId_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_taskId_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_taskId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_taskId_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_requestedById_fkey",
+    "label": "Add foreign key \"approval_request_requestedById_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_requestedById_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_requestedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_requestedById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_requestedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_requestedById_fkey\"\nFOREIGN KEY (\"requestedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_requestedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_requestedById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_decidedById_fkey",
+    "label": "Add foreign key \"approval_request_decidedById_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_decidedById_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_decidedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_decidedById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_decidedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_decidedById_fkey\"\nFOREIGN KEY (\"decidedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_decidedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_decidedById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request.approval_request_cancelledById_fkey",
+    "label": "Add foreign key \"approval_request_cancelledById_fkey\" on \"approval_request\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_cancelledById_fkey",
+        "table": "approval_request"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_cancelledById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_cancelledById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_cancelledById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request\"\nADD CONSTRAINT \"approval_request_cancelledById_fkey\"\nFOREIGN KEY (\"cancelledById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_cancelledById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_cancelledById_fkey",
+          "public",
+          "\"public\".\"approval_request\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request_file.approval_request_file_requestId_fkey",
+    "label": "Add foreign key \"approval_request_file_requestId_fkey\" on \"approval_request_file\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_file_requestId_fkey",
+        "table": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_file_requestId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_requestId_fkey",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_file_requestId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request_file\"\nADD CONSTRAINT \"approval_request_file_requestId_fkey\"\nFOREIGN KEY (\"requestId\")\nREFERENCES \"public\".\"approval_request\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_file_requestId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_requestId_fkey",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.approval_request_file.approval_request_file_fileId_fkey",
+    "label": "Add foreign key \"approval_request_file_fileId_fkey\" on \"approval_request_file\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "approval_request_file_fileId_fkey",
+        "table": "approval_request_file"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"approval_request_file_fileId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_fileId_fkey",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"approval_request_file_fileId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"approval_request_file\"\nADD CONSTRAINT \"approval_request_file_fileId_fkey\"\nFOREIGN KEY (\"fileId\")\nREFERENCES \"public\".\"file_asset\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"approval_request_file_fileId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "approval_request_file_fileId_fkey",
+          "public",
+          "\"public\".\"approval_request_file\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+// use prisma-8
+
+// A file shown to the client with an approval request. Clients may open
+// exactly these files and no others.
+model ApprovalRequestFile {
+  id        Uuid @id @default(uuid())
+  requestId Uuid
+  fileId    Uuid
+
+  request ApprovalRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  file    FileAsset       @relation(fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@unique([requestId, fileId])
+  @@index([fileId])
+  @@map("approval_request_file")
+}

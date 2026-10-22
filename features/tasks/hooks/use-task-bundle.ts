@@ -10,11 +10,15 @@ import type {
   TaskFile,
 } from "@/features/tasks/task-details-panel-data";
 import { getTaskBundleAction } from "@/features/tasks/tasks-actions";
+import type { TaskApprovals } from "@/src/server/approvals/approval-contracts";
 import type { LinkedPull } from "@/src/server/github/github-contracts";
 import type { RunningTimer, TaskTime } from "@/src/server/time/time-tracking";
 
 const linkedPullsOf = (bundle: TaskBundle | null): readonly LinkedPull[] =>
   bundle?.pulls.ok ? bundle.pulls.data : [];
+
+const approvalsOf = (bundle: TaskBundle | null): TaskApprovals | null =>
+  bundle?.approvals.ok ? bundle.approvals.data : null;
 
 // Reads everything the task panel shows while it is open, and owns the panel's
 // error so the reads and the comment actions report into one place. A deep link
@@ -74,6 +78,8 @@ export const useTaskBundle = ({
   );
   // Linked pull requests are a read-only extra, so a failed read just hides them.
   const [pulls, setPulls] = useState(() => linkedPullsOf(initialBundle));
+  // Like pull requests, approvals are an extra: a failed read hides the section.
+  const [approvals, setApprovals] = useState(() => approvalsOf(initialBundle));
   const requestSequence = useRef(0);
 
   // The first failing read is reported; the reads that succeeded still show.
@@ -113,6 +119,9 @@ export const useTaskBundle = ({
       if (bundle.pulls.ok) {
         setPulls(bundle.pulls.data);
       }
+      if (bundle.approvals.ok) {
+        setApprovals(bundle.approvals.data);
+      }
     },
     [setComments]
   );
@@ -137,6 +146,7 @@ export const useTaskBundle = ({
   }, [applyBundle, bugId, projectId, taskId]);
 
   return {
+    approvals,
     bugHistory,
     comments,
     error,

@@ -15,6 +15,7 @@ export const cleanActionFixtures = async (
   const statements = [
     `DELETE FROM recurrence_generation WHERE "sourceTaskId" IN ${tasks} OR "successorTaskId" IN ${tasks}`,
     `DELETE FROM upload_intent WHERE "taskId" IN ${tasks} OR "projectId" IN ${projects} OR "ownerId" IN ${users}`,
+    `DELETE FROM approval_request WHERE "projectId" IN ${projects} OR "requestedById" IN ${users} OR "companyId" IN (SELECT id FROM client_company WHERE "createdById" IN ${users})`,
     `DELETE FROM bug_release WHERE "bugReportId" IN ${bugs}`,
     `DELETE FROM bug_approval WHERE "bugReportId" IN ${bugs}`,
     `DELETE FROM bug_evidence WHERE "bugReportId" IN ${bugs}`,

@@ -7,6 +7,7 @@ import { use, useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { TaskApprovals } from "@/features/approvals/components/task-approvals";
 import { BugTaskDetail } from "@/features/bugs/components/bug-task-detail";
 import { ProjectFiles } from "@/features/files/components/project-files";
 import { TaskLinkedPulls } from "@/features/github/components/task-linked-pulls";
@@ -100,6 +101,7 @@ export const TaskDetailsPanel = ({
   // Set only when this panel shows a bug, so bug-only reads and views key off it.
   const bugDetailId = isBug ? bugId : undefined;
   const {
+    approvals,
     comments,
     bugHistory,
     error,
@@ -234,6 +236,12 @@ export const TaskDetailsPanel = ({
               timer={timer}
             />
             <TaskLinkedPulls pulls={pulls} />
+            <TaskApprovals
+              approvals={approvals}
+              files={files}
+              onChanged={refresh}
+              taskId={taskId}
+            />
             <TaskCommentsSection
               body={comments.body}
               comments={comments.comments}

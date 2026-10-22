@@ -170,7 +170,9 @@ const findReadableFile = async (actorId: string, fileId: string) => {
         message: "The task was not found.",
       });
     }
-  } else if (actorRole !== "admin") {
+  } else if (actorRole !== "admin" && actorRole !== "client") {
+    // A client reaches a standalone file only through an approval request
+    // for a milestone, which assertClientCanReadFile already checked.
     throw new AppError({
       code: "FORBIDDEN",
       message: "Only admins can access standalone project files.",

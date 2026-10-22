@@ -20,6 +20,7 @@ model FileAsset {
   uploadedBy User    @relation("FileUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
   deletedBy  User?   @relation("FileDeletedBy", fields: [deletedById], references: [id], onDelete: Restrict)
   bugEvidence BugEvidence[]
+  approvalFiles ApprovalRequestFile[]
 
   @@index([projectId, createdAt])
   @@index([taskId])

@@ -18,6 +18,7 @@ model ClientCompany {
   handlers      ClientCompanyHandler[]
   bugReports    BugReport[]
   intakeForms   IntakeForm[]
+  approvalRequests ApprovalRequest[]
 
   @@check(expression: "(\"deactivatedAt\" IS NULL AND \"deactivatedById\" IS NULL) OR (\"deactivatedAt\" IS NOT NULL AND \"deactivatedById\" IS NOT NULL)", name: "client_company_deactivation_fields_paired")
   @@index([deactivatedAt])

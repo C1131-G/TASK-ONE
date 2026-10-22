@@ -2,6 +2,7 @@
 // entries and server-only queries. Permission and replay coverage tests walk
 // this list so a new export cannot slip past them.
 export const serverEntryModules = await Promise.all([
+  import("../../../features/approvals/approval-actions"),
   import("../../../features/calendar/calendar-actions"),
   import("../../../features/clients/clients-actions"),
   import("../../../features/clients/clients-queries"),
@@ -20,6 +21,7 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/webhooks/webhooks-actions"),
   import("../../../features/webhooks/webhooks-queries"),
   import("../../../features/activity/activity-queries"),
+  import("../../../features/approvals/approval-queries"),
   import("../../../features/calendar/calendar-queries"),
   import("../../../features/dashboard/dashboard-queries"),
   import("../../../features/discovery/discovery-queries"),

@@ -1,5 +1,6 @@
 import { db } from "@/src/prisma/db";
 
+import { clientMayOpenApprovalFile } from "../approvals/approval-access";
 import { AppError } from "../core/action-result";
 import type { Transaction } from "./uploads-internal";
 
@@ -88,14 +89,12 @@ export const assertClientUploadAllowed = async (
 export const fileHidden = () =>
   new AppError({ code: "NOT_FOUND", message: "The file was not found." });
 
-// Clients read only files that client-company users attached to their own
-// company's bugs; internal evidence uploaded by staff stays hidden.
-export const assertClientCanReadFile = async (
-  actor: { readonly clientCompanyId: string | null },
+const isCompanyBugFile = async (
+  clientCompanyId: string,
   file: { readonly taskId: string | null; readonly uploadedById: string }
-): Promise<void> => {
-  if (!actor.clientCompanyId || !file.taskId) {
-    throw fileHidden();
+): Promise<boolean> => {
+  if (!file.taskId) {
+    return false;
   }
   const [bug, uploader] = await Promise.all([
     db.orm.public.BugReport.where({ taskId: file.taskId })
@@ -105,10 +104,32 @@ export const assertClientCanReadFile = async (
       .select("clientCompanyId")
       .first(),
   ]);
-  if (
-    bug?.clientCompanyId !== actor.clientCompanyId ||
-    uploader?.clientCompanyId !== actor.clientCompanyId
-  ) {
+  return (
+    bug?.clientCompanyId === clientCompanyId &&
+    uploader?.clientCompanyId === clientCompanyId
+  );
+};
+
+// Clients read only files that client-company users attached to their own
+// company's bugs, and the files of approval requests their company can see;
+// internal evidence uploaded by staff stays hidden.
+export const assertClientCanReadFile = async (
+  actor: { readonly clientCompanyId: string | null },
+  file: {
+    readonly id: string;
+    readonly taskId: string | null;
+    readonly uploadedById: string;
+  }
+): Promise<void> => {
+  const { clientCompanyId } = actor;
+  if (!clientCompanyId) {
     throw fileHidden();
   }
+  if (await isCompanyBugFile(clientCompanyId, file)) {
+    return;
+  }
+  if (await clientMayOpenApprovalFile(clientCompanyId, file.id)) {
+    return;
+  }
+  throw fileHidden();
 };

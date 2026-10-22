@@ -1,0 +1,45 @@
+// use prisma-8
+
+// A request for a client company to approve a deliverable. The subject is a
+// task or a project milestone (the milestone keeps no foreign key, so saving
+// milestones never trips over history; subjectTitle keeps its name). A new
+// version of the same subject is a new row, so earlier versions stay as they
+// were decided. The decision columns are written once, by a conditional update
+// from pending, and the check below makes any other combination impossible.
+model ApprovalRequest {
+  id              Uuid @id @default(uuid())
+  projectId       Uuid
+  companyId       Uuid
+  taskId          Uuid?
+  milestoneId     Uuid?
+  subjectKey      String
+  subjectTitle    String
+  version         Int
+  message         String
+  status          String @default("pending")
+  requestedById   String
+  requestedAt     TimestamptzJsDate @default(now())
+  decidedById     String?
+  decidedAt       TimestamptzJsDate?
+  decisionComment String?
+  cancelledById   String?
+  cancelledAt     TimestamptzJsDate?
+
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  company     ClientCompany @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  task        Task?         @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  requestedBy User          @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  decidedBy   User?         @relation("ApprovalDecider", fields: [decidedById], references: [id], onDelete: Restrict)
+  cancelledBy User?         @relation("ApprovalCanceller", fields: [cancelledById], references: [id], onDelete: Restrict)
+  files       ApprovalRequestFile[]
+
+  @@unique([subjectKey, companyId, version])
+  @@index([companyId, status, requestedAt])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([requestedById])
+  @@check(expression: "(\"taskId\" IS NOT NULL) <> (\"milestoneId\" IS NOT NULL)", name: "approval_request_one_subject")
+  @@check(expression: "\"version\" > 0", name: "approval_request_version_positive")
+  @@check(expression: "(\"status\" = 'pending' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"decisionComment\" IS NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'approved' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (\"status\" = 'changes_requested' AND \"decidedById\" IS NOT NULL AND \"decidedAt\" IS NOT NULL AND length(trim(\"decisionComment\")) > 0 AND \"cancelledAt\" IS NULL) OR (\"status\" = 'cancelled' AND \"decidedById\" IS NULL AND \"decidedAt\" IS NULL AND \"cancelledById\" IS NOT NULL AND \"cancelledAt\" IS NOT NULL)", name: "approval_request_status_valid")
+  @@map("approval_request")
+}

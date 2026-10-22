@@ -1,3 +1,4 @@
+import { approvalActionCatalog } from "./action-permissions-catalog-approvals";
 import {
   clientActionCatalog,
   clientAdminOnlyNames,
@@ -15,6 +16,7 @@ import {
 import { workspaceActionCatalog } from "./action-permissions-catalog-workspace";
 
 export const allActions = [
+  ...approvalActionCatalog,
   ...webhookActionCatalog,
   ...githubActionCatalog,
   ...workspaceActionCatalog,

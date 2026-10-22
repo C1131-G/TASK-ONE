@@ -30,6 +30,8 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "requestApprovalAction",
+  "cancelApprovalAction",
   "updateGithubConnectionAction",
   "createIntakeFormAction",
   "rotateIntakeFormAction",
