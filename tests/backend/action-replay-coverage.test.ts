@@ -32,6 +32,10 @@ const excludedByDesign = new Set([
 const replayedMutations = new Set([
   "requestApprovalAction",
   "cancelApprovalAction",
+  "createAutomationRuleAction",
+  "removeAutomationRuleAction",
+  "setAutomationRuleEnabledAction",
+  "updateAutomationRuleAction",
   "updateGithubConnectionAction",
   "createIntakeFormAction",
   "rotateIntakeFormAction",

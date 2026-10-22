@@ -1,0 +1,27 @@
+// use prisma-8
+
+// One rule evaluated for one event: matched, skipped or failed, with the
+// reason. The unique (rule, event) pair makes a retried job a no-op, and the
+// log doubles as the per-task rate-limit counter. Only admins ever read it.
+model AutomationRun {
+  id        Uuid @id @default(uuid())
+  ruleId    Uuid
+  projectId Uuid
+  taskId    Uuid?
+  eventId   Uuid
+  trigger   String
+  depth     Int @default(0)
+  outcome   String
+  reason    String?
+  createdAt TimestamptzJsDate @default(now())
+
+  rule    AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task    Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@unique([ruleId, eventId])
+  @@index([projectId, createdAt])
+  @@index([ruleId, taskId, createdAt])
+  @@index([createdAt])
+  @@map("automation_run")
+}

@@ -689,3 +689,31 @@ it("shows staff the history with who decided and when", async () => {
   ).toBe(true);
   await clear();
 });
+
+it("stops serving a request's file once the task is unshared or the file is removed", async () => {
+  await clear();
+  okData<Receipt>(await request());
+  expect(await open("client", fixture.sharedFileA)).toMatchObject({ ok: true });
+  await authPool.query(
+    'UPDATE task SET "clientVisible" = false WHERE id = $1',
+    [fixture.sharedTaskId]
+  );
+  expect(refused(await open("client", fixture.sharedFileA), "NOT_FOUND")).toBe(
+    true
+  );
+  await authPool.query('UPDATE task SET "clientVisible" = true WHERE id = $1', [
+    fixture.sharedTaskId,
+  ]);
+  await authPool.query(
+    'UPDATE file_asset SET "deletedAt" = now(), "deletedById" = $2 WHERE id = $1',
+    [fixture.sharedFileA, personaId("owner")]
+  );
+  expect(refused(await open("client", fixture.sharedFileA), "NOT_FOUND")).toBe(
+    true
+  );
+  await authPool.query(
+    'UPDATE file_asset SET "deletedAt" = null, "deletedById" = null WHERE id = $1',
+    [fixture.sharedFileA]
+  );
+  await clear();
+});

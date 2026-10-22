@@ -21,6 +21,7 @@ const DEFAULT_BATCH_SIZE = 5000;
 const RATE_LIMIT_STALE_DAYS = 1;
 
 export interface RetentionPolicy {
+  readonly automationRunDays: number;
   readonly completedJobDays: number;
   readonly deadJobDays: number;
   readonly pushDeliveryDays: number;
@@ -28,6 +29,7 @@ export interface RetentionPolicy {
 }
 
 export const DEFAULT_RETENTION_POLICY: RetentionPolicy = {
+  automationRunDays: 30,
   completedJobDays: 14,
   deadJobDays: 30,
   pushDeliveryDays: 30,
@@ -39,6 +41,9 @@ export const retentionPolicyFromEnv = (
 ): RetentionPolicy => {
   const env = parseRetentionEnv(source);
   return {
+    automationRunDays:
+      env.RETENTION_AUTOMATION_RUN_DAYS ??
+      DEFAULT_RETENTION_POLICY.automationRunDays,
     completedJobDays:
       env.RETENTION_COMPLETED_JOB_DAYS ??
       DEFAULT_RETENTION_POLICY.completedJobDays,
@@ -65,6 +70,14 @@ const before = (now: Date, days: number): Date =>
   new Date(now.getTime() - days * DAY_MS);
 
 const retentionTargets = {
+  // The run log is also the idempotency record for its events; a job never
+  // outlives it (jobs are purged sooner) so an event cannot run twice.
+  automationRuns: {
+    cutoff: (now, policy) => before(now, policy.automationRunDays),
+    key: "id",
+    predicate: '"createdAt" < $1',
+    table: "automation_run",
+  },
   completedJobs: {
     cutoff: (now, policy) => before(now, policy.completedJobDays),
     key: "id",

@@ -1,0 +1,683 @@
+[
+  {
+    "id": "table.automation_rule",
+    "label": "Create table \"automation_rule\"",
+    "summary": "Creates table \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"automation_rule\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"automation_rule\"",
+        "sql": "CREATE TABLE \"public\".\"automation_rule\" (\n  \"actions\" json NOT NULL,\n  \"conditions\" json NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" text NOT NULL,\n  \"enabled\" bool DEFAULT true NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"trigger\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"version\" int4 DEFAULT 1 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"automation_rule\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.automation_run",
+    "label": "Create table \"automation_run\"",
+    "summary": "Creates table \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"automation_run\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"automation_run\"",
+        "sql": "CREATE TABLE \"public\".\"automation_run\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"depth\" int4 DEFAULT 0 NOT NULL,\n  \"eventId\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"outcome\" text NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"reason\" text,\n  \"ruleId\" uuid NOT NULL,\n  \"taskId\" uuid,\n  \"trigger\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"automation_run\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.automation_run.automation_run_ruleId_eventId_key",
+    "label": "Add unique constraint on \"automation_run\" (ruleId, eventId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "automation_run_ruleId_eventId_key",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"automation_run_ruleId_eventId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_ruleId_eventId_key",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"automation_run_ruleId_eventId_key\"",
+        "sql": "ALTER TABLE \"public\".\"automation_run\" ADD CONSTRAINT \"automation_run_ruleId_eventId_key\" UNIQUE (\"ruleId\", \"eventId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"automation_run_ruleId_eventId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_ruleId_eventId_key",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_rule.automation_rule_createdById_idx_8bf640ed",
+    "label": "Create index \"automation_rule_createdById_idx_8bf640ed\" on \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_rule_createdById_idx_8bf640ed",
+        "table": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_rule_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_rule_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"automation_rule_createdById_idx_8bf640ed\" ON \"public\".\"automation_rule\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_rule_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_rule.automation_rule_projectId_enabled_trigger_idx_04904db6",
+    "label": "Create index \"automation_rule_projectId_enabled_trigger_idx_04904db6\" on \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_rule_projectId_enabled_trigger_idx_04904db6",
+        "table": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_rule_projectId_enabled_trigger_idx_04904db6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_projectId_enabled_trigger_idx_04904db6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_rule_projectId_enabled_trigger_idx_04904db6\"",
+        "sql": "CREATE INDEX \"automation_rule_projectId_enabled_trigger_idx_04904db6\" ON \"public\".\"automation_rule\" (\"projectId\", \"enabled\", \"trigger\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_rule_projectId_enabled_trigger_idx_04904db6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_projectId_enabled_trigger_idx_04904db6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_rule.automation_rule_projectId_idx_a96e4d92",
+    "label": "Create index \"automation_rule_projectId_idx_a96e4d92\" on \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_rule_projectId_idx_a96e4d92",
+        "table": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_rule_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_rule_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"automation_rule_projectId_idx_a96e4d92\" ON \"public\".\"automation_rule\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_rule_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_rule_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_createdAt_idx_9575dbd7",
+    "label": "Create index \"automation_run_createdAt_idx_9575dbd7\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_createdAt_idx_9575dbd7",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_createdAt_idx_9575dbd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_createdAt_idx_9575dbd7\"",
+        "sql": "CREATE INDEX \"automation_run_createdAt_idx_9575dbd7\" ON \"public\".\"automation_run\" (\"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_createdAt_idx_9575dbd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_projectId_createdAt_idx_d2d6484f",
+    "label": "Create index \"automation_run_projectId_createdAt_idx_d2d6484f\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_projectId_createdAt_idx_d2d6484f",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_projectId_createdAt_idx_d2d6484f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_projectId_createdAt_idx_d2d6484f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_projectId_createdAt_idx_d2d6484f\"",
+        "sql": "CREATE INDEX \"automation_run_projectId_createdAt_idx_d2d6484f\" ON \"public\".\"automation_run\" (\"projectId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_projectId_createdAt_idx_d2d6484f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_projectId_createdAt_idx_d2d6484f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_projectId_idx_a96e4d92",
+    "label": "Create index \"automation_run_projectId_idx_a96e4d92\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_projectId_idx_a96e4d92",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"automation_run_projectId_idx_a96e4d92\" ON \"public\".\"automation_run\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_ruleId_idx_05e770f7",
+    "label": "Create index \"automation_run_ruleId_idx_05e770f7\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_ruleId_idx_05e770f7",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_ruleId_idx_05e770f7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_ruleId_idx_05e770f7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_ruleId_idx_05e770f7\"",
+        "sql": "CREATE INDEX \"automation_run_ruleId_idx_05e770f7\" ON \"public\".\"automation_run\" (\"ruleId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_ruleId_idx_05e770f7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_ruleId_idx_05e770f7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_ruleId_taskId_createdAt_idx_5c233d78",
+    "label": "Create index \"automation_run_ruleId_taskId_createdAt_idx_5c233d78\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_ruleId_taskId_createdAt_idx_5c233d78",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_ruleId_taskId_createdAt_idx_5c233d78\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_ruleId_taskId_createdAt_idx_5c233d78\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_ruleId_taskId_createdAt_idx_5c233d78\"",
+        "sql": "CREATE INDEX \"automation_run_ruleId_taskId_createdAt_idx_5c233d78\" ON \"public\".\"automation_run\" (\"ruleId\", \"taskId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_ruleId_taskId_createdAt_idx_5c233d78\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_ruleId_taskId_createdAt_idx_5c233d78\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.automation_run.automation_run_taskId_idx_4965c936",
+    "label": "Create index \"automation_run_taskId_idx_4965c936\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "automation_run_taskId_idx_4965c936",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"automation_run_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"automation_run_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"automation_run_taskId_idx_4965c936\" ON \"public\".\"automation_run\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"automation_run_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"automation_run_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.automation_rule.automation_rule_projectId_fkey",
+    "label": "Add foreign key \"automation_rule_projectId_fkey\" on \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "automation_rule_projectId_fkey",
+        "table": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"automation_rule_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_rule_projectId_fkey",
+          "public",
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"automation_rule_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"automation_rule\"\nADD CONSTRAINT \"automation_rule_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"automation_rule_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_rule_projectId_fkey",
+          "public",
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.automation_rule.automation_rule_createdById_fkey",
+    "label": "Add foreign key \"automation_rule_createdById_fkey\" on \"automation_rule\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "automation_rule_createdById_fkey",
+        "table": "automation_rule"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"automation_rule_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_rule_createdById_fkey",
+          "public",
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"automation_rule_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"automation_rule\"\nADD CONSTRAINT \"automation_rule_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"automation_rule_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_rule_createdById_fkey",
+          "public",
+          "\"public\".\"automation_rule\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.automation_run.automation_run_ruleId_fkey",
+    "label": "Add foreign key \"automation_run_ruleId_fkey\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "automation_run_ruleId_fkey",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"automation_run_ruleId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_ruleId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"automation_run_ruleId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"automation_run\"\nADD CONSTRAINT \"automation_run_ruleId_fkey\"\nFOREIGN KEY (\"ruleId\")\nREFERENCES \"public\".\"automation_rule\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"automation_run_ruleId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_ruleId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.automation_run.automation_run_projectId_fkey",
+    "label": "Add foreign key \"automation_run_projectId_fkey\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "automation_run_projectId_fkey",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"automation_run_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_projectId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"automation_run_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"automation_run\"\nADD CONSTRAINT \"automation_run_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"automation_run_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_projectId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.automation_run.automation_run_taskId_fkey",
+    "label": "Add foreign key \"automation_run_taskId_fkey\" on \"automation_run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "automation_run_taskId_fkey",
+        "table": "automation_run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"automation_run_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_taskId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"automation_run_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"automation_run\"\nADD CONSTRAINT \"automation_run_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"automation_run_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "automation_run_taskId_fkey",
+          "public",
+          "\"public\".\"automation_run\""
+        ]
+      }
+    ]
+  }
+]

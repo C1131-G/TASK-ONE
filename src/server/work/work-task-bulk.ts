@@ -5,6 +5,7 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { enqueueTaskFieldEvents } from "../automation/automation-enqueue";
 import { AppError } from "../core/action-result";
 import { enqueueTaskChange } from "../webhooks/webhook-task-event";
 import type {
@@ -178,6 +179,21 @@ const finishBulkTaskUpdate = async (
     createdAt: now,
     details: { count: context.targetCount, status: changes.status },
     id: randomUUID(),
+    projectId: task.projectId,
+    taskId: task.id,
+  });
+  await enqueueTaskFieldEvents(transaction, {
+    after: {
+      assigneeIds,
+      priority: updated.priority,
+      status: updated.status,
+    },
+    before: {
+      assigneeIds: [...previousAssignees],
+      priority: task.priority,
+      status: task.status,
+    },
+    now,
     projectId: task.projectId,
     taskId: task.id,
   });

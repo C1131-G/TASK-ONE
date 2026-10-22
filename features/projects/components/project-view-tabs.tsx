@@ -8,6 +8,7 @@ import {
   ChartLineUp,
   Clock,
   Files,
+  Lightning,
   List,
   SquaresFour,
   Table,
@@ -29,26 +30,37 @@ const views = [
   { Icon: Pulse, id: "activity", label: "Activity" },
 ] as const;
 
+// Rules and their run log are for administrators only.
+const automationsView = {
+  Icon: Lightning,
+  id: "automations",
+  label: "Automations",
+} as const;
+
 export const ProjectViewTabs = ({
+  isAdmin = false,
   projectId,
   selected,
 }: {
+  readonly isAdmin?: boolean;
   readonly projectId: string;
   readonly selected: string;
 }) => (
   <nav aria-label="Project views" className="tabs project-tabs">
-    {views.map(({ Icon, id, label }) => (
-      <Link
-        aria-current={selected === id ? "page" : undefined}
-        className={`tab${selected === id ? " on" : ""}`}
-        href={`/projects/${projectId}?view=${id}`}
-        key={id}
-      >
-        <Icon aria-hidden="true" size={14} />
-        {label}
-        {selected === id ? <TabUnderline name="project-view-tab" /> : null}
-      </Link>
-    ))}
+    {(isAdmin ? [...views, automationsView] : views).map(
+      ({ Icon, id, label }) => (
+        <Link
+          aria-current={selected === id ? "page" : undefined}
+          className={`tab${selected === id ? " on" : ""}`}
+          href={`/projects/${projectId}?view=${id}`}
+          key={id}
+        >
+          <Icon aria-hidden="true" size={14} />
+          {label}
+          {selected === id ? <TabUnderline name="project-view-tab" /> : null}
+        </Link>
+      )
+    )}
     <Link className="tab" href={`/projects/${projectId}/time`}>
       <Clock aria-hidden="true" size={14} />
       Time

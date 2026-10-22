@@ -15,6 +15,8 @@ export const serverEntryModules = await Promise.all([
   import("../../../features/intake/intake-queries"),
   import("../../../features/notifications/notifications-actions"),
   import("../../../features/people/people-actions"),
+  import("../../../features/projects/automation-actions"),
+  import("../../../features/projects/automation-queries"),
   import("../../../features/projects/projects-actions"),
   import("../../../features/tasks/tasks-actions"),
   import("../../../features/time/time-actions"),

@@ -53,6 +53,7 @@ const MAX_RETENTION_DAYS = 3650;
 const retentionDays = Schema.optional(integerFromString(1, MAX_RETENTION_DAYS));
 
 const retentionFields = {
+  RETENTION_AUTOMATION_RUN_DAYS: retentionDays,
   RETENTION_COMPLETED_JOB_DAYS: retentionDays,
   RETENTION_DEAD_JOB_DAYS: retentionDays,
   RETENTION_PUSH_DELIVERY_DAYS: retentionDays,

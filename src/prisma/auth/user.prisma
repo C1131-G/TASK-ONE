@@ -61,6 +61,7 @@ model User {
   assignedClientCompanyHandlers ClientCompanyHandler[] @relation("ClientCompanyHandlerAssigner")
   pickedBugs BugReport[] @relation("BugPicker")
   createdIntakeForms IntakeForm[] @relation("IntakeFormCreator")
+  createdAutomationRules AutomationRule[] @relation("AutomationRuleCreator")
   createdGithubConnections GithubConnection[] @relation("GithubConnectionCreator")
   requestedApprovals ApprovalRequest[] @relation("ApprovalRequester")
   decidedApprovals ApprovalRequest[] @relation("ApprovalDecider")
