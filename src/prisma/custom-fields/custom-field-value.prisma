@@ -1,0 +1,23 @@
+// use prisma-8
+
+// One task's value for one field, in the column that matches the field type
+// (text and select use textValue). A row exists only while a value is set:
+// clearing deletes it. The check allows exactly one filled column.
+model CustomFieldValue {
+  id          Uuid @id @default(uuid())
+  taskId      Uuid
+  fieldId     Uuid
+  textValue   String?
+  numberValue Float?
+  dateValue   DateString?
+  boolValue   Boolean?
+  updatedAt   TimestamptzJsDate @default(now())
+
+  task  Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  field CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, fieldId])
+  @@index([fieldId])
+  @@check(expression: "num_nonnulls(\"textValue\", \"numberValue\", \"dateValue\", \"boolValue\") = 1", name: "custom_field_value_one_column")
+  @@map("custom_field_value")
+}

@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'0c39b3902c34577dc80fcc37e1cc1cf47742d70cedc76387007bac30753895f2'>;
+  StorageHashBase<'25ecf1b0c580b4b20b04b7c75a1bdad389a9c26ac3caa5c659e76e4179f9692f'>;
 export type ExecutionHash =
-  ExecutionHashBase<'a2460eb3d8010d01be1da70272056a2de32a050b20db655d1973d5f5da142d39'>;
+  ExecutionHashBase<'c81db46d91fe75b042799333d93566bc3c8bf0e06e1662364c480ab1dcc1250e'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -549,6 +549,28 @@ export type FieldOutputTypes = {
       readonly slaTargets: CodecTypes['pg/jsonb@1']['output'];
       readonly slug: CodecTypes['pg/text@1']['output'];
       readonly timeZone: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly CustomField: {
+      readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly options: CodecTypes['pg/jsonb@1']['output'] | null;
+      readonly position: CodecTypes['pg/int4@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly required: CodecTypes['pg/bool@1']['output'];
+      readonly type: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly CustomFieldValue: {
+      readonly boolValue: CodecTypes['pg/bool@1']['output'] | null;
+      readonly dateValue: CodecTypes['pg/date-string@1']['output'] | null;
+      readonly fieldId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly numberValue: CodecTypes['pg/float8@1']['output'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly textValue: CodecTypes['pg/text@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     };
     readonly EmailDelivery: {
@@ -1316,6 +1338,28 @@ export type FieldInputTypes = {
       readonly timeZone: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
     };
+    readonly CustomField: {
+      readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly options: CodecTypes['pg/jsonb@1']['input'] | null;
+      readonly position: CodecTypes['pg/int4@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly required: CodecTypes['pg/bool@1']['input'];
+      readonly type: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly CustomFieldValue: {
+      readonly boolValue: CodecTypes['pg/bool@1']['input'] | null;
+      readonly dateValue: CodecTypes['pg/date-string@1']['input'] | null;
+      readonly fieldId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly numberValue: CodecTypes['pg/float8@1']['input'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly textValue: CodecTypes['pg/text@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
     readonly EmailDelivery: {
       readonly dedupeKey: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -2081,6 +2125,28 @@ export type StorageColumnTypes = {
       readonly timeZone: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     };
+    readonly custom_field: {
+      readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly options: CodecTypes['pg/jsonb@1']['output'] | null;
+      readonly position: CodecTypes['pg/int4@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly required: CodecTypes['pg/bool@1']['output'];
+      readonly type: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly custom_field_value: {
+      readonly boolValue: CodecTypes['pg/bool@1']['output'] | null;
+      readonly dateValue: CodecTypes['pg/date-string@1']['output'] | null;
+      readonly fieldId: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly numberValue: CodecTypes['pg/float8@1']['output'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly textValue: CodecTypes['pg/text@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
     readonly email_delivery: {
       readonly dedupeKey: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
@@ -2844,6 +2910,28 @@ export type StorageColumnInputTypes = {
       readonly slaTargets: CodecTypes['pg/jsonb@1']['input'];
       readonly slug: CodecTypes['pg/text@1']['input'];
       readonly timeZone: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly custom_field: {
+      readonly archivedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly options: CodecTypes['pg/jsonb@1']['input'] | null;
+      readonly position: CodecTypes['pg/int4@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly required: CodecTypes['pg/bool@1']['input'];
+      readonly type: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly custom_field_value: {
+      readonly boolValue: CodecTypes['pg/bool@1']['input'] | null;
+      readonly dateValue: CodecTypes['pg/date-string@1']['input'] | null;
+      readonly fieldId: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly numberValue: CodecTypes['pg/float8@1']['input'] | null;
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly textValue: CodecTypes['pg/text@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
     };
     readonly email_delivery: {
@@ -3731,6 +3819,34 @@ export namespace Models {
     updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
     readonly [RelationKeys]?: never;
   };
+  export type public_CustomField = {
+    archivedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    name: CodecTypes['pg/text@1']['output'];
+    options: CodecTypes['pg/jsonb@1']['output'] | null;
+    position: CodecTypes['pg/int4@1']['output'];
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    required: CodecTypes['pg/bool@1']['output'];
+    type: CodecTypes['pg/text@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    project: public_Project;
+    values: public_CustomFieldValue[];
+    readonly [RelationKeys]?: 'project' | 'values';
+  };
+  export type public_CustomFieldValue = {
+    boolValue: CodecTypes['pg/bool@1']['output'] | null;
+    dateValue: CodecTypes['pg/date-string@1']['output'] | null;
+    fieldId: CodecTypes['pg/uuid@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    numberValue: CodecTypes['pg/float8@1']['output'] | null;
+    taskId: CodecTypes['pg/uuid@1']['output'];
+    textValue: CodecTypes['pg/text@1']['output'] | null;
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    field: public_CustomField;
+    task: public_Task;
+    readonly [RelationKeys]?: 'field' | 'task';
+  };
   export type public_EmailDelivery = {
     dedupeKey: CodecTypes['pg/text@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
@@ -3948,6 +4064,7 @@ export namespace Models {
     budget: public_ProjectBudget | null;
     bugReports: public_BugReport[];
     clientCompanies: public_ClientCompanyProject[];
+    customFields: public_CustomField[];
     files: public_FileAsset[];
     githubConnections: public_GithubConnection[];
     intakeForms: public_IntakeForm[];
@@ -3963,6 +4080,7 @@ export namespace Models {
       | 'budget'
       | 'bugReports'
       | 'clientCompanies'
+      | 'customFields'
       | 'files'
       | 'githubConnections'
       | 'intakeForms'
@@ -4121,6 +4239,7 @@ export namespace Models {
     automationRuns: public_AutomationRun[];
     bugReport: public_BugReport | null;
     createdBy: public_User;
+    customFieldValues: public_CustomFieldValue[];
     files: public_FileAsset[];
     githubLinks: public_GithubPullLink[];
     project: public_Project;
@@ -4135,6 +4254,7 @@ export namespace Models {
       | 'automationRuns'
       | 'bugReport'
       | 'createdBy'
+      | 'customFieldValues'
       | 'files'
       | 'githubLinks'
       | 'project'
@@ -4439,6 +4559,8 @@ export declare const models: {
     Comment: Models.public_Comment;
     CommentReaction: Models.public_CommentReaction;
     CompanySettings: Models.public_CompanySettings;
+    CustomField: Models.public_CustomField;
+    CustomFieldValue: Models.public_CustomFieldValue;
     EmailDelivery: Models.public_EmailDelivery;
     EmailSetting: Models.public_EmailSetting;
     FavoriteProject: Models.public_FavoriteProject;
@@ -7585,6 +7707,205 @@ type ContractBase = Omit<
               uniques: readonly [{ readonly columns: readonly ['slug'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
+            };
+            readonly custom_field: {
+              columns: {
+                readonly archivedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly name: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly options: {
+                  readonly dataType: 'pg/jsonb';
+                  readonly codecId: 'pg/jsonb@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly position: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly required: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly type: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'custom_field_projectId_idx_a96e4d92';
+                  readonly prefix: 'custom_field_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'custom_field_projectId_position_idx_8e0c4225';
+                  readonly prefix: 'custom_field_projectId_position_idx';
+                  readonly columns: readonly ['projectId', 'position'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'custom_field';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly custom_field_value: {
+              columns: {
+                readonly boolValue: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly dateValue: {
+                  readonly dataType: 'pg/date';
+                  readonly codecId: 'pg/date-string@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly fieldId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly numberValue: {
+                  readonly dataType: 'pg/float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly textValue: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['taskId', 'fieldId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'custom_field_value_fieldId_idx_44d815d7';
+                  readonly prefix: 'custom_field_value_fieldId_idx';
+                  readonly columns: readonly ['fieldId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'custom_field_value_taskId_idx_4965c936';
+                  readonly prefix: 'custom_field_value_taskId_idx';
+                  readonly columns: readonly ['taskId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'custom_field_value';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'custom_field_value';
+                    readonly columns: readonly ['fieldId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'custom_field';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly email_delivery: {
               columns: {
@@ -12071,6 +12392,14 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'CompanySettings';
     };
+    readonly custom_field: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'CustomField';
+    };
+    readonly custom_field_value: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'CustomFieldValue';
+    };
     readonly email_delivery: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'EmailDelivery';
@@ -14657,6 +14986,176 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly CustomField: {
+            readonly fields: {
+              readonly archivedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly options: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/jsonb@1' };
+              };
+              readonly position: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly required: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly values: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'CustomFieldValue';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fieldId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'custom_field';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly archivedAt: { readonly column: 'archivedAt' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly name: { readonly column: 'name' };
+                readonly options: { readonly column: 'options' };
+                readonly position: { readonly column: 'position' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly required: { readonly column: 'required' };
+                readonly type: { readonly column: 'type' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly CustomFieldValue: {
+            readonly fields: {
+              readonly boolValue: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly dateValue: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/date-string@1' };
+              };
+              readonly fieldId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly numberValue: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
+              readonly taskId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly textValue: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly field: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'CustomField';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['fieldId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'custom_field_value';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly boolValue: { readonly column: 'boolValue' };
+                readonly dateValue: { readonly column: 'dateValue' };
+                readonly fieldId: { readonly column: 'fieldId' };
+                readonly id: { readonly column: 'id' };
+                readonly numberValue: { readonly column: 'numberValue' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly textValue: { readonly column: 'textValue' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
           readonly EmailDelivery: {
             readonly fields: {
               readonly dedupeKey: {
@@ -15969,6 +16468,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['projectId'];
                 };
               };
+              readonly customFields: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'CustomField';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
               readonly files: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -16932,6 +17442,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['createdById'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly customFieldValues: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'CustomFieldValue';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
                 };
               };
               readonly files: {
@@ -18949,6 +19470,22 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'comment';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'custom_field';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'custom_field_value';
             readonly field: 'id';
             readonly namespace: 'public';
           };

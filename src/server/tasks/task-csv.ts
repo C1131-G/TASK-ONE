@@ -4,6 +4,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { loadCustomFieldColumns } from "../custom-fields/custom-field-export";
 import { TaskPrioritySchema, TaskStatusSchema } from "../work/work-contracts";
 import { databaseError } from "../work/work-internal";
 import { createTaskInTransaction } from "../work/work-task-creation";
@@ -157,8 +158,12 @@ const exportTasks = (
           emails.get(userId) ?? "",
         ]);
       }
+      const custom = await loadCustomFieldColumns(
+        new Map([...activeProjects].map(([id, { key }]) => [id, key])),
+        matching
+      );
       return formatCsv([
-        EXPORT_HEADER,
+        [...EXPORT_HEADER, ...custom.header],
         ...matching.map((task) => [
           activeProjects.get(task.projectId)?.key ?? "",
           task.projectTaskNumber,
@@ -170,6 +175,7 @@ const exportTasks = (
           task.dueDate,
           (assigneesByTask.get(task.id) ?? []).filter(Boolean).join("; "),
           task.createdAt.toISOString(),
+          ...custom.cells(task),
         ]),
       ]);
     },

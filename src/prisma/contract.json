@@ -96,6 +96,14 @@
       "model": "CompanySettings",
       "namespace": "public"
     },
+    "custom_field": {
+      "model": "CustomField",
+      "namespace": "public"
+    },
+    "custom_field_value": {
+      "model": "CustomFieldValue",
+      "namespace": "public"
+    },
     "email_delivery": {
       "model": "EmailDelivery",
       "namespace": "public"
@@ -4694,6 +4702,273 @@
               "table": "company_settings"
             }
           },
+          "CustomField": {
+            "fields": {
+              "archivedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "options": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
+              },
+              "position": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "projectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "required": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "project": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Project",
+                  "namespace": "public"
+                }
+              },
+              "values": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fieldId"
+                  ]
+                },
+                "to": {
+                  "model": "CustomFieldValue",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "archivedAt": {
+                  "column": "archivedAt"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "options": {
+                  "column": "options"
+                },
+                "position": {
+                  "column": "position"
+                },
+                "projectId": {
+                  "column": "projectId"
+                },
+                "required": {
+                  "column": "required"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "custom_field"
+            }
+          },
+          "CustomFieldValue": {
+            "fields": {
+              "boolValue": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "dateValue": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/date-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fieldId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "numberValue": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "taskId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "textValue": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "field": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fieldId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "CustomField",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "boolValue": {
+                  "column": "boolValue"
+                },
+                "dateValue": {
+                  "column": "dateValue"
+                },
+                "fieldId": {
+                  "column": "fieldId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "numberValue": {
+                  "column": "numberValue"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "textValue": {
+                  "column": "textValue"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "custom_field_value"
+            }
+          },
           "EmailDelivery": {
             "fields": {
               "dedupeKey": {
@@ -6752,6 +7027,21 @@
                   "namespace": "public"
                 }
               },
+              "customFields": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "CustomField",
+                  "namespace": "public"
+                }
+              },
               "files": {
                 "cardinality": "1:N",
                 "on": {
@@ -8289,6 +8579,21 @@
                 },
                 "to": {
                   "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "customFieldValues": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "CustomFieldValue",
                   "namespace": "public"
                 }
               },
@@ -14797,6 +15102,259 @@
                 }
               ]
             },
+            "custom_field": {
+              "checks": [
+                {
+                  "expression": "(\"type\" = 'select') = (\"options\" IS NOT NULL)",
+                  "name": "custom_field_options_for_select_b93ed7ff",
+                  "prefix": "custom_field_options_for_select"
+                },
+                {
+                  "expression": "\"position\" >= 0",
+                  "name": "custom_field_position_valid_f43e8efc",
+                  "prefix": "custom_field_position_valid"
+                },
+                {
+                  "expression": "\"type\" IN ('text', 'number', 'select', 'date', 'checkbox')",
+                  "name": "custom_field_type_valid_ab46f3fe",
+                  "prefix": "custom_field_type_valid"
+                }
+              ],
+              "columns": {
+                "archivedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "options": {
+                  "codecId": "pg/jsonb@1",
+                  "dataType": "pg/jsonb",
+                  "nullable": true
+                },
+                "position": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nullable": false
+                },
+                "projectId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "required": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "projectId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "custom_field"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "project"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "projectId"
+                  ],
+                  "name": "custom_field_projectId_idx_a96e4d92",
+                  "prefix": "custom_field_projectId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "projectId",
+                    "position"
+                  ],
+                  "name": "custom_field_projectId_position_idx_8e0c4225",
+                  "prefix": "custom_field_projectId_position_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "custom_field_value": {
+              "checks": [
+                {
+                  "expression": "num_nonnulls(\"textValue\", \"numberValue\", \"dateValue\", \"boolValue\") = 1",
+                  "name": "custom_field_value_one_column_395b7d69",
+                  "prefix": "custom_field_value_one_column"
+                }
+              ],
+              "columns": {
+                "boolValue": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "nullable": true
+                },
+                "dateValue": {
+                  "codecId": "pg/date-string@1",
+                  "dataType": "pg/date",
+                  "nullable": true
+                },
+                "fieldId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "numberValue": {
+                  "codecId": "pg/float8@1",
+                  "dataType": "pg/float8",
+                  "nullable": true
+                },
+                "taskId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "textValue": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "custom_field_value"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "fieldId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "custom_field_value"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "custom_field"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "fieldId"
+                  ],
+                  "name": "custom_field_value_fieldId_idx_44d815d7",
+                  "prefix": "custom_field_value_fieldId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "taskId"
+                  ],
+                  "name": "custom_field_value_taskId_idx_4965c936",
+                  "prefix": "custom_field_value_taskId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "taskId",
+                    "fieldId"
+                  ]
+                }
+              ]
+            },
             "email_delivery": {
               "columns": {
                 "dedupeKey": {
@@ -20266,10 +20824,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "0c39b3902c34577dc80fcc37e1cc1cf47742d70cedc76387007bac30753895f2"
+    "storageHash": "25ecf1b0c580b4b20b04b7c75a1bdad389a9c26ac3caa5c659e76e4179f9692f"
   },
   "execution": {
-    "executionHash": "a2460eb3d8010d01be1da70272056a2de32a050b20db655d1973d5f5da142d39",
+    "executionHash": "c81db46d91fe75b042799333d93566bc3c8bf0e06e1662364c480ab1dcc1250e",
     "mutations": {
       "defaults": [
         {
@@ -20466,6 +21024,28 @@
           },
           "ref": {
             "entry": "comment",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "custom_field",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "custom_field_value",
             "field": "id",
             "namespace": "public"
           }

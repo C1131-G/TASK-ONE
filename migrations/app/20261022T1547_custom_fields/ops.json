@@ -1,0 +1,404 @@
+[
+  {
+    "id": "table.custom_field",
+    "label": "Create table \"custom_field\"",
+    "summary": "Creates table \"custom_field\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "custom_field"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"custom_field\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"custom_field\"",
+        "sql": "CREATE TABLE \"public\".\"custom_field\" (\n  \"archivedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"options\" jsonb,\n  \"position\" int4 DEFAULT 0 NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"required\" bool DEFAULT false NOT NULL,\n  \"type\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"custom_field_options_for_select_b93ed7ff\" CHECK ((\"type\" = 'select') = (\"options\" IS NOT NULL)),\n  CONSTRAINT \"custom_field_position_valid_f43e8efc\" CHECK (\"position\" >= 0),\n  CONSTRAINT \"custom_field_type_valid_ab46f3fe\" CHECK (\"type\" IN ('text', 'number', 'select', 'date', 'checkbox'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"custom_field\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.custom_field_value",
+    "label": "Create table \"custom_field_value\"",
+    "summary": "Creates table \"custom_field_value\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"custom_field_value\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"custom_field_value\"",
+        "sql": "CREATE TABLE \"public\".\"custom_field_value\" (\n  \"boolValue\" bool,\n  \"dateValue\" date,\n  \"fieldId\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"numberValue\" float8,\n  \"taskId\" uuid NOT NULL,\n  \"textValue\" text,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"custom_field_value_one_column_395b7d69\" CHECK (num_nonnulls(\"textValue\", \"numberValue\", \"dateValue\", \"boolValue\") = 1)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"custom_field_value\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.custom_field_value.custom_field_value_taskId_fieldId_key",
+    "label": "Add unique constraint on \"custom_field_value\" (taskId, fieldId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "custom_field_value_taskId_fieldId_key",
+        "table": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"custom_field_value_taskId_fieldId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_taskId_fieldId_key",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"custom_field_value_taskId_fieldId_key\"",
+        "sql": "ALTER TABLE \"public\".\"custom_field_value\" ADD CONSTRAINT \"custom_field_value_taskId_fieldId_key\" UNIQUE (\"taskId\", \"fieldId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"custom_field_value_taskId_fieldId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_taskId_fieldId_key",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.custom_field.custom_field_projectId_idx_a96e4d92",
+    "label": "Create index \"custom_field_projectId_idx_a96e4d92\" on \"custom_field\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "custom_field_projectId_idx_a96e4d92",
+        "table": "custom_field"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"custom_field_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"custom_field_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"custom_field_projectId_idx_a96e4d92\" ON \"public\".\"custom_field\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"custom_field_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.custom_field.custom_field_projectId_position_idx_8e0c4225",
+    "label": "Create index \"custom_field_projectId_position_idx_8e0c4225\" on \"custom_field\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "custom_field_projectId_position_idx_8e0c4225",
+        "table": "custom_field"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"custom_field_projectId_position_idx_8e0c4225\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_projectId_position_idx_8e0c4225\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"custom_field_projectId_position_idx_8e0c4225\"",
+        "sql": "CREATE INDEX \"custom_field_projectId_position_idx_8e0c4225\" ON \"public\".\"custom_field\" (\"projectId\", \"position\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"custom_field_projectId_position_idx_8e0c4225\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_projectId_position_idx_8e0c4225\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.custom_field_value.custom_field_value_fieldId_idx_44d815d7",
+    "label": "Create index \"custom_field_value_fieldId_idx_44d815d7\" on \"custom_field_value\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "custom_field_value_fieldId_idx_44d815d7",
+        "table": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"custom_field_value_fieldId_idx_44d815d7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value_fieldId_idx_44d815d7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"custom_field_value_fieldId_idx_44d815d7\"",
+        "sql": "CREATE INDEX \"custom_field_value_fieldId_idx_44d815d7\" ON \"public\".\"custom_field_value\" (\"fieldId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"custom_field_value_fieldId_idx_44d815d7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value_fieldId_idx_44d815d7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.custom_field_value.custom_field_value_taskId_idx_4965c936",
+    "label": "Create index \"custom_field_value_taskId_idx_4965c936\" on \"custom_field_value\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "custom_field_value_taskId_idx_4965c936",
+        "table": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"custom_field_value_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"custom_field_value_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"custom_field_value_taskId_idx_4965c936\" ON \"public\".\"custom_field_value\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"custom_field_value_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"custom_field_value_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.custom_field.custom_field_projectId_fkey",
+    "label": "Add foreign key \"custom_field_projectId_fkey\" on \"custom_field\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "custom_field_projectId_fkey",
+        "table": "custom_field"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"custom_field_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_projectId_fkey",
+          "public",
+          "\"public\".\"custom_field\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"custom_field_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"custom_field\"\nADD CONSTRAINT \"custom_field_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"custom_field_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_projectId_fkey",
+          "public",
+          "\"public\".\"custom_field\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.custom_field_value.custom_field_value_taskId_fkey",
+    "label": "Add foreign key \"custom_field_value_taskId_fkey\" on \"custom_field_value\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "custom_field_value_taskId_fkey",
+        "table": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"custom_field_value_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_taskId_fkey",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"custom_field_value_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"custom_field_value\"\nADD CONSTRAINT \"custom_field_value_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"custom_field_value_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_taskId_fkey",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.custom_field_value.custom_field_value_fieldId_fkey",
+    "label": "Add foreign key \"custom_field_value_fieldId_fkey\" on \"custom_field_value\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "custom_field_value_fieldId_fkey",
+        "table": "custom_field_value"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"custom_field_value_fieldId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_fieldId_fkey",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"custom_field_value_fieldId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"custom_field_value\"\nADD CONSTRAINT \"custom_field_value_fieldId_fkey\"\nFOREIGN KEY (\"fieldId\")\nREFERENCES \"public\".\"custom_field\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"custom_field_value_fieldId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "custom_field_value_fieldId_fkey",
+          "public",
+          "\"public\".\"custom_field_value\""
+        ]
+      }
+    ]
+  }
+]

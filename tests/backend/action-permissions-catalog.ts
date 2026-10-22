@@ -8,6 +8,10 @@ import {
   clientAdminOnlyNames,
 } from "./action-permissions-catalog-clients";
 import {
+  customFieldActionCatalog,
+  customFieldAdminOnlyNames,
+} from "./action-permissions-catalog-custom-fields";
+import {
   githubActionCatalog,
   githubAdminOnlyNames,
 } from "./action-permissions-catalog-github";
@@ -28,6 +32,7 @@ export const allActions = [
   ...personalProjectActionCatalog,
   ...teamFileActionCatalog,
   ...clientActionCatalog,
+  ...customFieldActionCatalog,
 ] as const;
 
 export const adminOnlyNames: readonly string[] = [
@@ -70,4 +75,5 @@ export const adminOnlyNames: readonly string[] = [
   ...webhookAdminOnlyNames,
   ...automationAdminOnlyNames,
   ...githubAdminOnlyNames,
+  ...customFieldAdminOnlyNames,
 ];

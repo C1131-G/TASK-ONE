@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TaskApprovals } from "@/features/approvals/components/task-approvals";
 import { BugTaskDetail } from "@/features/bugs/components/bug-task-detail";
+import { TaskCustomFields } from "@/features/custom-fields/components/task-custom-fields";
 import { ProjectFiles } from "@/features/files/components/project-files";
 import { TaskLinkedPulls } from "@/features/github/components/task-linked-pulls";
 import { TaskCommentsSection } from "@/features/tasks/components/task-details-comments";
@@ -104,6 +105,7 @@ export const TaskDetailsPanel = ({
     approvals,
     comments,
     bugHistory,
+    customFields,
     error,
     files,
     loading,
@@ -236,6 +238,11 @@ export const TaskDetailsPanel = ({
               timer={timer}
             />
             <TaskLinkedPulls pulls={pulls} />
+            <TaskCustomFields
+              customFields={customFields}
+              onChanged={refresh}
+              taskId={taskId}
+            />
             <TaskApprovals
               approvals={approvals}
               files={files}

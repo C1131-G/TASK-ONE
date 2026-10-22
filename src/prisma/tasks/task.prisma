@@ -28,6 +28,7 @@ model Task {
   bugReport BugReport?
   githubLinks GithubPullLink[]
   approvalRequests ApprovalRequest[]
+  customFieldValues CustomFieldValue[]
   files FileAsset[]
   timeEntries TimeEntry[]
   timeTimers TimeTimer[]
