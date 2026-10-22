@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { enqueueTaskChange } from "../webhooks/webhook-task-event";
 import type {
   CreatedTask,
   TaskArchiveUndoReceipt,
@@ -174,6 +175,17 @@ export const updateTask = (
             taskId,
           });
         }
+        await enqueueTaskChange(transaction, {
+          dueDate: rawInput.dueDate,
+          id: taskId,
+          now,
+          previousStatus: task.status,
+          priority: rawInput.priority,
+          projectId: task.projectId,
+          projectTaskNumber: task.projectTaskNumber,
+          status: rawInput.status,
+          title,
+        });
         let completionUndo: TaskArchiveUndoReceipt | undefined;
         let recurrenceSuccessorId: string | undefined;
         if (task.status !== "done" && rawInput.status === "done") {

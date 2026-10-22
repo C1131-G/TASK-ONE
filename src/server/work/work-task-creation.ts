@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import type { CreatedTask, CreateTaskInput } from "./work-contracts";
 import {
   assertStartNotAfterDue,
@@ -144,6 +145,21 @@ export const createTaskInTransaction = async (
     projectId: input.projectId,
     taskId,
   });
+  // Bug tasks are reported through the bug workflow, which has its own event.
+  if (type === "task") {
+    await enqueueWebhookEvent(transaction, "task.created", {
+      data: {
+        dueDate: input.dueDate,
+        id: taskId,
+        priority: input.priority,
+        projectId: input.projectId,
+        projectTaskNumber,
+        status: initialStatus,
+        title: input.title,
+      },
+      now,
+    });
+  }
   return {
     assigneeIds: input.assigneeIds,
     createdById: actorId,

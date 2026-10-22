@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import type { AppError } from "../core/action-result";
+import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import type { CreateProjectInput, ProjectSummary } from "./project-contracts";
 import {
   mapError,
@@ -90,6 +91,10 @@ export const createProject = (
         await writeActivity(transaction, actorId, id, "project.created", {
           key: input.key,
           name: input.name,
+        });
+        await enqueueWebhookEvent(transaction, "project.created", {
+          data: { id, name: input.name },
+          now,
         });
         return toSummary(project);
       });

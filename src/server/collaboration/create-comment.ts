@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { notifyUsers } from "../notifications/notify-users";
+import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import { markFirstResponse } from "../work/bug-sla";
 import type { CommentVisibility, CreatedComment } from "./contracts";
 import { mapError, uuidSchema, extractMentionIds } from "./internal";
@@ -202,6 +203,11 @@ export const createCommentInTransaction = async (
     id: randomUUID(),
     projectId: task.projectId,
     taskId,
+  });
+  // Ids and visibility only: the comment text never leaves the system.
+  await enqueueWebhookEvent(transaction, "comment.added", {
+    data: { id, projectId: task.projectId, taskId, visibility },
+    now: createdAt,
   });
   if (visibility === "public" && actor.role !== "client" && bug) {
     // The team's first public reply answers the client.

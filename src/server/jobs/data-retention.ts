@@ -24,12 +24,14 @@ export interface RetentionPolicy {
   readonly completedJobDays: number;
   readonly deadJobDays: number;
   readonly pushDeliveryDays: number;
+  readonly webhookDeliveryDays: number;
 }
 
 export const DEFAULT_RETENTION_POLICY: RetentionPolicy = {
   completedJobDays: 14,
   deadJobDays: 30,
   pushDeliveryDays: 30,
+  webhookDeliveryDays: 30,
 };
 
 export const retentionPolicyFromEnv = (
@@ -45,6 +47,9 @@ export const retentionPolicyFromEnv = (
     pushDeliveryDays:
       env.RETENTION_PUSH_DELIVERY_DAYS ??
       DEFAULT_RETENTION_POLICY.pushDeliveryDays,
+    webhookDeliveryDays:
+      env.RETENTION_WEBHOOK_DELIVERY_DAYS ??
+      DEFAULT_RETENTION_POLICY.webhookDeliveryDays,
   };
 };
 
@@ -102,6 +107,13 @@ const retentionTargets = {
     key: "id",
     predicate: '"expiresAt" < $1',
     table: "verification",
+  },
+  // Deliveries still pending or retrying belong to live jobs and stay.
+  webhookDeliveries: {
+    cutoff: (now, policy) => before(now, policy.webhookDeliveryDays),
+    key: "id",
+    predicate: "\"createdAt\" < $1 AND \"status\" IN ('succeeded', 'dead')",
+    table: "webhook_delivery",
   },
 } as const satisfies Record<string, RetentionTarget>;
 

@@ -208,6 +208,11 @@ const SettingsWorkspace = ({
                 <p>Manage company identity and default time zone.</p>
               </div>
               {workspace}
+              <div className="panel-b">
+                <Link className="btn btn-secondary" href="/settings/webhooks">
+                  Webhooks and Slack
+                </Link>
+              </div>
             </section>
           </TabsContent>
         ) : null}
