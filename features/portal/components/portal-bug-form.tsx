@@ -23,24 +23,32 @@ import type {
   FieldKey,
   Values,
 } from "@/features/portal/components/portal-bug-form-model";
+import { PortalContextDisclosure } from "@/features/portal/components/portal-context-disclosure";
 import {
   EnvironmentFields,
   ImpactField,
   PageUrlField,
 } from "@/features/portal/components/portal-environment-fields";
-import { PortalFilePicker } from "@/features/portal/components/portal-file-picker";
+import { PortalReportAttachments } from "@/features/portal/components/portal-report-attachments";
+import type { CapturedScreenshot } from "@/features/portal/components/portal-screenshot-capture";
 import {
   editClientBugAction,
   submitClientBugAction,
 } from "@/features/portal/portal-bug-actions";
+import {
+  contextServerSnapshot,
+  contextSnapshot,
+  parseContext,
+  subscribeToContext,
+} from "@/features/portal/portal-context-store";
 import {
   environmentServerSnapshot,
   environmentSnapshot,
   parseEnvironment,
 } from "@/features/portal/portal-environment";
 import { recordFailedUploads } from "@/features/portal/portal-failed-uploads";
+import { withReportExtras } from "@/features/portal/portal-report-extras";
 import { uploadPortalFiles } from "@/features/portal/portal-upload";
-import { PORTAL_MAX_FILES_PER_BUG } from "@/features/portal/portal-upload-rules";
 
 import {
   conflictMessage,
@@ -60,6 +68,15 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
   const [pending, setPending] = useState(false);
   const [progress, setProgress] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [captured, setCaptured] = useState<CapturedScreenshot | null>(null);
+  const [sendContext, setSendContext] = useState(true);
+  const context = parseContext(
+    useSyncExternalStore(
+      subscribeToContext,
+      contextSnapshot,
+      contextServerSnapshot
+    )
+  );
   const stepCounter = useRef(values.steps.length);
   const keyRef = useRef<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -126,7 +143,11 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
 
   const createBug = async (idempotencyKey: string) => {
     const result = await submitClientBugAction({
-      ...toPayload(values, detected),
+      ...withReportExtras(toPayload(values, detected), {
+        context,
+        screenshotDescription: captured?.description,
+        sendContext,
+      }),
       idempotencyKey,
       projectId: values.projectId,
       ...(mode.kind === "create" && mode.recurrenceOf
@@ -139,9 +160,10 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       return;
     }
     const { bugId } = result.data;
-    const failures = await uploadPortalFiles(bugId, files, (index, file) =>
+    const toUpload = captured ? [captured.file, ...files] : files;
+    const failures = await uploadPortalFiles(bugId, toUpload, (index, file) =>
       setProgress(
-        `Uploading file ${index + 1} of ${files.length}: ${file.name}`
+        `Uploading file ${index + 1} of ${toUpload.length}: ${file.name}`
       )
     );
     recordFailedUploads(bugId, failures);
@@ -260,17 +282,27 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
         values={values}
       />
       {isCreate ? (
-        <div className="field">
-          <span className="label">
-            Screenshots <span className="faint">(optional)</span>
-          </span>
-          <PortalFilePicker
-            disabled={pending}
-            files={files}
-            onChange={setFiles}
-            slots={PORTAL_MAX_FILES_PER_BUG}
-          />
-        </div>
+        <PortalReportAttachments
+          captured={captured}
+          disabled={pending}
+          files={files}
+          onCaptured={(next) => {
+            keyRef.current = null;
+            setCaptured(next);
+          }}
+          onFiles={setFiles}
+        />
+      ) : null}
+      {isCreate && context ? (
+        <PortalContextDisclosure
+          context={context}
+          disabled={pending}
+          onToggle={(send) => {
+            keyRef.current = null;
+            setSendContext(send);
+          }}
+          sendContext={sendContext}
+        />
       ) : null}
       {formError ? (
         <p className="portal-form-error" role="alert">

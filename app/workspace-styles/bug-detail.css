@@ -282,3 +282,7 @@
   font-size: var(--fs-sm);
   padding: 10px 12px;
 }
+
+.bug-client-context {
+  overflow-wrap: anywhere;
+}

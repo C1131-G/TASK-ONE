@@ -2,6 +2,8 @@
 
 "use client";
 
+import { describeBrowserContext } from "@/features/portal/portal-browser-context";
+
 import { slaClockText } from "../bug-sla-format";
 import type { BugHistory } from "../bug-workflow-ui-shared";
 import { MAX_CLIENT_REOPENS } from "./bug-client-labels";
@@ -45,6 +47,23 @@ export const ClientOutcomeFacts = ({
         <dd>{resolutionText}</dd>
       </div>
     ) : null}
+  </>
+);
+
+// The details the reporter's browser sent along. React renders them as text,
+// and the server refused markup in them when they arrived.
+export const ClientContextFacts = ({
+  context,
+}: {
+  readonly context: NonNullable<BugHistory["clientContext"]>;
+}) => (
+  <>
+    {describeBrowserContext(context).map(([label, value]) => (
+      <div key={label}>
+        <dt>Reported {label.toLowerCase()}</dt>
+        <dd className="bug-client-context">{value}</dd>
+      </div>
+    ))}
   </>
 );
 

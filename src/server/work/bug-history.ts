@@ -5,6 +5,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
+import { loadClientContext } from "./bug-client-context";
 import { loadClientReport } from "./bug-client-report";
 import { BugHistorySchema } from "./bug-history-contracts";
 import { toBugReportItem } from "./bug-management";
@@ -105,19 +106,21 @@ const getBugHistory = (
     const relatedIds = relations.map(({ fromBugReportId, toBugReportId }) =>
       fromBugReportId === bug.id ? toBugReportId : fromBugReportId
     );
-    const [files, relatedReports, clientReport] = await Promise.all([
-      fileIds.length
-        ? transaction.orm.public.FileAsset.where((file) =>
-            file.id.in(fileIds)
-          ).all()
-        : [],
-      relatedIds.length
-        ? transaction.orm.public.BugReport.where((other) =>
-            other.id.in([...new Set(relatedIds)])
-          ).all()
-        : [],
-      loadClientReport(transaction, { id: actorId, role: actor.role }, bug),
-    ]);
+    const [files, relatedReports, clientReport, clientContext] =
+      await Promise.all([
+        fileIds.length
+          ? transaction.orm.public.FileAsset.where((file) =>
+              file.id.in(fileIds)
+            ).all()
+          : [],
+        relatedIds.length
+          ? transaction.orm.public.BugReport.where((other) =>
+              other.id.in([...new Set(relatedIds)])
+            ).all()
+          : [],
+        loadClientReport(transaction, { id: actorId, role: actor.role }, bug),
+        loadClientContext(transaction, bug.taskId),
+      ]);
     const [relatedTasks, relatedProjects] = await Promise.all([
       relatedReports.length
         ? transaction.orm.public.Task.where((otherTask) =>
@@ -206,6 +209,7 @@ const getBugHistory = (
         project.key,
         task.projectTaskNumber
       ),
+      clientContext,
       clientReport,
       evidence: evidence.map((evidenceRow) => {
         const file = evidenceRow.fileAssetId

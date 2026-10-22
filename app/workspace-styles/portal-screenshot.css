@@ -1,0 +1,78 @@
+/* screenshot capture, annotation editor and technical details */
+.portal-app .portal-shot {
+  display: grid;
+  gap: var(--s-2);
+  margin-bottom: var(--s-2);
+}
+.portal-app .portal-shot-acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+}
+.portal-app .portal-shot-editor {
+  display: grid;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.portal-app .portal-shot-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.portal-app .portal-shot-tools [aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.portal-app .portal-shot-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--sunken);
+  cursor: crosshair;
+  /* Dragging on the picture draws; it must not scroll the page. */
+  touch-action: none;
+}
+.portal-app .portal-shot-canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.portal-app .portal-context {
+  display: grid;
+  gap: var(--s-2);
+}
+.portal-app .portal-context-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.portal-app .portal-context-details summary {
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.portal-app .portal-context-list {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+}
+.portal-app .portal-context-list div {
+  display: grid;
+  gap: 2px;
+}
+.portal-app .portal-context-list dt {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.portal-app .portal-context-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-sm);
+}

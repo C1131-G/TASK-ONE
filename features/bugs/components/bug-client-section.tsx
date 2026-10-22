@@ -23,7 +23,11 @@ import { BugPickForm } from "@/features/bugs/components/bug-pick-form";
 
 import { formatBugDate } from "../bug-workflow-ui-shared";
 import type { BugHistory } from "../bug-workflow-ui-shared";
-import { ClientOutcomeFacts, SlaFacts } from "./bug-client-facts";
+import {
+  ClientContextFacts,
+  ClientOutcomeFacts,
+  SlaFacts,
+} from "./bug-client-facts";
 import {
   CLOSED_STATUSES,
   IMPACT_LABELS,
@@ -233,6 +237,9 @@ export const BugClientSection = ({
         ) : null}
         {report.sla ? <SlaFacts sla={report.sla} /> : null}
         <ClientOutcomeFacts report={report} resolutionText={resolutionText} />
+        {history.clientContext ? (
+          <ClientContextFacts context={history.clientContext} />
+        ) : null}
       </dl>
       <ClientReportStatus
         bug={bug}

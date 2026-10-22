@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import { UUIDSchema } from "../core/input-schemas";
+import { BrowserContextSchema } from "../portal/portal-browser-context";
 import { BugEnvironmentSchema } from "./bug-contracts";
 import { BugReportItemSchema } from "./bug-management";
 import { SlaViewSchema } from "./bug-management-contracts";
@@ -60,6 +61,8 @@ export const BugHistorySchema = Schema.Struct({
   ),
   attempts: Schema.Array(BugAttemptHistorySchema),
   bug: BugReportItemSchema,
+  // What the reporter's browser volunteered with the report; staff only.
+  clientContext: Schema.NullOr(BrowserContextSchema),
   // Set for client reports: who they came from and who has picked them up.
   clientReport: Schema.NullOr(
     Schema.Struct({

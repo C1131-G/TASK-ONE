@@ -71,6 +71,7 @@ import "./clients-dialogs.css";
 import "./portal.css";
 import "./portal-bugs.css";
 import "./portal-attachments.css";
+import "./portal-screenshot.css";
 import "./portal-lifecycle.css";
 import "./time-tracking.css";
 import "./budgets.css";

@@ -4,6 +4,7 @@ import { clientStatusLabels } from "@/features/portal/client-status";
 
 import { UUIDSchema } from "../core/input-schemas";
 import { ClientImpactSchema } from "../work/bug-contracts";
+import { BrowserContextSchema } from "./portal-browser-context";
 
 export const VersionSchema = Schema.Number.check(
   Schema.isInt(),
@@ -42,6 +43,8 @@ export const SatisfactionSchema = Schema.Literals(["up", "down"]);
 
 export const SubmitClientBugInputSchema = Schema.Struct({
   ...ClientBugFields,
+  // Optional technical details the reporter agreed to send; staff-only.
+  browserContext: Schema.optional(BrowserContextSchema),
   projectId: UUIDSchema,
   // Set when reporting a closed bug again; links the new bug as a recurrence.
   recurrenceOfBugId: Schema.optional(UUIDSchema),

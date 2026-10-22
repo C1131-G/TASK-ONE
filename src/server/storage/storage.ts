@@ -13,6 +13,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Context, Effect, Layer } from "effect";
 
 import { AppError } from "../core/action-result";
+import { FILE_SIGNATURE_BYTES, matchesFileSignature } from "./file-signature";
 
 export interface StorageApi {
   readonly listObjects?: (
@@ -220,6 +221,21 @@ export const StorageLive = Layer.succeed(
             throw new AppError({
               code: "VALIDATION_FAILED",
               message: "The uploaded file does not match its upload request.",
+            });
+          }
+          const head = await s3.send(
+            new GetObjectCommand({
+              Bucket: bucket,
+              Key: key,
+              Range: `bytes=0-${FILE_SIGNATURE_BYTES - 1}`,
+            })
+          );
+          const bytes =
+            (await head.Body?.transformToByteArray()) ?? new Uint8Array();
+          if (!matchesFileSignature(contentType, bytes)) {
+            throw new AppError({
+              code: "VALIDATION_FAILED",
+              message: "The uploaded file is not the type it was declared as.",
             });
           }
         },

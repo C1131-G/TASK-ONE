@@ -13,6 +13,7 @@ import {
 } from "../work/bug-workflow-internal";
 import { announceClientBug } from "../work/bug-workflow-pick";
 import { validateInput } from "../work/work-internal";
+import { CLIENT_CONTEXT_ACTION } from "./portal-browser-context";
 import {
   loadCompanyBug,
   loadWritableCompanyBug,
@@ -91,6 +92,18 @@ export const submitBug = (
         id: randomUUID(),
         toBugReportId: earlier.bug.id,
         type: "recurrence",
+      });
+    }
+    if (input.browserContext) {
+      // Kept on the activity ledger, which no client read returns.
+      await writeActivity(transaction, {
+        action: CLIENT_CONTEXT_ACTION,
+        actorId: actor.id,
+        bugId: created.id,
+        details: input.browserContext,
+        now: new Date(),
+        projectId: input.projectId,
+        taskId: created.taskId,
       });
     }
     await announceClientBug(transaction, {

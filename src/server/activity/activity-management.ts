@@ -3,6 +3,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { CLIENT_CONTEXT_ACTION } from "../portal/portal-browser-context";
 
 export const ActivityEntrySchema = Schema.Struct({
   action: Schema.String,
@@ -77,7 +78,11 @@ const list: ActivityManagement["Service"]["list"] = (
           message: "Choose a valid activity feed and page size.",
         });
       }
-      const activityQuery = db.orm.public.Activity.include("actor")
+      // A reporter's browser context is shown on the bug, not in the feeds.
+      const activityQuery = db.orm.public.Activity.where((activity) =>
+        activity.action.neq(CLIENT_CONTEXT_ACTION)
+      )
+        .include("actor")
         .include("task")
         .include("project");
       let scopedActivity = activityQuery;
