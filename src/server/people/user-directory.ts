@@ -48,13 +48,19 @@ export const listEmployees = (
             ? and(
                 user.deactivatedAt.isNull(),
                 user.role.neq("client"),
+                user.banned.eq(false),
                 or(
                   user.name.ilike(`%${normalizedSearch}%`),
                   user.email.ilike(`%${normalizedSearch}%`),
                   user.jobTitle.ilike(`%${normalizedSearch}%`)
                 )
               )
-            : and(user.deactivatedAt.isNull(), user.role.neq("client"))
+            : and(
+                user.deactivatedAt.isNull(),
+                user.role.neq("client"),
+                // The intake placeholder reporter is banned and never listed.
+                user.banned.eq(false)
+              )
         )
         .orderBy((user) => user.employeeNumber.asc())
         .limit(500)

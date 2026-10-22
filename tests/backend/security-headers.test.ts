@@ -37,6 +37,21 @@ it("locks production pages to this origin and the storage endpoint", () => {
   expect(headers.get("Permissions-Policy")).toContain("geolocation=()");
 });
 
+// The public intake form posts same-origin multipart data with fetch and is
+// never framed, so the static policy needs no change for it.
+it("lets the public intake form post to its own origin and nowhere else", () => {
+  const csp =
+    headerMap({
+      isDevelopment: false,
+      isProduction: true,
+      storageOrigin: undefined,
+    }).get("Content-Security-Policy") ?? "";
+  expect(csp).toContain("form-action 'self'");
+  expect(csp).toMatch(/connect-src 'self'(?:;|$)/u);
+  expect(csp).toContain("frame-ancestors 'none'");
+  expect(csp).not.toMatch(/(?:form-action|connect-src)[^;]*\*/u);
+});
+
 it("allows eval only in development and skips HSTS outside production", () => {
   const headers = headerMap({
     isDevelopment: true,

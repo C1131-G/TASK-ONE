@@ -104,6 +104,14 @@
       "model": "IdempotencyKey",
       "namespace": "public"
     },
+    "intake_form": {
+      "model": "IntakeForm",
+      "namespace": "public"
+    },
+    "intake_submission": {
+      "model": "IntakeSubmission",
+      "namespace": "public"
+    },
     "job": {
       "model": "Job",
       "namespace": "public"
@@ -2435,6 +2443,22 @@
                   "namespace": "public"
                 }
               },
+              "intakeSubmission": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "bugReportId"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeSubmission",
+                  "namespace": "public"
+                }
+              },
               "pickedBy": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -3260,6 +3284,21 @@
                 },
                 "to": {
                   "model": "ClientCompanyHandler",
+                  "namespace": "public"
+                }
+              },
+              "intakeForms": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "clientCompanyId"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeForm",
                   "namespace": "public"
                 }
               },
@@ -4519,6 +4558,315 @@
               "table": "idempotency_key"
             }
           },
+          "IntakeForm": {
+            "fields": {
+              "clientCompanyId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "enabled": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "projectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "slug": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "clientCompany": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "clientCompanyId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "createdBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "project": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "projectId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Project",
+                  "namespace": "public"
+                }
+              },
+              "submissions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "formId"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeSubmission",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "clientCompanyId": {
+                  "column": "clientCompanyId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "createdById": {
+                  "column": "createdById"
+                },
+                "enabled": {
+                  "column": "enabled"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "projectId": {
+                  "column": "projectId"
+                },
+                "slug": {
+                  "column": "slug"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "version": {
+                  "column": "version"
+                }
+              },
+              "namespaceId": "public",
+              "table": "intake_form"
+            }
+          },
+          "IntakeSubmission": {
+            "fields": {
+              "bugReportId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar"
+                }
+              },
+              "formId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "messageId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "referenceId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reporterEmail": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "senderHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "source": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "bugReport": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "bugReportId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "BugReport",
+                  "namespace": "public"
+                }
+              },
+              "form": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "formId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeForm",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "bugReportId": {
+                  "column": "bugReportId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "formId": {
+                  "column": "formId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "messageId": {
+                  "column": "messageId"
+                },
+                "referenceId": {
+                  "column": "referenceId"
+                },
+                "reporterEmail": {
+                  "column": "reporterEmail"
+                },
+                "senderHash": {
+                  "column": "senderHash"
+                },
+                "source": {
+                  "column": "source"
+                }
+              },
+              "namespaceId": "public",
+              "table": "intake_submission"
+            }
+          },
           "Job": {
             "fields": {
               "attempts": {
@@ -5211,6 +5559,21 @@
                 },
                 "to": {
                   "model": "FileAsset",
+                  "namespace": "public"
+                }
+              },
+              "intakeForms": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "projectId"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeForm",
                   "namespace": "public"
                 }
               },
@@ -8376,6 +8739,21 @@
                 },
                 "to": {
                   "model": "ClientCompany",
+                  "namespace": "public"
+                }
+              },
+              "createdIntakeForms": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "IntakeForm",
                   "namespace": "public"
                 }
               },
@@ -12994,6 +13372,314 @@
                 }
               ]
             },
+            "intake_form": {
+              "columns": {
+                "clientCompanyId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "createdById": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "enabled": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "projectId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "slug": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1
+                  },
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "clientCompanyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_form"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "client_company"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "projectId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_form"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "project"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_form"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "clientCompanyId"
+                  ],
+                  "name": "intake_form_clientCompanyId_idx_157c8ca5",
+                  "prefix": "intake_form_clientCompanyId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "createdById"
+                  ],
+                  "name": "intake_form_createdById_idx_8bf640ed",
+                  "prefix": "intake_form_createdById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "projectId"
+                  ],
+                  "name": "intake_form_projectId_idx_a96e4d92",
+                  "prefix": "intake_form_projectId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "slug"
+                  ]
+                }
+              ]
+            },
+            "intake_submission": {
+              "checks": [
+                {
+                  "expression": "\"source\" IN ('web', 'email')",
+                  "name": "intake_submission_source_valid_8448c890",
+                  "prefix": "intake_submission_source_valid"
+                }
+              ],
+              "columns": {
+                "bugReportId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "formId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": false
+                },
+                "messageId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "referenceId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "reporterEmail": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "senderHash": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "source": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "formId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_submission"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_form"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "bugReportId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "intake_submission"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bug_report"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "formId",
+                    "createdAt"
+                  ],
+                  "name": "intake_submission_formId_createdAt_idx_70828f6f",
+                  "prefix": "intake_submission_formId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "formId"
+                  ],
+                  "name": "intake_submission_formId_idx_3c13a9fa",
+                  "prefix": "intake_submission_formId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "senderHash",
+                    "createdAt"
+                  ],
+                  "name": "intake_submission_senderHash_createdAt_idx_3726379b",
+                  "prefix": "intake_submission_senderHash_createdAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "referenceId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "bugReportId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "formId",
+                    "messageId"
+                  ]
+                }
+              ]
+            },
             "job": {
               "columns": {
                 "attempts": {
@@ -17166,10 +17852,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "16a6a1b3b0c8b756c6b7f9eedae71077b9b7ffe4cc2956e85d0c5be805e4b496"
+    "storageHash": "8e74fac8e22b16ea02fecd15347e3c2687d5167d67bf6724fd5c980568b21bce"
   },
   "execution": {
-    "executionHash": "636ae0e2504cb1c17843540091b2f0e4382af07e3d1db16a86f93b36c471743a",
+    "executionHash": "cca36a02a65e63b349f929b3afaf31c805b35c721ff1f0a83ee2a4be3cafbab8",
     "mutations": {
       "defaults": [
         {
@@ -17355,6 +18041,28 @@
           },
           "ref": {
             "entry": "idempotency_key",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "intake_form",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "intake_submission",
             "field": "id",
             "namespace": "public"
           }

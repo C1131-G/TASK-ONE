@@ -24,7 +24,11 @@ const resolveSection = (
   canManageWorkspace: boolean,
   initialSection: SettingsSection
 ): SettingsSection => {
-  if (requestedSection === "workspace" || requestedSection === "sla") {
+  if (
+    requestedSection === "workspace" ||
+    requestedSection === "sla" ||
+    requestedSection === "intake"
+  ) {
     return canManageWorkspace ? requestedSection : "appearance";
   }
   if (
@@ -73,6 +77,7 @@ const ThemeChoice = ({
 const SettingsWorkspace = ({
   canManageWorkspace,
   initialSection,
+  intake,
   notificationPreferences,
   preferences,
   profile,
@@ -82,6 +87,7 @@ const SettingsWorkspace = ({
 }: {
   readonly canManageWorkspace: boolean;
   readonly initialSection: SettingsSection;
+  readonly intake: ReactNode;
   readonly notificationPreferences: ReactNode;
   readonly preferences: ReactNode;
   readonly profile: ReactNode;
@@ -117,6 +123,9 @@ const SettingsWorkspace = ({
         ) : null}
         {canManageWorkspace ? (
           <TabsTrigger value="sla">SLA &amp; business hours</TabsTrigger>
+        ) : null}
+        {canManageWorkspace ? (
+          <TabsTrigger value="intake">Intake forms</TabsTrigger>
         ) : null}
       </TabsList>
       <div className="settings-content">
@@ -215,6 +224,20 @@ const SettingsWorkspace = ({
                 <p>Set response and resolution targets for client bugs.</p>
               </div>
               {sla}
+            </section>
+          </TabsContent>
+        ) : null}
+        {canManageWorkspace ? (
+          <TabsContent value="intake">
+            <section className="panel">
+              <div className="panel-h">
+                <h2>Intake forms</h2>
+                <p>
+                  Let people outside the portal report bugs through a public
+                  link.
+                </p>
+              </div>
+              {intake}
             </section>
           </TabsContent>
         ) : null}

@@ -2,12 +2,16 @@
 /* eslint-disable shadcn/no-unknown-classes */
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { listAllClientCompanies } from "@/features/clients/clients-queries";
 import { getAvatarDownloadUrl } from "@/features/files/files-queries";
+import { IntakeFormsPanel } from "@/features/intake/components/intake-forms-panel";
+import { listIntakeForms } from "@/features/intake/intake-queries";
 import {
   getEmailSettings,
   getNotificationPreferences,
 } from "@/features/notifications/notifications-queries";
 import { listAllEmployees } from "@/features/people/people-queries";
+import { listAllProjects } from "@/features/projects/projects-queries";
 import { CalendarFeedCard } from "@/features/settings/components/calendar-feed-card";
 import {
   CompanySettingsForm,
@@ -65,14 +69,33 @@ const SettingsPanel = async ({
       ? employees.data.find(({ id }) => id === user.id)
       : null;
   const isAdmin = user?.role === "admin";
-  const [sla, avatar] = await Promise.all([
+  const [sla, avatar, intakeForms, companies, projects] = await Promise.all([
     isAdmin ? getSlaSettings({}) : Promise.resolve(null),
     user ? getAvatarDownloadUrl({ userId: user.id }) : Promise.resolve(null),
+    isAdmin ? listIntakeForms({}) : Promise.resolve(null),
+    isAdmin ? listAllClientCompanies() : Promise.resolve(null),
+    isAdmin ? listAllProjects() : Promise.resolve(null),
   ]);
   return (
     <SettingsWorkspace
       canManageWorkspace={isAdmin}
       initialSection={initialSection}
+      intake={
+        intakeForms?.ok && companies?.ok && projects?.ok ? (
+          <IntakeFormsPanel
+            companies={companies.data.flatMap(({ active, id, name }) =>
+              active ? [{ id, label: name }] : []
+            )}
+            forms={intakeForms.data}
+            projects={projects.data.map(({ id, key, name }) => ({
+              id,
+              label: `${key} ${name}`,
+            }))}
+          />
+        ) : (
+          <div className="panel-b muted">Intake forms could not be loaded.</div>
+        )
+      }
       notificationPreferences={
         <>
           {notificationPrefs.ok ? (

@@ -1,0 +1,24 @@
+// use prisma-8
+
+// One external report that became a triage bug. Only a keyed hash of the
+// sender address is kept for rate limiting, never the address itself.
+model IntakeSubmission {
+  id            Uuid @id @default(uuid())
+  formId        Uuid
+  referenceId   String @unique
+  source        String
+  bugReportId   Uuid @unique
+  reporterEmail String
+  messageId     String?
+  senderHash    String?
+  createdAt     TimestamptzJsDate @default(now())
+
+  form      IntakeForm @relation(fields: [formId], references: [id], onDelete: Restrict)
+  bugReport BugReport @relation(fields: [bugReportId], references: [id], onDelete: Restrict)
+
+  @@unique([formId, messageId])
+  @@index([senderHash, createdAt])
+  @@index([formId, createdAt])
+  @@check(expression: "\"source\" IN ('web', 'email')", name: "intake_submission_source_valid")
+  @@map("intake_submission")
+}

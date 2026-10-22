@@ -76,6 +76,8 @@ const serverFields = {
   BETTER_AUTH_URL: Schema.optional(httpUrl),
   CI: Schema.optional(Schema.String),
   EXPOSE_TESTING_API: Schema.optional(Schema.String),
+  // Shared secret for the inbound email intake endpoint; unset switches it off.
+  INTAKE_EMAIL_SECRET: Schema.optional(secretString),
   NODE_ENV: Schema.optional(Schema.String),
   S3_ACCESS_KEY_ID: Schema.optional(Schema.String),
   S3_BUCKET: Schema.optional(Schema.String),

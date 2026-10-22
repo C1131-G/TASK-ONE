@@ -4,7 +4,8 @@ type SettingsSection =
   | "profile"
   | "sessions"
   | "workspace"
-  | "sla";
+  | "sla"
+  | "intake";
 
 // Unknown section names open appearance, which is available to every role.
 const parseSettingsSection = (value: unknown): SettingsSection =>
@@ -12,7 +13,8 @@ const parseSettingsSection = (value: unknown): SettingsSection =>
   value === "profile" ||
   value === "sessions" ||
   value === "workspace" ||
-  value === "sla"
+  value === "sla" ||
+  value === "intake"
     ? value
     : "appearance";
 

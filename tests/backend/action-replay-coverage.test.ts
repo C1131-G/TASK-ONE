@@ -27,6 +27,9 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "createIntakeFormAction",
+  "rotateIntakeFormAction",
+  "setIntakeFormEnabledAction",
   "redeliverWebhookAction",
   "removeWebhookEndpointAction",
   "updateWebhookEndpointAction",

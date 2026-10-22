@@ -38,6 +38,9 @@ export const announceClientBug = async (
     readonly bugId: string;
     readonly reporterId: string;
     readonly now: Date;
+    // Reports that come in from outside the portal also reach every admin.
+    readonly includeAdmins?: boolean;
+    readonly text?: string;
   }
 ): Promise<void> => {
   const { bug, project, task } = await loadBug(transaction, input.bugId);
@@ -63,10 +66,11 @@ export const announceClientBug = async (
         )
           .select("id")
           .all();
+  const handlerRecipients = activeHandlers.map(({ id }) => id);
   const recipients =
-    activeHandlers.length > 0
-      ? activeHandlers.map(({ id }) => id)
-      : await activeAdminIds(transaction);
+    handlerRecipients.length > 0 && !input.includeAdmins
+      ? handlerRecipients
+      : [...handlerRecipients, ...(await activeAdminIds(transaction))];
   await notifyUsers(transaction, {
     actorId: input.reporterId,
     now: input.now,
@@ -74,7 +78,7 @@ export const announceClientBug = async (
     recipientIds: recipients,
     snippet: `${bugKey(project, task)} ${task.title}`,
     taskId: task.id,
-    text: `New bug from ${company?.name ?? "a client"}`,
+    text: input.text ?? `New bug from ${company?.name ?? "a client"}`,
     type: "client_bug",
     url: `/bugs/${bug.id}`,
   });
