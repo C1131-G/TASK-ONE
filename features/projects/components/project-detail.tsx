@@ -88,7 +88,11 @@ const ProjectHeader = async ({
           </>
         ) : null}
       </div>
-      <ProjectViewTabs projectId={project.id} selected={view} />
+      <ProjectViewTabs
+        isAdmin={isAdmin}
+        projectId={project.id}
+        selected={view}
+      />
     </div>
   );
 };
@@ -104,6 +108,7 @@ const ProjectBody = async ({
 }) => {
   const {
     activityResult,
+    automationResult,
     bugResult,
     calendarEvents,
     calendarMode,
@@ -120,6 +125,7 @@ const ProjectBody = async ({
     milestonesVersion,
     monthOffset,
     project,
+    runResult,
     savedViewState,
     taskResult,
     tasks,
@@ -149,6 +155,7 @@ const ProjectBody = async ({
         <ViewSwitchTransition name="project-view" view={view}>
           <ProjectViewContent
             activityResult={activityResult}
+            automationResult={automationResult}
             bugResult={bugResult}
             calendarEvents={calendarEvents}
             calendarMode={calendarMode}
@@ -164,6 +171,7 @@ const ProjectBody = async ({
             milestonesVersion={milestonesVersion}
             monthOffset={monthOffset}
             project={project}
+            runResult={runResult}
             taskResult={taskResult}
             tasks={tasks}
             teams={teamResult.ok ? teamResult.data : []}

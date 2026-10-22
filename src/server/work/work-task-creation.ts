@@ -4,6 +4,7 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { enqueueAutomationEvent } from "../automation/automation-enqueue";
 import { AppError } from "../core/action-result";
 import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import type { CreatedTask, CreateTaskInput } from "./work-contracts";
@@ -160,6 +161,12 @@ export const createTaskInTransaction = async (
       now,
     });
   }
+  await enqueueAutomationEvent(transaction, {
+    now,
+    projectId: input.projectId,
+    taskId,
+    trigger: type === "bug" ? "bug_reported" : "task_created",
+  });
   return {
     assigneeIds: input.assigneeIds,
     createdById: actorId,

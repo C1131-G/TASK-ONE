@@ -3,6 +3,7 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { AUTOMATION_OVERDUE_SWEEP_JOB } from "../automation/automation-contracts";
 import { AppError } from "../core/action-result";
 import { EMAIL_DIGEST_JOB } from "../email/email-contracts";
 import { enqueueSlaSweep } from "../work/bug-sla-sweep";
@@ -65,6 +66,20 @@ export const enqueueMaintenance = (
             dedupeKey: digestKey,
             id: crypto.randomUUID(),
             kind: EMAIL_DIGEST_JOB,
+            payload: { scheduledAt: scheduledAt.toISOString() },
+            updatedAt: scheduledAt,
+          },
+          update: { updatedAt: scheduledAt },
+        }),
+        db.orm.public.Job.upsert({
+          conflictOn: {
+            dedupeKey: `${AUTOMATION_OVERDUE_SWEEP_JOB}:${dueSummaryHour}`,
+          },
+          create: {
+            availableAt: scheduledAt,
+            dedupeKey: `${AUTOMATION_OVERDUE_SWEEP_JOB}:${dueSummaryHour}`,
+            id: crypto.randomUUID(),
+            kind: AUTOMATION_OVERDUE_SWEEP_JOB,
             payload: { scheduledAt: scheduledAt.toISOString() },
             updatedAt: scheduledAt,
           },

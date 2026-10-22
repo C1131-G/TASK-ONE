@@ -10,6 +10,11 @@ import { ProjectBugs } from "@/features/bugs/components/project-bugs";
 import type { listCalendarEvents } from "@/features/calendar/calendar-queries";
 import { ProjectFiles } from "@/features/files/components/project-files";
 import type { listProjectFiles } from "@/features/files/files-queries";
+import type {
+  listAutomationRules,
+  listAutomationRuns,
+} from "@/features/projects/automation-queries";
+import { ProjectAutomations } from "@/features/projects/components/project-automations";
 import { ProjectBoard } from "@/features/projects/components/project-board";
 import {
   ProjectBudgetPanel,
@@ -73,6 +78,10 @@ type ProjectCalendarRange = ReturnType<typeof currentUtcMonthRange> | null;
 interface ProjectViewContentProps {
   readonly bugResult: Awaited<ReturnType<typeof listBugs>> | null;
   readonly activityResult: ProjectActivityActionResult | null;
+  readonly automationResult: Awaited<
+    ReturnType<typeof listAutomationRules>
+  > | null;
+  readonly runResult: Awaited<ReturnType<typeof listAutomationRuns>> | null;
   readonly calendarEvents: readonly ProjectCalendarEvent[] | null;
   readonly calendarMode: "month" | "week";
   readonly calendarRange: ProjectCalendarRange;
@@ -216,6 +225,35 @@ const renderProjectBugs = ({
   );
 };
 
+const renderProjectAutomations = ({
+  automationResult,
+  employees,
+  isAdmin,
+  labelResult,
+  project,
+  runResult,
+}: ProjectViewContentProps): ReactNode => {
+  if (!isAdmin || !automationResult || !runResult) {
+    return (
+      <section className="panel panel-b" role="alert">
+        Only administrators can manage automations.
+      </section>
+    );
+  }
+  return (
+    <ProjectAutomations
+      labels={(labelResult.ok ? labelResult.data : []).map(({ id, name }) => ({
+        id,
+        label: name,
+      }))}
+      people={employees.map(({ id, name }) => ({ id, label: name }))}
+      projectId={project.id}
+      rules={readOrThrow(automationResult, "Automations")}
+      runs={readOrThrow(runResult, "The automation log")}
+    />
+  );
+};
+
 const renderProjectTasks = ({
   calendarEvents,
   calendarMode,
@@ -262,6 +300,7 @@ const projectViewRenderers: Readonly<
   Record<string, (props: ProjectViewContentProps) => ReactNode>
 > = {
   activity: renderProjectActivity,
+  automations: renderProjectAutomations,
   board: renderProjectBoard,
   bugs: renderProjectBugs,
   calendar: renderProjectTasks,

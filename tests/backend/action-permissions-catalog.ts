@@ -1,4 +1,8 @@
 import {
+  automationActionCatalog,
+  automationAdminOnlyNames,
+} from "./action-permissions-catalog-automation";
+import {
   clientActionCatalog,
   clientAdminOnlyNames,
 } from "./action-permissions-catalog-clients";
@@ -11,6 +15,7 @@ import {
 import { workspaceActionCatalog } from "./action-permissions-catalog-workspace";
 
 export const allActions = [
+  ...automationActionCatalog,
   ...webhookActionCatalog,
   ...workspaceActionCatalog,
   ...personalProjectActionCatalog,
@@ -56,4 +61,5 @@ export const adminOnlyNames: readonly string[] = [
   "listProjectFiles",
   ...clientAdminOnlyNames,
   ...webhookAdminOnlyNames,
+  ...automationAdminOnlyNames,
 ];

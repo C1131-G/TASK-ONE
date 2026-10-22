@@ -27,6 +27,10 @@ const excludedByDesign = new Set([
   "unlockUserAction",
 ]);
 const replayedMutations = new Set([
+  "createAutomationRuleAction",
+  "removeAutomationRuleAction",
+  "setAutomationRuleEnabledAction",
+  "updateAutomationRuleAction",
   "createIntakeFormAction",
   "rotateIntakeFormAction",
   "setIntakeFormEnabledAction",

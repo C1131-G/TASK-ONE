@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { Schema } from "effect";
 
+import { enqueueAutomationEvent } from "../automation/automation-enqueue";
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
 import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
@@ -260,6 +261,12 @@ export const updateBugStatus = async (
       to: input.nextStatus,
     },
     now: input.now,
+  });
+  await enqueueAutomationEvent(transaction, {
+    now: input.now,
+    projectId: input.bug.projectId,
+    taskId: input.bug.taskId,
+    trigger: "bug_status_changed",
   });
   return Schema.decodeUnknownSync(BugWorkflowReceiptSchema)({
     bugId: input.bug.id,

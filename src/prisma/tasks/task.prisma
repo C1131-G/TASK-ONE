@@ -29,6 +29,7 @@ model Task {
   files FileAsset[]
   timeEntries TimeEntry[]
   timeTimers TimeTimer[]
+  automationRuns AutomationRun[]
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
   createdBy User    @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Restrict)

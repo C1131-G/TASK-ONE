@@ -2,6 +2,13 @@ import { Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import {
+  AUTOMATION_OVERDUE_SWEEP_JOB,
+  AUTOMATION_RULE_JOB,
+} from "../automation/automation-contracts";
+import { decodeAutomationJob } from "../automation/automation-job";
+import { sweepOverdueTasks } from "../automation/automation-overdue";
+import { runAutomationEvent } from "../automation/automation-runner";
 import { AppError } from "../core/action-result";
 import {
   EMAIL_DELIVERY_JOB,
@@ -44,6 +51,7 @@ import { DATA_RETENTION_JOB, purgeExpiredData } from "./data-retention";
 import { JobHandlers } from "./job-handlers";
 import type { JsonValue } from "./job-handlers";
 
+const ISO_DATE_LENGTH = 10;
 const EmptyPayloadSchema = Schema.Struct({});
 const decodeEmptyPayload = (payload: JsonValue, jobLabel: string) =>
   Effect.try({
@@ -309,6 +317,47 @@ export const JobHandlersLive = Layer.effect(
           }).pipe(
             Effect.flatMap(({ scheduledAt }) => email.sendDigests(scheduledAt)),
             Effect.asVoid
+          );
+        }
+        if (kind === AUTOMATION_OVERDUE_SWEEP_JOB) {
+          return Effect.try({
+            catch: () =>
+              new AppError({
+                code: "VALIDATION_FAILED",
+                message: "The overdue sweep job payload is invalid.",
+              }),
+            try: () =>
+              Schema.decodeUnknownSync(DailyDueSummaryPayloadSchema)(payload),
+          }).pipe(
+            Effect.flatMap(({ scheduledAt }) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The overdue sweep could not be completed.",
+                  }),
+                try: () =>
+                  sweepOverdueTasks(
+                    scheduledAt.toISOString().slice(0, ISO_DATE_LENGTH),
+                    scheduledAt
+                  ),
+              })
+            ),
+            Effect.asVoid
+          );
+        }
+        if (kind === AUTOMATION_RULE_JOB) {
+          return decodeAutomationJob(payload).pipe(
+            Effect.flatMap((event) =>
+              Effect.tryPromise({
+                catch: () =>
+                  new AppError({
+                    code: "UNAVAILABLE",
+                    message: "The automation rules could not be run.",
+                  }),
+                try: () => runAutomationEvent(event),
+              })
+            )
           );
         }
         if (kind === WEBHOOK_DELIVERY_JOB) {

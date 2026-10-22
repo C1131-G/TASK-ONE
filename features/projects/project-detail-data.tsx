@@ -11,6 +11,10 @@ import {
   listAllEmployees,
   listAllTeams,
 } from "@/features/people/people-queries";
+import {
+  listAutomationRules,
+  listAutomationRuns,
+} from "@/features/projects/automation-queries";
 import { ProjectMilestones } from "@/features/projects/components/project-milestones";
 import {
   getProject,
@@ -27,6 +31,8 @@ import { getPersonalPreferences } from "@/features/user/user-queries";
 import { currentUtcMonthRange } from "@/src/lib/utc-date-range";
 import { getUtcToday } from "@/src/lib/utc-today";
 import { getPageSession } from "@/src/server/auth/page-session";
+
+const AUTOMATION_RUNS_SHOWN = 50;
 
 type ProjectTasks = Extract<
   Awaited<ReturnType<typeof listProjectTaskPages>>,
@@ -84,23 +90,38 @@ const loadProjectViewData = async ({
     view === "calendar"
       ? calendarPeriod(calendarMode, monthOffset).range
       : null;
-  const [taskResult, fileResult, activityResult, bugResult, calendarResult] =
-    await Promise.all([
-      requiresTaskList
-        ? listProjectTaskPages(project.id, project.taskCount)
-        : Promise.resolve(null),
-      view === "files" ? listProjectFiles({ projectId: project.id }) : null,
-      view === "activity" || view === "overview"
-        ? listActivity({ limit: 100, projectId: project.id })
-        : null,
-      view === "bugs" ? listBugs({ projectId: project.id }) : null,
-      calendarRange
-        ? listCalendarEvents({
-            from: calendarRange.fromInstant,
-            to: calendarRange.toInstant,
-          })
-        : null,
-    ]);
+  const wantsAutomations = view === "automations" && isAdmin;
+  const [
+    taskResult,
+    fileResult,
+    activityResult,
+    bugResult,
+    calendarResult,
+    automationResult,
+    runResult,
+  ] = await Promise.all([
+    requiresTaskList
+      ? listProjectTaskPages(project.id, project.taskCount)
+      : Promise.resolve(null),
+    view === "files" ? listProjectFiles({ projectId: project.id }) : null,
+    view === "activity" || view === "overview"
+      ? listActivity({ limit: 100, projectId: project.id })
+      : null,
+    view === "bugs" ? listBugs({ projectId: project.id }) : null,
+    calendarRange
+      ? listCalendarEvents({
+          from: calendarRange.fromInstant,
+          to: calendarRange.toInstant,
+        })
+      : null,
+    wantsAutomations ? listAutomationRules({ projectId: project.id }) : null,
+    wantsAutomations
+      ? listAutomationRuns({
+          limit: AUTOMATION_RUNS_SHOWN,
+          projectId: project.id,
+        })
+      : null,
+  ]);
   const tasks = taskResult?.ok ? taskResult.data : [];
   const editableTaskIds = getEditableTaskIds(tasks, isAdmin, currentUserId);
   const calendarEvents = calendarResult?.ok
@@ -109,11 +130,13 @@ const loadProjectViewData = async ({
   const timelineRange = view === "timeline" ? currentUtcMonthRange(0, 4) : null;
   return {
     activityResult,
+    automationResult,
     bugResult,
     calendarEvents,
     calendarRange,
     editableTaskIds,
     fileResult,
+    runResult,
     taskResult,
     tasks,
     timelineRange,
