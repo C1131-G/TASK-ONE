@@ -27,6 +27,8 @@ const replayedMutations = new Set([
   "createIntakeFormAction",
   "rotateIntakeFormAction",
   "setIntakeFormEnabledAction",
+  "clearProjectBudgetAction",
+  "saveProjectBudgetAction",
   "addTimeEntryAction",
   "deleteTimeEntryAction",
   "startTimerAction",

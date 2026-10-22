@@ -1,0 +1,203 @@
+[
+  {
+    "id": "table.project_budget",
+    "label": "Create table \"project_budget\"",
+    "summary": "Creates table \"project_budget\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "project_budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"project_budget\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"project_budget\"",
+        "sql": "CREATE TABLE \"public\".\"project_budget\" (\n  \"billableOnly\" bool DEFAULT false NOT NULL,\n  \"budgetMinutes\" int4 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currency\" text DEFAULT 'USD' NOT NULL,\n  \"hourlyRateCents\" int4,\n  \"kind\" text DEFAULT 'one_off' NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"warningPercent\" int4 DEFAULT 80 NOT NULL,\n  PRIMARY KEY (\"projectId\"),\n  CONSTRAINT \"project_budget_kind_check_de785e65\" CHECK (\"kind\" IN ('one_off', 'retainer')),\n  CONSTRAINT \"project_budget_minutes_positive_81247551\" CHECK (\"budgetMinutes\" > 0),\n  CONSTRAINT \"project_budget_rate_non_negative_b6a6c68b\" CHECK (\"hourlyRateCents\" IS NULL OR \"hourlyRateCents\" >= 0),\n  CONSTRAINT \"project_budget_warning_percent_087517d6\" CHECK (\"warningPercent\" BETWEEN 1 AND 100)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"project_budget\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.project_budget_alert",
+    "label": "Create table \"project_budget_alert\"",
+    "summary": "Creates table \"project_budget_alert\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "project_budget_alert"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"project_budget_alert\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget_alert\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"project_budget_alert\"",
+        "sql": "CREATE TABLE \"public\".\"project_budget_alert\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"level\" text NOT NULL,\n  \"periodKey\" text NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  PRIMARY KEY (\"projectId\", \"periodKey\", \"level\"),\n  CONSTRAINT \"project_budget_alert_level_check_57e39686\" CHECK (\"level\" IN ('warning', 'overrun'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"project_budget_alert\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget_alert\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.project_budget_alert.project_budget_alert_projectId_idx_a96e4d92",
+    "label": "Create index \"project_budget_alert_projectId_idx_a96e4d92\" on \"project_budget_alert\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "project_budget_alert_projectId_idx_a96e4d92",
+        "table": "project_budget_alert"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"project_budget_alert_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget_alert_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"project_budget_alert_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"project_budget_alert_projectId_idx_a96e4d92\" ON \"public\".\"project_budget_alert\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"project_budget_alert_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_budget_alert_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project_budget.project_budget_projectId_fkey",
+    "label": "Add foreign key \"project_budget_projectId_fkey\" on \"project_budget\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_budget_projectId_fkey",
+        "table": "project_budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_budget_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_budget_projectId_fkey",
+          "public",
+          "\"public\".\"project_budget\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_budget_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project_budget\"\nADD CONSTRAINT \"project_budget_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_budget_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_budget_projectId_fkey",
+          "public",
+          "\"public\".\"project_budget\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project_budget_alert.project_budget_alert_projectId_fkey",
+    "label": "Add foreign key \"project_budget_alert_projectId_fkey\" on \"project_budget_alert\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_budget_alert_projectId_fkey",
+        "table": "project_budget_alert"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_budget_alert_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_budget_alert_projectId_fkey",
+          "public",
+          "\"public\".\"project_budget_alert\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_budget_alert_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project_budget_alert\"\nADD CONSTRAINT \"project_budget_alert_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project_budget\" (\"projectId\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_budget_alert_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_budget_alert_projectId_fkey",
+          "public",
+          "\"public\".\"project_budget_alert\""
+        ]
+      }
+    ]
+  }
+]

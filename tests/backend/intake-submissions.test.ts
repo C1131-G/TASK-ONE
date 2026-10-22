@@ -290,10 +290,10 @@ it("enforces strict length and format limits on every field", async () => {
     ["email", { email: "not-an-email" }],
   ];
   for (const [field, override] of cases) {
+    const input = webInput(override);
     // eslint-disable-next-line no-await-in-loop
-    const error = failure(
-      await run((service) => service.submitWeb(webInput(override)))
-    );
+    const exit = await run((service) => service.submitWeb(input));
+    const error = failure(exit);
     expect(error.code).toBe("VALIDATION_FAILED");
     expect(error.fieldErrors?.[field]).toBeDefined();
   }

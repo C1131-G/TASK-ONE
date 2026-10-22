@@ -26,6 +26,7 @@ model Project {
   files FileAsset[]
   clientCompanies ClientCompanyProject[]
   intakeForms IntakeForm[]
+  budget ProjectBudget?
 
   team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
   lead       User? @relation("ProjectLead", fields: [leadId], references: [id], onDelete: Restrict)

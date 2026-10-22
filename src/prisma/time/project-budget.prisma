@@ -1,0 +1,24 @@
+// use prisma-8
+
+// How many hours a project may use, and how the allowance renews. A retainer
+// resets each company month; a one-off budget counts all time. Clients never
+// read this table.
+model ProjectBudget {
+  projectId       Uuid @id
+  kind            BudgetKind @default(OneOff)
+  budgetMinutes   Int
+  warningPercent  Int @default(80)
+  billableOnly    Boolean @default(false)
+  hourlyRateCents Int?
+  currency        String @default("USD")
+  createdAt       TimestamptzJsDate @default(now())
+  updatedAt       TimestamptzJsDate @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  alerts  ProjectBudgetAlert[]
+
+  @@check(expression: "\"budgetMinutes\" > 0", name: "project_budget_minutes_positive")
+  @@check(expression: "\"warningPercent\" BETWEEN 1 AND 100", name: "project_budget_warning_percent")
+  @@check(expression: "\"hourlyRateCents\" IS NULL OR \"hourlyRateCents\" >= 0", name: "project_budget_rate_non_negative")
+  @@map("project_budget")
+}

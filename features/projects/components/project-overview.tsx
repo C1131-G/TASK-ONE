@@ -18,6 +18,7 @@ import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 const ProjectOverview = ({
   activity,
   activityUnavailable,
+  budget,
   currentUserId,
   employees,
   isAdmin,
@@ -29,6 +30,7 @@ const ProjectOverview = ({
 }: {
   readonly activity: readonly ActivityEntry[];
   readonly activityUnavailable: boolean;
+  readonly budget: ReactNode;
   readonly currentUserId: string | null;
   readonly employees: readonly EmployeeDirectoryEntry[];
   readonly isAdmin: boolean;
@@ -49,6 +51,7 @@ const ProjectOverview = ({
         </p>
       </section>
       <ProjectProgress project={project} tasks={tasks} today={today} />
+      {budget}
       <ProjectUpcomingTasks
         currentUserId={currentUserId}
         employees={employees}

@@ -5,6 +5,11 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import postgres from "@prisma/orm-postgres/runtime";
 
 import { authPool } from "../server/auth/database";
+import { signalActivityWrites } from "../server/realtime/activity-signal";
+import {
+  queueRealtimeEvents,
+  withRealtimeOutbox,
+} from "../server/realtime/publisher";
 import type { Contract } from "./contract.d";
 import contractJson from "./contract.json" with { type: "json" };
 
@@ -42,9 +47,18 @@ export const db = new Proxy(client, {
         if (activeTransaction) {
           return operation(activeTransaction);
         }
-        // eslint-disable-next-line promise/prefer-await-to-callbacks -- Prisma requires a transaction callback.
-        return target.transaction((transaction) =>
-          transactionContext.run(transaction, () => operation(transaction))
+        // Realtime events raised inside are published after the commit.
+        return withRealtimeOutbox(() =>
+          // eslint-disable-next-line promise/prefer-await-to-callbacks -- Prisma requires a transaction callback.
+          target.transaction((rawTransaction) => {
+            const transaction = signalActivityWrites(
+              rawTransaction,
+              queueRealtimeEvents
+            );
+            return transactionContext.run(transaction, () =>
+              operation(transaction)
+            );
+          })
         );
       };
     }

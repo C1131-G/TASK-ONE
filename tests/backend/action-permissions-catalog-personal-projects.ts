@@ -149,6 +149,24 @@ export const personalProjectActionCatalog: readonly ActionEntry[] = [
       projectId: ids.projectId,
     })
   ),
+  entry("getProjectBudget", projectsQueries.getProjectBudget, () => ({
+    projectId: ids.projectId,
+  })),
+  entry("listProjectBudgets", projectsQueries.listProjectBudgets, () => ({})),
+  entry("saveProjectBudgetAction", projects.saveProjectBudgetAction, () => ({
+    billableOnly: false,
+    budgetMinutes: 600,
+    currency: "USD",
+    hourlyRateCents: null,
+    idempotencyKey: nextKey(),
+    kind: "retainer",
+    projectId: ids.projectId,
+    warningPercent: 80,
+  })),
+  entry("clearProjectBudgetAction", projects.clearProjectBudgetAction, () => ({
+    idempotencyKey: nextKey(),
+    projectId: ids.projectId,
+  })),
   entry("listSavedViews", projectsQueries.listSavedViews, () => ({})),
   entry("createSavedViewAction", savedViews.createSavedViewAction, () => ({
     idempotencyKey: nextKey(),
