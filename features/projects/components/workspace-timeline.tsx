@@ -282,6 +282,7 @@ export const WorkspaceTimeline = ({
       ) : null}
       {rows.length ? (
         <WorkspaceTimelineChart
+          allTasks={reschedule.tasks}
           dayCount={dayCount}
           dayWidth={dayWidth}
           editableIds={new Set(editableTaskIds)}

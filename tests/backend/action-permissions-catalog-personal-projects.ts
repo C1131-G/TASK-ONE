@@ -23,6 +23,8 @@ const tasks = await import("../../features/tasks/tasks-actions");
 const projectsQueries =
   await import("../../features/projects/projects-queries");
 const userQueries = await import("../../features/user/user-queries");
+const workloadQueries =
+  await import("../../features/workload/workload-queries");
 const tasksQueries = await import("../../features/tasks/tasks-queries");
 
 export const personalProjectActionCatalog: readonly ActionEntry[] = [
@@ -167,6 +169,7 @@ export const personalProjectActionCatalog: readonly ActionEntry[] = [
     idempotencyKey: nextKey(),
     projectId: ids.projectId,
   })),
+  entry("getWorkload", workloadQueries.getWorkload, () => ({})),
   entry("listSavedViews", projectsQueries.listSavedViews, () => ({})),
   entry("createSavedViewAction", savedViews.createSavedViewAction, () => ({
     idempotencyKey: nextKey(),

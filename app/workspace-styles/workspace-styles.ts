@@ -74,4 +74,5 @@ import "./portal-attachments.css";
 import "./portal-lifecycle.css";
 import "./time-tracking.css";
 import "./budgets.css";
+import "./workload.css";
 import "./touch-targets.css";
