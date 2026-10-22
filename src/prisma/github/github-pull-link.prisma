@@ -1,0 +1,27 @@
+// use prisma-8
+
+// A pull request that mentions a task key. The title and URL are display
+// copies; the URL is built from the repository and number, never taken from
+// the payload.
+model GithubPullLink {
+  id           Uuid @id @default(uuid())
+  connectionId Uuid
+  taskId       Uuid
+  prNumber     Int
+  title        String
+  url          String
+  state        String @default("open")
+  authorLogin  String?
+  mergedAt     TimestamptzJsDate?
+  createdAt    TimestamptzJsDate @default(now())
+  updatedAt    TimestamptzJsDate @default(now())
+
+  connection GithubConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  task       Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, taskId, prNumber])
+  @@index([taskId])
+  @@check(expression: "\"state\" IN ('open', 'closed', 'merged')", name: "github_pull_link_state_valid")
+  @@check(expression: "\"prNumber\" > 0", name: "github_pull_link_number_positive")
+  @@map("github_pull_link")
+}

@@ -26,6 +26,7 @@ model Task {
   recurrenceSuccessor RecurrenceGeneration? @relation("RecurrenceSuccessor")
   uploadIntents UploadIntent[]
   bugReport BugReport?
+  githubLinks GithubPullLink[]
   files FileAsset[]
   timeEntries TimeEntry[]
   timeTimers TimeTimer[]

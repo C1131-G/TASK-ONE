@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'8e74fac8e22b16ea02fecd15347e3c2687d5167d67bf6724fd5c980568b21bce'>;
+  StorageHashBase<'180e8f1b951bd4584f86f671b3214067323faf1a52fa4c9bdae669d11aeba5ad'>;
 export type ExecutionHash =
-  ExecutionHashBase<'cca36a02a65e63b349f929b3afaf31c805b35c721ff1f0a83ee2a4be3cafbab8'>;
+  ExecutionHashBase<'75ff55e8ab60d7d7c69af77d5bf64b46744ecfd22c5ca1ee26a6dcbf376e9451'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -538,6 +538,38 @@ export type FieldOutputTypes = {
       readonly storageKey: CodecTypes['pg/text@1']['output'];
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly uploadedById: CodecTypes['pg/text@1']['output'];
+    };
+    readonly GithubConnection: {
+      readonly autoCompleteOnMerge: CodecTypes['pg/bool@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly createdById: CodecTypes['pg/text@1']['output'];
+      readonly enabled: CodecTypes['pg/bool@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly repoFullName: CodecTypes['pg/text@1']['output'];
+      readonly secretCiphertext: CodecTypes['pg/text@1']['output'];
+      readonly secretHint: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly GithubDelivery: {
+      readonly connectionId: CodecTypes['pg/uuid@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly deliveryId: CodecTypes['pg/text@1']['output'];
+      readonly event: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+    };
+    readonly GithubPullLink: {
+      readonly authorLogin: CodecTypes['pg/text@1']['output'] | null;
+      readonly connectionId: CodecTypes['pg/uuid@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly mergedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly prNumber: CodecTypes['pg/int4@1']['output'];
+      readonly state: CodecTypes['pg/text@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly title: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly url: CodecTypes['pg/text@1']['output'];
     };
     readonly IdempotencyKey: {
       readonly actorId: CodecTypes['pg/text@1']['output'];
@@ -1223,6 +1255,38 @@ export type FieldInputTypes = {
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly uploadedById: CodecTypes['pg/text@1']['input'];
     };
+    readonly GithubConnection: {
+      readonly autoCompleteOnMerge: CodecTypes['pg/bool@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly createdById: CodecTypes['pg/text@1']['input'];
+      readonly enabled: CodecTypes['pg/bool@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly repoFullName: CodecTypes['pg/text@1']['input'];
+      readonly secretCiphertext: CodecTypes['pg/text@1']['input'];
+      readonly secretHint: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly GithubDelivery: {
+      readonly connectionId: CodecTypes['pg/uuid@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly deliveryId: CodecTypes['pg/text@1']['input'];
+      readonly event: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+    };
+    readonly GithubPullLink: {
+      readonly authorLogin: CodecTypes['pg/text@1']['input'] | null;
+      readonly connectionId: CodecTypes['pg/uuid@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly mergedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly prNumber: CodecTypes['pg/int4@1']['input'];
+      readonly state: CodecTypes['pg/text@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly title: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly url: CodecTypes['pg/text@1']['input'];
+    };
     readonly IdempotencyKey: {
       readonly actorId: CodecTypes['pg/text@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
@@ -1907,6 +1971,38 @@ export type StorageColumnTypes = {
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly uploadedById: CodecTypes['pg/text@1']['output'];
     };
+    readonly github_connection: {
+      readonly autoCompleteOnMerge: CodecTypes['pg/bool@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly createdById: CodecTypes['pg/text@1']['output'];
+      readonly enabled: CodecTypes['pg/bool@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly projectId: CodecTypes['pg/uuid@1']['output'];
+      readonly repoFullName: CodecTypes['pg/text@1']['output'];
+      readonly secretCiphertext: CodecTypes['pg/text@1']['output'];
+      readonly secretHint: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    };
+    readonly github_delivery: {
+      readonly connectionId: CodecTypes['pg/uuid@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly deliveryId: CodecTypes['pg/text@1']['output'];
+      readonly event: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+    };
+    readonly github_pull_link: {
+      readonly authorLogin: CodecTypes['pg/text@1']['output'] | null;
+      readonly connectionId: CodecTypes['pg/uuid@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly mergedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+      readonly prNumber: CodecTypes['pg/int4@1']['output'];
+      readonly state: CodecTypes['pg/text@1']['output'];
+      readonly taskId: CodecTypes['pg/uuid@1']['output'];
+      readonly title: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+      readonly url: CodecTypes['pg/text@1']['output'];
+    };
     readonly idempotency_key: {
       readonly actorId: CodecTypes['pg/text@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -2590,6 +2686,38 @@ export type StorageColumnInputTypes = {
       readonly storageKey: CodecTypes['pg/text@1']['input'];
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly uploadedById: CodecTypes['pg/text@1']['input'];
+    };
+    readonly github_connection: {
+      readonly autoCompleteOnMerge: CodecTypes['pg/bool@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly createdById: CodecTypes['pg/text@1']['input'];
+      readonly enabled: CodecTypes['pg/bool@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly projectId: CodecTypes['pg/uuid@1']['input'];
+      readonly repoFullName: CodecTypes['pg/text@1']['input'];
+      readonly secretCiphertext: CodecTypes['pg/text@1']['input'];
+      readonly secretHint: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+    };
+    readonly github_delivery: {
+      readonly connectionId: CodecTypes['pg/uuid@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly deliveryId: CodecTypes['pg/text@1']['input'];
+      readonly event: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+    };
+    readonly github_pull_link: {
+      readonly authorLogin: CodecTypes['pg/text@1']['input'] | null;
+      readonly connectionId: CodecTypes['pg/uuid@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly mergedAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
+      readonly prNumber: CodecTypes['pg/int4@1']['input'];
+      readonly state: CodecTypes['pg/text@1']['input'];
+      readonly taskId: CodecTypes['pg/uuid@1']['input'];
+      readonly title: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-date@1']['input'];
+      readonly url: CodecTypes['pg/text@1']['input'];
     };
     readonly idempotency_key: {
       readonly actorId: CodecTypes['pg/text@1']['input'];
@@ -3389,6 +3517,48 @@ export namespace Models {
     uploadedBy: public_User;
     readonly [RelationKeys]?: 'bugEvidence' | 'deletedBy' | 'project' | 'task' | 'uploadedBy';
   };
+  export type public_GithubConnection = {
+    autoCompleteOnMerge: CodecTypes['pg/bool@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    createdById: CodecTypes['pg/text@1']['output'];
+    enabled: CodecTypes['pg/bool@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    projectId: CodecTypes['pg/uuid@1']['output'];
+    repoFullName: CodecTypes['pg/text@1']['output'];
+    secretCiphertext: CodecTypes['pg/text@1']['output'];
+    secretHint: CodecTypes['pg/text@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    createdBy: public_User;
+    deliveries: public_GithubDelivery[];
+    project: public_Project;
+    pulls: public_GithubPullLink[];
+    readonly [RelationKeys]?: 'createdBy' | 'deliveries' | 'project' | 'pulls';
+  };
+  export type public_GithubDelivery = {
+    connectionId: CodecTypes['pg/uuid@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    deliveryId: CodecTypes['pg/text@1']['output'];
+    event: CodecTypes['pg/text@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    connection: public_GithubConnection;
+    readonly [RelationKeys]?: 'connection';
+  };
+  export type public_GithubPullLink = {
+    authorLogin: CodecTypes['pg/text@1']['output'] | null;
+    connectionId: CodecTypes['pg/uuid@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    mergedAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
+    prNumber: CodecTypes['pg/int4@1']['output'];
+    state: CodecTypes['pg/text@1']['output'];
+    taskId: CodecTypes['pg/uuid@1']['output'];
+    title: CodecTypes['pg/text@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-date@1']['output'];
+    url: CodecTypes['pg/text@1']['output'];
+    connection: public_GithubConnection;
+    task: public_Task;
+    readonly [RelationKeys]?: 'connection' | 'task';
+  };
   export type public_IdempotencyKey = {
     actorId: CodecTypes['pg/text@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-date@1']['output'];
@@ -3507,6 +3677,7 @@ export namespace Models {
     bugReports: public_BugReport[];
     clientCompanies: public_ClientCompanyProject[];
     files: public_FileAsset[];
+    githubConnections: public_GithubConnection[];
     intakeForms: public_IntakeForm[];
     lead: public_User | null;
     taskCounter: public_ProjectTaskCounter | null;
@@ -3518,6 +3689,7 @@ export namespace Models {
       | 'bugReports'
       | 'clientCompanies'
       | 'files'
+      | 'githubConnections'
       | 'intakeForms'
       | 'lead'
       | 'taskCounter'
@@ -3673,6 +3845,7 @@ export namespace Models {
     bugReport: public_BugReport | null;
     createdBy: public_User;
     files: public_FileAsset[];
+    githubLinks: public_GithubPullLink[];
     project: public_Project;
     recurrenceSources: public_RecurrenceGeneration[];
     recurrenceSuccessor: public_RecurrenceGeneration | null;
@@ -3684,6 +3857,7 @@ export namespace Models {
       | 'bugReport'
       | 'createdBy'
       | 'files'
+      | 'githubLinks'
       | 'project'
       | 'recurrenceSources'
       | 'recurrenceSuccessor'
@@ -3850,6 +4024,7 @@ export namespace Models {
     clientCompanyHandlerships: public_ClientCompanyHandler[];
     createdBugRelations: public_BugRelation[];
     createdClientCompanies: public_ClientCompany[];
+    createdGithubConnections: public_GithubConnection[];
     createdIntakeForms: public_IntakeForm[];
     deactivatedBy: public_User | null;
     deactivatedClientCompanies: public_ClientCompany[];
@@ -3882,6 +4057,7 @@ export namespace Models {
       | 'clientCompanyHandlerships'
       | 'createdBugRelations'
       | 'createdClientCompanies'
+      | 'createdGithubConnections'
       | 'createdIntakeForms'
       | 'deactivatedBy'
       | 'deactivatedClientCompanies'
@@ -3977,6 +4153,9 @@ export declare const models: {
     FavoriteProject: Models.public_FavoriteProject;
     FavoriteTask: Models.public_FavoriteTask;
     FileAsset: Models.public_FileAsset;
+    GithubConnection: Models.public_GithubConnection;
+    GithubDelivery: Models.public_GithubDelivery;
+    GithubPullLink: Models.public_GithubPullLink;
     IdempotencyKey: Models.public_IdempotencyKey;
     IntakeForm: Models.public_IntakeForm;
     IntakeSubmission: Models.public_IntakeSubmission;
@@ -6955,6 +7134,307 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly github_connection: {
+              columns: {
+                readonly autoCompleteOnMerge: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly createdById: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly enabled: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly repoFullName: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly secretCiphertext: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly secretHint: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['repoFullName'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'github_connection_createdById_idx_8bf640ed';
+                  readonly prefix: 'github_connection_createdById_idx';
+                  readonly columns: readonly ['createdById'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'github_connection_projectId_idx_a96e4d92';
+                  readonly prefix: 'github_connection_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_connection';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_connection';
+                    readonly columns: readonly ['createdById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly github_delivery: {
+              columns: {
+                readonly connectionId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly deliveryId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly event: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['connectionId', 'deliveryId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'github_delivery_connectionId_idx_b3eeb6ac';
+                  readonly prefix: 'github_delivery_connectionId_idx';
+                  readonly columns: readonly ['connectionId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'github_delivery_createdAt_idx_9575dbd7';
+                  readonly prefix: 'github_delivery_createdAt_idx';
+                  readonly columns: readonly ['createdAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_delivery';
+                    readonly columns: readonly ['connectionId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_connection';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly github_pull_link: {
+              columns: {
+                readonly authorLogin: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly connectionId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly mergedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly prNumber: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly state: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'open'>;
+                  };
+                  readonly many: false;
+                };
+                readonly taskId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly title: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly url: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['connectionId', 'taskId', 'prNumber'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'github_pull_link_connectionId_idx_b3eeb6ac';
+                  readonly prefix: 'github_pull_link_connectionId_idx';
+                  readonly columns: readonly ['connectionId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'github_pull_link_taskId_idx_4965c936';
+                  readonly prefix: 'github_pull_link_taskId_idx';
+                  readonly columns: readonly ['taskId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_pull_link';
+                    readonly columns: readonly ['connectionId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_connection';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'github_pull_link';
+                    readonly columns: readonly ['taskId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'task';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -10732,6 +11212,18 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'FileAsset';
     };
+    readonly github_connection: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'GithubConnection';
+    };
+    readonly github_delivery: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'GithubDelivery';
+    };
+    readonly github_pull_link: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'GithubPullLink';
+    };
     readonly idempotency_key: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'IdempotencyKey';
@@ -13167,6 +13659,266 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly GithubConnection: {
+            readonly fields: {
+              readonly autoCompleteOnMerge: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly createdById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly enabled: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly repoFullName: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly secretCiphertext: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly secretHint: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly createdBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['createdById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly deliveries: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubDelivery';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['connectionId'];
+                };
+              };
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly pulls: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubPullLink';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['connectionId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'github_connection';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly autoCompleteOnMerge: { readonly column: 'autoCompleteOnMerge' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly createdById: { readonly column: 'createdById' };
+                readonly enabled: { readonly column: 'enabled' };
+                readonly id: { readonly column: 'id' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly repoFullName: { readonly column: 'repoFullName' };
+                readonly secretCiphertext: { readonly column: 'secretCiphertext' };
+                readonly secretHint: { readonly column: 'secretHint' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly GithubDelivery: {
+            readonly fields: {
+              readonly connectionId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly deliveryId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly event: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+            };
+            readonly relations: {
+              readonly connection: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubConnection';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['connectionId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'github_delivery';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly connectionId: { readonly column: 'connectionId' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly deliveryId: { readonly column: 'deliveryId' };
+                readonly event: { readonly column: 'event' };
+                readonly id: { readonly column: 'id' };
+              };
+            };
+          };
+          readonly GithubPullLink: {
+            readonly fields: {
+              readonly authorLogin: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly connectionId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly mergedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly prNumber: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly state: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly taskId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly title: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                };
+              };
+              readonly url: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly connection: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubConnection';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['connectionId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly task: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['taskId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'github_pull_link';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly authorLogin: { readonly column: 'authorLogin' };
+                readonly connectionId: { readonly column: 'connectionId' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly mergedAt: { readonly column: 'mergedAt' };
+                readonly prNumber: { readonly column: 'prNumber' };
+                readonly state: { readonly column: 'state' };
+                readonly taskId: { readonly column: 'taskId' };
+                readonly title: { readonly column: 'title' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly url: { readonly column: 'url' };
+              };
+            };
+          };
           readonly IdempotencyKey: {
             readonly fields: {
               readonly actorId: {
@@ -13856,6 +14608,17 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'FileAsset';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
+              readonly githubConnections: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubConnection';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -14788,6 +15551,17 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'FileAsset';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['taskId'];
+                };
+              };
+              readonly githubLinks: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubPullLink';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -15876,6 +16650,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['createdById'];
                 };
               };
+              readonly createdGithubConnections: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'GithubConnection';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['createdById'];
+                };
+              };
               readonly createdIntakeForms: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -16717,6 +17502,30 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'file_asset';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'github_connection';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'github_delivery';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'github_pull_link';
             readonly field: 'id';
             readonly namespace: 'public';
           };

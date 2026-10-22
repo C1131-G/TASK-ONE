@@ -1,0 +1,17 @@
+// use prisma-8
+
+// One accepted GitHub delivery id per connection. The unique pair makes a
+// redelivered or replayed event take effect at most once.
+model GithubDelivery {
+  id           Uuid @id @default(uuid())
+  connectionId Uuid
+  deliveryId   String
+  event        String
+  createdAt    TimestamptzJsDate @default(now())
+
+  connection GithubConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, deliveryId])
+  @@index([createdAt])
+  @@map("github_delivery")
+}

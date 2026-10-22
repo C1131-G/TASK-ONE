@@ -26,6 +26,7 @@ model Project {
   files FileAsset[]
   clientCompanies ClientCompanyProject[]
   intakeForms IntakeForm[]
+  githubConnections GithubConnection[]
   budget ProjectBudget?
 
   team       Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)

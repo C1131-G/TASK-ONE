@@ -15,7 +15,7 @@ The `runner` image declares a `HEALTHCHECK` against `GET /api/health`, the readi
 
 ### Data retention
 
-The daily maintenance run enqueues `maintenance.purge-expired-data`, which deletes, in batches of 5,000 rows: completed jobs older than 14 days, dead jobs older than 30 days, push delivery records older than 30 days, finished webhook delivery logs older than 30 days (pending and retrying deliveries are kept), expired idempotency keys, sessions and verification tokens, and rate-limit counters idle for a day. Override the windows with `RETENTION_COMPLETED_JOB_DAYS`, `RETENTION_DEAD_JOB_DAYS`, `RETENTION_PUSH_DELIVERY_DAYS` and `RETENTION_WEBHOOK_DELIVERY_DAYS` (whole days). Audit events are never purged by this job; they are the compliance record and need an explicit retention decision.
+The daily maintenance run enqueues `maintenance.purge-expired-data`, which deletes, in batches of 5,000 rows: completed jobs older than 14 days, dead jobs older than 30 days, push delivery records older than 30 days, finished webhook delivery logs older than 30 days (pending and retrying deliveries are kept), GitHub delivery ids older than 30 days (the replay guard for the GitHub integration; they follow the same override as webhook deliveries), expired idempotency keys, sessions and verification tokens, and rate-limit counters idle for a day. Override the windows with `RETENTION_COMPLETED_JOB_DAYS`, `RETENTION_DEAD_JOB_DAYS`, `RETENTION_PUSH_DELIVERY_DAYS` and `RETENTION_WEBHOOK_DELIVERY_DAYS` (whole days). Audit events are never purged by this job; they are the compliance record and need an explicit retention decision.
 
 ### Server Actions encryption key
 

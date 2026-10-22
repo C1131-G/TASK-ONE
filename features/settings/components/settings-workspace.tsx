@@ -211,6 +211,9 @@ const SettingsWorkspace = ({
               <div className="panel-b">
                 <Link className="btn btn-secondary" href="/settings/webhooks">
                   Webhooks and Slack
+                </Link>{" "}
+                <Link className="btn btn-secondary" href="/settings/github">
+                  GitHub
                 </Link>
               </div>
             </section>

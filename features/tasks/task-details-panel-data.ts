@@ -1,6 +1,7 @@
 import "server-only";
 import { getBugHistory } from "@/features/bugs/bugs-queries";
 import { listTaskFilesAction } from "@/features/files/actions/files-upload-requests";
+import { getTaskLinkedPulls } from "@/features/github/github-queries";
 import { listTaskCommentsAction } from "@/features/tasks/actions/tasks-comments";
 import { listTaskSubtasksAction } from "@/features/tasks/actions/tasks-subtasks";
 import { getProjectTask } from "@/features/tasks/tasks-queries";
@@ -29,7 +30,7 @@ export const readTaskBundle = async (
   taskId: string,
   bugId?: string
 ) => {
-  const [task, comments, subtasks, files, bugHistory, time, timer] =
+  const [task, comments, subtasks, files, bugHistory, time, timer, pulls] =
     await Promise.all([
       getProjectTask({ projectId, taskId }),
       listTaskCommentsAction({ taskId }),
@@ -38,8 +39,9 @@ export const readTaskBundle = async (
       bugId ? getBugHistory({ bugId }) : Promise.resolve(null),
       getTaskTime({ taskId }),
       getRunningTimer({}),
+      getTaskLinkedPulls({ taskId }),
     ]);
-  return { bugHistory, comments, files, subtasks, task, time, timer };
+  return { bugHistory, comments, files, pulls, subtasks, task, time, timer };
 };
 
 export type TaskBundle = Awaited<ReturnType<typeof readTaskBundle>>;

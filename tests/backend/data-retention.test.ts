@@ -211,6 +211,7 @@ it("is idempotent when the purge runs again", async () => {
   expect(report).toEqual({
     completedJobs: 0,
     deadJobs: 0,
+    githubDeliveries: 0,
     idempotencyKeys: 0,
     pushDeliveries: 0,
     rateLimits: 0,

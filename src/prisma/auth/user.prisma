@@ -61,6 +61,7 @@ model User {
   assignedClientCompanyHandlers ClientCompanyHandler[] @relation("ClientCompanyHandlerAssigner")
   pickedBugs BugReport[] @relation("BugPicker")
   createdIntakeForms IntakeForm[] @relation("IntakeFormCreator")
+  createdGithubConnections GithubConnection[] @relation("GithubConnectionCreator")
   auditEventsAsActor AuditEvent[] @relation("AuditEventActor")
   auditEventsAsSubject AuditEvent[] @relation("AuditEventSubject")
 
