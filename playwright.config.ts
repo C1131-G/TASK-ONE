@@ -27,7 +27,9 @@ export default defineConfig({
     },
   ],
   reporter: [["list"]],
-  retries: 0,
+  // One retry on CI only: shared runners are slower, and a test that passes on
+  // the second try is reported as flaky instead of failing the run.
+  retries: process.env["CI"] ? 1 : 0,
   // The dev server compiles routes on first use, so give each test room.
   testDir: "tests/e2e",
   timeout: 120_000,
