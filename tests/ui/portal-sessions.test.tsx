@@ -24,7 +24,8 @@ const session = (overrides: Partial<TestSession> = {}): TestSession => ({
   expiresAt: "2026-10-20T16:00:00.000Z",
   id: "11111111-1111-4111-8111-111111111111",
   ipAddress: "203.0.113.7",
-  userAgent: "Firefox on Windows",
+  userAgent:
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
   ...overrides,
 });
 
@@ -45,6 +46,18 @@ test("lists each signed-in device with where it signed in from", () => {
   expect(markup).toContain("203.0.113.7");
   expect(markup).toContain("Browser session");
   expect(markup).toContain("Unknown network");
+});
+
+test("shows a short device name instead of the raw browser string", () => {
+  const markup = render([
+    session({
+      userAgent:
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/131.0.6778.33 Safari/537.36",
+    }),
+  ]);
+
+  expect(markup).toContain("Chrome on Linux");
+  expect(markup).not.toContain("HeadlessChrome");
 });
 
 test("offers a sign-out button named after the device for every session", () => {

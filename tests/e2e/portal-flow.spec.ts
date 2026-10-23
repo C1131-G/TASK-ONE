@@ -34,7 +34,9 @@ const SCREENSHOT = Buffer.from(
 
 let bugUrl = "";
 
-test.describe.configure({ mode: "serial" });
+// Serial and stateful: the first test uses up a temporary password, so a CI
+// retry would replay it against an account that has already moved on.
+test.describe.configure({ mode: "serial", retries: 0 });
 
 const expectNoViolations = async (page: Page, where: string) => {
   await settleAnimations(page);

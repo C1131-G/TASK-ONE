@@ -51,6 +51,19 @@
 .portal-app .portal-account {
   display: grid;
 }
+/* Signed-in devices: let a row wrap so a long network name or the sign-out
+   button never pushes the page sideways on a narrow phone. */
+.portal-app .portal-account .mini {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding-block: 10px;
+  cursor: default;
+}
+.portal-app .portal-account .mini .grow {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .portal-app .portal-bug-card {

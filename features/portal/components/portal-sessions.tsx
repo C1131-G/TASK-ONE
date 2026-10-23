@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/workspace/empty-state";
 import { LocalTime } from "@/components/workspace/local-time";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
+import { describeDevice } from "@/features/portal/portal-device";
 import { revokeSessionAction } from "@/features/user/user-actions";
 
 interface PortalSessionSummary {
@@ -21,7 +22,7 @@ interface PortalSessionSummary {
 }
 
 const deviceName = (session: PortalSessionSummary): string =>
-  session.userAgent || "Browser session";
+  describeDevice(session.userAgent);
 
 // Lets a client see where they are signed in and end any of those sessions,
 // the same way staff can from Settings.
