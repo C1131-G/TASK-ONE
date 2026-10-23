@@ -45,15 +45,17 @@ export interface RouteReply<Data = unknown> {
   readonly status: number;
 }
 
-type Handler = (
+type Params = Record<string, string>;
+
+type Handler<Context extends Params> = (
   request: Request,
-  context: { params: Promise<Record<string, string>> }
+  context: { params: Promise<Context> }
 ) => Promise<Response>;
 
-export interface RouteCall {
+export interface RouteCall<Context extends Params = Params> {
   readonly body?: unknown;
   readonly key?: string | null;
-  readonly params?: Record<string, string>;
+  readonly params?: Context;
   readonly query?: Record<string, string>;
   readonly token?: string;
 }
@@ -61,7 +63,7 @@ export interface RouteCall {
 // Calls a route handler the way Next does: a Request carrying a bearer token
 // and a promise of the path parameters.
 export const callRoute = async <Data = unknown>(
-  handler: Handler,
+  handler: Handler<Params>,
   method: "GET" | "POST" | "PATCH" | "DELETE",
   path: string,
   call: RouteCall = {}

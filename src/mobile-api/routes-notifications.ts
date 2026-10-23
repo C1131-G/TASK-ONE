@@ -52,6 +52,34 @@ export const listWorkspaceNotificationsRoute = {
     "The caller's notifications, newest first, one page at a time, with the unread counts.",
 } as const satisfies RouteDefinition;
 
+const NotificationIdParamsSchema = Schema.Struct({
+  id: Schema.String.check(Schema.isUUID()),
+});
+
+const DoneSchema = Schema.Struct({ done: Schema.Literal(true) });
+const CountSchema = Schema.Struct({ count: Schema.Number });
+
+export const markWorkspaceNotificationReadRoute = {
+  data: DoneSchema,
+  method: "post",
+  operationId: "markWorkspaceNotificationRead",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/workspace/notifications/{id}/read",
+  summary:
+    "Mark one of the caller's notifications read. Repeating it changes nothing.",
+} as const satisfies RouteDefinition;
+
+export const markAllWorkspaceNotificationsReadRoute = {
+  data: CountSchema,
+  method: "post",
+  operationId: "markAllWorkspaceNotificationsRead",
+  path: "/api/v1/workspace/notifications/read-all",
+  summary:
+    "Mark every unread notification of the caller read; answers how many changed.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
+  markWorkspaceNotificationReadRoute,
+  markAllWorkspaceNotificationsReadRoute,
 ] as const satisfies readonly RouteDefinition[];
