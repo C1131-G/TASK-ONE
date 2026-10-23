@@ -72,6 +72,29 @@ export const TaskApprovalsSchema = Schema.Struct({
 });
 export type TaskApprovals = typeof TaskApprovalsSchema.Type;
 
+// What the project's Approvals view shows: every request for its tasks and
+// milestones, and, for administrators, the choices the milestone form offers.
+export const ProjectApprovalSchema = Schema.Struct({
+  ...StaffApprovalSchema.fields,
+  subjectKind: Schema.Literals(["task", "milestone"]),
+  subjectTitle: Schema.String,
+});
+
+export const ProjectApprovalsSchema = Schema.Struct({
+  canRequest: Schema.Boolean,
+  companies: Schema.Array(
+    Schema.Struct({ id: UUIDSchema, name: Schema.String })
+  ),
+  files: Schema.Array(
+    Schema.Struct({ id: UUIDSchema, originalName: Schema.String })
+  ),
+  milestones: Schema.Array(
+    Schema.Struct({ id: UUIDSchema, name: Schema.String })
+  ),
+  requests: Schema.Array(ProjectApprovalSchema),
+});
+export type ProjectApprovals = typeof ProjectApprovalsSchema.Type;
+
 export const PortalApprovalSummarySchema = Schema.Struct({
   decidedAt: Schema.NullOr(Schema.String),
   fileCount: Schema.Number,
@@ -151,5 +174,9 @@ export class Approvals extends Context.Service<
       actorId: string,
       taskId: string
     ) => Effect.Effect<TaskApprovals, AppError>;
+    readonly forProject: (
+      actorId: string,
+      projectId: string
+    ) => Effect.Effect<ProjectApprovals, AppError>;
   }
 >()("metsys/server/Approvals") {}

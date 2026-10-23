@@ -11,6 +11,7 @@ import {
   Lightning,
   ListPlus,
   List,
+  SealCheck,
   SquaresFour,
   Table,
   Pulse,
@@ -29,6 +30,7 @@ const views = [
   { Icon: ChartLineUp, id: "timeline", label: "Timeline" },
   { Icon: Files, id: "files", label: "Files" },
   { Icon: Pulse, id: "activity", label: "Activity" },
+  { Icon: SealCheck, id: "approvals", label: "Approvals" },
 ] as const;
 
 // Rules and their run log are for administrators only.

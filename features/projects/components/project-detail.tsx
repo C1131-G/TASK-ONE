@@ -8,6 +8,7 @@ import {
   List,
   Pulse,
   CaretDown,
+  SealCheck,
   SquaresFour,
   Table,
 } from "@phosphor-icons/react/dist/ssr";
@@ -195,6 +196,7 @@ const VIEWS = [
   { Icon: ChartLineUp, label: "Timeline" },
   { Icon: Files, label: "Files" },
   { Icon: Pulse, label: "Activity" },
+  { Icon: SealCheck, label: "Approvals" },
 ] as const;
 
 const COLUMNS = ["Backlog", "To Do", "In Progress", "Review", "Done"] as const;

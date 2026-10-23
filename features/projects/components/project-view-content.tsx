@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import type { listActivity } from "@/features/activity/activity-queries";
 import { ProjectActivityFeed } from "@/features/activity/components/project-activity-feed";
+import { ProjectApprovals } from "@/features/approvals/components/project-approvals";
 import type { listBugs } from "@/features/bugs/bugs-queries";
 import { ProjectBugs } from "@/features/bugs/components/project-bugs";
 import type { listCalendarEvents } from "@/features/calendar/calendar-queries";
@@ -210,6 +211,10 @@ const renderProjectActivity = ({
   />
 );
 
+const renderProjectApprovals = ({ project }: ProjectViewContentProps) => (
+  <ProjectApprovals projectId={project.id} />
+);
+
 const renderProjectBugs = ({
   bugResult,
   project,
@@ -300,6 +305,7 @@ const projectViewRenderers: Readonly<
   Record<string, (props: ProjectViewContentProps) => ReactNode>
 > = {
   activity: renderProjectActivity,
+  approvals: renderProjectApprovals,
   automations: renderProjectAutomations,
   board: renderProjectBoard,
   bugs: renderProjectBugs,

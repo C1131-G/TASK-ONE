@@ -157,6 +157,7 @@ export const PortalBugReceiptSchema = Schema.Struct({
 });
 
 export const PortalNotificationSchema = Schema.Struct({
+  approvalId: Schema.NullOr(UUIDSchema),
   bugId: Schema.NullOr(UUIDSchema),
   createdAt: Schema.String,
   id: UUIDSchema,
