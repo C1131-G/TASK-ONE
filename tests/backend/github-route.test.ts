@@ -7,6 +7,7 @@ import {
   GithubConnections,
   GithubConnectionsLive,
 } from "../../src/server/github/github-connections";
+import { GITHUB_DELIVERY_RATE_LIMIT } from "../../src/server/github/github-rate-limit";
 import { signGithubBody } from "../../src/server/github/github-signature";
 import {
   authPool,
@@ -618,4 +619,26 @@ it("ignores actions that carry no pull request change", async () => {
   });
   expect(result.json).toMatchObject({ status: "ignored" });
   expect(await linksFor(task.id)).toEqual([]);
+});
+
+const postFrom = (ip: string) =>
+  POST(
+    new Request(URL_PATH, {
+      body: "{}",
+      headers: { "x-forwarded-for": ip },
+      method: "POST",
+    })
+  );
+
+it("throttles one client address before checking any signature", async () => {
+  for (let count = 0; count < GITHUB_DELIVERY_RATE_LIMIT; count += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const accepted = await postFrom("203.0.113.50");
+    expect(accepted.status).toBe(400);
+  }
+  const limited = await postFrom("203.0.113.50");
+  expect(limited.status).toBe(429);
+  expect(Number(limited.headers.get("retry-after"))).toBeGreaterThan(0);
+  const otherClient = await postFrom("203.0.113.51");
+  expect(otherClient.status).toBe(400);
 });

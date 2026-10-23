@@ -20,8 +20,10 @@ export interface EmailNotice {
   readonly now: Date;
 }
 
-// Queues one instant email job per person who switched this event on for
-// email and has not chosen the daily digest. The job re-checks both when it
+// Records one email job per person who switched this event on for email. A
+// person on the daily digest gets the job already completed: nothing sends it,
+// and the digest reads these rows (see email-digest.ts) so events they turned
+// off in-app still reach it. Everyone else's job re-checks preferences when it
 // runs, so this only avoids queueing work nobody asked for.
 export const enqueueEmails = async (
   transaction: Transaction,
@@ -58,13 +60,11 @@ export const enqueueEmails = async (
   const digestUsers = new Set(digests.map(({ userId }) => userId));
   await Promise.all(
     enabled.flatMap(({ userId }) => {
-      if (digestUsers.has(userId)) {
-        return [];
-      }
       const notificationId = notificationIds.get(userId) ?? randomUUID();
       return [
         transaction.orm.public.Job.create({
           availableAt: notice.now,
+          completedAt: digestUsers.has(userId) ? notice.now : null,
           createdAt: notice.now,
           dedupeKey: `email:${notificationId}`,
           id: randomUUID(),

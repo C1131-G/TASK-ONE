@@ -11,18 +11,22 @@ import {
   Clock,
   Files,
   FolderOpen,
+  Gauge,
   GearSix,
+  GithubLogo,
   House,
   Keyboard,
   ListChecks,
   MagnifyingGlass,
   Plus,
   Pulse,
+  Scales,
   SquaresFour,
   Star,
   Tray,
   UserPlus,
   UsersThree,
+  WebhooksLogo,
 } from "@phosphor-icons/react";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
@@ -83,10 +87,16 @@ const pages = [
 const COMMAND_ICONS = {
   "assign-task": UsersThree,
   "create-task": Plus,
+  "go-budgets": Gauge,
+  "go-github": GithubLogo,
   "go-home": House,
   "go-inbox": Tray,
+  "go-intake-forms": Tray,
+  "go-my-time": Clock,
   "go-projects": FolderOpen,
   "go-tasks": ListChecks,
+  "go-webhooks": WebhooksLogo,
+  "go-workload": Scales,
   "invite-member": UserPlus,
   "new-project": FolderOpen,
   "set-status": CheckCircle,
@@ -114,6 +124,9 @@ const isTaskControlId = (id: CommandId): id is TaskControlId =>
 // Navigation commands that have a "Go to" key show it beside their page below.
 const isPageShortcut = (command: WorkspaceCommand) =>
   command.group === "Navigate";
+
+const GO_TO_PREFIX = /^Go to /u;
+const listedHrefs = new Set<string>(pages.map(({ href }) => href));
 
 const WorkspaceSearchPalette = ({
   projects,
@@ -145,6 +158,13 @@ const WorkspaceSearchPalette = ({
     commands.flatMap(({ href, keys }) =>
       href && keys.length > 0 ? [[href, keys] as const] : []
     )
+  );
+  // Pages the viewer may open that the fixed list above does not carry.
+  const extraPages = commands.filter(
+    (command) =>
+      command.href !== undefined &&
+      isPageShortcut(command) &&
+      !listedHrefs.has(command.href)
   );
   const toggleKeys = getPaletteToggleKeys(isMac);
 
@@ -281,6 +301,26 @@ const WorkspaceSearchPalette = ({
                   </CommandShortcut>
                 </CommandItem>
               ))}
+              {extraPages.map((command) => {
+                const Icon = COMMAND_ICONS[command.id];
+                const { href } = command;
+                return href ? (
+                  <CommandItem
+                    key={command.id}
+                    onSelect={() => navigate(href)}
+                    value={`${command.label} ${href}`}
+                  >
+                    <Icon aria-hidden="true" size={16} />
+                    {command.label.replace(GO_TO_PREFIX, "")}
+                    <CommandShortcut>
+                      {pathname === href ? (
+                        <span className="mr-2">Current</span>
+                      ) : null}
+                      <ShortcutKeys keys={command.keys} />
+                    </CommandShortcut>
+                  </CommandItem>
+                ) : null;
+              })}
             </CommandGroup>
             {projects.length ? (
               <CommandGroup heading="Projects">

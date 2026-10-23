@@ -7,6 +7,7 @@ import { authPool } from "../../src/server/auth/database";
 import {
   DATA_RETENTION_JOB,
   purgeExpiredData,
+  retentionPolicyFromEnv,
 } from "../../src/server/jobs/data-retention";
 import { JobHandlers } from "../../src/server/jobs/job-handlers";
 import { JobHandlersLive } from "../../src/server/jobs/job-handlers-live";
@@ -28,6 +29,8 @@ const ids = {
   deadJobOld: randomUUID(),
   doneJobNew: randomUUID(),
   doneJobsOld: [randomUUID(), randomUUID(), randomUUID()],
+  emailNew: randomUUID(),
+  emailOld: randomUUID(),
   idempotencyLive: randomUUID(),
   idempotencyOld: randomUUID(),
   pendingJobOld: randomUUID(),
@@ -115,6 +118,10 @@ const seed = async () => {
     ]
   );
   await authPool.query(
+    'INSERT INTO email_delivery (id, "dedupeKey", "userId", "sentAt") VALUES ($1, \'retention-email-old-\' || $3::text, $3, $4), ($2, \'retention-email-new-\' || $3::text, $3, $5)',
+    [ids.emailOld, ids.emailNew, userId, daysAgo(91), daysAgo(89)]
+  );
+  await authPool.query(
     'INSERT INTO push_delivery (id, "notificationId", "userId", "endpointHash", "deliveredAt", "createdAt") VALUES ($1, $1, $3, \'e\', $4, $4), ($2, $2, $3, \'e\', $5, $5)',
     [ids.pushOld, ids.pushNew, userId, daysAgo(31), daysAgo(29)]
   );
@@ -139,6 +146,9 @@ const cleanup = async () => {
   await authPool.query('DELETE FROM "rateLimit" WHERE key = ANY($1)', [
     [ids.rateLimitStale, ids.rateLimitFresh],
   ]);
+  await authPool.query('DELETE FROM email_delivery WHERE "userId" = $1', [
+    userId,
+  ]);
   await authPool.query('DELETE FROM push_delivery WHERE "userId" = $1', [
     userId,
   ]);
@@ -154,6 +164,7 @@ const existing = async (table: string, column: string, values: string[]) => {
 };
 
 const remainingRows = async () => ({
+  email: await existing("email_delivery", "id", [ids.emailOld, ids.emailNew]),
   idempotency: await existing("idempotency_key", "id", [
     ids.idempotencyOld,
     ids.idempotencyLive,
@@ -178,6 +189,7 @@ const remainingRows = async () => ({
 });
 
 const expectedRemaining = {
+  email: [ids.emailNew],
   idempotency: [ids.idempotencyLive],
   jobs: [ids.doneJobNew, ids.deadJobNew, ids.pendingJobOld].toSorted(),
   push: [ids.pushNew],
@@ -202,6 +214,15 @@ it("purges only rows past their retention window, in small batches", async () =>
   expect(report.verifications).toBeGreaterThanOrEqual(1);
   expect(report.rateLimits).toBeGreaterThanOrEqual(1);
   expect(report.pushDeliveries).toBeGreaterThanOrEqual(1);
+  expect(report.emailDeliveries).toBeGreaterThanOrEqual(1);
+});
+
+it("keeps email receipts for 90 days by default and accepts an override", () => {
+  expect(retentionPolicyFromEnv({}).emailDeliveryDays).toBe(90);
+  expect(
+    retentionPolicyFromEnv({ RETENTION_EMAIL_DELIVERY_DAYS: "7" })
+      .emailDeliveryDays
+  ).toBe(7);
 });
 
 it("is idempotent when the purge runs again", async () => {
@@ -212,6 +233,7 @@ it("is idempotent when the purge runs again", async () => {
     automationRuns: 0,
     completedJobs: 0,
     deadJobs: 0,
+    emailDeliveries: 0,
     githubDeliveries: 0,
     idempotencyKeys: 0,
     pushDeliveries: 0,

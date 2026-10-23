@@ -190,11 +190,13 @@ export const updateTask = (
         await enqueueTaskFieldEvents(transaction, {
           after: {
             assigneeIds,
+            dueDate: rawInput.dueDate,
             priority: rawInput.priority,
             status: rawInput.status,
           },
           before: {
             assigneeIds: [...previouslyAssigned],
+            dueDate: task.dueDate,
             priority: task.priority,
             status: task.status,
           },

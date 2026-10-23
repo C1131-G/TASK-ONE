@@ -56,6 +56,7 @@ const retentionFields = {
   RETENTION_AUTOMATION_RUN_DAYS: retentionDays,
   RETENTION_COMPLETED_JOB_DAYS: retentionDays,
   RETENTION_DEAD_JOB_DAYS: retentionDays,
+  RETENTION_EMAIL_DELIVERY_DAYS: retentionDays,
   RETENTION_PUSH_DELIVERY_DAYS: retentionDays,
   RETENTION_WEBHOOK_DELIVERY_DAYS: retentionDays,
 };

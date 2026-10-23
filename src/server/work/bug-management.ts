@@ -4,6 +4,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { enqueueAutomationEvent } from "../automation/automation-enqueue";
 import { AppError } from "../core/action-result";
 import { UUIDSchema } from "../core/input-schemas";
 import type {
@@ -166,6 +167,15 @@ export const createBugReport = async (
     projectId: input.projectId,
     taskId: task.id,
   });
+  // Internal bugs never raise it; only client reports (portal and intake) do.
+  if (client) {
+    await enqueueAutomationEvent(transaction, {
+      now,
+      projectId: input.projectId,
+      taskId: task.id,
+      trigger: "bug_reported",
+    });
+  }
   return getBugInTransaction(transaction, id);
 };
 

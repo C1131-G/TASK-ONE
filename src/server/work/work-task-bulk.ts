@@ -185,11 +185,13 @@ const finishBulkTaskUpdate = async (
   await enqueueTaskFieldEvents(transaction, {
     after: {
       assigneeIds,
+      dueDate: updated.dueDate,
       priority: updated.priority,
       status: updated.status,
     },
     before: {
       assigneeIds: [...previousAssignees],
+      dueDate: task.dueDate,
       priority: task.priority,
       status: task.status,
     },

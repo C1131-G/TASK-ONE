@@ -4,6 +4,7 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { enqueueTaskFieldEvents } from "../automation/automation-enqueue";
 import { AppError } from "../core/action-result";
 import {
   assertOrdinaryTask,
@@ -112,6 +113,20 @@ export const rescheduleTask = (
             version,
           },
           id: randomUUID(),
+          projectId: task.projectId,
+          taskId,
+        });
+        // Only the due date is watched; a start-date-only move raises nothing.
+        const current = {
+          assigneeIds: assignments.map(({ userId }) => userId),
+          dueDate: task.dueDate,
+          priority: task.priority,
+          status: task.status,
+        };
+        await enqueueTaskFieldEvents(transaction, {
+          after: { ...current, dueDate: input.dueDate },
+          before: current,
+          now,
           projectId: task.projectId,
           taskId,
         });

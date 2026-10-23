@@ -11,6 +11,12 @@ export type CommandId =
   | "go-tasks"
   | "go-projects"
   | "go-inbox"
+  | "go-my-time"
+  | "go-workload"
+  | "go-budgets"
+  | "go-intake-forms"
+  | "go-webhooks"
+  | "go-github"
   | "new-project"
   | "invite-member"
   | "show-shortcuts";
@@ -141,6 +147,60 @@ const COMMANDS: readonly CommandDefinition[] = [
     isAvailable: always,
     keys: ["G", "I"],
     label: "Go to Inbox",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/my-time",
+    id: "go-my-time",
+    isAvailable: always,
+    keys: ["G", "M"],
+    label: "Go to My Time",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/workload",
+    id: "go-workload",
+    isAvailable: always,
+    keys: ["G", "W"],
+    label: "Go to Workload",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/budgets",
+    id: "go-budgets",
+    isAvailable: isAdmin,
+    keys: ["G", "B"],
+    label: "Go to Budgets",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/settings?section=intake",
+    id: "go-intake-forms",
+    isAvailable: isAdmin,
+    keys: [],
+    label: "Go to Intake forms",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/settings/webhooks",
+    id: "go-webhooks",
+    isAvailable: isAdmin,
+    keys: [],
+    label: "Go to Webhooks",
+    scope: "global",
+  },
+  {
+    group: "Navigate",
+    href: "/settings/github",
+    id: "go-github",
+    isAvailable: isAdmin,
+    keys: [],
+    label: "Go to GitHub",
     scope: "global",
   },
   {

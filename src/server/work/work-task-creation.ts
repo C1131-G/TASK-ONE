@@ -161,12 +161,16 @@ export const createTaskInTransaction = async (
       now,
     });
   }
-  await enqueueAutomationEvent(transaction, {
-    now,
-    projectId: input.projectId,
-    taskId,
-    trigger: type === "bug" ? "bug_reported" : "task_created",
-  });
+  // A bug's own event (bug_reported, client reports only) is raised once its
+  // report row exists.
+  if (type === "task") {
+    await enqueueAutomationEvent(transaction, {
+      now,
+      projectId: input.projectId,
+      taskId,
+      trigger: "task_created",
+    });
+  }
   return {
     assigneeIds: input.assigneeIds,
     createdById: actorId,
