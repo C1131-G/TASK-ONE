@@ -79,9 +79,14 @@ const fillPath = (route: RouteDefinition, params: unknown): string => {
     string,
     unknown
   >;
-  return route.path.replaceAll(/\{(?<name>[^}]+)\}/gu, (_match, name: string) =>
-    encodeURIComponent(String(encoded[name]))
-  );
+  return route.path
+    .split("/")
+    .map((segment) =>
+      segment.startsWith("{") && segment.endsWith("}")
+        ? encodeURIComponent(String(encoded[segment.slice(1, -1)]))
+        : segment
+    )
+    .join("/");
 };
 
 const buildUrl = (
