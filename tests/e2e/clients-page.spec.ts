@@ -10,8 +10,16 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const expectNoViolations = async (page: Page, where: string) => {
   await settleAnimations(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  // Name the offending elements, not only the rule, so a CI failure is enough
+  // to find the node without reproducing the run.
   expect(
-    results.violations.map((violation) => violation.id),
+    results.violations.map(
+      (violation) =>
+        `${violation.id}: ${violation.nodes
+          .slice(0, 5)
+          .map((node) => node.target.join(" "))
+          .join(" | ")}`
+    ),
     `axe violations on ${where}`
   ).toEqual([]);
 };

@@ -31,7 +31,7 @@ test.describe("Calendar (/calendar)", () => {
     page,
   }) => {
     await page.goto("/calendar");
-    const label = page.locator("h2.calendar-month-label");
+    const label = page.locator('h2.calendar-month-label[aria-live="polite"]');
     await expect(label).not.toBeEmpty();
     const current = (await label.textContent()) ?? "";
 
@@ -70,7 +70,9 @@ test.describe("Calendar (/calendar)", () => {
   }) => {
     await page.goto("/calendar?monthOffset=9999&calendarMode=bogus");
 
-    await expect(page.locator("h2.calendar-month-label")).not.toBeEmpty();
+    await expect(
+      page.locator('h2.calendar-month-label[aria-live="polite"]')
+    ).not.toBeEmpty();
     await expect(page.getByRole("link", { name: "Next month" })).toBeVisible();
   });
 
@@ -96,7 +98,9 @@ test.describe("Calendar (/calendar)", () => {
 
   test("the calendar passes axe", async ({ page }) => {
     await page.goto("/calendar");
-    await expect(page.locator("h2.calendar-month-label")).not.toBeEmpty();
+    await expect(
+      page.locator('h2.calendar-month-label[aria-live="polite"]')
+    ).not.toBeEmpty();
     await settleAnimations(page);
 
     const results = await new AxeBuilder({ page })

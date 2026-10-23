@@ -30,6 +30,16 @@ test.describe("inbox and notifications as employee", () => {
     await page.waitForLoadState("networkidle");
     const assigned = page.getByText("assigned you a task").first();
     const commented = page.getByText("commented on a task").first();
+    // These notifications come from scripts/seed-e2e-notifications.ts, which
+    // only runs against a local development database, so CI has none.
+    const seeded = await assigned
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    test.skip(
+      !seeded,
+      "Needs the notification fixture from scripts/seed-e2e-notifications.ts."
+    );
     await expect(assigned).toBeVisible();
 
     await page.getByRole("tab", { name: /^Comments/u }).click();

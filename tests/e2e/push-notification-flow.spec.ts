@@ -102,6 +102,12 @@ test.describe("Push notifications (flow)", () => {
     context,
     page,
   }) => {
+    // Reading delivered notifications back needs a full Chrome; the headless
+    // shell Playwright installs by default cannot list them.
+    test.skip(
+      !process.env["E2E_CHROMIUM_PATH"],
+      "Needs a full Chrome: set E2E_CHROMIUM_PATH to run this check."
+    );
     await context.grantPermissions(["notifications"]);
     await page.goto("/");
     await registerWorker(page);

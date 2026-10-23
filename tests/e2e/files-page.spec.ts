@@ -81,6 +81,16 @@ test.describe("Files (/files)", () => {
     const results = await new AxeBuilder({ page })
       .withTags(WCAG_TAGS)
       .analyze();
-    expect(results.violations.map((violation) => violation.id)).toEqual([]);
+    // Name the offending elements, not only the rule, so a CI failure is enough
+    // to find the node without reproducing the run.
+    expect(
+      results.violations.map(
+        (violation) =>
+          `${violation.id}: ${violation.nodes
+            .slice(0, 5)
+            .map((node) => node.target.join(" "))
+            .join(" | ")}`
+      )
+    ).toEqual([]);
   });
 });
