@@ -184,13 +184,20 @@ export const createPersona = async (
     throw new Error("The created test account could not be found.");
   }
   signInCounter = (signInCounter % 254) + 1;
+  const signInIp = `198.51.100.${signInCounter}`;
+  // Rate-limit rows live in the shared database, so another test file that
+  // happened to use this address a moment ago can push a harness sign-in over
+  // the limit on a fast machine. Start every harness sign-in from a clean slate.
+  await authPool.query('DELETE FROM "rateLimit" WHERE key LIKE $1', [
+    `${signInIp}%`,
+  ]);
   const signIn = await auth.handler(
     withResolvedClientIp(
       new Request("http://localhost:3000/api/auth/sign-in/email", {
         body: JSON.stringify({ email, password: created.temporaryPassword }),
         headers: {
           "content-type": "application/json",
-          "x-forwarded-for": `198.51.100.${signInCounter}`,
+          "x-forwarded-for": signInIp,
         },
         method: "POST",
       })
