@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useEffect } from "react";
 
 import { createRealtimeController } from "./realtime-controller";
+import { announceRealtimeRefresh } from "./realtime-signal";
 
 const EVENTS_URL = "/api/events";
 const DEBOUNCE_MS = 300;
@@ -44,6 +45,7 @@ export const RealtimeRefresh = () => {
         startTransition(() => {
           router.refresh();
         });
+        announceRealtimeRefresh();
       },
     });
     controller.start();

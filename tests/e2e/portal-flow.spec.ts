@@ -119,6 +119,9 @@ test.describe("a new client user", () => {
     await page.waitForURL(/\/portal$/u);
 
     await page.goto("/portal/new");
+    await page
+      .getByRole("combobox", { name: "Project" })
+      .selectOption({ label: "Acme Web App" });
     await page.getByLabel("Title").fill(BUG_TITLE);
     await page.getByLabel("Expected behavior").fill("A CSV file downloads.");
     await page.getByLabel("Actual behavior").fill("The page shows an error.");

@@ -94,7 +94,7 @@ test.describe("Project automations (/projects/[projectId]?view=automations)", ()
         0
       );
       await openPopulatedProject(page, "automations");
-      await expect(page.getByRole("alert")).toContainText(
+      await expect(page.locator('section[role="alert"]')).toContainText(
         "Only administrators can manage automations."
       );
       await expect(page.locator("[data-automation-rule]")).toHaveCount(0);
