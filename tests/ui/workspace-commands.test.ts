@@ -55,8 +55,41 @@ describe("getAvailableCommands", () => {
       "go-tasks",
       "go-projects",
       "go-inbox",
+      "go-my-time",
+      "go-workload",
       "show-shortcuts",
     ]);
+  });
+
+  it("adds budgets and the admin settings pages for admins only", () => {
+    expect(ids(admin)).toEqual(
+      expect.arrayContaining([
+        "go-budgets",
+        "go-intake-forms",
+        "go-webhooks",
+        "go-github",
+      ])
+    );
+    for (const id of [
+      "go-budgets",
+      "go-intake-forms",
+      "go-webhooks",
+      "go-github",
+    ]) {
+      expect(ids(employee)).not.toContain(id);
+    }
+  });
+
+  it("points the new navigation entries at their pages", () => {
+    const hrefs = Object.fromEntries(
+      getAvailableCommands(admin).map(({ href, id }) => [id, href])
+    );
+    expect(hrefs["go-my-time"]).toBe("/my-time");
+    expect(hrefs["go-workload"]).toBe("/workload");
+    expect(hrefs["go-budgets"]).toBe("/budgets");
+    expect(hrefs["go-intake-forms"]).toBe("/settings?section=intake");
+    expect(hrefs["go-webhooks"]).toBe("/settings/webhooks");
+    expect(hrefs["go-github"]).toBe("/settings/github");
   });
 
   it("adds admin-only actions for admins", () => {
@@ -97,6 +130,9 @@ describe("getAvailableCommands", () => {
     expect(hints["go-tasks"]).toBe("G T");
     expect(hints["go-projects"]).toBe("G P");
     expect(hints["go-inbox"]).toBe("G I");
+    expect(hints["go-my-time"]).toBe("G M");
+    expect(hints["go-workload"]).toBe("G W");
+    expect(hints["go-budgets"]).toBe("G B");
     expect(hints["show-shortcuts"]).toBe("?");
   });
 });
@@ -166,6 +202,16 @@ describe("createShortcutMatcher", () => {
     const matcher = createShortcutMatcher();
     expect(matcher.handle(key("g"), idle(), 0)).toBeUndefined();
     expect(matcher.handle(key("t"), idle(), 500)?.id).toBe("go-tasks");
+  });
+
+  it("matches the new G sequences only for people who may open the page", () => {
+    const matcher = createShortcutMatcher();
+    matcher.handle(key("g"), idle(admin), 0);
+    expect(matcher.handle(key("b"), idle(admin), 10)?.id).toBe("go-budgets");
+    matcher.handle(key("g"), idle(employee), 20);
+    expect(matcher.handle(key("b"), idle(employee), 30)).toBeUndefined();
+    matcher.handle(key("g"), idle(employee), 40);
+    expect(matcher.handle(key("m"), idle(employee), 50)?.id).toBe("go-my-time");
   });
 
   it("forgets G after the window passes", () => {

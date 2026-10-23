@@ -76,6 +76,7 @@ export const enqueueAutomationEvent = async (
 export interface TaskFieldState {
   readonly status: string;
   readonly priority: string;
+  readonly dueDate: string | null;
   readonly assigneeIds: readonly string[];
 }
 
@@ -101,6 +102,9 @@ export const enqueueTaskFieldEvents = async (
   }
   if (before.priority !== after.priority) {
     triggers.push("priority_changed");
+  }
+  if (before.dueDate !== after.dueDate) {
+    triggers.push("due_date_changed");
   }
   if (!sameAssignees) {
     triggers.push("assignee_changed");

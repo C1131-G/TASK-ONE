@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeAll, expect, it } from "bun:test";
 
 import { Effect, Layer } from "effect";
 
+import { db } from "../../src/prisma/db";
 import { authPool } from "../../src/server/auth/database";
 import { JobHandlersLive } from "../../src/server/jobs/job-handlers-live";
 import {
@@ -11,6 +12,7 @@ import {
 import { PushTransport } from "../../src/server/notifications/push-transport";
 import { Storage } from "../../src/server/storage/storage";
 import {
+  createBugReport,
   BugManagement,
   BugManagementLive,
 } from "../../src/server/work/bug-management";
@@ -270,7 +272,7 @@ it("fires from a bulk edit", async () => {
   ]);
 });
 
-it("fires bug_reported and bug_status_changed, leaving bug status to the workflow", async () => {
+it("fires bug_status_changed but not bug_reported for an internal bug, leaving bug status to the workflow", async () => {
   const reported = await insertRule(world, {
     actions: [
       { status: "done", type: "set_status" },
@@ -314,17 +316,7 @@ it("fires bug_reported and bug_status_changed, leaving bug status to the workflo
     })
   );
   await drain();
-  expect(await runsFor(reported)).toEqual([
-    {
-      outcome: "skipped",
-      trigger: "bug_reported",
-    },
-  ]);
-  const skipped = await authPool.query<{ reason: string }>(
-    'SELECT reason FROM automation_run WHERE "ruleId" = $1',
-    [reported]
-  );
-  expect(skipped.rows[0]?.reason).toBe("action_blocked:set_status");
+  expect(await runsFor(reported)).toEqual([]);
   expect(await runsFor(changed)).toEqual([
     { outcome: "matched", trigger: "bug_status_changed" },
   ]);
@@ -333,4 +325,76 @@ it("fires bug_reported and bug_status_changed, leaving bug status to the workflo
     [bug.id]
   );
   expect(comment.rows.map((row) => row.visibility)).toEqual(["internal"]);
+});
+
+const clientBugInput = {
+  actualBehavior: "Blank panel.",
+  appVersion: null,
+  browser: null,
+  component: "Client report",
+  description: null,
+  device: null,
+  discoverySource: "customer_report",
+  environment: "production",
+  expectedBehavior: "Totals show.",
+  os: null,
+  reproductionSteps: ["Open it"],
+  route: "/overview",
+  severity: "minor",
+} as const;
+
+it("fires bug_reported for a client-reported bug", async () => {
+  const reported = await insertRule(world, {
+    actions: [{ priority: "high", type: "set_priority" }],
+    trigger: "bug_reported",
+  });
+  const bug = await db.transaction((transaction) =>
+    createBugReport(
+      transaction,
+      world.clientId,
+      { ...clientBugInput, projectId: world.projectId, title: "Client bug" },
+      { clientCompanyId: world.companyId, clientImpact: "medium" }
+    )
+  );
+  await drain();
+  expect(await runsFor(reported)).toEqual([
+    { outcome: "matched", trigger: "bug_reported" },
+  ]);
+  const task = await authPool.query<{ priority: string }>(
+    "SELECT priority FROM task WHERE id = $1",
+    [bug.taskId]
+  );
+  expect(task.rows[0]?.priority).toBe("high");
+});
+
+it("fires due_date_changed when a task is only rescheduled", async () => {
+  const task = await run(
+    Effect.gen(function* create() {
+      const work = yield* WorkManagement;
+      return yield* work.createTask(world.adminId, {
+        ...base,
+        dueDate: "2027-01-10",
+        priority: "low",
+        projectId: world.projectId,
+        title: "Reschedule me",
+      });
+    })
+  );
+  const ruleId = await insertRule(world, {
+    actions: [{ body: "moved", type: "post_comment" }],
+    trigger: "due_date_changed",
+  });
+  await run(
+    Effect.gen(function* reschedule() {
+      const work = yield* WorkManagement;
+      return yield* work.rescheduleTask(world.adminId, task.id, task.version, {
+        dueDate: "2027-01-20",
+        startDate: null,
+      });
+    })
+  );
+  await drain();
+  expect(await runsFor(ruleId)).toEqual([
+    { outcome: "matched", trigger: "due_date_changed" },
+  ]);
 });

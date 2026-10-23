@@ -24,6 +24,7 @@ export interface RetentionPolicy {
   readonly automationRunDays: number;
   readonly completedJobDays: number;
   readonly deadJobDays: number;
+  readonly emailDeliveryDays: number;
   readonly pushDeliveryDays: number;
   readonly webhookDeliveryDays: number;
 }
@@ -32,6 +33,7 @@ export const DEFAULT_RETENTION_POLICY: RetentionPolicy = {
   automationRunDays: 30,
   completedJobDays: 14,
   deadJobDays: 30,
+  emailDeliveryDays: 90,
   pushDeliveryDays: 30,
   webhookDeliveryDays: 30,
 };
@@ -49,6 +51,9 @@ export const retentionPolicyFromEnv = (
       DEFAULT_RETENTION_POLICY.completedJobDays,
     deadJobDays:
       env.RETENTION_DEAD_JOB_DAYS ?? DEFAULT_RETENTION_POLICY.deadJobDays,
+    emailDeliveryDays:
+      env.RETENTION_EMAIL_DELIVERY_DAYS ??
+      DEFAULT_RETENTION_POLICY.emailDeliveryDays,
     pushDeliveryDays:
       env.RETENTION_PUSH_DELIVERY_DAYS ??
       DEFAULT_RETENTION_POLICY.pushDeliveryDays,
@@ -89,6 +94,14 @@ const retentionTargets = {
     key: "id",
     predicate: '"completedAt" IS NULL AND "deadAt" < $1',
     table: "job",
+  },
+  // Receipts only guard against a duplicate send of the same notification or
+  // morning digest, which retries finish within hours.
+  emailDeliveries: {
+    cutoff: (now, policy) => before(now, policy.emailDeliveryDays),
+    key: "id",
+    predicate: '"sentAt" < $1',
+    table: "email_delivery",
   },
   // Delivery ids only need to outlive GitHub's redelivery window.
   githubDeliveries: {

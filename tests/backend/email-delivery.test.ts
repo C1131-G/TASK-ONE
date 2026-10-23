@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { Effect, Layer } from "effect";
 
+import { db } from "../../src/prisma/db";
 import { authPool } from "../../src/server/auth/database";
 import { AppError } from "../../src/server/core/action-result";
 import type { EmailEventType } from "../../src/server/email/email-events";
@@ -12,6 +13,7 @@ import {
 } from "../../src/server/email/email-notifications";
 import { MailTransport } from "../../src/server/email/mail-transport";
 import type { MailMessage } from "../../src/server/email/mail-transport";
+import { notifyUsers } from "../../src/server/notifications/notify-users";
 
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
@@ -121,6 +123,10 @@ afterEach(async () => {
   await authPool.query('DELETE FROM notification WHERE "userId" = ANY($1)', [
     users,
   ]);
+  await authPool.query(
+    "DELETE FROM job WHERE kind IN ('notifications.deliver-email', 'notifications.deliver-push') AND payload->>'userId' = ANY($1)",
+    [users]
+  );
   await authPool.query('DELETE FROM "user" WHERE id = ANY($1)', [users]);
 });
 
@@ -245,6 +251,70 @@ describe("daily email digest", () => {
     expect(setting.rows[0]?.lastDigestAt?.toISOString()).toBe(
       scheduledAt.toISOString()
     );
+  });
+
+  it("includes events switched off in-app but on for email", async () => {
+    const userId = await createUser({
+      digest: true,
+      emailEvents: ["comment"],
+    });
+    await authPool.query(
+      "INSERT INTO notification_preference (id, \"userId\", channel, \"eventType\", enabled) VALUES ($1, $2, 'in-app', 'comment', false)",
+      [randomUUID(), userId]
+    );
+    await db.transaction((transaction) =>
+      notifyUsers(transaction, {
+        actorId: null,
+        now: new Date("2099-03-13T12:00:00.000Z"),
+        projectId: null,
+        recipientIds: [userId],
+        snippet: "details",
+        taskId: null,
+        text: "Quiet comment",
+        type: "comment",
+        url: "/notifications",
+      })
+    );
+    const rows = await authPool.query(
+      'SELECT 1 FROM notification WHERE "userId" = $1',
+      [userId]
+    );
+    expect(rows.rowCount).toBe(0);
+
+    await run((email) => email.sendDigests(scheduledAt));
+
+    const digests = sentMessages.filter(
+      ({ to }) => to === `${userId}@email-delivery.example`
+    );
+    expect(digests).toHaveLength(1);
+    expect(digests[0]?.text).toContain("Quiet comment");
+  });
+
+  it("does not repeat an event that is both an in-app row and a queued email", async () => {
+    const userId = await createUser({
+      digest: true,
+      emailEvents: ["comment"],
+    });
+    await db.transaction((transaction) =>
+      notifyUsers(transaction, {
+        actorId: null,
+        now: new Date("2099-03-13T12:00:00.000Z"),
+        projectId: null,
+        recipientIds: [userId],
+        snippet: "details",
+        taskId: null,
+        text: "Loud comment",
+        type: "comment",
+        url: "/notifications",
+      })
+    );
+
+    await run((email) => email.sendDigests(scheduledAt));
+
+    const digest = sentMessages.find(
+      ({ to }) => to === `${userId}@email-delivery.example`
+    );
+    expect(digest?.subject).toBe("Your Metsys digest: 1 update");
   });
 
   it("sends nothing outside the local morning hour or without news", async () => {

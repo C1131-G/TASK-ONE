@@ -254,6 +254,13 @@ export const createRule = async (
         message: "Archived projects are read only.",
       });
     }
+    // Writing the project's counter row takes its row lock until commit, so
+    // concurrent creates count one after another and cannot pass the limit.
+    await transaction.orm.public.ProjectTaskCounter.upsert({
+      conflictOn: { projectId },
+      create: { nextNumber: 1, projectId, updatedAt: new Date() },
+      update: { updatedAt: new Date() },
+    });
     const existing = await transaction.orm.public.AutomationRule.where({
       projectId,
     })

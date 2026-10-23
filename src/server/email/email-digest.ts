@@ -1,12 +1,14 @@
 import { and } from "@prisma/orm-postgres/orm-client";
-import { Effect } from "effect";
+import { Effect, Option, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
 
+import { authPool } from "../auth/database";
 import {
   getLocalDateAndHour,
   timezoneForUser,
 } from "../notifications/service-internal";
+import { EMAIL_DELIVERY_JOB, EmailJobPayloadSchema } from "./email-contracts";
 import type { EmailNotifications } from "./email-contracts";
 import {
   emailLinkContext,
@@ -40,6 +42,53 @@ const linkFor = (row: {
   return row.projectId ? `/projects/${row.projectId}` : "/notifications";
 };
 
+interface TimedDigestItem extends DigestItem {
+  readonly at: Date;
+  readonly notificationId: string;
+}
+
+const decodeJobPayload = Schema.decodeUnknownOption(EmailJobPayloadSchema);
+
+// The email jobs written next to each notification. They exist even when the
+// person turned the event off in-app, which is why the digest reads them too.
+const queuedEmailItems = async (
+  userId: string,
+  window: { readonly since: Date; readonly until: Date },
+  events: readonly string[]
+): Promise<readonly TimedDigestItem[]> => {
+  const { rows } = await authPool.query<{
+    createdAt: Date;
+    payload: unknown;
+  }>(
+    `SELECT "createdAt", payload FROM job
+      WHERE kind = $1 AND "createdAt" > $2 AND "createdAt" <= $3
+        AND payload->>'userId' = $4 AND payload->>'eventType' = ANY($5::text[])
+      ORDER BY "createdAt" ASC LIMIT $6`,
+    [
+      EMAIL_DELIVERY_JOB,
+      window.since,
+      window.until,
+      userId,
+      [...events],
+      MAX_DIGEST_ITEMS,
+    ]
+  );
+  return rows.flatMap(({ createdAt, payload }) => {
+    const decoded = decodeJobPayload(payload);
+    return Option.isSome(decoded)
+      ? [
+          {
+            at: createdAt,
+            body: decoded.value.body,
+            notificationId: decoded.value.notificationId,
+            title: decoded.value.title,
+            url: decoded.value.url,
+          },
+        ]
+      : [];
+  });
+};
+
 const digestItemsFor = async (
   userId: string,
   since: Date,
@@ -49,22 +98,36 @@ const digestItemsFor = async (
   if (events.length === 0) {
     return [];
   }
-  const rows = await db.orm.public.Notification.where((notification) =>
-    and(
-      notification.userId.eq(userId),
-      notification.createdAt.gt(since),
-      notification.createdAt.lte(until),
-      notification.type.in([...events])
+  const [rows, queued] = await Promise.all([
+    db.orm.public.Notification.where((notification) =>
+      and(
+        notification.userId.eq(userId),
+        notification.createdAt.gt(since),
+        notification.createdAt.lte(until),
+        notification.type.in([...events])
+      )
     )
-  )
-    .orderBy((notification) => notification.createdAt.asc())
-    .limit(MAX_DIGEST_ITEMS)
-    .all();
-  return rows.map((row) => ({
+      .orderBy((notification) => notification.createdAt.asc())
+      .limit(MAX_DIGEST_ITEMS)
+      .all(),
+    queuedEmailItems(userId, { since, until }, events),
+  ]);
+  const inApp: readonly TimedDigestItem[] = rows.map((row) => ({
+    at: row.createdAt,
     body: row.snippet ?? "",
+    notificationId: row.id,
     title: row.text,
     url: linkFor(row),
   }));
+  // A notification that exists in-app has the same id as its email job.
+  const seen = new Set(inApp.map(({ notificationId }) => notificationId));
+  return [
+    ...inApp,
+    ...queued.filter(({ notificationId }) => !seen.has(notificationId)),
+  ]
+    .toSorted((left, right) => left.at.getTime() - right.at.getTime())
+    .slice(0, MAX_DIGEST_ITEMS)
+    .map(({ body, title, url }) => ({ body, title, url }));
 };
 
 // Sends the digest for one person when it is their local morning and there is

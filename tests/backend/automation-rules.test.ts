@@ -179,6 +179,38 @@ it("enforces the per-project rule limit", async () => {
   expect(error.message).toContain(String(MAX_RULES_PER_PROJECT));
 });
 
+it("keeps the per-project rule limit under concurrent creates", async () => {
+  for (let count = 0; count < MAX_RULES_PER_PROJECT - 1; count += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await insertRule(world, {
+      actions: [{ priority: "low", type: "set_priority" }],
+      trigger: "task_created",
+    });
+  }
+  const outcomes = await Promise.all(
+    Array.from({ length: 6 }, () =>
+      Effect.runPromise(
+        Effect.provide(
+          Effect.gen(function* run() {
+            const service = yield* AutomationManagement;
+            return yield* Effect.result(
+              service.create(world.adminId, world.projectId, rule())
+            );
+          }),
+          AutomationManagementLive
+        )
+      )
+    )
+  );
+  const created = outcomes.filter((outcome) => outcome._tag === "Success");
+  expect(created).toHaveLength(1);
+  const stored = await authPool.query<{ count: number }>(
+    'SELECT count(*)::int AS count FROM automation_rule WHERE "projectId" = $1',
+    [world.projectId]
+  );
+  expect(stored.rows[0]?.count).toBe(MAX_RULES_PER_PROJECT);
+});
+
 it("rejects rules that name people or labels that cannot be used", async () => {
   const bad: readonly AutomationRuleInput["actions"][number][] = [
     { type: "assign", userId: world.clientId },

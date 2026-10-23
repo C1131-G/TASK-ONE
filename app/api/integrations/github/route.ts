@@ -5,6 +5,7 @@ import {
   GithubIngestLive,
 } from "@/src/server/github/github-ingest";
 import type { GithubIngestOutcome } from "@/src/server/github/github-ingest";
+import { checkGithubDeliveryRate } from "@/src/server/github/github-rate-limit";
 import {
   failureResponse,
   json,
@@ -37,6 +38,16 @@ const respond = (outcome: GithubIngestOutcome): Response => {
 
 // eslint-disable-next-line func-style -- Next route handler remains a named export.
 export async function POST(request: Request): Promise<Response> {
+  const rate = checkGithubDeliveryRate(request.headers);
+  if (!rate.allowed) {
+    return failureResponse(
+      429,
+      "RATE_LIMITED",
+      "Too many deliveries. Try again later.",
+      {},
+      { "retry-after": String(rate.retryAfterSeconds) }
+    );
+  }
   const rawBody = await readBoundedBytes(request, MAX_BODY_BYTES);
   if (!rawBody) {
     return failureResponse(413, "TOO_LARGE", "The delivery is too large.");

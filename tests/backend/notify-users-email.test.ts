@@ -85,7 +85,7 @@ it("queues one idempotent email job for people who opted in to the event", async
   expect(jobs[0]?.dedupeKey).toStartWith("email:");
 });
 
-it("leaves digest subscribers to the daily digest", async () => {
+it("records digest subscribers' email as already complete so only the digest sends it", async () => {
   const digestUser = await createUser({
     digest: true,
     emailEvents: ["assignment"],
@@ -93,7 +93,12 @@ it("leaves digest subscribers to the daily digest", async () => {
 
   await notify([digestUser], "assignment");
 
-  expect(await emailJobsFor([digestUser])).toHaveLength(0);
+  const queued = await authPool.query(
+    `SELECT "completedAt" FROM job WHERE kind = 'notifications.deliver-email' AND payload->>'userId' = $1`,
+    [digestUser]
+  );
+  expect(queued.rows).toHaveLength(1);
+  expect(queued.rows[0]?.completedAt).not.toBeNull();
 });
 
 it("never queues email for events that cannot be emailed", async () => {
