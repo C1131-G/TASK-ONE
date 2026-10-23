@@ -1,6 +1,7 @@
 import { and } from "@prisma/orm-postgres/orm-client";
 import type { Effect } from "effect";
 
+import { approvalLinksFor } from "../approvals/approval-notification-links";
 import { loadSlaSettings } from "../company/sla-settings";
 import type { AppError } from "../core/action-result";
 import { run } from "./portal-bug-access";
@@ -86,6 +87,11 @@ export const listNotifications = (
             .select("id", "taskId")
             .all();
     const bugByTask = new Map(bugs.map((bug) => [bug.taskId, bug.id]));
+    const approvalLinks = await approvalLinksFor(
+      transaction,
+      actor.clientCompanyId,
+      notifications
+    );
     return {
       items: notifications.flatMap((notification) => {
         let bugId: string | null = null;
@@ -98,6 +104,7 @@ export const listNotifications = (
         }
         return [
           {
+            approvalId: approvalLinks.get(notification.id) ?? null,
             bugId,
             createdAt: notification.createdAt.toISOString(),
             id: notification.id,

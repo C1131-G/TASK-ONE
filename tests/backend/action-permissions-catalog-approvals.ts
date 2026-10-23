@@ -13,6 +13,9 @@ export const approvalActionCatalog: readonly ActionEntry[] = [
   entry("listTaskApprovals", approvalQueries.listTaskApprovals, () => ({
     taskId: ids.taskId,
   })),
+  entry("listProjectApprovals", approvalQueries.listProjectApprovals, () => ({
+    projectId: ids.projectId,
+  })),
   entry("requestApprovalAction", approvalActions.requestApprovalAction, () => ({
     companyId: ids.clientCompanyId,
     fileIds: [ids.fileId],

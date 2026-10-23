@@ -10,6 +10,7 @@ import {
   markAllPortalNotificationsReadAction,
   markPortalNotificationReadAction,
 } from "@/features/portal/portal-notification-actions";
+import { portalNotificationHref } from "@/features/portal/portal-notification-link";
 import type { PortalNotificationList as PortalNotificationData } from "@/src/server/portal/portal-contracts";
 
 type Item = PortalNotificationData["items"][number];
@@ -111,16 +112,17 @@ const PortalNotificationList = ({
               </span>
             </>
           );
+          const href = portalNotificationHref(item);
           return (
             <li
               className="portal-notif"
               data-unread={unread || undefined}
               key={item.id}
             >
-              {item.bugId ? (
+              {href ? (
                 <Link
                   className="portal-notif-main"
-                  href={`/portal/bugs/${item.bugId}`}
+                  href={href}
                   transitionTypes={["nav-forward"]}
                   onClick={() => {
                     if (unread) {

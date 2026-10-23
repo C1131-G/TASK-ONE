@@ -5,6 +5,14 @@ import type { Transaction } from "../work/work-internal";
 
 const SNIPPET_LENGTH = 240;
 
+export const requestNotificationText = (
+  subjectTitle: string,
+  version: number
+): string =>
+  version > 1
+    ? `Approval requested again: ${subjectTitle}`
+    : `Approval requested: ${subjectTitle}`;
+
 // Every active person of the company hears about a new request, with a link
 // to the portal page and no task reference (the portal lists only bugs by
 // task, and a shared task is shown through the request instead).
@@ -37,10 +45,7 @@ export const notifyClientsOfRequest = async (
     recipientIds: clients.map(({ id }) => id),
     snippet: request.message.slice(0, SNIPPET_LENGTH),
     taskId: null,
-    text:
-      request.version > 1
-        ? `Approval requested again: ${request.subjectTitle}`
-        : `Approval requested: ${request.subjectTitle}`,
+    text: requestNotificationText(request.subjectTitle, request.version),
     type: "status",
     url: `/portal/approvals/${request.id}`,
   });

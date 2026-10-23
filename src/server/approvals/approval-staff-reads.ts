@@ -1,13 +1,15 @@
-import { Effect, Schema } from "effect";
+import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
-import { UUIDSchema } from "../core/input-schemas";
-import { taskSubjectKey, toApprovalStatus } from "./approval-access";
+import { taskSubjectKey } from "./approval-access";
 import type { TaskApprovals } from "./approval-contracts";
-
-const isUuid = Schema.is(UUIDSchema);
+import {
+  assertStaffReader,
+  describeRequests,
+  isUuid,
+} from "./approval-staff-shared";
 
 const notFound = () =>
   new AppError({ code: "NOT_FOUND", message: "The task was not found." });
@@ -16,21 +18,7 @@ const forTaskInternal = async (
   actorId: string,
   taskId: string
 ): Promise<TaskApprovals> => {
-  const actor = await db.orm.public.User.where({ id: actorId })
-    .select("deactivatedAt", "mustChangePassword", "role")
-    .first();
-  if (!actor || actor.deactivatedAt) {
-    throw new AppError({
-      code: "UNAUTHENTICATED",
-      message: "Sign in to continue.",
-    });
-  }
-  if (actor.role === "client" || actor.mustChangePassword) {
-    throw new AppError({
-      code: "FORBIDDEN",
-      message: "Approvals are managed by the team.",
-    });
-  }
+  const actor = await assertStaffReader(actorId);
   if (!isUuid(taskId)) {
     throw notFound();
   }
@@ -52,40 +40,10 @@ const forTaskInternal = async (
       .select("companyId")
       .all(),
   ]);
-  const companyIds = [
-    ...new Set([
-      ...links.map(({ companyId }) => companyId),
-      ...rows.map(({ companyId }) => companyId),
-    ]),
-  ];
-  const userIds = [
-    ...new Set(
-      rows.flatMap(({ decidedById, requestedById }) =>
-        decidedById ? [requestedById, decidedById] : [requestedById]
-      )
-    ),
-  ];
-  const [companies, users, attachments] = await Promise.all([
-    companyIds.length === 0
-      ? []
-      : db.orm.public.ClientCompany.where((company) =>
-          company.id.in(companyIds)
-        )
-          .select("id", "name", "deactivatedAt")
-          .all(),
-    userIds.length === 0
-      ? []
-      : db.orm.public.User.where((user) => user.id.in(userIds))
-          .select("id", "name")
-          .all(),
-    rows.length === 0
-      ? []
-      : db.orm.public.ApprovalRequestFile.include("file")
-          .where((attached) => attached.requestId.in(rows.map(({ id }) => id)))
-          .all(),
-  ]);
-  const companyNames = new Map(companies.map(({ id, name }) => [id, name]));
-  const userNames = new Map(users.map(({ id, name }) => [id, name]));
+  const { companies, requests } = await describeRequests(
+    rows,
+    links.map(({ companyId }) => companyId)
+  );
   const shared =
     task.clientVisible &&
     task.project.clientVisible &&
@@ -105,29 +63,7 @@ const forTaskInternal = async (
           )
           .toSorted((first, second) => first.name.localeCompare(second.name))
       : [],
-    requests: rows
-      .toSorted((first, second) => second.version - first.version)
-      .map((row) => ({
-        cancelledAt: row.cancelledAt?.toISOString() ?? null,
-        companyId: row.companyId,
-        companyName: companyNames.get(row.companyId) ?? "",
-        decidedAt: row.decidedAt?.toISOString() ?? null,
-        decidedByName: row.decidedById
-          ? (userNames.get(row.decidedById) ?? null)
-          : null,
-        decisionComment: row.decisionComment,
-        files: attachments.flatMap(({ file, requestId }) =>
-          requestId === row.id
-            ? [{ fileId: file.id, fileName: file.originalName }]
-            : []
-        ),
-        id: row.id,
-        message: row.message,
-        requestedAt: row.requestedAt.toISOString(),
-        requestedByName: userNames.get(row.requestedById) ?? "",
-        status: toApprovalStatus(row.status),
-        version: row.version,
-      })),
+    requests,
   };
 };
 
