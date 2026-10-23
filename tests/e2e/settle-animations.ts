@@ -39,5 +39,8 @@ export const settleAnimations = async (page: Page): Promise<void> => {
       QUIET_MS,
       { polling: "raf", timeout: SETTLE_TIMEOUT_MS }
     )
-    .catch(() => {});
+    .then(
+      () => true,
+      () => false
+    );
 };
