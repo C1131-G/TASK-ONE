@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, it } from "bun:test";
 
 import {
+  authPool,
   ids,
   personaBearerToken,
   personaId,
@@ -65,6 +66,25 @@ it("refuses a request that carries no token", async () => {
 
 it("refuses a token that was never issued", async () => {
   const response = await getMe("not-a-real-token");
+
+  expect(response.status).toBe(401);
+});
+
+it("stops honouring a token once its session is revoked", async () => {
+  const token = personaBearerToken("outsider");
+  const before = await getMe(token);
+  expect(before.status).toBe(200);
+
+  await authPool.query('DELETE FROM session WHERE "userId" = $1', [
+    personaId("outsider"),
+  ]);
+  const response = await getMe(token);
+
+  expect(response.status).toBe(401);
+});
+
+it("refuses a token whose account was deactivated", async () => {
+  const response = await getMe(personaBearerToken("deactivated"));
 
   expect(response.status).toBe(401);
 });
