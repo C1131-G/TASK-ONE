@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
-import { FailureSchema, mobileRoutes } from "../../mobile-api/routes";
+import { FailureSchema } from "../../mobile-api/route-definition";
+import { mobileRoutes } from "../../mobile-api/routes";
 
 type JsonObject = Record<string, unknown>;
 

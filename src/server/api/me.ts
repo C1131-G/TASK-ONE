@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { MobileMe } from "../../mobile-api/routes";
+import type { MobileMe } from "../../mobile-api/routes-account";
 import { AuthSession } from "../auth/session";
 import type { AppError } from "../core/action-result";
 
