@@ -42,6 +42,16 @@ Every response is JSON and carries the request ID in the `x-request-id` header a
 - Every `POST`, `PATCH` and `DELETE` needs an `Idempotency-Key` header of 8 to 128 characters. Resend the same key when retrying; the first result is replayed instead of acting twice. A key reused for a different request returns `409`. `readIdempotencyKey` (`src/server/api/idempotency-key.ts`) reads it, and the service passes it to `Idempotency.run`.
 - Records that can be edited concurrently carry a `version`. Send it back as `expectedVersion`; a stale value returns `409`.
 
+## Writing a route
+
+1. Add its entry to the domain's list (`src/mobile-api/routes-tasks.ts`, `routes-bugs.ts`, `routes-notifications.ts`, `routes-attachments.ts`). An entry names the operation, method, path, response `data` schema and, when it takes them, `params`, `query` and `body` schemas. Paths start with `/api/v1/workspace/` for staff or `/api/v1/portal/` for clients.
+2. Add `app/api/v1/<path>/route.ts`. A dynamic segment `{id}` is the folder `[id]`. Next passes `params` as a promise.
+3. In the handler, run one Effect program through `respondWith`: resolve the caller with `AuthSession` (`requireWorkspaceAccess` or `requirePortalAccess`), read the input with `readRouteInput(route, request, await params)`, then call the domain service in `src/server/<domain>/`. Domain rules, authorization and transactions stay in the service, never in the route.
+4. A write passes `input.idempotencyKey` to the service, which wraps its work in `Idempotency.run`, and passes `expectedVersion` through where the record has a `version`.
+5. Test it through the route handler with a bearer token (`personaBearerToken` in `tests/backend/support/action-harness.ts`), including the denied cases and that a refused write leaves the database unchanged.
+
+Use `Schema.FiniteFromString` for numeric query values: `Schema.NumberFromString` accepts text such as `many` as `NaN`.
+
 ## Routes
 
 | Method | Path | Who | Purpose |
