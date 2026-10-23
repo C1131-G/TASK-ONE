@@ -13,6 +13,7 @@ playwright-report
 test-results
 backups
 tests
+!tests/e2e/auth-state.ts
 docs
 *.md
 *.tsbuildinfo
