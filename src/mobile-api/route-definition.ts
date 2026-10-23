@@ -1,0 +1,61 @@
+import { Schema } from "effect";
+
+export type HttpMethod = "get" | "post" | "patch" | "delete";
+
+// One entry per route file under app/api/v1. The OpenAPI document and the
+// typed client are both read from the route list, and a test fails when a
+// route file and its entry drift apart.
+export interface RouteDefinition {
+  readonly operationId: string;
+  readonly method: HttpMethod;
+  // The public path, with `{name}` for dynamic segments.
+  readonly path: string;
+  readonly summary: string;
+  // Shape of `data` in a successful response.
+  readonly data: Schema.Constraint;
+  // The `{name}` segments of the path, each decoded from text.
+  readonly params?: Schema.Constraint;
+  // Query-string fields, each decoded from text.
+  readonly query?: Schema.Constraint;
+  // The JSON request body of a write.
+  readonly body?: Schema.Constraint;
+}
+
+// What a caller supplies for a route: its decoded path, query and body, plus
+// the key that makes a write safe to retry.
+export type RouteInput<Route extends RouteDefinition> = (Route extends {
+  readonly params: infer Params extends Schema.Constraint;
+}
+  ? { readonly params: Params["Type"] }
+  : unknown) &
+  (Route extends { readonly query: infer Query extends Schema.Constraint }
+    ? { readonly query: Query["Type"] }
+    : unknown) &
+  (Route extends { readonly body: infer Body extends Schema.Constraint }
+    ? { readonly body: Body["Type"] }
+    : unknown) &
+  (Route["method"] extends "get"
+    ? unknown
+    : { readonly idempotencyKey: string });
+
+export const ERROR_CODES = [
+  "UNAUTHENTICATED",
+  "FORBIDDEN",
+  "NOT_FOUND",
+  "VALIDATION_FAILED",
+  "CONFLICT",
+  "RATE_LIMITED",
+  "UNAVAILABLE",
+] as const;
+
+export type AppErrorCode = (typeof ERROR_CODES)[number];
+
+export const FailureSchema = Schema.Struct({
+  error: Schema.Struct({
+    code: Schema.Literals(ERROR_CODES),
+    fieldErrors: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+    message: Schema.String,
+    requestId: Schema.String,
+  }),
+  ok: Schema.Literal(false),
+});

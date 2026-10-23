@@ -39,7 +39,7 @@ const fieldErrorsFromIssue = (issue: SchemaIssue.Issue): FieldErrors => {
   return fieldErrors;
 };
 
-const invalidInput = (error: Schema.SchemaError): AppError => {
+export const invalidInput = (error: Schema.SchemaError): AppError => {
   const fieldErrors = fieldErrorsFromIssue(error.issue);
   return new AppError({
     code: "VALIDATION_FAILED",
