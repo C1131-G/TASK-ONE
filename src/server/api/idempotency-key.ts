@@ -1,8 +1,7 @@
 import { Effect } from "effect";
 
+import { IDEMPOTENCY_KEY_HEADER } from "../../mobile-api/idempotency";
 import { AppError } from "../core/action-result";
-
-export const IDEMPOTENCY_KEY_HEADER = "Idempotency-Key";
 
 // Matches the bounds Idempotency.run enforces, so a bad key is refused before
 // any work starts.
