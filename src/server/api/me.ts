@@ -1,18 +1,8 @@
-import { Effect, Schema } from "effect";
+import { Effect } from "effect";
 
+import type { MobileMe } from "../../mobile-api/routes";
 import { AuthSession } from "../auth/session";
 import type { AppError } from "../core/action-result";
-
-export const MeSchema = Schema.Struct({
-  clientCompanyId: Schema.NullOr(Schema.String),
-  id: Schema.String,
-  mustChangePassword: Schema.Boolean,
-  name: Schema.String,
-  role: Schema.Literals(["admin", "employee", "client"]),
-  timeZone: Schema.NullOr(Schema.String),
-});
-
-export type MobileMe = typeof MeSchema.Type;
 
 // Who the bearer token belongs to. The app reads this once after sign-in to
 // choose between the workspace and the client portal.

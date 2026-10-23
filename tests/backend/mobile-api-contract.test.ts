@@ -27,7 +27,11 @@ const publishedPaths = (): string[] =>
       path
         .relative(apiRoot, path.dirname(file))
         .split(path.sep)
-        .map((part) => part.replace(/^\[(?<name>.+)\]$/u, "{$<name>}"))
+        .map((part) =>
+          part.startsWith("[") && part.endsWith("]")
+            ? `{${part.slice(1, -1)}}`
+            : part
+        )
         .join("/")
     )
     .filter((route) => route !== SPEC_ROUTE)
