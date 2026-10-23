@@ -5,16 +5,21 @@ import { SkelterSurface } from "@/components/workspace/skelter-surface";
 import { PortalChangePassword } from "@/features/portal/components/portal-change-password";
 import { PortalEmailControl } from "@/features/portal/components/portal-email-control";
 import { PortalPushControl } from "@/features/portal/components/portal-push-control";
+import { PortalSessions } from "@/features/portal/components/portal-sessions";
 import { PortalSignOut } from "@/features/portal/components/portal-sign-out";
 import { getPortalCompany } from "@/features/portal/portal-company";
 import { getPortalEmailUpdates } from "@/features/portal/portal-queries";
+import { listMySessions } from "@/features/user/user-queries";
 import { readOrThrow } from "@/lib/read-result";
 
 const PortalAccount = async () => {
   const company = await getPortalCompany();
-  const emailUpdates = company?.preview
-    ? false
-    : readOrThrow(await getPortalEmailUpdates({}), "Email updates");
+  const [emailUpdates, sessions] = company?.preview
+    ? [false, []]
+    : [
+        readOrThrow(await getPortalEmailUpdates({}), "Email updates"),
+        readOrThrow(await listMySessions({}), "Sessions"),
+      ];
   return (
     <div className="portal-account">
       <section
@@ -37,8 +42,8 @@ const PortalAccount = async () => {
       </section>
       {company?.preview ? (
         <p className="portal-banner" role="note">
-          Password, push notification and sign-out controls are not available
-          while previewing a client. Use Exit preview above to return.
+          Password, push notification, device and sign-out controls are not
+          available while previewing a client. Use Exit preview above to return.
         </p>
       ) : (
         <>
@@ -72,6 +77,15 @@ const PortalAccount = async () => {
             <PortalEmailControl enabled={emailUpdates} />
           </section>
           <section
+            aria-labelledby="portal-sessions-h"
+            className="panel portal-panel"
+          >
+            <h2 className="sec" id="portal-sessions-h">
+              Signed-in devices
+            </h2>
+            <PortalSessions sessions={sessions} />
+          </section>
+          <section
             aria-labelledby="portal-out-h"
             className="panel portal-panel"
           >
@@ -94,6 +108,7 @@ const PortalAccountSkeleton = () => (
         "Change password",
         "Push notifications",
         "Email updates",
+        "Signed-in devices",
         "Sign out",
       ].map((title) => (
         <div className="panel portal-panel" key={title}>

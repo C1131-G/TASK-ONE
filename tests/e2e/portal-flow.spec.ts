@@ -340,4 +340,19 @@ test.describe("client one", () => {
       await noSidewaysScroll(page);
     });
   }
+
+  test("the account page lists the signed-in devices with a sign-out button", async ({
+    page,
+  }) => {
+    await page.goto("/portal/account");
+
+    await expect(
+      page.getByRole("heading", { name: "Signed-in devices" })
+    ).toBeVisible();
+    // Each device row has its own "Sign out <device>" button; the page's
+    // plain "Sign out" button has no device name after it.
+    await expect(
+      page.getByRole("button", { name: /^Sign out .+/u }).first()
+    ).toBeVisible();
+  });
 });
