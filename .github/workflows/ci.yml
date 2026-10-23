@@ -79,13 +79,16 @@ jobs:
           echo "E2E_PORTAL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
       - name: Seed browser test data
         run: |
-          docker run -d --name metsys-minio -p 9000:9000 -e MINIO_ROOT_USER=metsys -e MINIO_ROOT_PASSWORD=local-minio-password minio/minio:RELEASE.2025-10-15T17-29-55Z server /data
+          # MinIO ships as source only, so build the server and client from the
+          # same Dockerfile compose uses instead of pulling Docker Hub images.
+          docker build -f docker/minio.Dockerfile --target server -t metsys-minio-server:ci .
+          docker build -f docker/minio.Dockerfile --target client -t metsys-minio-client:ci .
+          docker run -d --name metsys-minio -p 9000:9000 -e MINIO_ROOT_USER=metsys -e MINIO_ROOT_PASSWORD=local-minio-password metsys-minio-server:ci server /data
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
             sleep 2
           done
-          docker run --rm --network host minio/mc:RELEASE.2025-08-13T08-35-41Z alias set local http://localhost:9000 metsys local-minio-password
-          docker run --rm --network host minio/mc:RELEASE.2025-08-13T08-35-41Z mb --ignore-existing local/metsys-private
+          docker run --rm --network host -e MC_HOST_local=http://metsys:local-minio-password@localhost:9000 metsys-minio-client:ci mb --ignore-existing local/metsys-private
           bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
           UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
       - run: bunx playwright install --with-deps chromium
