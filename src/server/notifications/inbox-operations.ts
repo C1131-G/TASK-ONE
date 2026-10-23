@@ -1,4 +1,4 @@
-import { not } from "@prisma/orm-postgres/orm-client";
+import { and, not, or } from "@prisma/orm-postgres/orm-client";
 import { Effect, Schema } from "effect";
 
 import { db } from "@/src/prisma/db";
@@ -14,6 +14,7 @@ import type {
   NotificationPreferenceValue,
 } from "./contracts";
 import { NotificationPreferencesSchema } from "./contracts";
+import { decodeInboxCursor, encodeInboxCursor } from "./inbox-cursor";
 import { mapError, verifyUser } from "./service-internal";
 
 export const listInbox = (
@@ -33,13 +34,30 @@ export const listInbox = (
           .where((notification) => not(notification.type.eq("update")))
           .aggregate((aggregates) => ({ count: aggregates.count() })),
       ]);
+      const after = options.cursor ? decodeInboxCursor(options.cursor) : null;
       const base = db.orm.public.Notification.include("actor")
         .include("project")
-        .where({ userId, ...(options.unreadOnly ? { readAt: null } : {}) });
-      const notifications = await base
-        .orderBy((notification) => notification.createdAt.desc())
-        .limit(limit)
+        .where({ userId, ...(options.unreadOnly ? { readAt: null } : {}) })
+        .where((notification) =>
+          after
+            ? or(
+                notification.createdAt.lt(after.createdAt),
+                and(
+                  notification.createdAt.eq(after.createdAt),
+                  notification.id.lt(after.id)
+                )
+              )
+            : notification.id.isNotNull()
+        );
+      const fetched = await base
+        .orderBy([
+          (notification) => notification.createdAt.desc(),
+          (notification) => notification.id.desc(),
+        ])
+        .limit(limit + 1)
         .all();
+      const notifications = fetched.slice(0, limit);
+      const last = notifications.at(-1);
       return {
         items: notifications.map((notification) => ({
           actorId: notification.actorId,
@@ -54,6 +72,10 @@ export const listInbox = (
           text: notification.text,
           type: notification.type,
         })),
+        nextCursor:
+          fetched.length > limit && last
+            ? encodeInboxCursor({ createdAt: last.createdAt, id: last.id })
+            : null,
         unreadCount: allUnread.count,
         unreadInboxCount: inboxUnread.count,
       };
