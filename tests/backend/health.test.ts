@@ -6,6 +6,17 @@ import { readinessResponse } from "../../src/server/health/readiness";
 // request scope it throws, so the handlers are called with it stubbed.
 mock.module("next/server", () => ({ connection: () => Promise.resolve() }));
 
+// The route wiring test below must not depend on a reachable MinIO or on the
+// shared database: CI runs this suite without object storage, so the real
+// probes would answer 503 there. The probes themselves are covered by the
+// tests that inject their own.
+mock.module("../../src/server/health/live-probes", () => ({
+  liveReadinessProbes: {
+    database: () => Promise.resolve(),
+    storage: () => Promise.resolve(),
+  },
+}));
+
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 
