@@ -50,7 +50,7 @@ test.describe("Intake (public form to triage)", () => {
     await page.getByLabel("Form name").fill(FORM_NAME);
     await page.getByLabel("Client company").click();
     await page.getByRole("option", { name: "Acme" }).click();
-    await page.getByLabel("Project").click();
+    await page.getByRole("combobox", { name: "Project" }).click();
     await page.getByRole("option", { name: /^ACMEP/u }).click();
     await page.getByRole("button", { name: "Create form" }).click();
 

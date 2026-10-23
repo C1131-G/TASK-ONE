@@ -46,6 +46,9 @@ const removeScreenShare = () => {
 
 const fillReport = async (page: Page, title: string) => {
   await page.goto("/portal/new");
+  await page
+    .getByRole("combobox", { name: "Project" })
+    .selectOption({ label: "Acme Web App" });
   await page.getByLabel("Title").fill(title);
   await page.getByLabel("Expected behavior").fill("The page loads.");
   await page.getByLabel("Actual behavior").fill("The page shows an error.");

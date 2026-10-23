@@ -101,8 +101,13 @@ test.describe("activity and archive as admin", () => {
     // Clicks must run one after another, since each tab replaces the list.
     const selectTab = async (name: string) => {
       const tab = filters.getByRole("tab", { name });
-      await tab.click();
-      await expect(tab).toHaveAttribute("aria-selected", "true");
+      // A click before hydration does nothing, so click again until it lands.
+      await expect(async () => {
+        await tab.click();
+        await expect(tab).toHaveAttribute("aria-selected", "true", {
+          timeout: 1500,
+        });
+      }).toPass();
     };
     await selectTab("Status changes");
     await selectTab("Comments");

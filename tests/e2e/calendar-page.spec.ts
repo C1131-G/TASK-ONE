@@ -23,7 +23,7 @@ test.describe("Calendar (/calendar)", () => {
       "page"
     );
     await expect(
-      page.getByRole("textbox", { name: "Search calendar tasks" })
+      page.getByRole("searchbox", { name: "Search calendar tasks" })
     ).toBeVisible();
   });
 
@@ -40,6 +40,7 @@ test.describe("Calendar (/calendar)", () => {
     await expect(label).not.toHaveText(current);
 
     await page.getByRole("link", { name: "Previous month" }).click();
+    await expect(page).toHaveURL(/monthOffset=0/u);
     await page.getByRole("link", { name: "Previous month" }).click();
     await expect(page).toHaveURL(/monthOffset=-1/u);
     await expect(label).not.toHaveText(current);
@@ -77,7 +78,8 @@ test.describe("Calendar (/calendar)", () => {
     page,
   }) => {
     await page.goto("/calendar");
-    await page.getByRole("button", { name: "New event" }).click();
+    // The page header and the events section each carry a New event button.
+    await page.getByRole("button", { name: "New event" }).first().click();
 
     const dialog = page.getByRole("dialog", { name: "New event" });
     await expect(dialog).toBeVisible();

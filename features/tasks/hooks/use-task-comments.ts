@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 
 import { useWorkspaceUndo } from "@/components/workspace/workspace-undo";
+import { subscribeToRealtimeRefresh } from "@/features/realtime/realtime-signal";
 import type { TaskCommentView } from "@/features/tasks/components/task-comment-parts";
 import {
   createCommentAction,
@@ -38,6 +39,16 @@ export const useTaskComments = ({
       setComments(result.data);
     }
   }, [taskId]);
+
+  // Another person's comment arrives as a server event; this list is client
+  // state, so it reads again when the page does.
+  useEffect(
+    () =>
+      subscribeToRealtimeRefresh(() => {
+        void refresh();
+      }),
+    [refresh]
+  );
 
   const submit = () =>
     startTransition(async () => {

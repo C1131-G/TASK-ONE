@@ -22,15 +22,15 @@ test.describe("Members (/members)", () => {
       const total = await profileLinks.count();
       expect(total).toBeGreaterThan(1);
 
-      await page.getByPlaceholder("Search members").fill("Test Employee");
+      await page.getByPlaceholder("Search members").fill("UI Employee");
       await expect(profileLinks).toHaveCount(1);
-      await expect(profileLinks.first()).toContainText("Test Employee");
+      await expect(profileLinks.first()).toContainText("UI Employee");
 
       await page.getByPlaceholder("Search members").fill("");
       await page.getByRole("button", { exact: true, name: "Admin" }).click();
       await expect(profileLinks).not.toHaveCount(0);
       await expect(
-        page.locator("a.members-person-link", { hasText: "Test Employee" })
+        page.locator("a.members-person-link", { hasText: "UI Employee" })
       ).toHaveCount(0);
     });
 
@@ -60,7 +60,7 @@ test.describe("Members (/members)", () => {
         const names = await page
           .locator("a.members-person-link")
           .evaluateAll((links) => links.map((link) => link.textContent ?? ""));
-        const index = names.findIndex((name) => name.includes("Test Employee"));
+        const index = names.findIndex((name) => name.includes("UI Employee"));
         expect(index).toBeGreaterThanOrEqual(0);
         await page.getByRole("button", { name: "Manage" }).nth(index).click();
         await expect(

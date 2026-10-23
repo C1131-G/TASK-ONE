@@ -176,7 +176,7 @@ test.describe("Project (/projects/[projectId])", () => {
 
       await page.goto("/budgets");
       await expect(
-        page.getByRole("link", { name: /UI Fixture Populated/u })
+        page.getByRole("link", { name: /UI Fixture Populated/u }).first()
       ).toBeVisible();
 
       await page.goBack();

@@ -59,9 +59,10 @@ test.describe("Timeline (/timeline)", () => {
     const search = page.getByRole("searchbox", {
       name: "Search timeline tasks",
     });
+    // Group and milestone lane headings stay while no task matches.
     const rows = page
       .getByRole("list", { name: "Timeline tasks" })
-      .getByRole("listitem");
+      .locator("a.timeline-row-link");
     const before = await rows.count();
 
     await search.fill("zzqx no task has this title");
