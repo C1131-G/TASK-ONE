@@ -62,6 +62,17 @@ export const TaskCustomFieldsSchema = Schema.Struct({
 });
 export type TaskCustomFields = typeof TaskCustomFieldsSchema.Type;
 
+// What the project table shows: the active fields and, per task id, the value
+// of each field that task has one for.
+export const ProjectCustomFieldTableSchema = Schema.Struct({
+  fields: CustomFieldListSchema,
+  values: Schema.Record(
+    UUIDSchema,
+    Schema.Record(UUIDSchema, FieldValueSchema)
+  ),
+});
+export type ProjectCustomFieldTable = typeof ProjectCustomFieldTableSchema.Type;
+
 export const CustomFieldReceiptSchema = Schema.Struct({ id: UUIDSchema });
 
 export const ValueChangeSchema = Schema.Struct({ changed: Schema.Boolean });
@@ -92,6 +103,10 @@ export class CustomFields extends Context.Service<
       actorId: string,
       taskId: string
     ) => Effect.Effect<TaskCustomFields, AppError>;
+    readonly tableForProject: (
+      actorId: string,
+      projectId: string
+    ) => Effect.Effect<ProjectCustomFieldTable, AppError>;
     readonly setValue: (
       actorId: string,
       taskId: string,

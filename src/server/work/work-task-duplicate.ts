@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { copyTaskFieldValues } from "../custom-fields/custom-field-copy";
 import type { CreatedTask } from "./work-contracts";
 import { decodeTaskPriority } from "./work-contracts";
 import { assertOrdinaryTask, databaseError } from "./work-internal";
@@ -156,6 +157,12 @@ export const duplicateTask = (
             })
           ),
         ]);
+        await copyTaskFieldValues(transaction, {
+          actorId,
+          copyTaskId: id,
+          projectId: source.projectId,
+          sourceTaskId: taskId,
+        });
         await transaction.orm.public.Activity.create({
           action: "task.duplicated",
           actorId,

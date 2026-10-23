@@ -5,6 +5,7 @@ import { listBugs } from "@/features/bugs/bugs-queries";
 import { calendarPeriod } from "@/features/calendar/calendar-params";
 import type { CalendarMode } from "@/features/calendar/calendar-params";
 import { listCalendarEvents } from "@/features/calendar/calendar-queries";
+import { getProjectCustomFieldTable } from "@/features/custom-fields/custom-field-queries";
 import { getPersonalWorkspace } from "@/features/discovery/discovery-queries";
 import { listProjectFiles } from "@/features/files/files-queries";
 import {
@@ -99,6 +100,7 @@ const loadProjectViewData = async ({
     calendarResult,
     automationResult,
     runResult,
+    customFieldResult,
   ] = await Promise.all([
     requiresTaskList
       ? listProjectTaskPages(project.id, project.taskCount)
@@ -121,7 +123,14 @@ const loadProjectViewData = async ({
           projectId: project.id,
         })
       : null,
+    // Only the table has custom field columns; a failed read just hides them.
+    view === "table"
+      ? getProjectCustomFieldTable({ projectId: project.id })
+      : null,
   ]);
+  const customFieldTable = customFieldResult?.ok
+    ? customFieldResult.data
+    : null;
   const tasks = taskResult?.ok ? taskResult.data : [];
   const editableTaskIds = getEditableTaskIds(tasks, isAdmin, currentUserId);
   const calendarEvents = calendarResult?.ok
@@ -134,6 +143,7 @@ const loadProjectViewData = async ({
     bugResult,
     calendarEvents,
     calendarRange,
+    customFieldTable,
     editableTaskIds,
     fileResult,
     runResult,
@@ -234,7 +244,8 @@ export const getProjectBodyData = async (
     currentUserId,
     employeeResult,
     initialColumnWidths: columnWidthsFromPreferences(
-      preferences.ok ? preferences.data.taskTableColumnWidths : undefined
+      preferences.ok ? preferences.data.taskTableColumnWidths : undefined,
+      viewData.customFieldTable?.fields.map(({ id }) => id)
     ),
     isAdmin,
     labelResult,

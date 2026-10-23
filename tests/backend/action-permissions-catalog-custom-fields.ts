@@ -20,6 +20,11 @@ export const customFieldActionCatalog: readonly ActionEntry[] = [
       projectId: ids.projectId,
     })
   ),
+  entry(
+    "getProjectCustomFieldTable",
+    fieldQueries.getProjectCustomFieldTable,
+    () => ({ projectId: ids.projectId })
+  ),
   entry("getTaskCustomFields", fieldQueries.getTaskCustomFields, () => ({
     taskId: ids.taskId,
   })),
@@ -83,6 +88,7 @@ export const customFieldActionCatalog: readonly ActionEntry[] = [
 
 const readOnlyOrTaskScoped = new Set([
   "listProjectCustomFields",
+  "getProjectCustomFieldTable",
   "getTaskCustomFields",
   "setCustomFieldValueAction",
   "clearCustomFieldValueAction",

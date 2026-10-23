@@ -114,6 +114,7 @@ const ProjectBody = async ({
     calendarMode,
     calendarRange,
     currentUserId,
+    customFieldTable,
     editableTaskIds,
     employeeResult,
     fileResult,
@@ -161,6 +162,7 @@ const ProjectBody = async ({
             calendarMode={calendarMode}
             calendarRange={calendarRange}
             currentUserId={currentUserId}
+            customFieldTable={customFieldTable}
             editableTaskIds={editableTaskIds}
             employees={employees}
             fileResult={fileResult}

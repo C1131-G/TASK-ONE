@@ -6,9 +6,14 @@ import type {
 
 import type { TaskTableColumnId } from "../tasks/task-table-columns";
 import {
+  HIDEABLE_COLUMNS,
   parseHiddenColumns,
   serializeHiddenColumns,
 } from "../tasks/task-table-columns";
+
+// A project's table is the only one with custom field columns. Whether a
+// listed field still exists is checked where its fields are known.
+const PROJECT_COLUMN_OPTIONS = { customFields: true } as const;
 
 export const PROJECT_VIEW_STATUSES = [
   "backlog",
@@ -77,7 +82,11 @@ export const normalizeProjectViewSearch = (
   raw: ProjectViewSearch
 ): NormalizedProjectViewSearch => ({
   group: pick(PROJECT_VIEW_GROUPS, raw.group) ?? "status",
-  hidden: parseHiddenColumns(raw.hidden),
+  hidden: parseHiddenColumns(
+    raw.hidden,
+    HIDEABLE_COLUMNS,
+    PROJECT_COLUMN_OPTIONS
+  ),
   priority: pick(PROJECT_VIEW_PRIORITIES, raw.priority) ?? "all",
   q: raw.q.slice(0, MAX_QUERY_LENGTH),
   sort: pick(PROJECT_VIEW_SORTS, raw.sort) ?? "manual",
@@ -130,7 +139,11 @@ export const toRawProjectViewSearch = (
   search: NormalizedProjectViewSearch
 ): ProjectViewSearch => ({
   group: search.group,
-  hidden: serializeHiddenColumns(search.hidden),
+  hidden: serializeHiddenColumns(
+    search.hidden,
+    HIDEABLE_COLUMNS,
+    PROJECT_COLUMN_OPTIONS
+  ),
   priority: search.priority,
   q: search.q,
   sort: search.sort,
@@ -162,7 +175,15 @@ export const projectViewSettingsToSearch = (settings: {
   readonly hiddenColumns: readonly string[];
 }): NormalizedProjectViewSearch => ({
   group: settings.groupBy ?? "status",
-  hidden: parseHiddenColumns(serializeHiddenColumns(settings.hiddenColumns)),
+  hidden: parseHiddenColumns(
+    serializeHiddenColumns(
+      settings.hiddenColumns,
+      HIDEABLE_COLUMNS,
+      PROJECT_COLUMN_OPTIONS
+    ),
+    HIDEABLE_COLUMNS,
+    PROJECT_COLUMN_OPTIONS
+  ),
   priority: settings.filters.priority[0] ?? "all",
   q: settings.filters.query,
   sort: settings.sort.field,

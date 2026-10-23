@@ -16,7 +16,13 @@ import type { ProjectTaskViewItem } from "@/features/projects/types/project-task
 import { GlobalTaskBulkDialog } from "@/features/tasks/components/global-task-bulk-dialog";
 import { TaskCreateForm } from "@/features/tasks/components/task-create-form";
 import { TaskTableColumnMenu } from "@/features/tasks/components/task-table-column-menu";
-import { serializeHiddenColumns } from "@/features/tasks/task-table-columns";
+import {
+  HIDEABLE_COLUMNS,
+  customFieldColumn,
+  dropInactiveCustomColumns,
+  serializeHiddenColumns,
+} from "@/features/tasks/task-table-columns";
+import type { ProjectCustomFieldTable } from "@/src/server/custom-fields/custom-field-contracts";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectListItem } from "@/src/server/projects/project-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
@@ -24,8 +30,11 @@ import type { LabelSummary } from "@/src/server/tasks/label-management";
 import { useProjectViewSearch } from "../hooks/use-project-view-search";
 import { useProjectViewStore } from "../providers/project-view-store-provider";
 
+const NO_VALUES: ProjectCustomFieldTable["values"] = {};
+
 export const ProjectTaskListViewContent = ({
   currentUserId,
+  customFieldTable,
   editableTaskIds,
   employees,
   isAdmin,
@@ -35,6 +44,7 @@ export const ProjectTaskListViewContent = ({
   view,
 }: {
   readonly currentUserId: string | null;
+  readonly customFieldTable: ProjectCustomFieldTable | null;
   readonly editableTaskIds: ReadonlySet<string>;
   readonly employees: readonly EmployeeDirectoryEntry[];
   readonly isAdmin: boolean;
@@ -58,6 +68,17 @@ export const ProjectTaskListViewContent = ({
   const columnWidths = useSelector(
     projectViewStore,
     (state) => state.columnWidths
+  );
+  // The list names columns that differ from their default, and a field
+  // archived since it was saved is no longer a column.
+  const customFields = customFieldTable?.fields ?? [];
+  const menuColumns = [
+    ...HIDEABLE_COLUMNS,
+    ...customFields.map(customFieldColumn),
+  ];
+  const hiddenColumns = dropInactiveCustomColumns(
+    search.hidden,
+    customFields.map(({ id }) => id)
   );
   const selectedTaskIds: ReadonlySet<string> = useMemo(
     () => new Set(selectedTaskIdList),
@@ -130,9 +151,14 @@ export const ProjectTaskListViewContent = ({
       {view === "table" ? (
         <div className="project-task-table-tools">
           <TaskTableColumnMenu
-            hidden={search.hidden}
+            columns={menuColumns}
+            hidden={hiddenColumns}
             onHiddenChange={(next) =>
-              updateSearch({ hidden: serializeHiddenColumns(next) })
+              updateSearch({
+                hidden: serializeHiddenColumns(next, HIDEABLE_COLUMNS, {
+                  customFields: true,
+                }),
+              })
             }
           />
         </div>
@@ -142,10 +168,12 @@ export const ProjectTaskListViewContent = ({
           activeSort={sort}
           columnWidths={columnWidths}
           currentUserId={currentUserId}
+          customFields={customFields}
+          customValues={customFieldTable?.values ?? NO_VALUES}
           editableTaskIds={editableTaskIds}
           employees={employees}
           groups={tableGroups}
-          hiddenColumns={search.hidden}
+          hiddenColumns={hiddenColumns}
           isAdmin={isAdmin}
           labels={labels}
           onResizeColumn={(columnId, width) =>

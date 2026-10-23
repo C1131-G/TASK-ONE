@@ -10,6 +10,7 @@ import { WorkspaceTimeline } from "@/features/projects/components/workspace-time
 import type { ProjectTaskViewItem } from "@/features/projects/types/project-task-view-types";
 import { TaskCreateForm } from "@/features/tasks/components/task-create-form";
 import type { CalendarEventSummary } from "@/src/server/calendar/calendar-contracts";
+import type { ProjectCustomFieldTable } from "@/src/server/custom-fields/custom-field-contracts";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type {
   ProjectListItem,
@@ -34,6 +35,7 @@ export const ProjectTaskViews = ({
   tasks,
   editableTaskIds,
   currentUserId,
+  customFieldTable,
   isAdmin,
   employees,
   labels,
@@ -50,6 +52,7 @@ export const ProjectTaskViews = ({
   readonly tasks: readonly ProjectTaskViewItem[];
   readonly editableTaskIds: ReadonlySet<string>;
   readonly currentUserId: string | null;
+  readonly customFieldTable: ProjectCustomFieldTable | null;
   readonly isAdmin: boolean;
   readonly employees: readonly EmployeeDirectoryEntry[];
   readonly labels: readonly LabelSummary[];
@@ -176,6 +179,7 @@ export const ProjectTaskViews = ({
     return (
       <ProjectTaskListViewContent
         currentUserId={currentUserId}
+        customFieldTable={customFieldTable}
         editableTaskIds={editableTaskIds}
         employees={employees}
         isAdmin={isAdmin}

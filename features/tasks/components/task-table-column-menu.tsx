@@ -44,13 +44,16 @@ export const TaskTableColumnMenu = ({
       >
         {columns.map((column) => (
           <DropdownMenuCheckboxItem
-            checked={!hiddenSet.has(column.id)}
+            checked={
+              hiddenSet.has(column.id) === (column.hiddenByDefault ?? false)
+            }
             key={column.id}
             onCheckedChange={(visible) =>
+              // The list holds columns that differ from their default.
               onHiddenChange(
-                visible
-                  ? hidden.filter((id) => id !== column.id)
-                  : [...hidden, column.id]
+                visible === (column.hiddenByDefault ?? false)
+                  ? [...hidden, column.id]
+                  : hidden.filter((id) => id !== column.id)
               )
             }
             onSelect={(event) => event.preventDefault()}

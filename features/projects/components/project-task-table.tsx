@@ -15,17 +15,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCustomFieldValue } from "@/features/custom-fields/custom-field-format";
 import { TaskManageControls } from "@/features/tasks/components/task-manage-controls";
 import { TaskStatusSelect } from "@/features/tasks/components/task-status-select";
 import { TaskTableHeaderCell } from "@/features/tasks/components/task-table-header-cell";
 import type {
   TaskTableColumn,
+  TaskTableColumnDef,
   TaskTableColumnId,
 } from "@/features/tasks/task-table-columns";
 import {
   TASK_TABLE_COLUMNS,
+  customFieldColumn,
   defaultColumnWidth,
+  shownColumns,
 } from "@/features/tasks/task-table-columns";
+import type {
+  CustomFieldView,
+  ProjectCustomFieldTable,
+} from "@/src/server/custom-fields/custom-field-contracts";
 import type { LabelSummary } from "@/src/server/tasks/label-management";
 import type { ProjectTaskListItem } from "@/src/server/work/work-contracts";
 
@@ -64,10 +72,26 @@ const formatDate = (date: string | null): string => {
   return DATE_FORMATTER.format(new Date(`${date}T12:00:00Z`));
 };
 
+const isBuiltInColumn = (
+  column: TaskTableColumnDef
+): column is TaskTableColumn =>
+  TASK_TABLE_COLUMNS.some(({ id }) => id === column.id);
+
+// Custom field columns sit after the built-in ones, before the actions column.
+const withCustomColumns = (
+  customFields: readonly CustomFieldView[]
+): readonly TaskTableColumnDef[] => [
+  ...TASK_TABLE_COLUMNS.filter(({ id }) => id !== "actions"),
+  ...customFields.map(customFieldColumn),
+  ...TASK_TABLE_COLUMNS.filter(({ id }) => id === "actions"),
+];
+
 export const ProjectTaskTable = ({
   activeSort,
   columnWidths,
   currentUserId,
+  customFields,
+  customValues,
   editableTaskIds,
   employees,
   hiddenColumns,
@@ -86,6 +110,8 @@ export const ProjectTaskTable = ({
   readonly activeSort: string;
   readonly columnWidths: Partial<Record<TaskTableColumnId, number>>;
   readonly currentUserId: string | null;
+  readonly customFields: readonly CustomFieldView[];
+  readonly customValues: ProjectCustomFieldTable["values"];
   readonly editableTaskIds: ReadonlySet<string>;
   readonly employees: readonly { readonly id: string; readonly name: string }[];
   readonly hiddenColumns: readonly TaskTableColumnId[];
@@ -106,8 +132,12 @@ export const ProjectTaskTable = ({
   readonly tasks: readonly ProjectTaskTableItem[];
 }) => {
   const labelsById = new Map(labels.map((label) => [label.id, label]));
-  const visibleColumns = TASK_TABLE_COLUMNS.filter(
-    (column) => !hiddenColumns.includes(column.id)
+  const fieldsByColumnId = new Map(
+    customFields.map((field) => [customFieldColumn(field).id, field])
+  );
+  const visibleColumns = shownColumns(
+    withCustomColumns(customFields),
+    hiddenColumns
   );
   const selectableCount = tasks.filter((task) =>
     selectableTaskIds.has(task.id)
@@ -124,8 +154,18 @@ export const ProjectTaskTable = ({
     headerChecked = "indeterminate";
   }
 
-  const widthOf = (column: TaskTableColumn) =>
+  const widthOf = (column: TaskTableColumnDef) =>
     columnWidths[column.id] ?? defaultColumnWidth(column.id);
+
+  const renderCustomCell = (
+    column: TaskTableColumnDef,
+    task: ProjectTaskTableItem
+  ) => {
+    const field = fieldsByColumnId.get(column.id);
+    return field
+      ? formatCustomFieldValue(field.type, customValues[task.id]?.[field.id])
+      : "—";
+  };
 
   const renderCell = (
     column: TaskTableColumn,
@@ -281,7 +321,9 @@ export const ProjectTaskTable = ({
                       data-label={column.label}
                       key={column.id}
                     >
-                      {renderCell(column, task, editable)}
+                      {isBuiltInColumn(column)
+                        ? renderCell(column, task, editable)
+                        : renderCustomCell(column, task)}
                     </TableCell>
                   ))}
                 </TableRow>

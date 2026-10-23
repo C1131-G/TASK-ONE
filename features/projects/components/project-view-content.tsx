@@ -30,6 +30,7 @@ import type {
 } from "@/features/tasks/tasks-queries";
 import { readOrThrow } from "@/lib/read-result";
 import type { currentUtcMonthRange } from "@/src/lib/utc-date-range";
+import type { ProjectCustomFieldTable } from "@/src/server/custom-fields/custom-field-contracts";
 import type { EmployeeDirectoryEntry } from "@/src/server/people/user-contracts";
 import type { ProjectMilestone } from "@/src/server/projects/project-contracts";
 
@@ -86,6 +87,7 @@ interface ProjectViewContentProps {
   readonly calendarMode: "month" | "week";
   readonly calendarRange: ProjectCalendarRange;
   readonly currentUserId: string | null;
+  readonly customFieldTable: ProjectCustomFieldTable | null;
   readonly editableTaskIds: ReadonlySet<string>;
   readonly employees: readonly EmployeeDirectoryEntry[];
   readonly fileResult: Awaited<ReturnType<typeof listProjectFiles>> | null;
@@ -259,6 +261,7 @@ const renderProjectTasks = ({
   calendarMode,
   calendarRange,
   currentUserId,
+  customFieldTable,
   editableTaskIds,
   employees,
   isAdmin,
@@ -281,6 +284,7 @@ const renderProjectTasks = ({
       calendarRange={calendarRange}
       calendarMode={calendarMode}
       currentUserId={currentUserId}
+      customFieldTable={customFieldTable}
       editableTaskIds={editableTaskIds}
       employees={employees}
       isAdmin={isAdmin}

@@ -5,6 +5,7 @@ import { Effect, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { copyProjectFields } from "../custom-fields/custom-field-copy";
 import { DuplicateProjectInputSchema } from "./project-contracts";
 import type {
   DuplicateProjectInput,
@@ -225,12 +226,19 @@ export const duplicateProject = (
               : [];
           }),
         ]);
+        const copiedFields = await copyProjectFields(transaction, {
+          projectId,
+          sourceProjectId,
+          taskIdMap,
+        });
         await writeActivity(
           transaction,
           actorId,
           projectId,
           "project.duplicated",
           {
+            customFieldCount: copiedFields.fieldCount,
+            customValueCount: copiedFields.valueCount,
             sourceProjectId,
             taskCount: activeTasks.length,
           }

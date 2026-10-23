@@ -8,6 +8,7 @@ import {
   reorderFields,
   updateField,
 } from "./custom-field-definitions";
+import { tableForProject } from "./custom-field-table";
 import {
   clearFieldValue,
   fieldsForTask,
@@ -24,6 +25,7 @@ export const CustomFieldsLive = Layer.succeed(
     listForProject: listProjectFields,
     reorder: reorderFields,
     setValue: setFieldValue,
+    tableForProject,
     update: updateField,
   })
 );

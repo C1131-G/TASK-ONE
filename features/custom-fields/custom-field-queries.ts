@@ -8,6 +8,7 @@ import { runServerAction } from "@/src/server/core/server-action";
 import {
   CustomFieldListSchema,
   CustomFields,
+  ProjectCustomFieldTableSchema,
   TaskCustomFieldsSchema,
 } from "@/src/server/custom-fields/custom-field-contracts";
 import { CustomFieldsLive } from "@/src/server/custom-fields/custom-fields";
@@ -31,6 +32,28 @@ export const listProjectCustomFields = async (input: unknown) =>
       ),
     undefined,
     CustomFieldListSchema
+  );
+
+// Staff only: a project's active fields with every task's values, for the
+// project table's optional custom field columns.
+export const getProjectCustomFieldTable = async (input: unknown) =>
+  await runServerAction(
+    input,
+    Schema.Struct({ projectId: UUIDSchema }),
+    ({ projectId }) =>
+      Effect.gen(function* projectTable() {
+        const sessions = yield* AuthSession;
+        const actor = yield* sessions.requireWorkspaceAccess(
+          yield* requestHeadersOrFail
+        );
+        const fields = yield* CustomFields;
+        return yield* fields.tableForProject(actor.id, projectId);
+      }).pipe(
+        Effect.provide(AuthSessionLive),
+        Effect.provide(CustomFieldsLive)
+      ),
+    undefined,
+    ProjectCustomFieldTableSchema
   );
 
 // Staff only: a task's project fields with the task's values. Clients never
