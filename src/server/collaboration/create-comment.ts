@@ -6,6 +6,7 @@ import { Effect, Schema } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
+import { LONG_TEXT_MAX_LENGTH } from "../core/text-limits";
 import { notifyUsers } from "../notifications/notify-users";
 import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import { markFirstResponse } from "../work/bug-sla";
@@ -117,10 +118,14 @@ export const createCommentInTransaction = async (
 ): Promise<CreatedComment> => {
   const { actorId, taskId, visibility } = input;
   const body = input.body.trim();
-  if (!Schema.is(uuidSchema)(taskId) || !body || body.length > 10_000) {
+  if (
+    !Schema.is(uuidSchema)(taskId) ||
+    !body ||
+    body.length > LONG_TEXT_MAX_LENGTH
+  ) {
     throw new AppError({
       code: "VALIDATION_FAILED",
-      message: "Comments must contain 1 to 10,000 characters.",
+      message: `Comments must contain 1 to ${LONG_TEXT_MAX_LENGTH.toLocaleString("en-US")} characters.`,
     });
   }
   const mentionIds = extractMentionIds(body);

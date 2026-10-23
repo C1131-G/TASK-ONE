@@ -3,11 +3,14 @@ import { Context, Schema } from "effect";
 
 import type { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { LONG_TEXT_MAX_LENGTH } from "../core/text-limits";
 import type { CreatedTask } from "../work/work-contracts";
 
 export const SubtaskFieldsSchema = Schema.Struct({
   assigneeId: Schema.NullOr(Schema.String.check(Schema.isUUID())),
-  description: Schema.NullOr(Schema.String.check(Schema.isMaxLength(10_000))),
+  description: Schema.NullOr(
+    Schema.String.check(Schema.isMaxLength(LONG_TEXT_MAX_LENGTH))
+  ),
   dueDate: Schema.NullOr(CalendarDateSchema),
   title: Schema.Trim.check(Schema.isMinLength(1), Schema.isMaxLength(240)),
 });

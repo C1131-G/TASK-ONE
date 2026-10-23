@@ -14,6 +14,7 @@ import {
 } from "@/components/workspace/workspace-controls";
 import { WorkspaceDatePicker } from "@/components/workspace/workspace-date-picker";
 import { WorkspaceDisclosure } from "@/components/workspace/workspace-disclosure";
+import { LONG_TEXT_MAX_LENGTH } from "@/src/server/core/text-limits";
 
 export interface TaskSubtaskView {
   readonly id: string;
@@ -100,7 +101,7 @@ export const TaskSubtasksSection = ({
                 <WorkspaceTextarea
                   className="input"
                   defaultValue={subtask.description ?? ""}
-                  maxLength={10_000}
+                  maxLength={LONG_TEXT_MAX_LENGTH}
                   name="description"
                   rows={2}
                   id={`subtask-${subtask.id}-field-223`}

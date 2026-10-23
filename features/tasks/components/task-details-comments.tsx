@@ -10,6 +10,7 @@ import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 import type { CommentVisibility } from "@/src/server/collaboration/contracts";
+import { LONG_TEXT_MAX_LENGTH } from "@/src/server/core/text-limits";
 
 import { findMentionQuery, insertMention } from "../task-mentions";
 import { CommentCard, VisibilityToggle } from "./task-comment-parts";
@@ -154,7 +155,7 @@ export const TaskCommentsSection = ({
           aria-expanded={listOpen}
           className="input"
           id={fieldId}
-          maxLength={10_000}
+          maxLength={LONG_TEXT_MAX_LENGTH}
           onChange={(event) => {
             onBodyChange(event.currentTarget.value);
             updateMention(

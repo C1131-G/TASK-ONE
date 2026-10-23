@@ -7,9 +7,10 @@ import type { FormEvent } from "react";
 
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { addClientCommentAction } from "@/features/portal/portal-bug-actions";
+import { LONG_TEXT_MAX_LENGTH } from "@/src/server/core/text-limits";
 import type { PortalComment } from "@/src/server/portal/portal-contracts";
 
-const BODY_MAX = 10_000;
+const BODY_MAX = LONG_TEXT_MAX_LENGTH;
 
 const PortalComments = ({
   bugId,

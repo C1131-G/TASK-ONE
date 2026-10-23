@@ -3,6 +3,7 @@ import { Context, Schema } from "effect";
 
 import type { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { LONG_TEXT_MAX_LENGTH } from "../core/text-limits";
 
 export const TaskStatusSchema = Schema.Literals([
   "backlog",
@@ -27,7 +28,7 @@ export const decodeTaskPriority = (
 ): CreateTaskInput["priority"] =>
   Schema.decodeUnknownSync(TaskPrioritySchema)(priority);
 
-export const TASK_DESCRIPTION_MAX_LENGTH = 20_000;
+export const TASK_DESCRIPTION_MAX_LENGTH = LONG_TEXT_MAX_LENGTH;
 
 export const TaskDescriptionSchema = Schema.NullOr(
   Schema.String.check(Schema.isMaxLength(TASK_DESCRIPTION_MAX_LENGTH))
