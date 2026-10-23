@@ -63,6 +63,8 @@ export interface Ids {
 }
 
 interface PersonaRecord {
+  // The bearer token the mobile API accepts; empty until sign-in returns one.
+  readonly bearerToken: string;
   readonly headers: Headers;
   readonly id: string;
 }
@@ -95,6 +97,9 @@ export const nextKey = (): string => {
 
 export const personaId = (persona: Persona): string =>
   personas.get(persona)?.id ?? "";
+
+export const personaBearerToken = (persona: Persona): string =>
+  personas.get(persona)?.bearerToken ?? "";
 
 export const personaHeaders = (persona: Persona): Headers =>
   personas.get(persona)?.headers ?? new Headers();
@@ -210,7 +215,11 @@ export const createPersona = async (
     .getSetCookie()
     .map((value) => value.split(";")[0])
     .join("; ");
-  return { headers: new Headers({ cookie }), id: userId };
+  return {
+    bearerToken: signIn.headers.get("set-auth-token") ?? "",
+    headers: new Headers({ cookie }),
+    id: userId,
+  };
 };
 
 export const setupHarness = async (): Promise<void> => {
@@ -282,7 +291,11 @@ export const setupHarness = async (): Promise<void> => {
     [otherClient.id, otherClientCompanyId]
   );
   personas.set("otherClient", otherClient);
-  personas.set("anonymous", { headers: new Headers(), id: "" });
+  personas.set("anonymous", {
+    bearerToken: "",
+    headers: new Headers(),
+    id: "",
+  });
 
   const projectId = randomUUID();
   const archivedProjectId = randomUUID();

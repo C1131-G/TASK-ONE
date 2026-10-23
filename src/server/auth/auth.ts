@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { createAccessControl } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
+import { bearer } from "better-auth/plugins/bearer";
 
 import { db } from "@/src/prisma/db";
 
@@ -223,6 +224,9 @@ export const auth = betterAuth({
       defaultRole: "employee",
       roles: { admin: adminRole, client: clientRole, employee: employeeRole },
     }),
+    // The mobile app sends the same database session as an Authorization
+    // header, so revocation and expiry behave exactly as they do for cookies.
+    bearer(),
   ],
   rateLimit: {
     customRules: {
