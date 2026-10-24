@@ -5,12 +5,17 @@ import type {
   listWorkspaceNotificationsRoute,
   markAllWorkspaceNotificationsReadRoute,
   markWorkspaceNotificationReadRoute,
+  setWorkspaceNotificationPreferenceRoute,
 } from "../../../mobile-api/routes-notifications";
 import { NOTIFICATION_PAGE_DEFAULT_SIZE } from "../../../mobile-api/routes-notifications";
 import { AuthSession } from "../../auth/session";
 import type { AppError } from "../../core/action-result";
 import type { InboxPage } from "../../notifications/contracts";
 import { Notifications, NotificationsLive } from "../../notifications/service";
+import {
+  readNotificationPreferences,
+  writeNotificationPreference,
+} from "./preferences";
 import { markAllNotificationsRead, markNotificationRead } from "./read-state";
 
 // A staff member's inbox. The person is the one the bearer token names.
@@ -51,4 +56,25 @@ export const markAllWorkspaceNotificationsRead = (
     const sessions = yield* AuthSession;
     const user = yield* sessions.requireWorkspaceAccess(headers);
     return yield* markAllNotificationsRead(user.id, input.idempotencyKey);
+  });
+
+export const readWorkspacePreferences = (headers: Headers) =>
+  Effect.gen(function* readPreferences() {
+    const sessions = yield* AuthSession;
+    const user = yield* sessions.requireWorkspaceAccess(headers);
+    return yield* readNotificationPreferences(user.id);
+  });
+
+export const writeWorkspacePreference = (
+  headers: Headers,
+  input: RouteInput<typeof setWorkspaceNotificationPreferenceRoute>
+) =>
+  Effect.gen(function* writePreference() {
+    const sessions = yield* AuthSession;
+    const user = yield* sessions.requireWorkspaceAccess(headers);
+    return yield* writeNotificationPreference(
+      user.id,
+      input.body,
+      input.idempotencyKey
+    );
   });

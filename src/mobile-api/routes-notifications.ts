@@ -78,8 +78,44 @@ export const markAllWorkspaceNotificationsReadRoute = {
     "Mark every unread notification of the caller read; answers how many changed.",
 } as const satisfies RouteDefinition;
 
+export const NotificationPreferenceSchema = Schema.Struct({
+  channel: Schema.Literals(["in-app", "web-push", "email"]),
+  enabled: Schema.Boolean,
+  eventType: Schema.Literals([
+    "mention",
+    "assignment",
+    "comment",
+    "update",
+    "due",
+    "status",
+  ]),
+});
+
+export const getWorkspaceNotificationPreferencesRoute = {
+  data: Schema.Struct({
+    preferences: Schema.Array(NotificationPreferenceSchema),
+  }),
+  method: "get",
+  operationId: "getWorkspaceNotificationPreferences",
+  path: "/api/v1/workspace/notifications/preferences",
+  summary:
+    "The kinds of notification the caller switched on or off, per channel.",
+} as const satisfies RouteDefinition;
+
+export const setWorkspaceNotificationPreferenceRoute = {
+  body: NotificationPreferenceSchema,
+  data: DoneSchema,
+  method: "patch",
+  operationId: "setWorkspaceNotificationPreference",
+  path: "/api/v1/workspace/notifications/preferences",
+  summary:
+    "Switch one kind of notification on or off for one channel; email exists only for some kinds.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
   markWorkspaceNotificationReadRoute,
   markAllWorkspaceNotificationsReadRoute,
+  getWorkspaceNotificationPreferencesRoute,
+  setWorkspaceNotificationPreferenceRoute,
 ] as const satisfies readonly RouteDefinition[];
