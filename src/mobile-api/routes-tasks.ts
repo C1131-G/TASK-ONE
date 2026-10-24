@@ -68,8 +68,71 @@ export const myWorkRoute = {
     "Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones.",
 } as const satisfies RouteDefinition;
 
+export const TaskActionSchema = Schema.Literals([
+  "update",
+  "manageSubtasks",
+  "comment",
+  "trackTime",
+]);
+
+export const SubtaskSchema = Schema.Struct({
+  assigneeId: Schema.NullOr(Schema.String),
+  completed: Schema.Boolean,
+  description: Schema.NullOr(Schema.String),
+  dueDate: Schema.NullOr(Schema.String),
+  id: Schema.String,
+  position: Schema.Number,
+  taskId: Schema.String,
+  title: Schema.String,
+});
+
+export const DiscussionEntrySchema = Schema.Struct({
+  authorId: Schema.String,
+  authorName: Schema.String,
+  body: Schema.String,
+  createdAt: Schema.String,
+  id: Schema.String,
+  visibility: Schema.Literals(["public", "internal"]),
+});
+
+export const TaskContextSchema = Schema.Struct({
+  assignees: Schema.Array(
+    Schema.Struct({ id: Schema.String, name: Schema.String })
+  ),
+  createdById: Schema.String,
+  description: Schema.NullOr(Schema.String),
+  discussion: Schema.Array(DiscussionEntrySchema),
+  dueDate: Schema.NullOr(Schema.String),
+  id: Schema.String,
+  isArchived: Schema.Boolean,
+  permittedActions: Schema.Array(TaskActionSchema),
+  priority: TaskPrioritySchema,
+  projectId: Schema.String,
+  projectName: Schema.String,
+  reference: Schema.String,
+  startDate: Schema.NullOr(Schema.String),
+  status: TaskStatusSchema,
+  subtasks: Schema.Array(SubtaskSchema),
+  title: Schema.String,
+  type: Schema.Literals(["task", "bug"]),
+  version: Schema.Number,
+});
+
+export type MobileTaskContext = typeof TaskContextSchema.Type;
+
+const TaskPathSchema = Schema.Struct({ taskId: IdSchema });
+
+export const taskContextRoute = {
+  data: TaskContextSchema,
+  method: "get",
+  operationId: "getTaskContext",
+  params: TaskPathSchema,
+  path: "/api/v1/workspace/tasks/{taskId}",
+  summary:
+    "One task with its assignees, subtasks, discussion, version and what the caller may do with it.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
   myWorkRoute,
+  taskContextRoute,
 ] as const satisfies readonly RouteDefinition[];
-
-export { IdSchema };

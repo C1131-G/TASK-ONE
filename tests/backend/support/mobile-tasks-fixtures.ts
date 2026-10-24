@@ -1,30 +1,54 @@
 import { randomUUID } from "node:crypto";
 
+import { Schema } from "effect";
+
+import type { RouteDefinition } from "../../../src/mobile-api/route-definition";
 import { authPool, ids, personaBearerToken, personaId } from "./action-harness";
 import type { Persona } from "./action-harness";
 
-interface RouteContext {
-  params: Promise<Record<string, string>>;
-}
-type RouteHandler = (
-  request: Request,
-  context: RouteContext
-) => Promise<Response>;
+type RouteHandler = (request: Request, context: never) => Promise<Response>;
 type RouteModule = Record<string, RouteHandler | undefined>;
 
 // Each published path maps to the route file that serves it. Loading the file
-// on demand keeps a test file importable before its route exists.
+// on demand keeps a test file importable before its route exists. A `:name`
+// segment is a dynamic path parameter.
 const ROUTES: readonly {
   readonly load: () => Promise<RouteModule>;
-  readonly pattern: RegExp;
-  readonly names: readonly string[];
+  readonly path: string;
 }[] = [
   {
     load: () => import("../../../app/api/v1/workspace/me/work/route"),
-    names: [],
-    pattern: /^\/api\/v1\/workspace\/me\/work$/u,
+    path: "/api/v1/workspace/me/work",
+  },
+  {
+    load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
+    path: "/api/v1/workspace/tasks/:taskId",
   },
 ];
+
+const matchRoute = (
+  pathname: string
+): { load: () => Promise<RouteModule>; params: Record<string, string> } => {
+  const actual = pathname.split("/");
+  for (const route of ROUTES) {
+    const expected = route.path.split("/");
+    const params: Record<string, string> = {};
+    const matches =
+      actual.length === expected.length &&
+      expected.every((part, index) => {
+        const segment = actual[index] ?? "";
+        if (part.startsWith(":")) {
+          params[part.slice(1)] = segment;
+          return segment !== "";
+        }
+        return part === segment;
+      });
+    if (matches) {
+      return { load: route.load, params };
+    }
+  }
+  throw new Error(`No route is registered for ${pathname}`);
+};
 
 export interface ApiResponse<Data = unknown> {
   readonly status: number;
@@ -55,14 +79,7 @@ export const send = async <Data = unknown>(
   options: SendOptions = {}
 ): Promise<ApiResponse<Data>> => {
   const [pathname] = path.split("?");
-  const route = ROUTES.find(({ pattern }) => pattern.test(pathname ?? ""));
-  if (!route) {
-    throw new Error(`No route is registered for ${path}`);
-  }
-  const match = route.pattern.exec(pathname ?? "");
-  const params = Object.fromEntries(
-    route.names.map((name, index) => [name, match?.[index + 1] ?? ""])
-  );
+  const route = matchRoute(pathname ?? "");
   const token =
     options.token ?? (options.as ? personaBearerToken(options.as) : "");
   const headers = new Headers();
@@ -88,7 +105,7 @@ export const send = async <Data = unknown>(
       headers,
       method,
     }),
-    { params: Promise.resolve(params) }
+    { params: Promise.resolve(route.params) } as never
   );
   return {
     body: (await response.json()) as ApiResponse<Data>["body"],
@@ -172,3 +189,34 @@ export const taskState = async (taskId: string): Promise<unknown> => {
     task: task.rows,
   };
 };
+
+export const seedSubtask = async (
+  taskId: string,
+  title: string,
+  position = 0
+): Promise<string> => {
+  const subtaskId = randomUUID();
+  await authPool.query(
+    'INSERT INTO task_subtask (id, "taskId", title, position) VALUES ($1, $2, $3, $4)',
+    [subtaskId, taskId, title, position]
+  );
+  return subtaskId;
+};
+
+export const seedComment = async (
+  taskId: string,
+  authorId: string,
+  body: string
+): Promise<string> => {
+  const commentId = randomUUID();
+  await authPool.query(
+    `INSERT INTO comment (id, "taskId", "authorId", body, visibility) VALUES ($1, $2, $3, $4, 'internal')`,
+    [commentId, taskId, authorId, body]
+  );
+  return commentId;
+};
+
+// The response body must decode with the schema the route advertises, so the
+// OpenAPI document and the generated client never drift from the real answer.
+export const decodesAs = (route: RouteDefinition, data: unknown): boolean =>
+  Schema.is(route.data as Schema.Codec<unknown, unknown, never, never>)(data);
