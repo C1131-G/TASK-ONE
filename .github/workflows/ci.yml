@@ -106,6 +106,27 @@ jobs:
           curl --fail http://localhost:3000/api/health
           bunx playwright test --project=chromium --workers=1
 
+  mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.0
+      - run: bun install --frozen-lockfile
+      - name: Audit dependencies (blocking at critical)
+        run: bun audit --audit-level=critical
+      - run: bun run lint
+        working-directory: apps/mobile
+      - run: bun run typecheck
+        working-directory: apps/mobile
+      - run: bun run test:effect
+        working-directory: apps/mobile
+      - run: bun run test:ui
+        working-directory: apps/mobile
+
   docker:
     runs-on: ubuntu-latest
     env:
