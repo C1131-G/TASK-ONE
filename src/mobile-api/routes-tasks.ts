@@ -180,8 +180,30 @@ export const taskChangeRoute = {
     "Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409.",
 } as const satisfies RouteDefinition;
 
+export const TaskCreateBodySchema = Schema.Struct({
+  assigneeIds: Schema.Array(IdSchema).check(Schema.isMaxLength(100)),
+  description: Schema.optional(Schema.NullOr(Schema.String)),
+  dueDate: Schema.optional(Schema.NullOr(CalendarDayText)),
+  priority: Schema.optional(TaskPrioritySchema),
+  projectId: IdSchema,
+  title: Schema.String,
+});
+
+export type MobileTaskCreateBody = typeof TaskCreateBodySchema.Type;
+
+export const taskCreateRoute = {
+  body: TaskCreateBodySchema,
+  data: TaskChangeSchema,
+  method: "post",
+  operationId: "createTask",
+  path: "/api/v1/workspace/tasks",
+  summary:
+    "Create a task in an active project and assign it. Admins and employees follow the same rules as the web.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
   myWorkRoute,
   taskContextRoute,
   taskChangeRoute,
+  taskCreateRoute,
 ] as const satisfies readonly RouteDefinition[];

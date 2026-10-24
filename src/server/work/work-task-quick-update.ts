@@ -2,10 +2,14 @@ import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
-import type { MobileTaskChange } from "../../mobile-api/routes-tasks";
+import type {
+  MobileTaskChange,
+  MobileTaskCreateBody,
+} from "../../mobile-api/routes-tasks";
 import { AppError } from "../core/action-result";
 import { decodeTaskPriority, decodeTaskStatus } from "./work-contracts";
 import { databaseError } from "./work-internal";
+import { createTask } from "./work-task-creation";
 import { updateTask } from "./work-task-update";
 
 export interface QuickTaskChange {
@@ -72,5 +76,39 @@ export const quickUpdateTask = (
       status: updated.status,
       title: updated.title,
       version: updated.version,
+    };
+  });
+
+// A new task through the same creation rules as the web form.
+export const quickCreateTask = (
+  actorId: string,
+  body: MobileTaskCreateBody
+): Effect.Effect<MobileTaskChange, AppError> =>
+  Effect.gen(function* createFromMobile() {
+    const created = yield* createTask(actorId, {
+      assigneeIds: body.assigneeIds,
+      description: body.description ?? null,
+      dueDate: body.dueDate ?? null,
+      priority: body.priority ?? "medium",
+      projectId: body.projectId,
+      title: body.title,
+    });
+    const project = yield* Effect.tryPromise({
+      catch: databaseError,
+      try: () =>
+        db.orm.public.Project.where({ id: created.projectId })
+          .select("key")
+          .first(),
+    });
+    return {
+      assigneeIds: [...created.assigneeIds],
+      dueDate: created.dueDate,
+      id: created.id,
+      priority: created.priority,
+      projectId: created.projectId,
+      reference: `${project?.key ?? ""}-${created.projectTaskNumber}`,
+      status: created.status,
+      title: created.title,
+      version: created.version,
     };
   });

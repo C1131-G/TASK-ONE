@@ -21,6 +21,10 @@ const ROUTES: readonly {
     path: "/api/v1/workspace/me/work",
   },
   {
+    load: () => import("../../../app/api/v1/workspace/tasks/route"),
+    path: "/api/v1/workspace/tasks",
+  },
+  {
     load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId",
   },
