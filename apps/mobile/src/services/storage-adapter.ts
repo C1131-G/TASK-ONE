@@ -15,14 +15,14 @@ export interface StorageAdapter {
 
 /** The storage operations both services expose; values cross the boundary as codec-encoded strings. */
 export interface StoreOps {
-  readonly read: <A>(
+  readonly read: <TValue>(
     key: string,
-    codec: Schema.Codec<A, string, never, never>
-  ) => Effect.Effect<A | null, StorageFailure | DecodeFailure>;
-  readonly write: <A>(
+    codec: Schema.Codec<TValue, string, never, never>
+  ) => Effect.Effect<TValue | null, StorageFailure | DecodeFailure>;
+  readonly write: <TValue>(
     key: string,
-    value: A,
-    codec: Schema.Codec<A, string, never, never>
+    value: TValue,
+    codec: Schema.Codec<TValue, string, never, never>
   ) => Effect.Effect<void, StorageFailure>;
   readonly remove: (key: string) => Effect.Effect<void, StorageFailure>;
 }

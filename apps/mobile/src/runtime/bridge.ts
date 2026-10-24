@@ -21,17 +21,17 @@ declare module "@tanstack/react-query" {
  * runPromiseExit so screens match on the Exit for rollback and Undo.
  */
 export const makeBridge = (runtime: AppRuntime) => ({
-  queryOptions: <A>(input: {
+  queryOptions: <TData>(input: {
     readonly queryKey: readonly unknown[];
-    readonly program: Effect.Effect<A, AppFailure>;
+    readonly program: Effect.Effect<TData, AppFailure>;
   }) =>
     tanstackQueryOptions({
       queryKey: input.queryKey,
       queryFn: () => runtime.runPromise(input.program),
     }),
-  mutationOptions: <TVariables, A>(input: {
+  mutationOptions: <TVariables, TData>(input: {
     readonly mutationKey?: readonly unknown[];
-    readonly program: (variables: TVariables) => Effect.Effect<A, AppFailure>;
+    readonly program: (variables: TVariables) => Effect.Effect<TData, AppFailure>;
   }) =>
     tanstackMutationOptions({
       ...(input.mutationKey === undefined
