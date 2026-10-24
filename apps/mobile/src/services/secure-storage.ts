@@ -28,7 +28,7 @@ export const SecureStorageLive = Layer.effect(
   ),
 );
 
-export const SecureStorageMemory = Layer.succeed(
+export const SecureStorageMemory = Layer.effect(
   SecureStorage,
-  SecureStorage.of(makeStoreOps(memoryStorageAdapter())),
+  Effect.sync(() => SecureStorage.of(makeStoreOps(memoryStorageAdapter()))),
 );

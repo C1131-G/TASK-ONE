@@ -30,7 +30,7 @@ export const KeyValueStoreLive = Layer.effect(
   ),
 );
 
-export const KeyValueStoreMemory = Layer.succeed(
+export const KeyValueStoreMemory = Layer.effect(
   KeyValueStore,
-  KeyValueStore.of(makeStoreOps(memoryStorageAdapter())),
+  Effect.sync(() => KeyValueStore.of(makeStoreOps(memoryStorageAdapter()))),
 );

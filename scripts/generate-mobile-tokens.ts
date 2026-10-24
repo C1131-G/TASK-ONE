@@ -296,6 +296,7 @@ export const buildTokenModule = (lightCss: string, darkCss: string): string => {
       portalEntries(portalDarkBlock)
     ),
     `export const accents = {\n${accentLines.join("\n")}\n} as const;\n`,
+    "export type AccentName = keyof typeof accents;\n",
     `export const density = {\n${densityLines.join("\n")}\n} as const;\n`,
     emitObject("radii", radii),
     emitObject("spacing", spacing),

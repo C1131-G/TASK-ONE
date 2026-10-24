@@ -142,6 +142,8 @@ export const accents = {
   "graphite": { accL: "#34332f", accD: "#d9d6cf" },
 } as const;
 
+export type AccentName = keyof typeof accents;
+
 export const density = {
   "sideCompact": {
     "sideRow": 26,
