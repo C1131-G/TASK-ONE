@@ -132,7 +132,56 @@ export const taskContextRoute = {
     "One task with its assignees, subtasks, discussion, version and what the caller may do with it.",
 } as const satisfies RouteDefinition;
 
+const CalendarDayText = Schema.String.check(
+  Schema.isPattern(/^\d{4}-\d{2}-\d{2}$/u)
+);
+
+const ExpectedVersionSchema = Schema.Number.check(
+  Schema.isInt(),
+  Schema.isGreaterThanOrEqualTo(1)
+);
+
+// What a quick change or a create answers with: the task's new state and the
+// version the next write must send.
+export const TaskChangeSchema = Schema.Struct({
+  assigneeIds: Schema.Array(Schema.String),
+  dueDate: Schema.NullOr(Schema.String),
+  id: Schema.String,
+  priority: TaskPrioritySchema,
+  projectId: Schema.String,
+  reference: Schema.String,
+  status: TaskStatusSchema,
+  title: Schema.String,
+  version: Schema.Number,
+});
+
+export type MobileTaskChange = typeof TaskChangeSchema.Type;
+
+export const TaskChangeBodySchema = Schema.Struct({
+  assigneeIds: Schema.optional(
+    Schema.Array(IdSchema).check(Schema.isMaxLength(100))
+  ),
+  dueDate: Schema.optional(Schema.NullOr(CalendarDayText)),
+  expectedVersion: ExpectedVersionSchema,
+  priority: Schema.optional(TaskPrioritySchema),
+  status: Schema.optional(TaskStatusSchema),
+});
+
+export type MobileTaskChangeBody = typeof TaskChangeBodySchema.Type;
+
+export const taskChangeRoute = {
+  body: TaskChangeBodySchema,
+  data: TaskChangeSchema,
+  method: "patch",
+  operationId: "changeTask",
+  params: TaskPathSchema,
+  path: "/api/v1/workspace/tasks/{taskId}",
+  summary:
+    "Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
   myWorkRoute,
   taskContextRoute,
+  taskChangeRoute,
 ] as const satisfies readonly RouteDefinition[];
