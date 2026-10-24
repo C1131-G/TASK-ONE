@@ -150,3 +150,27 @@ export const countRows = async (
   );
   return Number(result.rows[0]?.count ?? 0);
 };
+
+// Moves a bug straight to a status, the way earlier workflow steps would.
+export const forceStatus = async (
+  bugId: string,
+  status: string,
+  columns: Record<string, string | number | Date | null> = {}
+): Promise<void> => {
+  const names = Object.keys(columns);
+  const set = names.map((name, index) => `"${name}" = $${index + 3}`);
+  await authPool.query(
+    `UPDATE bug_report SET status = $2, version = version + 1${set.length ? `, ${set.join(", ")}` : ""} WHERE id = $1`,
+    [bugId, status, ...Object.values(columns)]
+  );
+};
+
+export const statusOf = async (bugId: string): Promise<string> => {
+  const { status } = await bugRow(bugId);
+  return status;
+};
+
+export const versionOf = async (bugId: string): Promise<number> => {
+  const { version } = await bugRow(bugId);
+  return version;
+};

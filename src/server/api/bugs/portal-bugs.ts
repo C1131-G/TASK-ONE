@@ -1,9 +1,13 @@
 import { Effect } from "effect";
 
-import { portalBugRoutes } from "../../../mobile-api/routes-bugs";
+import {
+  portalBugActionRoutes,
+  portalBugRoutes,
+} from "../../../mobile-api/routes-bugs";
 import { Idempotency } from "../../core/idempotency";
 import {
   PortalBugs,
+  PortalCommentSchema,
   PortalBugReceiptSchema,
 } from "../../portal/portal-contracts";
 import { asPortalCaller } from "./caller";
@@ -45,6 +49,72 @@ export const submitPortalBug = (request: Request) =>
           input: input.body,
           key: input.idempotencyKey,
           operation: "portal.bug.submit",
+          resultSchema: PortalBugReceiptSchema,
+        });
+      })
+  );
+
+export const addPortalBugComment = (request: Request, params: PathParams) =>
+  asPortalCaller(
+    portalBugActionRoutes.comment,
+    request,
+    params,
+    ({ actor, input, user }) =>
+      Effect.gen(function* comment() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const commentInput = {
+          body: input.body.body,
+          bugId: input.params.bugId,
+        };
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => bugs.addComment(actor, commentInput),
+          input: commentInput,
+          key: input.idempotencyKey,
+          operation: "portal.bug.comment",
+          resultSchema: PortalCommentSchema,
+        });
+      })
+  );
+
+export const confirmPortalBugFix = (request: Request, params: PathParams) =>
+  asPortalCaller(
+    portalBugActionRoutes.confirm,
+    request,
+    params,
+    ({ actor, input, user }) =>
+      Effect.gen(function* confirm() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const fixInput = { ...input.body, bugId: input.params.bugId };
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => bugs.confirmFix(actor, fixInput),
+          input: fixInput,
+          key: input.idempotencyKey,
+          operation: "portal.bug.confirm",
+          resultSchema: PortalBugReceiptSchema,
+        });
+      })
+  );
+
+export const reopenPortalBugFix = (request: Request, params: PathParams) =>
+  asPortalCaller(
+    portalBugActionRoutes.reopen,
+    request,
+    params,
+    ({ actor, input, user }) =>
+      Effect.gen(function* reopen() {
+        const bugs = yield* PortalBugs;
+        const idempotency = yield* Idempotency;
+        const fixInput = { ...input.body, bugId: input.params.bugId };
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => bugs.reopenFix(actor, fixInput),
+          input: fixInput,
+          key: input.idempotencyKey,
+          operation: "portal.bug.reopen",
           resultSchema: PortalBugReceiptSchema,
         });
       })

@@ -193,8 +193,57 @@ export const portalBugRoutes = {
   },
 } as const satisfies Record<string, RouteDefinition>;
 
+const PortalCommentBody = Schema.Struct({
+  body: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(10_000)),
+});
+
+const PortalConfirmBody = Schema.Struct({
+  comment: Schema.optional(Schema.String.check(Schema.isMaxLength(2000))),
+  expectedVersion: Version,
+  satisfaction: Schema.optional(Satisfaction),
+});
+
+const PortalReopenBody = Schema.Struct({
+  expectedVersion: Version,
+  reason: Text,
+});
+
+export const portalBugActionRoutes = {
+  comment: {
+    body: PortalCommentBody,
+    data: PortalComment,
+    method: "post",
+    operationId: "addPortalBugComment",
+    params: BugIdParams,
+    path: "/api/v1/portal/bugs/{bugId}/comments",
+    summary: "Answer the team or reply on one of the company's bug reports.",
+  },
+  confirm: {
+    body: PortalConfirmBody,
+    data: PortalReceipt,
+    method: "post",
+    operationId: "confirmPortalBugFix",
+    params: BugIdParams,
+    path: "/api/v1/portal/bugs/{bugId}/confirm",
+    summary: "Confirm that the fix works, which closes the report.",
+  },
+  reopen: {
+    body: PortalReopenBody,
+    data: PortalReceipt,
+    method: "post",
+    operationId: "reopenPortalBugFix",
+    params: BugIdParams,
+    path: "/api/v1/portal/bugs/{bugId}/reopen",
+    summary:
+      "Say the fix did not work, with the reason, to send the report back.",
+  },
+} as const satisfies Record<string, RouteDefinition>;
+
 export const bugRoutes = [
   portalBugRoutes.list,
   portalBugRoutes.submit,
   portalBugRoutes.detail,
+  portalBugActionRoutes.comment,
+  portalBugActionRoutes.confirm,
+  portalBugActionRoutes.reopen,
 ] as const satisfies readonly RouteDefinition[];
