@@ -2,6 +2,9 @@
   "name": "metsys-ksat",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "type": "module",
   "scripts": {
     "dev": "next dev",
