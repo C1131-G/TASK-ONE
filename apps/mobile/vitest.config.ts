@@ -12,6 +12,6 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["tests/services/**/*.test.ts", "tests/guard/**/*.test.ts"],
+    include: ["tests/**/*.test.ts"],
   },
 });
