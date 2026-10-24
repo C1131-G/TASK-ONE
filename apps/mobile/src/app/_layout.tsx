@@ -1,15 +1,32 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useColorScheme } from "react-native";
+import { Effect } from "effect";
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider as RouterThemeProvider,
+} from "expo-router";
 
-SplashScreen.preventAutoHideAsync();
+import { appRuntime } from "@/runtime/runtime";
+import { loadAppFonts } from "@/theme/fonts";
+import { ThemeProvider, useTheme } from "@/theme/theme-provider";
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+// Fonts load once alongside the runtime; a failure keeps the system font.
+void appRuntime().runPromiseExit(loadAppFonts);
+
+const RoutedStack = () => {
+  const { isDark } = useTheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <RouterThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack />
+    </RouterThemeProvider>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RoutedStack />
     </ThemeProvider>
   );
 }
