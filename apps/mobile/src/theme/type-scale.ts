@@ -28,7 +28,10 @@ export interface TypeStyleOptions {
 }
 
 /** Builds a RN text style from the generated type tokens and the loaded Geist faces. */
-export const typeStyle = (sizeName: FontSizeName, options: TypeStyleOptions): TypeStyle => {
+export const typeStyle = (
+  sizeName: FontSizeName,
+  options: TypeStyleOptions = {}
+): TypeStyle => {
   const fontSize = FONT_SIZES[sizeName];
   const ratio = options.leading === "tight" ? type.lhTight : type.lhBody;
   const families = options.mono === true ? FONT_FAMILIES.mono : FONT_FAMILIES.sans;
