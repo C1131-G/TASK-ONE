@@ -10,6 +10,7 @@ module.exports = {
     "^@babel/runtime$": "<rootDir>/node_modules/@babel/runtime/index.js",
     "^@babel/runtime/(.*)$": "<rootDir>/node_modules/@babel/runtime/$1",
     "^react-native-svg$": "<rootDir>/tests/components/support/svg-mock.tsx",
+    "^@react-native-community/datetimepicker$": "<rootDir>/tests/components/support/datetime-mock.tsx",
   },
   // Bun stores packages under node_modules/.bun/<name>@<version>+<hash>/,
   // so the preset's ignore patterns never match and React Native's ESM

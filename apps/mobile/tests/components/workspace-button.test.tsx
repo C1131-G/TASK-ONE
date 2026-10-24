@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react-native";
+import { screen, userEvent } from "@testing-library/react-native";
 
 import { WorkspaceButton, WorkspaceIconButton } from "@/components/workspace/workspace-button";
 import { View } from "react-native";
@@ -22,11 +22,10 @@ it("marks a disabled button in its accessibility state", async () => {
 
 it("fires onPress on activation", async () => {
   let presses = 0;
-  await renderWithTheme(
-    <WorkspaceButton onPress={() => (presses += 1)}>Go</WorkspaceButton>,
-  );
+  const user = userEvent.setup();
+  await renderWithTheme(<WorkspaceButton onPress={() => (presses += 1)}>Go</WorkspaceButton>);
 
-  fireEvent.press(screen.getByRole("button", { name: "Go" }));
+  await user.press(screen.getByRole("button", { name: "Go" }));
 
   expect(presses).toBe(1);
 });

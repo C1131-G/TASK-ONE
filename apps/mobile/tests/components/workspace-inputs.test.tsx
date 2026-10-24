@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react-native";
+import { fireEvent, screen, userEvent } from "@testing-library/react-native";
 
 import { WorkspaceField } from "@/components/workspace/workspace-field";
 import {
@@ -17,14 +17,13 @@ it("labels its text input through the field", async () => {
     </WorkspaceField>,
   );
 
-  const input = screen.getByLabelText("Task title");
-
-  expect(input).toBeTruthy();
+  expect(screen.getByLabelText("Task title")).toBeTruthy();
   expect(screen.getByText("Shown on the board")).toBeTruthy();
 });
 
 it("emits each change of the text input", async () => {
   const values: string[] = [];
+  const user = userEvent.setup();
   await renderWithTheme(
     <WorkspaceField label="Title">
       <WorkspaceTextInput
@@ -35,9 +34,11 @@ it("emits each change of the text input", async () => {
     </WorkspaceField>,
   );
 
-  fireEvent.changeText(screen.getByLabelText("Title"), "Ship it");
+  await user.type(screen.getByLabelText("Title"), "Ship it");
 
-  expect(values).toEqual(["Ship it"]);
+  // The controlled value never updates in this test, so each keystroke
+  // arrives as its own character.
+  expect(values.join("")).toBe("Ship it");
 });
 
 it("renders the ValidationFailed field errors and hides other failures", async () => {
@@ -87,6 +88,7 @@ it("toggles the switch and reports its state", async () => {
 
 it("toggles the checkbox row and reports its checked state", async () => {
   let checked = false;
+  const user = userEvent.setup();
   await renderWithTheme(
     <WorkspaceCheckbox
       checked={checked}
@@ -97,7 +99,7 @@ it("toggles the checkbox row and reports its checked state", async () => {
     />,
   );
 
-  fireEvent.press(screen.getByRole("checkbox", { name: "Include evidence" }));
+  await user.press(screen.getByRole("checkbox", { name: "Include evidence" }));
 
   expect(checked).toBe(true);
 });
