@@ -10,7 +10,7 @@ export interface ThemeRenderOptions {
   readonly isDark?: boolean;
 }
 
-/** Renders inside a fixed ThemeContext so primitives read deterministic tokens. */
+/** Renders inside a fixed ThemeContext and a fresh QueryClient. */
 export const renderWithTheme = async (
   ui: ReactElement,
   options: ThemeRenderOptions = {},
@@ -25,5 +25,14 @@ export const renderWithTheme = async (
     setDensity: noop,
     setMode: noop,
   };
-  await render(createElement(ThemeContext.Provider, { value }, ui as ReactNode));
+  const queryClient = new QueryClient({
+    defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
+  });
+  await render(
+    createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(ThemeContext.Provider, { value }, ui as ReactNode),
+    ),
+  );
 };

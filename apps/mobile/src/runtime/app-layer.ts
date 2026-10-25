@@ -2,6 +2,7 @@ import { Config, Effect, Layer } from "effect";
 
 import { AppLifecycle, AppLifecycleLive } from "@/services/app-lifecycle";
 import { Connectivity, ConnectivityLive } from "@/services/connectivity";
+import { makeIdempotencyKeys, IdempotencyKeys } from "@/services/idempotency-keys";
 import { makeMobileApiLayer, MobileApi, TokenSource } from "@/services/mobile-api";
 import { SecureStorageLive } from "@/services/secure-storage";
 import { makeSessionLayer, Session, TokenSourceFromSession } from "@/services/session";
@@ -28,6 +29,7 @@ const MobileApiLive = Layer.provide(
   makeMobileApiLayer({ baseUrl: resolveBaseUrl() }),
   TokenSourceLive,
 );
+const IdempotencyKeysLive = makeIdempotencyKeys();
 const ThemePreferencesLive = Layer.provide(
   ThemePreferencesServiceLive,
   KeyValueStoreLive,
@@ -35,6 +37,7 @@ const ThemePreferencesLive = Layer.provide(
 
 /** Every service the app runtime provides. */
 export const AppLive = Layer.mergeAll(
+  IdempotencyKeysLive,
   SessionLive,
   TokenSourceLive,
   MobileApiLive,
@@ -44,6 +47,7 @@ export const AppLive = Layer.mergeAll(
 );
 
 export type AppServices =
+  | IdempotencyKeys
   | Session
   | TokenSource
   | MobileApi

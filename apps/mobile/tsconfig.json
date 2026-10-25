@@ -8,7 +8,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/assets/*": ["./assets/*"],
-      "@api/*": ["../../src/mobile-api/*"]
+      "@api/*": ["../../src/mobile-api/*"],
+      "@pending/*": ["./src/api/pending-routes/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]

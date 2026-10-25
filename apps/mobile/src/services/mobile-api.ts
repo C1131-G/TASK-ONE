@@ -1,7 +1,7 @@
 import { Context, Effect, Layer } from "effect";
 
 import { buildClient, type MobileClient } from "@api/client";
-import { mobileRoutes } from "@api/routes";
+import { clientRoutes } from "@/api/routes-for-client";
 
 import { fromMobileApiError, Unauthenticated, type AppFailure } from "@/errors";
 
@@ -46,7 +46,7 @@ export const makeMobileApi = (deps: MobileApiDeps) =>
           if (token === null) {
             return Effect.fail(new Unauthenticated());
           }
-          const client = buildClient(mobileRoutes, {
+          const client = buildClient(clientRoutes, {
             baseUrl: deps.baseUrl,
             ...(deps.fetchImpl === undefined ? {} : { fetch: deps.fetchImpl }),
             token,

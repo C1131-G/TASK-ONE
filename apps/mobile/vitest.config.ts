@@ -11,6 +11,7 @@ export default defineConfig({
     dedupe: ["effect", "@tanstack/react-query", "@tanstack/react-store"],
     alias: {
       "@api": `${mobileRoot}../../src/mobile-api`,
+      "@pending": `${mobileRoot}src/api/pending-routes`,
       "@": `${mobileRoot}src`,
     },
   },

@@ -33,7 +33,9 @@ export const WorkspaceErrorState = ({ failure, onRetry }: WorkspaceErrorStatePro
 
   return (
     <View
+      accessible
       accessibilityLiveRegion="polite"
+      accessibilityRole="alert"
       style={[styles.host, { backgroundColor: palette.surface }]}
     >
       <Text style={[typeStyle("md"), styles.message, { color: palette.text }]}>{message}</Text>

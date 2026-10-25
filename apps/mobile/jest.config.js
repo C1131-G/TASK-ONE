@@ -1,9 +1,10 @@
 /** @type {import('jest').Config} */
 module.exports = {
   preset: "jest-expo",
-  testMatch: ["<rootDir>/tests/components/**/*.test.tsx"],
+  testMatch: ["<rootDir>/tests/components/**/*.test.tsx", "<rootDir>/tests/features/**/*.test.tsx"],
   moduleNameMapper: {
     "^@api/(.*)$": "<rootDir>/../../src/mobile-api/$1",
+    "^@pending/(.*)$": "<rootDir>/src/api/pending-routes/$1",
     "^@/(.*)$": "<rootDir>/src/$1",
     // Files under ../../src/mobile-api transform to @babel/runtime requires,
     // but bun only links the runtime inside this workspace.

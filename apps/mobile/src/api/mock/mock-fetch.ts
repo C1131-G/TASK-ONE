@@ -1,6 +1,6 @@
 import { Effect, Layer, Schema } from "effect";
 
-import { mobileRoutes } from "@api/routes";
+import { clientRoutes } from "@/api/routes-for-client";
 import type { RouteDefinition } from "@api/route-definition";
 import type { AppErrorCode } from "@api/route-definition";
 import { makeMobileApiLayer, type MobileApi, type TokenSource } from "@/services/mobile-api";
@@ -47,7 +47,7 @@ export const registerFixtures = (
 ): Effect.Effect<ReadonlyMap<string, RegisteredFixture>> =>
   Effect.forEach(fixtures, (fixture) =>
     Effect.gen(function* () {
-      const route = mobileRoutes.find((candidate) => candidate.operationId === fixture.operationId);
+      const route = clientRoutes.find((candidate) => candidate.operationId === fixture.operationId);
       if (route === undefined) {
         return yield* Effect.die(new Error(`Mock fixture for unknown operationId ${fixture.operationId}`));
       }
