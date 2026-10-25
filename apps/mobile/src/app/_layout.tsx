@@ -7,6 +7,7 @@ import {
 } from "expo-router";
 
 import { SessionGate } from "@/features/auth/session-gate";
+import { OfflineBanner } from "@/features/connectivity/offline-banner";
 import { appRuntime } from "@/runtime/runtime";
 import { loadAppFonts } from "@/theme/fonts";
 import { ThemeProvider, useTheme } from "@/theme/theme-provider";
@@ -28,6 +29,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <SessionGate>
+        <OfflineBanner />
         <RoutedStack />
       </SessionGate>
     </ThemeProvider>

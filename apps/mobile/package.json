@@ -50,6 +50,7 @@
     "test:effect": "vitest run",
     "test:ui": "jest",
     "lint": "oxlint --config oxlint.config.ts",
-    "fix": "oxlint --config oxlint.config.ts --fix"
+    "fix": "oxlint --config oxlint.config.ts --fix",
+    "test:e2e": "maestro test e2e"
   }
 }

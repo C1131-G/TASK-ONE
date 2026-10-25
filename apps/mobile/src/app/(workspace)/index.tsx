@@ -1,22 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
+import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
+import { HomeScreen } from "@/features/workspace/workspace-screens";
+import { useSessionState } from "@/features/auth/session-gate";
+import { useApi } from "@/runtime/api-hooks";
 
-import { WorkspaceScreen } from "@/components/workspace/workspace-screen";
+export default function HomeRoute() {
+  const api = useApi();
+  const { state } = useSessionState();
 
-/** Placeholder until the workspace screens land in Phase 6. */
-export default function WorkspaceHomeRoute() {
-  return (
-    <WorkspaceScreen title="Home">
-      <View style={styles.host}>
-        <Text>Workspace screens arrive in Phase 6.</Text>
-      </View>
-    </WorkspaceScreen>
-  );
+  if (api === null || state.kind !== "authenticated") {
+    return <WorkspaceSkeleton variant="panel" />;
+  }
+
+  return <HomeScreen api={api} name={state.me.name} />;
 }
-
-const styles = StyleSheet.create({
-  host: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
-});
