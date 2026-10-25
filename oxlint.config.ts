@@ -12,6 +12,8 @@ const generatedAndVendorPaths = [
   ".claude/**",
   ".cursor/**",
   ".devin/**",
+  ".zcode/**",
+  "apps/**",
   "migrations/**",
   "src/prisma/contract.d.ts",
   "src/prisma/contract.json",

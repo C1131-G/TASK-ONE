@@ -54,3 +54,4 @@ AGENTS.md
 
 # Database dumps written by docker/backup.sh
 /backups/
+/.zcode/
