@@ -15,6 +15,13 @@ export const FONT_SIZES = {
 export type FontSizeName = keyof typeof FONT_SIZES;
 export type FontLeading = "body" | "tight";
 
+/** The Dynamic Type ceiling the plan commits to: 200%. */
+export const FONT_SCALE_CAP = 2;
+
+/** Clamps a system font scale to the 200% Dynamic Type ceiling (pure). */
+export const capFontScale = (scale: number): number =>
+    Number.isFinite(scale) && scale > 0 ? Math.min(scale, FONT_SCALE_CAP) : 1;
+
 export interface TypeStyle {
   readonly fontFamily: string;
   readonly fontSize: number;

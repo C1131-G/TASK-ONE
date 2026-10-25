@@ -2,7 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/theme/theme-provider";
-import { typeStyle } from "@/theme/type-scale";
+import { FONT_SCALE_CAP, typeStyle } from "@/theme/type-scale";
 import { radii, spacing, theme } from "@/theme/tokens.generated";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
@@ -61,7 +61,9 @@ export const WorkspaceButton = ({
       ]}
     >
       {leadingIcon === undefined ? null : <View style={styles.icon}>{leadingIcon}</View>}
-      <Text style={[label, { color: colors.text }]}>{children}</Text>
+      <Text maxFontSizeMultiplier={FONT_SCALE_CAP} style={[label, { color: colors.text }]}>
+        {children}
+      </Text>
       {trailingIcon === undefined ? null : <View style={styles.icon}>{trailingIcon}</View>}
     </Pressable>
   );

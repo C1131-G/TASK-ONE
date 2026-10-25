@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { useTheme } from "@/theme/theme-provider";
-import { typeStyle } from "@/theme/type-scale";
+import { FONT_SCALE_CAP, typeStyle } from "@/theme/type-scale";
 import { radii, spacing, theme } from "@/theme/tokens.generated";
 
 export interface WorkspaceTextInputProps {
@@ -39,6 +39,7 @@ export const WorkspaceTextInput = ({
         aria-invalid={invalid}
         accessibilityLabel={accessibilityLabel}
         keyboardType={keyboardType}
+        maxFontSizeMultiplier={FONT_SCALE_CAP}
         multiline={multiline}
         onChangeText={onChangeText}
         placeholder={placeholder}

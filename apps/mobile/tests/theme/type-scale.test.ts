@@ -2,7 +2,7 @@ import { Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { FONT_FAMILIES, loadAppFonts } from "@/theme/fonts";
-import { typeStyle } from "@/theme/type-scale";
+import { capFontScale, FONT_SCALE_CAP, typeStyle } from "@/theme/type-scale";
 
 describe("the type scale", () => {
   it("maps a size and weight to a font style", () => {
@@ -40,5 +40,16 @@ describe("font loading", () => {
     const exit = await Effect.runPromiseExit(loadAppFonts);
 
     expect(Exit.isSuccess(exit)).toBe(true);
+  });
+});
+
+describe('Dynamic Type', () => {
+  it('clamps the system font scale to the 200% ceiling', () => {
+    expect(capFontScale(1)).toBe(1);
+    expect(capFontScale(1.3)).toBeCloseTo(1.3, 5);
+    expect(capFontScale(2)).toBeCloseTo(2, 5);
+    expect(capFontScale(3.5)).toBe(FONT_SCALE_CAP);
+    expect(capFontScale(Number.NaN)).toBe(1);
+    expect(capFontScale(0)).toBe(1);
   });
 });
