@@ -6,7 +6,7 @@ import { typeStyle } from "@/theme/type-scale";
 import { spacing, theme } from "@/theme/tokens.generated";
 
 export interface WorkspaceFieldErrorProps {
-  readonly failure?: AppFailure;
+  readonly failure?: AppFailure | undefined;
   /** The form field whose message to show; omitted shows the first message. */
   readonly field?: string;
 }

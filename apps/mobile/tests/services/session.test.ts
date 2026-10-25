@@ -32,6 +32,12 @@ const fetchImpl = ((input: Request | string | URL, init?: RequestInit) => {
   if (url.endsWith("/api/auth/sign-in/email")) {
     return jsonResponse(200, { user: ME }, { "set-auth-token": "token-new" });
   }
+  if (url.endsWith("/api/auth/change-password")) {
+    const body = JSON.parse(String(init?.body ?? "{}")) as { currentPassword?: string };
+    return body.currentPassword === "old-pass"
+      ? jsonResponse(200, { ok: true })
+      : jsonResponse(400, { error: { message: "Wrong current password" } });
+  }
   if (url.endsWith("/api/auth/sign-out")) {
     return jsonResponse(200, { ok: true });
   }
@@ -153,4 +159,19 @@ it.effect("never times out a staff session", () =>
       expect((yield* session.current).kind).toBe("authenticated");
     }),
   ).pipe(Effect.provide(sessionLayer("token-stored"))),
+);
+
+it.effect("changes the password and surfaces the server field error", () =>
+  Effect.gen(function* () {
+    const session = yield* Effect.service(Session);
+    yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+
+    yield* session.changeOwnPassword({ currentPassword: "old-pass", newPassword: "new-pass" });
+
+    const exit = yield* Effect.exit(
+      session.changeOwnPassword({ currentPassword: "wrong", newPassword: "new-pass" }),
+    );
+
+    expect(exit._tag).toBe("Failure");
+  }).pipe(Effect.provide(sessionLayer(null))),
 );

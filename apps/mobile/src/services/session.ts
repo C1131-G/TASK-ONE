@@ -1,10 +1,15 @@
-import { Context, Effect, Layer, Schema, Stream, SubscriptionRef, type Duration } from "effect";
+import { Context, Effect, Exit, Layer, Schema, Stream, SubscriptionRef, type Duration } from "effect";
 
 import { buildClient } from "@api/client";
 import { mobileRoutes } from "@api/routes";
 import type { MobileMe } from "@api/routes-account";
 
-import { fromMobileApiError, type AppFailure } from "@/errors";
+import {
+  fromMobileApiError,
+  Unauthenticated,
+  ValidationFailed,
+  type AppFailure,
+} from "@/errors";
 import type { LifecycleState } from "@/services/app-lifecycle";
 import { TokenSource } from "@/services/mobile-api";
 import { SecureStorage } from "@/services/secure-storage";
@@ -16,6 +21,8 @@ const TokenCodec = Schema.String;
 export type SessionState =
   | { readonly kind: "anonymous" }
   | { readonly kind: "authenticated"; readonly token: string; readonly me: MobileMe };
+
+export type SessionService = Session["Service"];
 
 export interface SignInInput {
   readonly email: string;
@@ -32,6 +39,11 @@ export class Session extends Context.Service<
     readonly signIn: (input: SignInInput) => Effect.Effect<SessionState, AppFailure>;
     /** Restores the stored token, validating it against /me. */
     readonly restore: Effect.Effect<SessionState, never>;
+    /** Changes the signed-in account's password through better-auth. */
+    readonly changeOwnPassword: (input: {
+      readonly currentPassword: string;
+      readonly newPassword: string;
+    }) => Effect.Effect<void, AppFailure>;
     /** Revokes the server session and clears local state. */
     readonly signOut: Effect.Effect<void, never>;
     /** Clears local state without a server call (used on a 401 cascade). */
@@ -151,6 +163,59 @@ export const makeSession = (deps: SessionDeps) =>
             token.length === 0
               ? Effect.fail(fromMobileApiError(new Error("sign-in rejected")))
               : Effect.flatMap(persist(token), () => loadMe(token)),
+        ),
+      changeOwnPassword: (input) =>
+        Effect.flatMap(SubscriptionRef.get(ref), (state) =>
+          state.kind === "authenticated"
+            ? Effect.flatMap(
+                Effect.tryPromise({
+                  catch: (error) => fromMobileApiError(error),
+                  try: async () => {
+                    const response = await (deps.fetchImpl ?? fetch)(
+                      `${deps.baseUrl}/api/auth/change-password`,
+                      {
+                        body: JSON.stringify({
+                          currentPassword: input.currentPassword,
+                          newPassword: input.newPassword,
+                        }),
+                        headers: {
+                          authorization: `Bearer ${state.token}`,
+                          "content-type": "application/json",
+                        },
+                        method: "POST",
+                      },
+                    );
+                    if (response.ok) {
+                      return { ok: true as const, text: "" };
+                    }
+                    return { ok: false as const, text: await response.text() };
+                  },
+                }),
+                (outcome) => {
+                  if (outcome.ok) {
+                    return Effect.void;
+                  }
+                  return Effect.flatMap(
+                    Effect.exit(
+                      Effect.try({
+                        catch: () => null,
+                        try: () => JSON.parse(outcome.text) as { error?: { message?: string } } | null,
+                      }),
+                    ),
+                    (exit) =>
+                      Effect.fail(
+                        new ValidationFailed({
+                          fieldErrors: {
+                            currentPassword: Exit.isSuccess(exit)
+                              ? (exit.value?.error?.message ?? "Change rejected")
+                              : "Change rejected",
+                          },
+                        }),
+                      ),
+                  );
+                },
+              )
+            : Effect.fail(new Unauthenticated()),
         ),
       signOut: Effect.flatMap(SubscriptionRef.get(ref), (state) =>
         state.kind === "authenticated"
