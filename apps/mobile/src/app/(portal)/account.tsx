@@ -1,5 +1,30 @@
-import { WorkspaceEmptyState } from "@/components/workspace/workspace-empty-state";
+import { Effect } from "effect";
+import { useRouter } from "expo-router";
+
+import { WorkspaceScreen } from "@/components/workspace/workspace-screen";
+import { useSessionState, useGateSession } from "@/features/auth/session-gate";
+import { PortalAccountBody } from "@/features/portal/portal-list";
 
 export default function Route() {
-  return <WorkspaceEmptyState message="This area arrives with its live API routes." title="" />;
+  const session = useGateSession();
+  const router = useRouter();
+  const { state } = useSessionState();
+  const me = state.kind === "authenticated" ? state.me : null;
+
+  return (
+    <WorkspaceScreen title="Account">
+      {me === null ? null : (
+        <PortalAccountBody
+          email={me.id}
+          name={me.name}
+          onSignOut={() => {
+            if (session !== null) {
+              void Effect.runPromiseExit(session.signOut);
+            }
+            router.push("/login");
+          }}
+        />
+      )}
+    </WorkspaceScreen>
+  );
 }

@@ -2,6 +2,7 @@ import type { MobileRouteDefinition } from "./route-definition";
 
 import { notificationRoutes } from "./notifications";
 import { taskRoutes } from "./tasks";
+import { portalMoreRoutes } from "./portal-more";
 import { portalRoutes } from "./portal";
 import { workspaceRoutes } from "./workspace";
 
@@ -15,4 +16,5 @@ export const pendingRoutes: readonly MobileRouteDefinition[] = [
   ...taskRoutes,
   ...workspaceRoutes,
   ...portalRoutes,
+  ...portalMoreRoutes,
 ];
