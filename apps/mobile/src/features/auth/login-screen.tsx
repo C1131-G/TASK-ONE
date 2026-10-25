@@ -1,6 +1,7 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+import { useMutation } from "@tanstack/react-query";
 
 import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceField } from "@/components/workspace/workspace-field";
@@ -36,13 +37,13 @@ export const validateCredentials = (
 
 export const SessionContext = createContext<SessionService | null>(null);
 
-export const useSession = (): SessionService => {
-  const session = useContext(SessionContext);
-  if (session === null) {
-    throw new Error("SessionContext is missing a session");
-  }
-  return session;
-};
+/** The session from the nearest provider, or null outside one. */
+export const useSession = (): SessionService | null => useContext(SessionContext);
+
+const failureOf = (exit: Exit.Exit<unknown, AppFailure> | undefined): AppFailure | undefined =>
+  exit === undefined || Exit.isSuccess(exit)
+    ? undefined
+    : Option.getOrUndefined(Cause.findErrorOption(exit.cause));
 
 const fieldError = (message: string | undefined, field: string): AppFailure | undefined =>
   message === undefined
@@ -59,28 +60,22 @@ export const LoginScreen = ({ session: sessionProp }: LoginScreenProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [serverFailure, setServerFailure] = useState<AppFailure | undefined>(undefined);
-  const [pending, setPending] = useState(false);
+
+  const signIn = useMutation({
+    mutationFn: (input: Credentials) => Effect.runPromiseExit(session!.signIn(input)),
+  });
 
   const submit = (): void => {
     const validated = validateCredentials({ email, password });
     if (!validated.ok) {
       setFieldErrors(validated.errors);
-      setServerFailure(undefined);
       return;
     }
     setFieldErrors({});
-    setServerFailure(undefined);
-    setPending(true);
-    void Effect.runPromiseExit(session.signIn(validated.values)).then((exit) => {
-      setPending(false);
-      setServerFailure(
-        Exit.isSuccess(exit)
-          ? undefined
-          : Option.getOrUndefined(Cause.findErrorOption(exit.cause)),
-      );
-    });
+    signIn.mutate(validated.values);
   };
+
+  const serverFailure = failureOf(signIn.data);
 
   return (
     <WorkspaceScreen title="Sign in">
@@ -114,8 +109,8 @@ export const LoginScreen = ({ session: sessionProp }: LoginScreenProps) => {
         {serverFailure === undefined || serverFailure._tag === "ValidationFailed" ? null : (
           <WorkspaceFieldError failure={serverFailure} />
         )}
-        <WorkspaceButton disabled={pending} onPress={submit}>
-          {pending ? "Signing in" : "Sign in"}
+        <WorkspaceButton disabled={session === null || signIn.isPending} onPress={submit}>
+          {signIn.isPending ? "Signing in" : "Sign in"}
         </WorkspaceButton>
       </View>
     </WorkspaceScreen>

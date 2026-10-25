@@ -1,4 +1,5 @@
 import { createElement, type ReactElement, type ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react-native";
 
 import { ThemeContext, type ThemeContextValue } from "@/theme/theme-provider";
