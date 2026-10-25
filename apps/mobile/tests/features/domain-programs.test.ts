@@ -4,6 +4,8 @@ import { expect } from "vitest";
 
 import { WORKSPACE_DOMAIN_FIXTURES } from "@/api/mocks/workspace-domains";
 import { WORKSPACE_FIXTURES } from "@/api/mocks/workspace";
+import { WORKSPACE_MORE_FIXTURES } from "@/api/mocks/workspace-more";
+import { TASK_FIXTURES } from "@/api/mocks/tasks";
 import { PORTAL_MORE_FIXTURES } from "@/api/mocks/portal-more";
 import { makeMockMobileApiLayer } from "@/api/mock/mock-fetch";
 import {
@@ -24,15 +26,25 @@ import {
   portalNotificationsProgram,
 } from "@/features/portal/portal-queries";
 import { overviewProgram } from "@/features/workspace/overview-program";
+import {
+  bugApprovalsProgram,
+  calendarProgram,
+  notificationsProgram,
+  timelineProgram,
+} from "@/features/workspace/more-queries";
 import { MobileApi, TokenSource } from "@/services/mobile-api";
 
 const ALL_FIXTURES = [
   ...WORKSPACE_FIXTURES,
   ...WORKSPACE_DOMAIN_FIXTURES,
+  ...WORKSPACE_MORE_FIXTURES,
+  ...TASK_FIXTURES,
   ...PORTAL_MORE_FIXTURES,
 ];
 const MOCKED = new Set([
+  "bug-approvals",
   "activity",
+  "bug-approvals",
   "archive",
   "approvals",
   "budgets",
@@ -44,6 +56,7 @@ const MOCKED = new Set([
   "notifications",
   "projects",
   "search",
+  "tasks",
   "teams",
   "workload",
 ]);
@@ -84,6 +97,10 @@ const programs: readonly [
   ["archive", archiveProgram],
   ["portal approvals", portalApprovalsProgram],
   ["portal notifications", portalNotificationsProgram],
+  ["bug approvals", bugApprovalsProgram],
+  ["workspace notifications", notificationsProgram],
+  ["calendar by due date", calendarProgram],
+  ["timeline by due date", timelineProgram],
 ];
 
 for (const [name, program] of programs) {

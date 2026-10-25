@@ -4,6 +4,7 @@ import { notificationRoutes } from "./notifications";
 import { taskRoutes } from "./tasks";
 import { portalMoreRoutes } from "./portal-more";
 import { portalRoutes } from "./portal";
+import { workspaceMoreRoutes } from "./workspace-more";
 import { workspaceRoutes } from "./workspace";
 
 /**
@@ -15,6 +16,7 @@ export const pendingRoutes: readonly MobileRouteDefinition[] = [
   ...notificationRoutes,
   ...taskRoutes,
   ...workspaceRoutes,
+  ...workspaceMoreRoutes,
   ...portalRoutes,
   ...portalMoreRoutes,
 ];
