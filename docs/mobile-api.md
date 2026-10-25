@@ -52,6 +52,10 @@ Every response is JSON and carries the request ID in the `x-request-id` header a
 
 Use `Schema.FiniteFromString` for numeric query values: `Schema.NumberFromString` accepts text such as `many` as `NaN`.
 
+## Pending routes and the mobile app
+
+The Expo app in apps/mobile keeps its own pending route definitions under src/api/pending-routes/ for domains whose live lists have not landed on main yet. When a domain's routes-<domain>.ts lands: merge main, delete that domain's pending file and mock, and flip its screens to the live client. The app's pending-audit test lists the domains still pending.
+
 ## Routes
 
 | Method | Path | Who | Purpose |
