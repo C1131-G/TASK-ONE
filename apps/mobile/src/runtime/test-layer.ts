@@ -6,6 +6,7 @@ import { makeConnectivityTest, Connectivity } from "@/services/connectivity";
 import { SecureStorageMemory } from "@/services/secure-storage";
 import { makeSessionLayer, TokenSourceFromSession } from "@/services/session";
 import { makeIdempotencyKeys } from "@/services/idempotency-keys";
+import { makeHapticsStub } from "@/services/haptics";
 import { makeMobileApiLayer } from "@/services/mobile-api";
 import {
   ThemePreferencesServiceLive as ThemePreferencesTestLive,
@@ -20,6 +21,7 @@ const TokenSourceTestLive = Layer.provide(TokenSourceFromSession, SessionTestLiv
 
 /** The combined in-memory layers the vitest suites provide instead of AppLive. */
 export const AppTestLive = Layer.mergeAll(
+  makeHapticsStub(),
   makeIdempotencyKeys(),
   SessionTestLive,
   TokenSourceTestLive,

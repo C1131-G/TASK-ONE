@@ -3,6 +3,7 @@ import { Config, Effect, Layer } from "effect";
 import { AppLifecycle, AppLifecycleLive } from "@/services/app-lifecycle";
 import { Connectivity, ConnectivityLive } from "@/services/connectivity";
 import { makeIdempotencyKeys, IdempotencyKeys } from "@/services/idempotency-keys";
+import { Haptics, HapticsLive } from "@/services/haptics";
 import { makeMobileApiLayer, MobileApi, TokenSource } from "@/services/mobile-api";
 import { SecureStorageLive } from "@/services/secure-storage";
 import { makeSessionLayer, Session, TokenSourceFromSession } from "@/services/session";
@@ -37,6 +38,7 @@ const ThemePreferencesLive = Layer.provide(
 
 /** Every service the app runtime provides. */
 export const AppLive = Layer.mergeAll(
+  HapticsLive,
   IdempotencyKeysLive,
   SessionLive,
   TokenSourceLive,
@@ -47,6 +49,7 @@ export const AppLive = Layer.mergeAll(
 );
 
 export type AppServices =
+  | Haptics
   | IdempotencyKeys
   | Session
   | TokenSource
