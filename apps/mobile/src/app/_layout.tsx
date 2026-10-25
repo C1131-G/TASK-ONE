@@ -6,6 +6,7 @@ import {
   ThemeProvider as RouterThemeProvider,
 } from "expo-router";
 
+import { SessionGate } from "@/features/auth/session-gate";
 import { appRuntime } from "@/runtime/runtime";
 import { loadAppFonts } from "@/theme/fonts";
 import { ThemeProvider, useTheme } from "@/theme/theme-provider";
@@ -18,7 +19,7 @@ const RoutedStack = () => {
 
   return (
     <RouterThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Stack />
+      <Stack screenOptions={{ headerShown: false }} />
     </RouterThemeProvider>
   );
 };
@@ -26,7 +27,9 @@ const RoutedStack = () => {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RoutedStack />
+      <SessionGate>
+        <RoutedStack />
+      </SessionGate>
     </ThemeProvider>
   );
 }
