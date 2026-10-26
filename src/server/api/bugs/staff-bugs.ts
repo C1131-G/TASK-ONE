@@ -24,3 +24,15 @@ export const requestBugInfo = staffWorkflowWrite(
   "requestInfo",
   "request-info"
 );
+
+export const recordBugFixAttempt = staffWorkflowWrite(
+  staffBugActionRoutes.fixAttempt,
+  "addFixAttempt",
+  "fix-attempt"
+);
+
+export const verifyBugFix = staffWorkflowWrite(
+  staffBugActionRoutes.verification,
+  "verifyFix",
+  "verification"
+);

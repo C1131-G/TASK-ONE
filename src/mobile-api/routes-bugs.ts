@@ -502,7 +502,39 @@ const StaffRequestInfoBody = Schema.Struct({
   question: Text,
 });
 
+const StaffFixAttemptBody = Schema.Struct({
+  affectedVersion: ShortText,
+  commitUrl: ShortText,
+  expectedVersion: Version,
+  fixSummary: Text,
+  fixedVersion: ShortText,
+  pullRequestUrl: ShortText,
+  rootCause: Text,
+  verificationSteps: Schema.Array(Text).check(
+    Schema.isMinLength(1),
+    Schema.isMaxLength(30)
+  ),
+});
+
+const StaffVerificationBody = Schema.Struct({
+  attemptId: Uuid,
+  expectedVersion: Version,
+  notes: Text,
+  outcome: Schema.Literals(["passed", "failed"]),
+  testedEnvironment: Environment,
+  testedVersion: Text,
+});
+
 export const staffBugActionRoutes = {
+  fixAttempt: {
+    body: StaffFixAttemptBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "recordBugFixAttempt",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/fix-attempts",
+    summary: "Record the root cause, the fix and how to verify it.",
+  },
   pick: {
     body: StaffPickBody,
     data: WorkflowReceipt,
@@ -540,6 +572,15 @@ export const staffBugActionRoutes = {
     path: "/api/v1/workspace/bugs/{bugId}/triage",
     summary: "Set the assignees, priority and severity of a client report.",
   },
+  verification: {
+    body: StaffVerificationBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "verifyBugFix",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/verifications",
+    summary: "Say whether a fix attempt passed its verification.",
+  },
 } as const satisfies Record<string, RouteDefinition>;
 
 export const bugRoutes = [
@@ -551,8 +592,10 @@ export const bugRoutes = [
   portalBugActionRoutes.reopen,
   staffBugContextRoute,
   staffBugApprovalInboxRoute,
+  staffBugActionRoutes.fixAttempt,
   staffBugActionRoutes.pick,
   staffBugActionRoutes.reassign,
   staffBugActionRoutes.requestInfo,
   staffBugActionRoutes.triage,
+  staffBugActionRoutes.verification,
 ] as const satisfies readonly RouteDefinition[];
