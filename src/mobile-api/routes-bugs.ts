@@ -457,6 +457,28 @@ export const staffBugContextRoute = {
   summary: "A bug's full staff history, with its client context.",
 } as const satisfies RouteDefinition;
 
+const BugApprovalStatus = Schema.Literals(["pending", "approved", "rejected"]);
+
+export const StaffBugApprovalInbox = Schema.Struct({
+  items: Schema.Array(
+    Schema.Struct({
+      bugTitle: Schema.String,
+      id: Uuid,
+      projectName: Schema.String,
+      reportedBy: Schema.String,
+      status: BugApprovalStatus,
+    })
+  ),
+});
+
+export const staffBugApprovalInboxRoute = {
+  data: StaffBugApprovalInbox,
+  method: "get",
+  operationId: "listBugApprovals",
+  path: "/api/v1/workspace/bug-approvals",
+  summary: "The bug approvals with their status, newest first.",
+} as const satisfies RouteDefinition;
+
 const StaffPickBody = Schema.Struct({
   expectedVersion: Version,
   priority: Priority,
@@ -484,5 +506,6 @@ export const bugRoutes = [
   portalBugActionRoutes.confirm,
   portalBugActionRoutes.reopen,
   staffBugContextRoute,
+  staffBugApprovalInboxRoute,
   staffBugActionRoutes.pick,
 ] as const satisfies readonly RouteDefinition[];

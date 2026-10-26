@@ -16,6 +16,8 @@ import { IdempotencyLive } from "../../core/idempotency";
 import type { Idempotency } from "../../core/idempotency";
 import { PortalBugsLive } from "../../portal/portal-bugs";
 import type { PortalActor, PortalBugs } from "../../portal/portal-contracts";
+import { BugApprovalInboxLive } from "../../work/bug-approval-inbox";
+import type { BugApprovalInbox } from "../../work/bug-approval-inbox";
 import { BugHistoryLive } from "../../work/bug-history";
 import type { BugHistory } from "../../work/bug-history";
 import { BugManagementLive } from "../../work/bug-management";
@@ -29,6 +31,7 @@ export type PathParams = Readonly<Record<string, string>>;
 export type PortalServices = PortalBugs | PortalApprovals | Idempotency;
 export type StaffServices =
   | Approvals
+  | BugApprovalInbox
   | BugHistory
   | BugManagement
   | BugWorkflowManagement
@@ -48,6 +51,7 @@ const portalLayer = Layer.mergeAll(
 );
 const staffLayer = Layer.mergeAll(
   ApprovalsLive,
+  BugApprovalInboxLive,
   BugHistoryLive,
   BugManagementLive,
   BugWorkflowManagementLive,
