@@ -8,6 +8,8 @@ export interface SeededNotification {
   readonly projectId?: string | null;
   readonly readAt?: Date | null;
   readonly snippet?: string | null;
+  readonly targetId?: string | null;
+  readonly targetType?: "task" | "bug" | "approval" | null;
   readonly taskId?: string | null;
   readonly text?: string;
   readonly type?: string;
@@ -19,13 +21,15 @@ export const seedNotification = async (
 ): Promise<string> => {
   const id = randomUUID();
   await authPool.query(
-    'INSERT INTO notification (id, "userId", "actorId", "taskId", "projectId", type, text, snippet, "readAt", "createdAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+    'INSERT INTO notification (id, "userId", "actorId", "taskId", "projectId", "targetType", "targetId", type, text, snippet, "readAt", "createdAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
     [
       id,
       notification.userId,
       notification.actorId ?? null,
       notification.taskId ?? null,
       notification.projectId ?? null,
+      notification.targetType ?? null,
+      notification.targetId ?? null,
       notification.type ?? "mention",
       notification.text ?? `Notification ${id.slice(0, 8)}`,
       notification.snippet ?? null,
@@ -98,10 +102,20 @@ export const callRoute = async <Data = unknown>(
 export const notificationRows = async (
   userId: string
 ): Promise<
-  readonly { id: string; readAt: Date | null; targetType?: string | null }[]
+  readonly {
+    id: string;
+    readAt: Date | null;
+    targetId: string | null;
+    targetType: string | null;
+  }[]
 > => {
-  const result = await authPool.query<{ id: string; readAt: Date | null }>(
-    'SELECT id, "readAt" FROM notification WHERE "userId" = $1 ORDER BY id',
+  const result = await authPool.query<{
+    id: string;
+    readAt: Date | null;
+    targetId: string | null;
+    targetType: string | null;
+  }>(
+    'SELECT id, "readAt", "targetId", "targetType" FROM notification WHERE "userId" = $1 ORDER BY id',
     [userId]
   );
   return result.rows;

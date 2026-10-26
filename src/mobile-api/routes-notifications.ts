@@ -112,10 +112,59 @@ export const setWorkspaceNotificationPreferenceRoute = {
     "Switch one kind of notification on or off for one channel; email exists only for some kinds.",
 } as const satisfies RouteDefinition;
 
+// A client's inbox. The row keeps its text, and carries the same string as
+// `title` for the app, which shows a title and ignores the body.
+export const PortalNotificationSchema = Schema.Struct({
+  approvalId: Schema.NullOr(Schema.String),
+  bugId: Schema.NullOr(Schema.String),
+  createdAt: Schema.String,
+  id: Schema.String,
+  readAt: Schema.NullOr(Schema.String),
+  snippet: Schema.NullOr(Schema.String),
+  text: Schema.String,
+  title: Schema.String,
+});
+
+export const PortalInboxSchema = Schema.Struct({
+  items: Schema.Array(PortalNotificationSchema),
+  unreadCount: Schema.Number,
+});
+
+export const listPortalNotificationsRoute = {
+  data: PortalInboxSchema,
+  method: "get",
+  operationId: "listPortalNotifications",
+  path: "/api/v1/portal/notifications",
+  summary:
+    "The caller's notifications, newest first, each tied to a bug or request they can open now.",
+} as const satisfies RouteDefinition;
+
+export const markPortalNotificationReadRoute = {
+  data: DoneSchema,
+  method: "post",
+  operationId: "markPortalNotificationRead",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/portal/notifications/{id}/read",
+  summary:
+    "Mark one of the caller's notifications read. Repeating it changes nothing.",
+} as const satisfies RouteDefinition;
+
+export const markAllPortalNotificationsReadRoute = {
+  data: CountSchema,
+  method: "post",
+  operationId: "markAllPortalNotificationsRead",
+  path: "/api/v1/portal/notifications/read-all",
+  summary:
+    "Mark every unread notification of the caller read; answers how many changed.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
   markWorkspaceNotificationReadRoute,
   markAllWorkspaceNotificationsReadRoute,
   getWorkspaceNotificationPreferencesRoute,
   setWorkspaceNotificationPreferenceRoute,
+  listPortalNotificationsRoute,
+  markPortalNotificationReadRoute,
+  markAllPortalNotificationsReadRoute,
 ] as const satisfies readonly RouteDefinition[];
