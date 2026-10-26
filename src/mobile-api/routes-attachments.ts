@@ -43,6 +43,21 @@ export const UploadTicketSchema = Schema.Struct({
   uploadUrl: Schema.String,
 });
 
+// A file as the app lists it: what the web shows, plus the id the download
+// routes take and whether the preview route will serve it inline.
+export const AttachmentFileSchema = Schema.Struct({
+  contentType: Schema.String,
+  createdAt: Schema.String,
+  id: Uuid,
+  name: Schema.String,
+  previewable: Schema.Boolean,
+  sizeBytes: Schema.Number,
+  taskId: Schema.NullOr(Uuid),
+  uploadedBy: Schema.Struct({ id: Schema.String, name: Schema.String }),
+});
+
+const UploadIntentParams = Schema.Struct({ uploadIntentId: Uuid });
+
 export const requestWorkspaceUploadRoute = {
   body: Schema.Struct({ ...UploadFields, taskId: Uuid }),
   data: UploadTicketSchema,
@@ -53,6 +68,16 @@ export const requestWorkspaceUploadRoute = {
   summary: "A signed URL for uploading one file to a task.",
 } as const satisfies RouteDefinition;
 
+export const finalizeWorkspaceUploadRoute = {
+  data: AttachmentFileSchema,
+  method: "post",
+  operationId: "finalizeWorkspaceUpload",
+  params: UploadIntentParams,
+  path: "/api/v1/workspace/attachments/uploads/{uploadIntentId}/finalize",
+  summary: "Turns a finished upload into a file on the task.",
+} as const satisfies RouteDefinition;
+
 export const attachmentRoutes = [
   requestWorkspaceUploadRoute,
+  finalizeWorkspaceUploadRoute,
 ] as const satisfies readonly RouteDefinition[];

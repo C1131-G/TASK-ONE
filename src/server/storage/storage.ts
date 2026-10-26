@@ -57,6 +57,19 @@ const storageError = () =>
     message: "Private file storage is unavailable.",
   });
 
+// Storage answers 404 for a key that was never written.
+const isMissingObject = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  "$metadata" in error &&
+  (error.$metadata as { httpStatusCode?: number }).httpStatusCode === 404;
+
+const objectNotUploaded = () =>
+  new AppError({
+    code: "VALIDATION_FAILED",
+    message: "The file has not been uploaded yet.",
+  });
+
 // How long each kind of signed URL works, in seconds. The mobile API reports the
 // same windows, so both read them from here.
 export const SIGNED_URL_SECONDS = {
@@ -218,9 +231,11 @@ export const StorageLive = Layer.succeed(
       Effect.tryPromise({
         catch: (error) => (error instanceof AppError ? error : storageError()),
         try: async () => {
-          const object = await s3.send(
-            new HeadObjectCommand({ Bucket: bucket, Key: key })
-          );
+          const object = await s3
+            .send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+            .catch((error: unknown) => {
+              throw isMissingObject(error) ? objectNotUploaded() : error;
+            });
           if (
             object.ContentLength !== sizeBytes ||
             object.ContentType?.split(";")[0]?.trim().toLowerCase() !==
