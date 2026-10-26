@@ -239,6 +239,57 @@ export const portalBugActionRoutes = {
   },
 } as const satisfies Record<string, RouteDefinition>;
 
+// ---- Workspace (staff) ----
+
+export const WorkflowStatus = Schema.Literals([
+  "reported",
+  "triaged",
+  "in_progress",
+  "in_verification",
+  "awaiting_admin_approval",
+  "approved_for_release",
+  "released",
+  "closed",
+  "duplicate",
+  "rejected",
+  "needs_info",
+  "awaiting_client",
+  "withdrawn",
+]);
+const Severity = Schema.Literals([
+  "blocker",
+  "critical",
+  "major",
+  "minor",
+  "trivial",
+]);
+const Priority = Schema.Literals(["urgent", "high", "medium", "low", "none"]);
+
+export const WorkflowReceipt = Schema.Struct({
+  bugId: Uuid,
+  status: WorkflowStatus,
+  version: Version,
+});
+
+const StaffPickBody = Schema.Struct({
+  expectedVersion: Version,
+  priority: Priority,
+  severity: Severity,
+});
+
+export const staffBugActionRoutes = {
+  pick: {
+    body: StaffPickBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "pickWorkspaceBug",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/pick",
+    summary:
+      "Pick up a client report. Only a designated handler of the client's company may.",
+  },
+} as const satisfies Record<string, RouteDefinition>;
+
 export const bugRoutes = [
   portalBugRoutes.list,
   portalBugRoutes.submit,
@@ -246,4 +297,5 @@ export const bugRoutes = [
   portalBugActionRoutes.comment,
   portalBugActionRoutes.confirm,
   portalBugActionRoutes.reopen,
+  staffBugActionRoutes.pick,
 ] as const satisfies readonly RouteDefinition[];
