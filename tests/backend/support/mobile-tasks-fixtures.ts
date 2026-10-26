@@ -21,6 +21,18 @@ const ROUTES: readonly {
     path: "/api/v1/workspace/me/work",
   },
   {
+    load: () => import("../../../app/api/v1/workspace/me/timer/route"),
+    path: "/api/v1/workspace/me/timer",
+  },
+  {
+    load: () => import("../../../app/api/v1/workspace/me/timer/start/route"),
+    path: "/api/v1/workspace/me/timer/start",
+  },
+  {
+    load: () => import("../../../app/api/v1/workspace/me/timer/stop/route"),
+    path: "/api/v1/workspace/me/timer/stop",
+  },
+  {
     load: () => import("../../../app/api/v1/workspace/tasks/route"),
     path: "/api/v1/workspace/tasks",
   },
@@ -149,6 +161,7 @@ interface TaskSeed {
   readonly createdById?: string;
   readonly dueDate?: string | null;
   readonly priority?: string;
+  readonly projectId?: string;
   readonly status?: string;
   readonly title?: string;
   readonly type?: "task" | "bug";
@@ -165,7 +178,7 @@ export const seedTask = async (seed: TaskSeed = {}): Promise<string> => {
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     [
       taskId,
-      ids.projectId,
+      seed.projectId ?? ids.projectId,
       numberCounter,
       seed.title ?? `Mobile task ${numberCounter}`,
       seed.createdById ?? personaId("owner"),
