@@ -80,12 +80,12 @@ it("documents every route file and has no definition without a route", async () 
   );
 });
 
-it("publishes the app's subtask status path with its own parameter name", async () => {
+it("publishes the subtask status path with the folder's parameter names", async () => {
   const spec = await loadSpec();
   const operation =
-    spec.paths["/api/v1/workspace/tasks/{id}/subtasks/{subtaskId}/status"]?.[
-      "post"
-    ];
+    spec.paths[
+      "/api/v1/workspace/tasks/{taskId}/subtasks/{subtaskId}/status"
+    ]?.["post"];
 
   expect(operation).toMatchObject({ operationId: "setSubtaskStatus" });
   const parameters = operation?.["parameters"] as
@@ -95,5 +95,6 @@ it("publishes the app's subtask status path with its own parameter name", async 
     parameters
       ?.filter(({ in: location }) => location === "path")
       .map(({ name }) => name)
-  ).toEqual(["id", "subtaskId"]);
+      .toSorted()
+  ).toEqual(["subtaskId", "taskId"]);
 });

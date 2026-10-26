@@ -267,15 +267,13 @@ export const SubtaskStatusResultSchema = Schema.Struct({
 
 export type MobileSubtaskStatus = typeof SubtaskStatusResultSchema.Type;
 
-// The app publishes `{id}` for the task while the route file calls the folder
-// `[taskId]`; the handler maps one name to the other.
 export const subtaskStatusRoute = {
   body: SubtaskStatusBodySchema,
   data: SubtaskStatusResultSchema,
   method: "post",
   operationId: "setSubtaskStatus",
-  params: Schema.Struct({ id: IdSchema, subtaskId: IdSchema }),
-  path: "/api/v1/workspace/tasks/{id}/subtasks/{subtaskId}/status",
+  params: Schema.Struct({ subtaskId: IdSchema, taskId: IdSchema }),
+  path: "/api/v1/workspace/tasks/{taskId}/subtasks/{subtaskId}/status",
   summary:
     "Mark a subtask done or not done. Needs the task version the caller last saw; a stale one answers 409.",
 } as const satisfies RouteDefinition;
