@@ -154,7 +154,7 @@ export const seedOpenFixture = async (
     [
       fixture.projectId,
       `OP${randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`,
-      "Open target project",
+      "Harness open target project",
     ]
   );
   await authPool.query(
