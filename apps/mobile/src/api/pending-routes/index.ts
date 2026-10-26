@@ -1,6 +1,5 @@
 import type { MobileRouteDefinition } from "./route-definition";
 
-import { notificationRoutes } from "./notifications";
 import { taskRoutes } from "./tasks";
 import { portalMoreRoutes } from "./portal-more";
 import { portalRoutes } from "./portal";
@@ -13,7 +12,6 @@ import { workspaceRoutes } from "./workspace";
  * main, delete the pending file, flip the domain's mode to live.
  */
 export const pendingRoutes: readonly MobileRouteDefinition[] = [
-  ...notificationRoutes,
   ...taskRoutes,
   ...workspaceRoutes,
   ...workspaceMoreRoutes,

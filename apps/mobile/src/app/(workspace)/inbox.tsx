@@ -16,7 +16,7 @@ export default function InboxRoute() {
   const router = useRouter();
 
   const program: Effect.Effect<InboxPage, AppFailure> =
-    api === null ? Effect.succeed({ items: [], unread: 0 }) : listInbox(api);
+    api === null ? Effect.succeed({ items: [], nextCursor: null, unreadCount: 0, unreadInboxCount: 0 }) : listInbox(api);
 
   const inbox = useApiQuery({ enabled: api !== null, program, queryKey: ["inbox"] });
 

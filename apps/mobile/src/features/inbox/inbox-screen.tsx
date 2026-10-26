@@ -86,7 +86,7 @@ export const InboxScreen = ({ api, items, keys, onOpenTask }: InboxScreenProps) 
         <View style={styles.list}>
           {visible.map((item) => (
             <Pressable
-              accessibilityLabel={`${item.readAt === null ? "Unread" : "Read"}: ${item.title}`}
+              accessibilityLabel={`${item.readAt === null ? "Unread" : "Read"}: ${item.text}`}
               accessibilityRole="button"
               key={item.id}
               onPress={() => {
@@ -108,11 +108,11 @@ export const InboxScreen = ({ api, items, keys, onOpenTask }: InboxScreenProps) 
                   { color: palette.text },
                 ]}
               >
-                {item.title}
+                {item.text}
               </Text>
               <Text style={[typeStyle("xs"), { color: palette.text3 }]}>
-                {item.kind}
-                {item.taskTitle === null ? "" : ` · ${item.taskTitle}`}
+                {item.type}
+                {item.projectName === null ? "" : ` · ${item.projectName}`}
               </Text>
             </Pressable>
           ))}

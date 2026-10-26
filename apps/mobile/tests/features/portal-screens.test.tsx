@@ -13,7 +13,7 @@ const noop = (): void => undefined;
 
 const renderPortal = async (ui: ReactElement, api: ApiContextValue): Promise<void> => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+    defaultOptions: { queries: { gcTime: 0, retry: false } },
   });
   await render(
     createElement(
@@ -58,28 +58,53 @@ const ApiProviderShim = ({
     createElement(ApiContext.Provider, { value: api, children }),
   );
 
-const apiServing = (data: {
-  readonly bugs?: readonly { readonly id: string; readonly status: string; readonly title: string }[];
-  readonly projects?: readonly { readonly id: string }[];
-}): ApiContextValue =>
+const PROJECT = "5a1d9c42-6b7e-4f30-8c2d-9e4b1a7f3c05";
+
+interface ServedProject {
+  readonly id: string;
+  readonly key: string;
+  readonly name: string;
+  readonly openTasks: number;
+  readonly progress: number;
+}
+
+const apiServing = (
+  data: {
+    readonly bugs?: readonly { readonly id: string; readonly status: string; readonly title: string }[];
+    readonly projects?: readonly ServedProject[];
+  },
+  submitted: unknown[] = [],
+): ApiContextValue =>
   ({
     call: (run: (client: unknown) => Promise<unknown>) =>
       Effect.tryPromise({
         catch: () => new ValidationFailed({ fieldErrors: {} }),
         try: () =>
           run({
-            listPortalBugs: () => Promise.resolve({ bugs: data.bugs ?? [] }),
+            listPortalBugs: () => Promise.resolve(data.bugs ?? []),
             listPortalProjects: () => Promise.resolve({ projects: data.projects ?? [] }),
+            submitPortalBug: (input: unknown) => {
+              submitted.push(input);
+              return Promise.resolve({ bugId: "bug-new", version: 1 });
+            },
           }),
       }),
   }) as unknown as ApiContextValue;
+
+const WEBSITE: ServedProject = {
+  id: PROJECT,
+  key: "WEB",
+  name: "Website relaunch",
+  openTasks: 4,
+  progress: 62,
+};
 
 it("lists the portal projects and bugs", async () => {
   await renderPortal(
     <PortalHomeScreen />,
     apiServing({
-      bugs: [{ id: "bug-1", status: "open", title: "Login rejects valid passwords" }],
-      projects: [{ id: "proj-1" }],
+      bugs: [{ id: "bug-1", status: "acknowledged", title: "Login rejects valid passwords" }],
+      projects: [WEBSITE],
     }),
   );
 
@@ -87,28 +112,73 @@ it("lists the portal projects and bugs", async () => {
   expect(screen.getByText("Your bugs")).toBeTruthy();
 });
 
-it("validates the report form before submitting", async () => {
-  const submitted: string[] = [];
-  const api = {
-    call: (run: (client: unknown) => Promise<unknown>) =>
-      Effect.tryPromise({
-        catch: () => new ValidationFailed({ fieldErrors: {} }),
-        try: () =>
-          run({
-            createPortalBug: (input: { readonly body: { readonly title: string } }) => {
-              submitted.push(input.body.title);
-              return Promise.resolve({ id: "bug-new" });
-            },
-          }),
-      }),
-  } as unknown as ApiContextValue;
-
+it("asks for the missing report fields before submitting", async () => {
+  const submitted: unknown[] = [];
   const user = userEvent.setup();
-  await renderPortal(<PortalNewBugScreen onDone={() => submitted.push("done")} />, api);
+  await renderPortal(
+    <PortalNewBugScreen onDone={() => submitted.push("done")} />,
+    apiServing({ projects: [WEBSITE] }, submitted),
+  );
 
   await user.type(screen.getByLabelText("Title"), "No");
   await user.press(screen.getByRole("button", { name: "Send report" }));
 
   await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+  expect(submitted).toEqual([]);
+});
+
+it("sends a complete report for the only project", async () => {
+  const submitted: unknown[] = [];
+  const user = userEvent.setup();
+  await renderPortal(
+    <PortalNewBugScreen onDone={() => submitted.push("done")} />,
+    apiServing({ projects: [WEBSITE] }, submitted),
+  );
+  await waitFor(() => expect(screen.getByRole("button", { name: "Project Website relaunch" })).toBeTruthy());
+
+  await user.type(screen.getByLabelText("Title"), "Dashboard never loads");
+  await user.type(screen.getByLabelText("What you expected"), "The dashboard opens");
+  await user.type(screen.getByLabelText("What happened"), "A spinner forever");
+  await user.type(screen.getByLabelText("Steps to reproduce, one per line"), "Sign in");
+  await user.type(screen.getByLabelText("Page address"), "https://app.example.com/dashboard");
+  await user.press(screen.getByRole("button", { name: "Impact urgent" }));
+  await user.press(screen.getByRole("button", { name: "Send report" }));
+
+  await waitFor(() => expect(submitted.length).toBe(2));
+  expect(submitted[0]).toMatchObject({
+    body: {
+      actualBehavior: "A spinner forever",
+      expectedBehavior: "The dashboard opens",
+      impact: "urgent",
+      pageUrl: "https://app.example.com/dashboard",
+      projectId: PROJECT,
+      reproductionSteps: ["Sign in"],
+      title: "Dashboard never loads",
+    },
+    idempotencyKey: "key-1234567890",
+  });
+  expect(submitted[1]).toBe("done");
+});
+
+it("makes the client choose when there are several projects", async () => {
+  const submitted: unknown[] = [];
+  const user = userEvent.setup();
+  await renderPortal(
+    <PortalNewBugScreen onDone={() => submitted.push("done")} />,
+    apiServing(
+      { projects: [WEBSITE, { ...WEBSITE, id: "5a1d9c42-6b7e-4f30-8c2d-9e4b1a7f3c06", name: "Mobile app" }] },
+      submitted,
+    ),
+  );
+  await waitFor(() => expect(screen.getByRole("button", { name: "Project Mobile app" })).toBeTruthy());
+
+  await user.type(screen.getByLabelText("Title"), "Dashboard never loads");
+  await user.type(screen.getByLabelText("What you expected"), "The dashboard opens");
+  await user.type(screen.getByLabelText("What happened"), "A spinner forever");
+  await user.type(screen.getByLabelText("Steps to reproduce, one per line"), "Sign in");
+  await user.type(screen.getByLabelText("Page address"), "https://app.example.com/dashboard");
+  await user.press(screen.getByRole("button", { name: "Send report" }));
+
+  await waitFor(() => expect(screen.getByText("Choose a project")).toBeTruthy());
   expect(submitted).toEqual([]);
 });

@@ -9,13 +9,15 @@ export default function Route() {
     <WorkspaceScreen title="Bugs">
       <PortalListBody
         emptyTitle="Bugs"
-        program={(api) => Effect.map(listPortalBugs(api), (page) => ({
-          rows: page.bugs.map((bug) => ({
-            id: bug.id,
-            subtitle: `${bug.projectName} · ${bug.priority} · ${bug.status}`,
-            title: bug.title,
-          })),
-        }))}
+        program={(api) =>
+          Effect.map(listPortalBugs(api), (bugs) => ({
+            rows: bugs.map((bug) => ({
+              id: bug.id,
+              subtitle: `${bug.key} · ${bug.projectName} · ${bug.status}`,
+              title: bug.title,
+            })),
+          }))
+        }
         queryKey={["portal", "bugs"]}
       />
     </WorkspaceScreen>

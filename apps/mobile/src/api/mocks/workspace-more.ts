@@ -22,25 +22,4 @@ export const WORKSPACE_MORE_FIXTURES: readonly MockFixture[] = [
     },
     operationId: "listBugApprovals",
   },
-  {
-    data: {
-      items: [
-        {
-          createdAt: "2026-10-24T09:15:00.000Z",
-          id: "wn-1",
-          kind: "assignment",
-          readAt: null,
-          title: "Ada assigned you a task",
-        },
-        {
-          createdAt: "2026-10-23T17:30:00.000Z",
-          id: "wn-2",
-          kind: "comment",
-          readAt: "2026-10-23T18:00:00.000Z",
-          title: "New comment on your task",
-        },
-      ],
-    },
-    operationId: "listNotifications",
-  },
 ];

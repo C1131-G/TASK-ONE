@@ -5,17 +5,13 @@ import { WorkspaceErrorState } from "@/components/workspace/workspace-error-stat
 import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
 import { MyTasksScreen, type TaskRowModel } from "@/features/tasks/task-screens";
-import { listTasks } from "@/features/tasks/queries";
+import { getMyWork } from "@/features/tasks/queries";
 import { useApi, useApiQuery } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
 
 interface PageModel {
   readonly tasks: readonly TaskRowModel[];
 }
-
-const toRows = (page: { readonly tasks: readonly TaskRowModel[] }): PageModel => ({
-  tasks: page.tasks.map((task) => ({ ...task })),
-});
 
 export default function MyTasksRoute() {
   const api = useApi();
@@ -24,7 +20,16 @@ export default function MyTasksRoute() {
   const program: Effect.Effect<PageModel, AppFailure> =
     api === null
       ? Effect.succeed<PageModel>({ tasks: [] })
-      : Effect.map(listTasks(api), (page) => toRows(page));
+      : Effect.map(getMyWork(api), (work) => ({
+          tasks: work.items.map((item) => ({
+            dueAt: item.dueDate,
+            id: item.id,
+            priority: item.priority,
+            projectName: item.projectName,
+            status: item.status,
+            title: item.title,
+          })),
+        }));
 
   const tasks = useApiQuery({
     enabled: api !== null,

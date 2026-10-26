@@ -73,70 +73,91 @@ it("filters the visible rows through the chips", async () => {
   expect(screen.queryByText("Open task Ship the landing page")).toBeNull();
 });
 
+
 const keysStub: KeysContextValue = {
   forget: () => Effect.void,
   run: (_intent, program) => program("key-1234567890"),
 };
 
-it("renders the subtasks and toggles one", async () => {
-  const toggled: boolean[] = [];
-  const api = {
+const SUBTASKS = [
+  { completed: true, id: "sub-1", title: "Hero art" },
+  { completed: false, id: "sub-2", title: "Launch checklist" },
+];
+
+const detail = (overrides: Partial<Parameters<typeof TaskDetailScreen>[0]["task"]> = {}) => ({
+  projectName: "Website relaunch",
+  status: "progress" as const,
+  subtasks: SUBTASKS,
+  title: "Ship the landing page",
+  version: 3,
+  ...overrides,
+});
+
+const apiWith = (client: Record<string, unknown>) =>
+  ({
     call: (run: (client: unknown) => Promise<unknown>) =>
       Effect.tryPromise({
         catch: () => new ValidationFailed({ fieldErrors: {} }),
-        try: () =>
-          run({
-            listSubtasks: () =>
-              Promise.resolve({
-                subtasks: [
-                  { done: true, id: "sub-1", title: "Hero art" },
-                  { done: false, id: "sub-2", title: "Launch checklist" },
-                ],
-              }),
-            setSubtaskStatus: (input: { readonly body: { readonly done: boolean } }) => {
-              toggled.push(input.body.done);
-              return Promise.resolve({ done: input.body.done, version: 4 });
-            },
-            setTaskStatus: () => Promise.resolve({ status: "done", version: 4 }),
-          }),
+        try: () => run(client),
       }),
-  } as unknown as ApiContextValue;
+  }) as unknown as ApiContextValue;
+
+it("shows the task's subtasks and toggles one", async () => {
+  const toggled: boolean[] = [];
+  const api = apiWith({
+    setSubtaskStatus: (input: { readonly body: { readonly done: boolean } }) => {
+      toggled.push(input.body.done);
+      return Promise.resolve({ done: input.body.done, version: 4 });
+    },
+  });
 
   await renderWithTheme(
-    <TaskDetailScreen
-      api={api}
-      keys={keysStub}
-      task={{
-        projectName: "Website relaunch",
-        status: "progress",
-        title: "Ship the landing page",
-        version: 3,
-      }}
-      taskId="task-1"
-    />,
+    <TaskDetailScreen api={api} keys={keysStub} task={detail()} taskId="task-1" />,
   );
 
-  await waitFor(() => expect(screen.getByText("Launch checklist")).toBeTruthy());
-
+  expect(screen.getByText("Hero art")).toBeTruthy();
   const user = userEvent.setup();
   await user.press(screen.getByRole("button", { name: "Toggle subtask Launch checklist" }));
 
   await waitFor(() => expect(toggled).toEqual([true]));
 });
 
-it("shows the error state when the subtasks read fails", async () => {
+it("moves the status with the version the screen last saw", async () => {
+  const sent: unknown[] = [];
+  const api = apiWith({
+    changeTask: (input: unknown) => {
+      sent.push(input);
+      return Promise.resolve({ status: "done", version: 4 });
+    },
+  });
+
+  await renderWithTheme(
+    <TaskDetailScreen api={api} keys={keysStub} task={detail()} taskId="task-1" />,
+  );
+  const user = userEvent.setup();
+  await user.press(screen.getByRole("button", { name: "Change status" }));
+  await user.press(screen.getByRole("radio", { name: "done" }));
+
+  await waitFor(() => expect(sent.length).toBe(1));
+  expect(sent[0]).toMatchObject({
+    body: { expectedVersion: 3, status: "done" },
+    idempotencyKey: "key-1234567890",
+    params: { taskId: "task-1" },
+  });
+});
+
+it("tells the user when a status move fails", async () => {
   const api = {
-    call: () => Effect.fail(new ValidationFailed({ fieldErrors: {} })),
+    call: () => Effect.fail(new ValidationFailed({ fieldErrors: { status: "Cannot move this task" } })),
   } as unknown as ApiContextValue;
 
   await renderWithTheme(
-    <TaskDetailScreen
-      api={api}
-      keys={keysStub}
-      task={{ projectName: "Website relaunch", status: "progress", title: "Ship it", version: 1 }}
-      taskId="task-gone"
-    />,
+    <TaskDetailScreen api={api} keys={keysStub} task={detail()} taskId="task-1" />,
   );
+  const user = userEvent.setup();
+  await user.press(screen.getByRole("button", { name: "Change status" }));
+  await user.press(screen.getByRole("radio", { name: "done" }));
 
   await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+  expect(screen.getByText("Cannot move this task")).toBeTruthy();
 });
