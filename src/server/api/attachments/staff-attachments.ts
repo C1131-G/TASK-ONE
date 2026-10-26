@@ -2,15 +2,18 @@ import { Effect } from "effect";
 
 import {
   AttachmentFileSchema,
+  downloadWorkspaceAttachmentRoute,
   finalizeWorkspaceUploadRoute,
+  listWorkspaceAttachmentsRoute,
+  previewWorkspaceAttachmentRoute,
   requestWorkspaceUploadRoute,
 } from "../../../mobile-api/routes-attachments";
 import { Idempotency } from "../../core/idempotency";
 import { Uploads } from "../../storage/uploads-contracts";
 import { asStaffAttachmentCaller } from "./caller";
 import type { PathParams } from "./caller";
-import { summarizeFile } from "./file-summary";
-import { withUploadExpiry } from "./signed-urls";
+import { summarizeFile, summarizeFiles } from "./file-summary";
+import { expiresIn, withUploadExpiry } from "./signed-urls";
 
 // Staff get the same access the web gives: an admin, the creator or an
 // assignee may upload to a task. Nothing is stored for replay because the
@@ -53,5 +56,56 @@ export const finalizeWorkspaceUpload = (request: Request, params: PathParams) =>
           operation: "mobile.attachment.finalize",
           resultSchema: AttachmentFileSchema,
         });
+      })
+  );
+
+// The same list the web shows on a task: every active file, to any employee.
+export const listWorkspaceAttachments = (
+  request: Request,
+  params: PathParams
+) =>
+  asStaffAttachmentCaller(
+    listWorkspaceAttachmentsRoute,
+    request,
+    params,
+    ({ input, user }) =>
+      Effect.gen(function* list() {
+        const uploads = yield* Uploads;
+        const files = yield* uploads.listTaskFiles(user.id, input.query.taskId);
+        return { items: yield* summarizeFiles(files.map(({ id }) => id)) };
+      })
+  );
+
+// The link is signed at request time, after the storage layer checks the
+// caller may open the file, so a removed file never gets one.
+export const downloadWorkspaceAttachment = (
+  request: Request,
+  params: PathParams
+) =>
+  asStaffAttachmentCaller(
+    downloadWorkspaceAttachmentRoute,
+    request,
+    params,
+    ({ input, user }) =>
+      Effect.gen(function* download() {
+        const uploads = yield* Uploads;
+        const url = yield* uploads.signedDownload(user.id, input.params.fileId);
+        return { expiresAt: expiresIn("download"), url };
+      })
+  );
+
+export const previewWorkspaceAttachment = (
+  request: Request,
+  params: PathParams
+) =>
+  asStaffAttachmentCaller(
+    previewWorkspaceAttachmentRoute,
+    request,
+    params,
+    ({ input, user }) =>
+      Effect.gen(function* preview() {
+        const uploads = yield* Uploads;
+        const url = yield* uploads.signedPreview(user.id, input.params.fileId);
+        return { expiresAt: expiresIn("preview"), url };
       })
   );

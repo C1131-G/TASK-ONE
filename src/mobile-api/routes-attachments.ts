@@ -56,6 +56,18 @@ export const AttachmentFileSchema = Schema.Struct({
   uploadedBy: Schema.Struct({ id: Schema.String, name: Schema.String }),
 });
 
+export const AttachmentListSchema = Schema.Struct({
+  items: Schema.Array(AttachmentFileSchema),
+});
+
+// A link the app opens at once. It stops working at `expiresAt`, so the app
+// asks again instead of keeping it.
+export const SignedUrlSchema = Schema.Struct({
+  expiresAt: Schema.String,
+  url: Schema.String,
+});
+
+const FileIdParams = Schema.Struct({ fileId: Uuid });
 const UploadIntentParams = Schema.Struct({ uploadIntentId: Uuid });
 
 export const requestWorkspaceUploadRoute = {
@@ -77,7 +89,37 @@ export const finalizeWorkspaceUploadRoute = {
   summary: "Turns a finished upload into a file on the task.",
 } as const satisfies RouteDefinition;
 
+export const listWorkspaceAttachmentsRoute = {
+  data: AttachmentListSchema,
+  method: "get",
+  operationId: "listWorkspaceAttachments",
+  path: "/api/v1/workspace/attachments",
+  query: Schema.Struct({ taskId: Uuid }),
+  summary: "The files attached to a task.",
+} as const satisfies RouteDefinition;
+
+export const downloadWorkspaceAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "downloadWorkspaceAttachment",
+  params: FileIdParams,
+  path: "/api/v1/workspace/attachments/{fileId}/download",
+  summary: "A short-lived link that downloads one file.",
+} as const satisfies RouteDefinition;
+
+export const previewWorkspaceAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "previewWorkspaceAttachment",
+  params: FileIdParams,
+  path: "/api/v1/workspace/attachments/{fileId}/preview",
+  summary: "A short-lived link that shows one image or PDF inline.",
+} as const satisfies RouteDefinition;
+
 export const attachmentRoutes = [
   requestWorkspaceUploadRoute,
   finalizeWorkspaceUploadRoute,
+  listWorkspaceAttachmentsRoute,
+  downloadWorkspaceAttachmentRoute,
+  previewWorkspaceAttachmentRoute,
 ] as const satisfies readonly RouteDefinition[];
