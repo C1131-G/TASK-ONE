@@ -253,6 +253,33 @@ export const subtaskChangeRoute = {
     "Update or toggle a subtask of a task the caller may edit. Fields left out keep their value.",
 } as const satisfies RouteDefinition;
 
+export const SubtaskStatusBodySchema = Schema.Struct({
+  done: Schema.Boolean,
+  expectedVersion: ExpectedVersionSchema,
+});
+
+export type MobileSubtaskStatusBody = typeof SubtaskStatusBodySchema.Type;
+
+export const SubtaskStatusResultSchema = Schema.Struct({
+  done: Schema.Boolean,
+  version: Schema.Number,
+});
+
+export type MobileSubtaskStatus = typeof SubtaskStatusResultSchema.Type;
+
+// The app publishes `{id}` for the task while the route file calls the folder
+// `[taskId]`; the handler maps one name to the other.
+export const subtaskStatusRoute = {
+  body: SubtaskStatusBodySchema,
+  data: SubtaskStatusResultSchema,
+  method: "post",
+  operationId: "setSubtaskStatus",
+  params: Schema.Struct({ id: IdSchema, subtaskId: IdSchema }),
+  path: "/api/v1/workspace/tasks/{id}/subtasks/{subtaskId}/status",
+  summary:
+    "Mark a subtask done or not done. Needs the task version the caller last saw; a stale one answers 409.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
   myWorkRoute,
   taskContextRoute,
@@ -260,4 +287,5 @@ export const taskRoutes = [
   taskCreateRoute,
   subtaskAddRoute,
   subtaskChangeRoute,
+  subtaskStatusRoute,
 ] as const satisfies readonly RouteDefinition[];

@@ -1,10 +1,15 @@
 import { Effect } from "effect";
 
-import { SubtaskResultSchema } from "../../../mobile-api/routes-tasks";
+import {
+  SubtaskResultSchema,
+  SubtaskStatusResultSchema,
+} from "../../../mobile-api/routes-tasks";
 import type {
   MobileSubtaskAddBody,
   MobileSubtaskChangeBody,
   MobileSubtaskResult,
+  MobileSubtaskStatus,
+  MobileSubtaskStatusBody,
 } from "../../../mobile-api/routes-tasks";
 import { AuthSession } from "../../auth/session";
 import type { AppError } from "../../core/action-result";
@@ -12,6 +17,7 @@ import { Idempotency } from "../../core/idempotency";
 import {
   addSubtaskFromMobile,
   changeSubtaskFromMobile,
+  setSubtaskStatusFromMobile,
 } from "../../tasks/subtask-mobile";
 
 export const addTaskSubtask = (
@@ -52,5 +58,27 @@ export const changeTaskSubtask = (
       key: idempotencyKey,
       operation: "mobile.subtask.change",
       resultSchema: SubtaskResultSchema,
+    });
+  });
+
+export const setTaskSubtaskStatus = (
+  headers: Headers,
+  taskId: string,
+  subtaskId: string,
+  body: MobileSubtaskStatusBody,
+  idempotencyKey: string
+): Effect.Effect<MobileSubtaskStatus, AppError, AuthSession | Idempotency> =>
+  Effect.gen(function* resolveStatus() {
+    const session = yield* AuthSession;
+    const actor = yield* session.requireWorkspaceAccess(headers);
+    const idempotency = yield* Idempotency;
+    return yield* idempotency.run({
+      actorId: actor.id,
+      execute: () =>
+        setSubtaskStatusFromMobile(actor.id, taskId, subtaskId, body),
+      input: { body, subtaskId, taskId },
+      key: idempotencyKey,
+      operation: "mobile.subtask.status",
+      resultSchema: SubtaskStatusResultSchema,
     });
   });

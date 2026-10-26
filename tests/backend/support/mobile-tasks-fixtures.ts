@@ -35,6 +35,11 @@ const ROUTES: readonly {
     path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId",
   },
   {
+    load: () =>
+      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/status/route"),
+    path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId/status",
+  },
+  {
     load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId",
   },

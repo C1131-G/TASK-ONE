@@ -11,7 +11,8 @@ const apiRoot = fileURLToPath(new URL("../../app/api/v1", import.meta.url));
 const SPEC_ROUTE = "openapi.json";
 
 // "me/route.ts" becomes "/api/v1/me"; "tasks/[id]/route.ts" becomes
-// "/api/v1/tasks/{id}".
+// "/api/v1/tasks/{}". Dynamic segments are compared by position, because the
+// route file and the published path may name the same segment differently.
 const routeFiles = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(directory, entry.name);
@@ -21,6 +22,12 @@ const routeFiles = (directory: string): string[] =>
     return entry.name === "route.ts" ? [full] : [];
   });
 
+const normalizePath = (route: string): string =>
+  route
+    .split("/")
+    .map((part) => (part.startsWith("{") && part.endsWith("}") ? "{}" : part))
+    .join("/");
+
 const publishedPaths = (): string[] =>
   routeFiles(apiRoot)
     .map((file) =>
@@ -28,9 +35,7 @@ const publishedPaths = (): string[] =>
         .relative(apiRoot, path.dirname(file))
         .split(path.sep)
         .map((part) =>
-          part.startsWith("[") && part.endsWith("]")
-            ? `{${part.slice(1, -1)}}`
-            : part
+          part.startsWith("[") && part.endsWith("]") ? "{}" : part
         )
         .join("/")
     )
@@ -70,5 +75,25 @@ it("describes /api/v1/me with bearer security and its response shape", async () 
 it("documents every route file and has no definition without a route", async () => {
   const spec = await loadSpec();
 
-  expect(Object.keys(spec.paths).toSorted()).toEqual(publishedPaths());
+  expect(Object.keys(spec.paths).map(normalizePath).toSorted()).toEqual(
+    publishedPaths()
+  );
+});
+
+it("publishes the app's subtask status path with its own parameter name", async () => {
+  const spec = await loadSpec();
+  const operation =
+    spec.paths["/api/v1/workspace/tasks/{id}/subtasks/{subtaskId}/status"]?.[
+      "post"
+    ];
+
+  expect(operation).toMatchObject({ operationId: "setSubtaskStatus" });
+  const parameters = operation?.["parameters"] as
+    | readonly { readonly in: string; readonly name: string }[]
+    | undefined;
+  expect(
+    parameters
+      ?.filter(({ in: location }) => location === "path")
+      .map(({ name }) => name)
+  ).toEqual(["id", "subtaskId"]);
 });
