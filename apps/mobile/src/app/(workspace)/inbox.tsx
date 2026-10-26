@@ -6,7 +6,7 @@ import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
 import { InboxScreen } from "@/features/inbox/inbox-screen";
 import { listInbox } from "@/features/inbox/queries";
-import { failureOf, useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
+import { useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
 import type { InboxPage } from "@/features/inbox/queries";
 

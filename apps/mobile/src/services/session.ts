@@ -1,4 +1,4 @@
-import { Context, Effect, Exit, Layer, Schema, Stream, SubscriptionRef, type Duration } from "effect";
+import { Context, Effect, Exit, Layer, Schema, Stream, SubscriptionRef } from "effect";
 
 import { buildClient } from "@api/client";
 import { mobileRoutes } from "@api/routes";

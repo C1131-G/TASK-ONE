@@ -1,4 +1,4 @@
-import { Config, Effect, Layer } from "effect";
+import { Config, Layer } from "effect";
 
 import { AppLifecycle, AppLifecycleLive } from "@/services/app-lifecycle";
 import { Connectivity, ConnectivityLive } from "@/services/connectivity";

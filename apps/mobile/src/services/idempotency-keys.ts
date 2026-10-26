@@ -4,10 +4,7 @@ import {
   Conflict,
   Forbidden,
   NotFound,
-  Offline,
-  RateLimited,
   Unauthenticated,
-  Unavailable,
   type AppFailure,
 } from "@/errors";
 

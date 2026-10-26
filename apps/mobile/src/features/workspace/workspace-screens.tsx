@@ -6,7 +6,6 @@ import { WorkspaceScreen } from "@/components/workspace/workspace-screen";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
 import { listBugs, listProjects } from "@/features/workspace/queries";
 import { useApi, useApiQuery, type ApiContextValue } from "@/runtime/api-hooks";
-import type { AppFailure } from "@/errors";
 import { useTheme } from "@/theme/theme-provider";
 import { typeStyle } from "@/theme/type-scale";
 import { spacing, theme } from "@/theme/tokens.generated";

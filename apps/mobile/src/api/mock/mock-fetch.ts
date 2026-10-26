@@ -27,16 +27,6 @@ export interface RegisteredFixture {
   readonly route: RouteDefinition;
 }
 
-const STATUS_BY_CODE: Record<AppErrorCode, number> = {
-  CONFLICT: 409,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  RATE_LIMITED: 429,
-  UNAUTHENTICATED: 401,
-  UNAVAILABLE: 503,
-  VALIDATION_FAILED: 422,
-};
-
 /**
  * Validates every fixture against its route's schema up front, so a fixture
  * that drifts from the live contract fails loudly instead of serving stale
@@ -75,7 +65,6 @@ export const registerFixtures = (
               ok: true,
               requestId,
             };
-      const status = fixture.error !== undefined ? fixture.error.status : 200;
       return [
         `${fixture.operationId}`,
         {

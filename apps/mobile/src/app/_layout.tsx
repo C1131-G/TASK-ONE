@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import {
   DarkTheme,
   DefaultTheme,

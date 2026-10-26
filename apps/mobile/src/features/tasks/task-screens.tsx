@@ -18,7 +18,6 @@ import {
   type TaskStatus,
 } from "@/features/tasks/queries";
 import {
-  failureOf,
   useApiQuery,
   type ApiContextValue,
   type KeysContextValue,
