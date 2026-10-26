@@ -210,3 +210,73 @@ it("filters by status and leaves out archived bugs", async () => {
   expect(invalid.status).toBe(422);
   expect(invalid.body.error.fieldErrors).toHaveProperty("status");
 });
+
+const itemFor = (
+  reply: Awaited<ReturnType<typeof listAs>>,
+  bugId: string
+): { readonly permittedActions: readonly string[] } | undefined =>
+  (
+    reply.body.data.items as readonly {
+      readonly id: string;
+      readonly permittedActions: readonly string[];
+    }[]
+  ).find(({ id }) => id === bugId);
+
+it("tells each caller what they may do with a bug, as the services will accept it", async () => {
+  const bugId = await submit("client", "Actions: unpicked");
+
+  const handlerBefore = itemFor(await listAs("owner"), bugId);
+  const adminBefore = itemFor(await listAs("admin"), bugId);
+  expect(handlerBefore?.permittedActions).toEqual(["pick"]);
+  expect(adminBefore?.permittedActions).toEqual(["comment", "reply_to_client"]);
+
+  const { POST: pick } =
+    await import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+  const picked = await send(pick, "POST", "owner", {
+    body: { expectedVersion: 1, priority: "high", severity: "major" },
+    params: { bugId },
+  });
+  expect(picked.status).toBe(200);
+
+  const handlerAfter = itemFor(await listAs("owner"), bugId);
+  expect(handlerAfter?.permittedActions).toEqual([
+    "comment",
+    "reply_to_client",
+    "request_info",
+  ]);
+});
+
+it("offers only an internal note on a bug that has no client", async () => {
+  const { BugManagement, BugManagementLive } =
+    await import("../../src/server/work/bug-management");
+  const { Effect } = await import("effect");
+  const report = await Effect.runPromise(
+    Effect.provide(
+      Effect.gen(function* reportInternal() {
+        const bugs = yield* BugManagement;
+        return yield* bugs.reportBug(personaId("admin"), {
+          actualBehavior: "Hangs.",
+          appVersion: null,
+          browser: null,
+          component: "Dialog",
+          description: null,
+          device: null,
+          discoverySource: "internal_qa",
+          environment: "staging",
+          expectedBehavior: "Closes.",
+          os: null,
+          projectId: ids.projectId,
+          reproductionSteps: ["Open"],
+          route: "/x",
+          severity: "minor",
+          title: "Actions: internal",
+        });
+      }),
+      BugManagementLive
+    )
+  );
+
+  const item = itemFor(await listAs("admin"), report.id);
+
+  expect(item?.permittedActions).toEqual(["comment"]);
+});

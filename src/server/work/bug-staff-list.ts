@@ -8,6 +8,7 @@ import {
   decodeInboxCursor,
   encodeInboxCursor,
 } from "../notifications/inbox-cursor";
+import { clientBugPermissions } from "./bug-client-report";
 import type { BugWorkflowStatusSchema } from "./bug-contracts";
 import { ensureBugListAccess } from "./bug-list-access";
 import { buildSlaView } from "./bug-sla";
@@ -21,20 +22,16 @@ export interface StaffBugListInput {
   readonly status?: typeof BugWorkflowStatusSchema.Type | undefined;
 }
 
-type Scope =
-  | "all"
-  | "none"
-  | { readonly companyIds: string[]; readonly taskIds: string[] };
+type BugAction = "comment" | "reply_to_client" | "pick" | "request_info";
 
-// An admin sees every bug. An employee sees the bugs of the companies they are
-// a designated handler of and the bugs they are assigned to.
-const visibilityScope = async (
-  actorId: string,
-  role: string
-): Promise<Scope> => {
-  if (role === "admin") {
-    return "all";
-  }
+interface Involvement {
+  readonly handledCompanyIds: ReadonlySet<string>;
+  readonly assignedTaskIds: ReadonlySet<string>;
+}
+
+// The companies the caller is a designated handler of and the bugs they are
+// assigned to: the two ways an employee is involved with a bug.
+const loadInvolvement = async (actorId: string): Promise<Involvement> => {
   const [handled, assigned] = await Promise.all([
     db.orm.public.ClientCompanyHandler.where({ employeeId: actorId })
       .select("companyId")
@@ -43,12 +40,9 @@ const visibilityScope = async (
       .select("taskId")
       .all(),
   ]);
-  if (handled.length === 0 && assigned.length === 0) {
-    return "none";
-  }
   return {
-    companyIds: handled.map(({ companyId }) => companyId),
-    taskIds: assigned.map(({ taskId }) => taskId),
+    assignedTaskIds: new Set(assigned.map(({ taskId }) => taskId)),
+    handledCompanyIds: new Set(handled.map(({ companyId }) => companyId)),
   };
 };
 
@@ -70,10 +64,49 @@ const loadArchivedIds = async () => {
   };
 };
 
+const actionsFor = (
+  actor: { readonly role: string },
+  involvement: Involvement,
+  bug: {
+    readonly clientCompanyId: string | null;
+    readonly pickedById: string | null;
+    readonly status: string;
+    readonly taskId: string;
+  },
+  companyIsActive: boolean
+): BugAction[] => {
+  if (!bug.clientCompanyId) {
+    return ["comment"];
+  }
+  const permissions = clientBugPermissions({
+    companyIsActive,
+    isAssigned: involvement.assignedTaskIds.has(bug.taskId),
+    isHandler: involvement.handledCompanyIds.has(bug.clientCompanyId),
+    pickedById: bug.pickedById,
+    role: actor.role,
+    status: bug.status,
+  });
+  const actions: BugAction[] = [];
+  if (permissions.canPick) {
+    actions.push("pick");
+  }
+  // Only the handler who works on a client bug, or an admin, may reply.
+  if (permissions.canWork) {
+    actions.push("comment", "reply_to_client");
+  }
+  if (permissions.canAskClient) {
+    actions.push("request_info");
+  }
+  return actions;
+};
+
 const listForStaff = async (actorId: string, input: StaffBugListInput) => {
   const actor = await ensureBugListAccess(actorId);
-  const scope = await visibilityScope(actorId, actor.role);
-  if (scope === "none") {
+  const involvement = await loadInvolvement(actorId);
+  const isAdmin = actor.role === "admin";
+  const handledIds = [...involvement.handledCompanyIds];
+  const assignedIds = [...involvement.assignedTaskIds];
+  if (!isAdmin && handledIds.length === 0 && assignedIds.length === 0) {
     return { items: [], nextCursor: null };
   }
   const limit = input.limit ?? DEFAULT_PAGE_SIZE;
@@ -89,13 +122,11 @@ const listForStaff = async (actorId: string, input: StaffBugListInput) => {
     )
   )
     .where((bug) =>
-      scope === "all"
+      isAdmin
         ? bug.id.isNotNull()
         : or(
-            ...(scope.taskIds.length ? [bug.taskId.in(scope.taskIds)] : []),
-            ...(scope.companyIds.length
-              ? [bug.clientCompanyId.in(scope.companyIds)]
-              : [])
+            ...(assignedIds.length ? [bug.taskId.in(assignedIds)] : []),
+            ...(handledIds.length ? [bug.clientCompanyId.in(handledIds)] : [])
           )
     )
     .where((bug) =>
@@ -111,11 +142,25 @@ const listForStaff = async (actorId: string, input: StaffBugListInput) => {
     .all();
   const bugs = fetched.slice(0, limit);
   const last = fetched.length > limit ? bugs.at(-1) : undefined;
-  const taskIds = bugs.map(({ taskId }) => taskId);
+  const companyIds = [
+    ...new Set(bugs.flatMap(({ clientCompanyId }) => clientCompanyId ?? [])),
+  ];
   const [tasks, projects, companies, slas, settings] = await Promise.all([
-    db.orm.public.Task.where((task) => task.id.in(taskIds)).all(),
-    db.orm.public.Project.select("id", "key").all(),
-    db.orm.public.ClientCompany.select("id", "name").all(),
+    db.orm.public.Task.where((task) =>
+      task.id.in(bugs.map(({ taskId }) => taskId))
+    ).all(),
+    db.orm.public.Project.where((project) =>
+      project.id.in(bugs.map(({ projectId }) => projectId))
+    )
+      .select("id", "key")
+      .all(),
+    companyIds.length
+      ? db.orm.public.ClientCompany.where((company) =>
+          company.id.in(companyIds)
+        )
+          .select("deactivatedAt", "id", "name")
+          .all()
+      : [],
     db.orm.public.BugSla.where((sla) =>
       sla.bugId.in(bugs.map(({ id }) => id))
     ).all(),
@@ -123,20 +168,28 @@ const listForStaff = async (actorId: string, input: StaffBugListInput) => {
   ]);
   const taskById = new Map(tasks.map((task) => [task.id, task]));
   const projectKey = new Map(projects.map(({ id, key }) => [id, key]));
-  const companyName = new Map(companies.map(({ id, name }) => [id, name]));
+  const companyById = new Map(
+    companies.map((company) => [company.id, company])
+  );
   const slaByBug = new Map(slas.map((sla) => [sla.bugId, sla]));
   const now = new Date();
   const items = [];
   for (const bug of bugs) {
     const task = taskById.get(bug.taskId);
     if (task) {
+      const company = bug.clientCompanyId
+        ? companyById.get(bug.clientCompanyId)
+        : undefined;
       const sla = slaByBug.get(bug.id);
       items.push({
-        clientCompanyName: bug.clientCompanyId
-          ? (companyName.get(bug.clientCompanyId) ?? null)
-          : null,
+        clientCompanyName: company?.name ?? null,
         id: bug.id,
-        permittedActions: [],
+        permittedActions: actionsFor(
+          actor,
+          involvement,
+          bug,
+          company?.deactivatedAt === null
+        ),
         priority: task.priority,
         reference: `${projectKey.get(bug.projectId) ?? ""}-${task.projectTaskNumber}`,
         severity: bug.severity,
