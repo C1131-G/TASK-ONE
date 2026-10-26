@@ -479,6 +479,28 @@ export const staffBugApprovalInboxRoute = {
   summary: "The bug approvals with their status, newest first.",
 } as const satisfies RouteDefinition;
 
+const WorkspaceApprovalBody = Schema.Struct({
+  companyId: Uuid,
+  fileIds: Schema.Array(Uuid).check(Schema.isMaxLength(10)),
+  message: Schema.String.check(Schema.isMaxLength(2000)),
+  taskId: Uuid,
+});
+
+const WorkspaceApprovalReceipt = Schema.Struct({
+  id: Uuid,
+  version: Schema.Number,
+});
+
+export const workspaceApprovalRoute = {
+  body: WorkspaceApprovalBody,
+  data: WorkspaceApprovalReceipt,
+  method: "post",
+  operationId: "requestWorkspaceApproval",
+  path: "/api/v1/workspace/approvals",
+  summary:
+    "Ask a client company to approve a shared task with its finished files.",
+} as const satisfies RouteDefinition;
+
 const StaffPickBody = Schema.Struct({
   expectedVersion: Version,
   priority: Priority,
@@ -623,6 +645,7 @@ export const bugRoutes = [
   portalBugActionRoutes.reopen,
   staffBugContextRoute,
   staffBugApprovalInboxRoute,
+  workspaceApprovalRoute,
   staffBugActionRoutes.approval,
   staffBugActionRoutes.approvalDecision,
   staffBugActionRoutes.fixAttempt,
