@@ -735,6 +735,34 @@ export const staffBugActionRoutes = {
   },
 } as const satisfies Record<string, RouteDefinition>;
 
+const CommentVisibility = Schema.Literals(["internal", "public"]);
+
+const StaffCommentBody = Schema.Struct({
+  body: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(10_000)),
+  // "internal" stays with the team; "public" is a reply the client sees.
+  visibility: CommentVisibility,
+});
+
+export const StaffBugComment = Schema.Struct({
+  authorId: Schema.String,
+  body: Schema.String,
+  bugId: Uuid,
+  createdAt: Schema.String,
+  id: Uuid,
+  visibility: CommentVisibility,
+});
+
+export const staffBugCommentRoute = {
+  body: StaffCommentBody,
+  data: StaffBugComment,
+  method: "post",
+  operationId: "addWorkspaceBugComment",
+  params: BugIdParams,
+  path: "/api/v1/workspace/bugs/{bugId}/comments",
+  summary:
+    "Reply in a bug's discussion, as an internal note or as a reply the client sees.",
+} as const satisfies RouteDefinition;
+
 export const bugRoutes = [
   portalBugRoutes.list,
   portalBugRoutes.submit,
@@ -747,6 +775,7 @@ export const bugRoutes = [
   portalApprovalRoutes.decide,
   staffBugContextRoute,
   staffBugApprovalInboxRoute,
+  staffBugCommentRoute,
   workspaceApprovalRoute,
   staffBugActionRoutes.approval,
   staffBugActionRoutes.approvalDecision,
