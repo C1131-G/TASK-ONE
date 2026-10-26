@@ -373,9 +373,8 @@ it("lets one racing decision win and replays a retried decision", async () => {
     "SELECT status FROM approval_request WHERE id = $1",
     [raceId]
   );
-  expect(["approved", "changes_requested"]).toContain(
-    raceStatus.rows[0]?.status
-  );
+  const raceOutcome = raceStatus.rows[0]?.status ?? "";
+  expect(["approved", "changes_requested"]).toContain(raceOutcome);
 
   const key = "portal-approval-decision-key";
   const first = await send(POST, "POST", "client", {

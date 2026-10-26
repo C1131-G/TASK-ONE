@@ -422,7 +422,7 @@ it("gives one of two simultaneous decisions the approval", async () => {
 
   expect(replies.map((reply) => reply.status).toSorted()).toEqual([200, 409]);
   const [approval] = await approvalsOf(pending.bugId);
-  expect(["approved", "rejected"]).toContain(approval?.status);
+  expect(["approved", "rejected"]).toContain(approval?.status ?? "");
   expect(await statusOf(pending.bugId)).toBe(
     approval?.status === "approved" ? "approved_for_release" : "rejected"
   );
