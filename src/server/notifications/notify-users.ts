@@ -6,6 +6,8 @@ import type { db } from "@/src/prisma/db";
 
 import { enqueueEmails } from "../email/email-enqueue";
 import { queueRealtimeEvents } from "../realtime/publisher";
+import type { NotificationTarget } from "./notification-target";
+import { resolveTaskTarget } from "./notification-target";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -27,6 +29,8 @@ export interface UserNotification {
   readonly snippet: string | null;
   readonly taskId: string | null;
   readonly projectId: string | null;
+  // What it is about; a task notification defaults to its task or bug.
+  readonly target?: NotificationTarget | null;
   // A local path the notification and its push message open.
   readonly url: string;
   readonly now: Date;
@@ -66,6 +70,9 @@ export const notifyUsers = async (
   const disabledChannels = new Set(
     disabled.map(({ channel, userId }) => `${userId}:${channel}`)
   );
+  const target =
+    notification.target ??
+    (await resolveTaskTarget(transaction, notification.taskId));
   const writes: Promise<unknown>[] = [];
   const issued: { userId: string; notificationId: string }[] = [];
   const issuedInApp: string[] = [];
@@ -82,6 +89,8 @@ export const notifyUsers = async (
           projectId: notification.projectId,
           readAt: null,
           snippet: notification.snippet,
+          targetId: target?.id ?? null,
+          targetType: target?.type ?? null,
           taskId: notification.taskId,
           text: notification.text,
           type: notification.type,

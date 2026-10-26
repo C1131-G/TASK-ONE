@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'25ecf1b0c580b4b20b04b7c75a1bdad389a9c26ac3caa5c659e76e4179f9692f'>;
+  StorageHashBase<'fbda034d9cd4349b3f088c05c77ccdc8a435640a7f1ef609b7b893adbb931597'>;
 export type ExecutionHash =
   ExecutionHashBase<'c81db46d91fe75b042799333d93566bc3c8bf0e06e1662364c480ab1dcc1250e'>;
 export type ProfileHash =
@@ -704,6 +704,8 @@ export type FieldOutputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly readAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly snippet: CodecTypes['pg/text@1']['output'] | null;
+      readonly targetId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly targetType: CodecTypes['pg/text@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly text: CodecTypes['pg/text@1']['output'];
       readonly type:
@@ -1491,6 +1493,8 @@ export type FieldInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly readAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly snippet: CodecTypes['pg/text@1']['input'] | null;
+      readonly targetId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly targetType: CodecTypes['pg/text@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly text: CodecTypes['pg/text@1']['input'];
       readonly type:
@@ -2278,6 +2282,8 @@ export type StorageColumnTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly readAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
       readonly snippet: CodecTypes['pg/text@1']['output'] | null;
+      readonly targetId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly targetType: CodecTypes['pg/text@1']['output'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly text: CodecTypes['pg/text@1']['output'];
       readonly type:
@@ -3065,6 +3071,8 @@ export type StorageColumnInputTypes = {
       readonly projectId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly readAt: CodecTypes['pg/timestamptz-date@1']['input'] | null;
       readonly snippet: CodecTypes['pg/text@1']['input'] | null;
+      readonly targetId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly targetType: CodecTypes['pg/text@1']['input'] | null;
       readonly taskId: CodecTypes['pg/uuid@1']['input'] | null;
       readonly text: CodecTypes['pg/text@1']['input'];
       readonly type:
@@ -4018,6 +4026,8 @@ export namespace Models {
     projectId: CodecTypes['pg/uuid@1']['output'] | null;
     readAt: CodecTypes['pg/timestamptz-date@1']['output'] | null;
     snippet: CodecTypes['pg/text@1']['output'] | null;
+    targetId: CodecTypes['pg/uuid@1']['output'] | null;
+    targetType: CodecTypes['pg/text@1']['output'] | null;
     taskId: CodecTypes['pg/uuid@1']['output'] | null;
     text: CodecTypes['pg/text@1']['output'];
     type: 'mention' | 'assignment' | 'comment' | 'update' | 'due' | 'client_bug' | 'status' | 'sla';
@@ -9150,6 +9160,18 @@ type ContractBase = Omit<
                   readonly many: false;
                 };
                 readonly snippet: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly targetId: {
+                  readonly dataType: 'pg/uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly targetType: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
@@ -16178,6 +16200,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly targetId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly targetType: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly taskId: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
@@ -16246,6 +16276,8 @@ type ContractBase = Omit<
                 readonly projectId: { readonly column: 'projectId' };
                 readonly readAt: { readonly column: 'readAt' };
                 readonly snippet: { readonly column: 'snippet' };
+                readonly targetId: { readonly column: 'targetId' };
+                readonly targetType: { readonly column: 'targetType' };
                 readonly taskId: { readonly column: 'taskId' };
                 readonly text: { readonly column: 'text' };
                 readonly type: { readonly column: 'type' };

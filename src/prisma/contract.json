@@ -6558,6 +6558,20 @@
                   "kind": "scalar"
                 }
               },
+              "targetId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "targetType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "taskId": {
                 "nullable": true,
                 "type": {
@@ -6678,6 +6692,12 @@
                 },
                 "snippet": {
                   "column": "snippet"
+                },
+                "targetId": {
+                  "column": "targetId"
+                },
+                "targetType": {
+                  "column": "targetType"
                 },
                 "taskId": {
                   "column": "taskId"
@@ -16848,6 +16868,11 @@
             "notification": {
               "checks": [
                 {
+                  "expression": "(\"targetType\" IS NULL) = (\"targetId\" IS NULL) AND (\"targetType\" IS NULL OR \"targetType\" IN ('task', 'bug', 'approval'))",
+                  "name": "notification_target_valid_74444e8d",
+                  "prefix": "notification_target_valid"
+                },
+                {
                   "expression": "\"type\" IN ('mention', 'assignment', 'comment', 'update', 'due', 'client_bug', 'status', 'sla')",
                   "name": "notification_type_check_5a30586b",
                   "prefix": "notification_type_check"
@@ -16884,6 +16909,16 @@
                   "nullable": true
                 },
                 "snippet": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "targetId": {
+                  "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
+                  "nullable": true
+                },
+                "targetType": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
@@ -20824,7 +20859,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "25ecf1b0c580b4b20b04b7c75a1bdad389a9c26ac3caa5c659e76e4179f9692f"
+    "storageHash": "fbda034d9cd4349b3f088c05c77ccdc8a435640a7f1ef609b7b893adbb931597"
   },
   "execution": {
     "executionHash": "c81db46d91fe75b042799333d93566bc3c8bf0e06e1662364c480ab1dcc1250e",
