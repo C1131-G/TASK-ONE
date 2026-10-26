@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { RouteInput } from "../../../mobile-api/route-definition";
+import { getPortalNotificationTargetRoute } from "../../../mobile-api/routes-notifications";
 import type {
   markAllPortalNotificationsReadRoute,
   markPortalNotificationReadRoute,
@@ -9,7 +10,10 @@ import { AuthSession } from "../../auth/session";
 import type { PortalUser } from "../../auth/session-types";
 import type { PortalActor } from "../../portal/portal-contracts";
 import { listPortalNotificationInbox } from "../../portal/portal-notification-inbox";
+import { asPortalCaller } from "../bugs/caller";
+import type { PathParams } from "../bugs/caller";
 import { markAllNotificationsRead, markNotificationRead } from "./read-state";
+import { openPortalTarget } from "./target";
 
 // The company always comes from the signed-in client's session, never from
 // the request. Kept local to the notifications branch.
@@ -55,3 +59,15 @@ export const markAllPortalNotificationsRead = (
     const user = yield* sessions.requirePortalAccess(headers);
     return yield* markAllNotificationsRead(user.id, input.idempotencyKey);
   });
+
+// Where a notification leads, checked against the client's company now.
+export const openPortalNotificationTarget = (
+  request: Request,
+  params: PathParams
+) =>
+  asPortalCaller(
+    getPortalNotificationTargetRoute,
+    request,
+    params,
+    ({ actor, input }) => openPortalTarget(actor, input.params.id)
+  );

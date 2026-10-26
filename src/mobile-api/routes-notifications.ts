@@ -158,6 +158,24 @@ export const markAllPortalNotificationsReadRoute = {
     "Mark every unread notification of the caller read; answers how many changed.",
 } as const satisfies RouteDefinition;
 
+// What a notification opens. The id is the one the task, bug or request
+// endpoints take, and the summary holds only what the caller may see there.
+export const NotificationTargetSchema = Schema.Struct({
+  id: Schema.String,
+  summary: Schema.Struct({ status: Schema.String, title: Schema.String }),
+  type: Schema.Literals(["task", "bug", "approval"]),
+});
+
+export const getPortalNotificationTargetRoute = {
+  data: NotificationTargetSchema,
+  method: "get",
+  operationId: "getPortalNotificationTarget",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/portal/notifications/{id}/target",
+  summary:
+    "The bug or request one of the caller's notifications opens, checked again now; answers not found when it cannot be opened.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
   markWorkspaceNotificationReadRoute,
@@ -167,4 +185,5 @@ export const notificationRoutes = [
   listPortalNotificationsRoute,
   markPortalNotificationReadRoute,
   markAllPortalNotificationsReadRoute,
+  getPortalNotificationTargetRoute,
 ] as const satisfies readonly RouteDefinition[];
