@@ -44,6 +44,7 @@ export const notifyClientsOfRequest = async (
     projectId: request.projectId,
     recipientIds: clients.map(({ id }) => id),
     snippet: request.message.slice(0, SNIPPET_LENGTH),
+    target: { id: request.id, type: "approval" },
     taskId: null,
     text: requestNotificationText(request.subjectTitle, request.version),
     type: "status",

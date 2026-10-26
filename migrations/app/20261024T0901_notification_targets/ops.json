@@ -1,0 +1,157 @@
+[
+  {
+    "id": "column.public.notification.targetId",
+    "label": "Add column \"targetId\" to \"notification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetId",
+        "table": "notification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "notification",
+          "targetId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetId\"",
+        "sql": "ALTER TABLE \"public\".\"notification\" ADD COLUMN \"targetId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "notification",
+          "targetId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.notification.targetType",
+    "label": "Add column \"targetType\" to \"notification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetType",
+        "table": "notification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetType\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "notification",
+          "targetType"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetType\"",
+        "sql": "ALTER TABLE \"public\".\"notification\" ADD COLUMN \"targetType\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetType\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "notification",
+          "targetType"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data.notification.backfillTargets",
+    "label": "Backfill notification targets from existing rows",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "point notifications about bug tasks at their bug",
+        "sql": "UPDATE \"public\".\"notification\" AS n SET \"targetType\" = 'bug', \"targetId\" = b.\"id\" FROM \"public\".\"bug_report\" AS b WHERE n.\"targetType\" IS NULL AND n.\"taskId\" = b.\"taskId\""
+      },
+      {
+        "description": "point the remaining task notifications at their task",
+        "sql": "UPDATE \"public\".\"notification\" SET \"targetType\" = 'task', \"targetId\" = \"taskId\" WHERE \"targetType\" IS NULL AND \"taskId\" IS NOT NULL"
+      },
+      {
+        "description": "point approval request notifications at their request",
+        "sql": "UPDATE \"public\".\"notification\" AS n SET \"targetType\" = 'approval', \"targetId\" = r.\"id\" FROM \"public\".\"approval_request\" AS r, \"public\".\"user\" AS u WHERE n.\"targetType\" IS NULL AND n.\"taskId\" IS NULL AND n.\"type\" = 'status' AND n.\"projectId\" = r.\"projectId\" AND n.\"createdAt\" = r.\"requestedAt\" AND n.\"actorId\" = r.\"requestedById\" AND u.\"id\" = n.\"userId\" AND u.\"clientCompanyId\" = r.\"companyId\" AND n.\"text\" = CASE WHEN r.\"version\" > 1 THEN 'Approval requested again: ' ELSE 'Approval requested: ' END || r.\"subjectTitle\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify no task notification was left without a target",
+        "sql": "SELECT NOT EXISTS (SELECT 1 FROM \"public\".\"notification\" WHERE \"taskId\" IS NOT NULL AND \"targetType\" IS NULL) AS \"result\""
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.notification.notification_target_valid_74444e8d",
+    "label": "Add check constraint \"notification_target_valid_74444e8d\" on \"notification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "notification_target_valid_74444e8d",
+        "table": "notification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"notification_target_valid_74444e8d\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_target_valid_74444e8d",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"notification_target_valid_74444e8d\"",
+        "sql": "ALTER TABLE \"public\".\"notification\" ADD CONSTRAINT \"notification_target_valid_74444e8d\" CHECK ((\"targetType\" IS NULL) = (\"targetId\" IS NULL) AND (\"targetType\" IS NULL OR \"targetType\" IN ('task', 'bug', 'approval')))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"notification_target_valid_74444e8d\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "notification_target_valid_74444e8d",
+          "public",
+          "\"public\".\"notification\""
+        ]
+      }
+    ]
+  }
+]

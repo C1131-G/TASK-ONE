@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { and } from "@prisma/orm-postgres/orm-client";
 
+import { resolveTaskTarget } from "../notifications/notification-target";
 import type { Transaction } from "./work-internal";
 
 export const notifyTaskAssignees = async (
@@ -45,6 +46,7 @@ export const notifyTaskAssignees = async (
   const disabledChannels = new Set(
     disabled.map(({ channel, userId }) => `${userId}:${channel}`)
   );
+  const target = await resolveTaskTarget(transaction, task.id);
   const writes: Promise<unknown>[] = [];
   for (const userId of activeRecipientIds) {
     const notificationId = randomUUID();
@@ -61,6 +63,8 @@ export const notifyTaskAssignees = async (
           projectId: task.projectId,
           readAt: null,
           snippet: task.title,
+          targetId: target?.id ?? null,
+          targetType: target?.type ?? null,
           taskId: task.id,
           text,
           type: eventType,

@@ -1,11 +1,17 @@
 // use prisma-8
 
+// targetType and targetId say what the notification is about: a task, a bug
+// or an approval request. They carry no foreign key, so a deleted subject
+// never blocks history; opening a target re-checks that the person can still
+// see it. Older rows have a target only where one could be derived.
 model Notification {
   id        Uuid @id @default(uuid())
   userId    String
   actorId   String?
   taskId    Uuid?
   projectId Uuid?
+  targetType String?
+  targetId   Uuid?
   type      NotificationType
   text      String
   snippet   String?
@@ -19,5 +25,6 @@ model Notification {
 
   @@index([userId, readAt, createdAt])
   @@index([actorId])
+  @@check(expression: "(\"targetType\" IS NULL) = (\"targetId\" IS NULL) AND (\"targetType\" IS NULL OR \"targetType\" IN ('task', 'bug', 'approval'))", name: "notification_target_valid")
   @@map("notification")
 }

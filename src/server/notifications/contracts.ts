@@ -19,11 +19,15 @@ export interface NotificationItem {
 
 export interface InboxPage {
   readonly items: readonly NotificationItem[];
+  // Opaque position of the next page; null on the last page.
+  readonly nextCursor: string | null;
   readonly unreadCount: number;
   readonly unreadInboxCount: number;
 }
 
 export interface InboxOptions {
+  // Continue after this position (a `nextCursor` from an earlier page).
+  readonly cursor?: string | null;
   readonly unreadOnly: boolean;
   readonly limit: number;
 }
@@ -59,6 +63,7 @@ export const InboxSchema = Schema.Struct({
       type: Schema.String,
     })
   ),
+  nextCursor: Schema.NullOr(Schema.String),
   unreadCount: Schema.Number,
   unreadInboxCount: Schema.Number,
 });
