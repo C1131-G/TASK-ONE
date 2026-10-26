@@ -20,6 +20,7 @@ const BugEvidenceHistorySchema = Schema.Struct({
   ),
   id: UUIDSchema,
   kind: Schema.Literals(["before", "after", "other"]),
+  uploadedBy: Schema.Struct({ id: Schema.String, name: Schema.String }),
 });
 
 const BugAttemptHistorySchema = Schema.Struct({

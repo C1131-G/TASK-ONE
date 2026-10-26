@@ -20,6 +20,37 @@ const canWorkInStatus = (
   allowedStatuses: ReadonlySet<string>
 ) => canWork && allowedStatuses.has(status);
 
+// What a staff member may do with a client bug. The staff bug context and the
+// mobile bug list both answer from here, so they never disagree.
+export const clientBugPermissions = (facts: {
+  readonly companyIsActive: boolean;
+  readonly isAssigned: boolean;
+  readonly isHandler: boolean;
+  readonly pickedById: string | null;
+  readonly role: string;
+  readonly status: string;
+}) => {
+  const canWork = facts.role === "admin" || facts.isAssigned;
+  return {
+    canAskClient: canWorkInStatus(
+      canWork,
+      facts.status,
+      CAN_ASK_CLIENT_STATUSES
+    ),
+    canCloseNotABug: canWorkInStatus(
+      canWork,
+      facts.status,
+      CAN_CLOSE_NOT_A_BUG_STATUSES
+    ),
+    canPick:
+      facts.status === "reported" &&
+      facts.pickedById === null &&
+      facts.isHandler &&
+      facts.companyIsActive,
+    canWork,
+  };
+};
+
 const optionalRecord = <Record>(
   enabled: boolean,
   query: () => Promise<Record | null>
@@ -78,20 +109,19 @@ export const loadClientReport = async (
       transaction.orm.public.BugSla.where({ bugId: bug.id }).first(),
       loadSlaSettings(transaction),
     ]);
-  const canWork = actor.role === "admin" || Boolean(assignment);
+  const permissions = clientBugPermissions({
+    companyIsActive: company?.deactivatedAt === null,
+    isAssigned: Boolean(assignment),
+    isHandler: Boolean(handler),
+    pickedById: bug.pickedById,
+    role: actor.role,
+    status: bug.status,
+  });
   return {
     awaitingClientSince: bug.awaitingClientSince?.toISOString() ?? null,
-    canAskClient: canWorkInStatus(canWork, bug.status, CAN_ASK_CLIENT_STATUSES),
-    canCloseNotABug: canWorkInStatus(
-      canWork,
-      bug.status,
-      CAN_CLOSE_NOT_A_BUG_STATUSES
-    ),
-    canPick:
-      bug.status === "reported" &&
-      bug.pickedById === null &&
-      Boolean(handler) &&
-      company?.deactivatedAt === null,
+    canAskClient: permissions.canAskClient,
+    canCloseNotABug: permissions.canCloseNotABug,
+    canPick: permissions.canPick,
     companyId,
     companyName: company?.name ?? "Unknown company",
     needsInfoSince: bug.needsInfoSince?.toISOString() ?? null,

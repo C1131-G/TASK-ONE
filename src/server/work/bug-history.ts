@@ -106,12 +106,20 @@ const getBugHistory = (
     const relatedIds = relations.map(({ fromBugReportId, toBugReportId }) =>
       fromBugReportId === bug.id ? toBugReportId : fromBugReportId
     );
-    const [files, relatedReports, clientReport, clientContext] =
+    const uploaderIds = [
+      ...new Set(evidence.map(({ uploadedById }) => uploadedById)),
+    ];
+    const [files, uploaders, relatedReports, clientReport, clientContext] =
       await Promise.all([
         fileIds.length
           ? transaction.orm.public.FileAsset.where((file) =>
               file.id.in(fileIds)
             ).all()
+          : [],
+        uploaderIds.length
+          ? transaction.orm.public.User.where((user) => user.id.in(uploaderIds))
+              .select("id", "name")
+              .all()
           : [],
         relatedIds.length
           ? transaction.orm.public.BugReport.where((other) =>
@@ -136,6 +144,9 @@ const getBugHistory = (
         : [],
     ]);
     const fileById = new Map(files.map((file) => [file.id, file]));
+    const uploaderNameById = new Map(
+      uploaders.map((user) => [user.id, user.name])
+    );
     const taskById = new Map(
       relatedTasks.map((relatedTask) => [relatedTask.id, relatedTask])
     );
@@ -229,6 +240,10 @@ const getBugHistory = (
             : null,
           id: evidenceRow.id,
           kind: evidenceRow.kind,
+          uploadedBy: {
+            id: evidenceRow.uploadedById,
+            name: uploaderNameById.get(evidenceRow.uploadedById) ?? "Unknown",
+          },
         };
       }),
       priority: task.priority,
