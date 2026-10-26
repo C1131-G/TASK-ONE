@@ -525,7 +525,38 @@ const StaffVerificationBody = Schema.Struct({
   testedVersion: Text,
 });
 
+const StaffApprovalBody = Schema.Struct({
+  expectedVersion: Version,
+  fixAttemptId: Uuid,
+});
+
+const StaffApprovalDecisionBody = Schema.Struct({
+  approvalId: Uuid,
+  comment: Schema.NullOr(Schema.String.check(Schema.isMaxLength(10_000))),
+  decision: Schema.Literals(["approved", "rejected"]),
+  expectedVersion: Version,
+  rejectionReason: Schema.NullOr(Schema.String.check(Schema.isMaxLength(2000))),
+});
+
 export const staffBugActionRoutes = {
+  approval: {
+    body: StaffApprovalBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "submitBugApproval",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/approval",
+    summary: "Send a verified fix to an admin for approval.",
+  },
+  approvalDecision: {
+    body: StaffApprovalDecisionBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "decideBugApproval",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/approval/decision",
+    summary: "Approve a fix for release or send it back with a reason.",
+  },
   fixAttempt: {
     body: StaffFixAttemptBody,
     data: WorkflowReceipt,
@@ -592,6 +623,8 @@ export const bugRoutes = [
   portalBugActionRoutes.reopen,
   staffBugContextRoute,
   staffBugApprovalInboxRoute,
+  staffBugActionRoutes.approval,
+  staffBugActionRoutes.approvalDecision,
   staffBugActionRoutes.fixAttempt,
   staffBugActionRoutes.pick,
   staffBugActionRoutes.reassign,

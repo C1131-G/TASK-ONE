@@ -36,3 +36,15 @@ export const verifyBugFix = staffWorkflowWrite(
   "verifyFix",
   "verification"
 );
+
+export const submitBugApproval = staffWorkflowWrite(
+  staffBugActionRoutes.approval,
+  "submitApproval",
+  "approval-submit"
+);
+
+export const decideBugApproval = staffWorkflowWrite(
+  staffBugActionRoutes.approvalDecision,
+  "decideApproval",
+  "approval-decision"
+);
