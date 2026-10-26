@@ -3,12 +3,14 @@ import { afterAll, beforeAll, expect, it } from "bun:test";
 import { Schema } from "effect";
 
 import {
+  authPool,
   ids,
   personaId,
   setupHarness,
   teardownHarness,
 } from "./support/action-harness";
 import {
+  forceStatus,
   linkProjectToCompanies,
   reportBody,
   send,
@@ -120,4 +122,91 @@ it("shows a handler their company's bugs and bugs assigned to them, and others n
   expect(owner).not.toContain("Scope: foreign");
   expect(outsider).toEqual([]);
   expect([handled, foreign]).toHaveLength(2);
+});
+
+const walk = async (
+  limit: number,
+  query: Record<string, string> = {}
+): Promise<readonly (readonly string[])[]> => {
+  const pages: string[][] = [];
+  let cursor: string | null = null;
+  do {
+    // oxlint-disable-next-line no-await-in-loop
+    const reply: Awaited<ReturnType<typeof listAs>> = await listAs("admin", {
+      ...query,
+      ...(cursor ? { cursor } : {}),
+      limit: String(limit),
+    });
+    expect(reply.status).toBe(200);
+    pages.push(
+      (reply.body.data.items as readonly { readonly id: string }[]).map(
+        ({ id }) => id
+      )
+    );
+    cursor = reply.body.data.nextCursor as string | null;
+  } while (cursor);
+  return pages;
+};
+
+it("pages through the list in a stable order without repeats or gaps, even when rows share a timestamp", async () => {
+  const created: string[] = [];
+  for (let index = 0; index < 5; index += 1) {
+    // oxlint-disable-next-line no-await-in-loop
+    created.push(await submit("client", `Paging ${index}`));
+  }
+  await authPool.query(
+    "UPDATE bug_report SET \"updatedAt\" = '2026-01-01T00:00:00Z' WHERE id = ANY($1::uuid[])",
+    [created.slice(0, 4)]
+  );
+
+  const pages = await walk(2);
+  const again = await walk(2);
+
+  for (const page of pages) {
+    expect(page.length).toBeLessThanOrEqual(2);
+  }
+  const flat = pages.flat();
+  expect(new Set(flat).size).toBe(flat.length);
+  expect(flat).toEqual(expect.arrayContaining(created));
+  expect(again).toEqual(pages);
+  const single = await walk(100);
+  expect(single.flat()).toEqual(flat);
+});
+
+it("refuses a page size outside 1 to 100 and a cursor it did not issue", async () => {
+  const tooBig = await listAs("admin", { limit: "101" });
+  const zero = await listAs("admin", { limit: "0" });
+  const fractional = await listAs("admin", { limit: "1.5" });
+  const garbage = await listAs("admin", { cursor: "not-a-cursor" });
+
+  expect(tooBig.status).toBe(422);
+  expect(tooBig.body.error.fieldErrors).toHaveProperty("limit");
+  expect(zero.status).toBe(422);
+  expect(fractional.status).toBe(422);
+  expect(garbage.status).toBe(422);
+});
+
+it("filters by status and leaves out archived bugs", async () => {
+  const open = await submit("client", "Filter: open");
+  const closed = await submit("client", "Filter: closed");
+  const archived = await submit("client", "Filter: archived");
+  await forceStatus(closed, "closed");
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = now() WHERE id = (SELECT "taskId" FROM bug_report WHERE id = $1)',
+    [archived]
+  );
+
+  const closedOnly = await listAs("admin", { status: "closed" });
+  const reported = await listAs("admin", { status: "reported" });
+  const all = await listAs("admin", { limit: "100" });
+  const invalid = await listAs("admin", { status: "sleeping" });
+
+  expect(titlesOf(closedOnly)).toContain("Filter: closed");
+  expect(titlesOf(closedOnly)).not.toContain("Filter: open");
+  expect(titlesOf(reported)).toContain("Filter: open");
+  expect(titlesOf(reported)).not.toContain("Filter: closed");
+  expect(titlesOf(all)).not.toContain("Filter: archived");
+  expect([open, closed]).toHaveLength(2);
+  expect(invalid.status).toBe(422);
+  expect(invalid.body.error.fieldErrors).toHaveProperty("status");
 });

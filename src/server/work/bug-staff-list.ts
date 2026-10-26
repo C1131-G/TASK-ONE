@@ -1,9 +1,14 @@
-import { or } from "@prisma/orm-postgres/orm-client";
+import { and, not, or } from "@prisma/orm-postgres/orm-client";
 import { Effect } from "effect";
 
 import { db } from "@/src/prisma/db";
 
 import { loadSlaSettings } from "../company/sla-settings";
+import {
+  decodeInboxCursor,
+  encodeInboxCursor,
+} from "../notifications/inbox-cursor";
+import type { BugWorkflowStatusSchema } from "./bug-contracts";
 import { ensureBugListAccess } from "./bug-list-access";
 import { buildSlaView } from "./bug-sla";
 import { databaseError } from "./work-internal";
@@ -13,7 +18,7 @@ const DEFAULT_PAGE_SIZE = 30;
 export interface StaffBugListInput {
   readonly cursor?: string | undefined;
   readonly limit?: number | undefined;
-  readonly status?: string | undefined;
+  readonly status?: typeof BugWorkflowStatusSchema.Type | undefined;
 }
 
 type Scope =
@@ -47,6 +52,24 @@ const visibilityScope = async (
   };
 };
 
+// Archived bugs and the bugs of archived projects are no longer actionable.
+const loadArchivedIds = async () => {
+  const [tasks, projects] = await Promise.all([
+    db.orm.public.Task.where((task) =>
+      and(task.type.eq("bug"), task.archivedAt.isNotNull())
+    )
+      .select("id")
+      .all(),
+    db.orm.public.Project.where((project) => project.archivedAt.isNotNull())
+      .select("id")
+      .all(),
+  ]);
+  return {
+    projectIds: projects.map(({ id }) => id),
+    taskIds: tasks.map(({ id }) => id),
+  };
+};
+
 const listForStaff = async (actorId: string, input: StaffBugListInput) => {
   const actor = await ensureBugListAccess(actorId);
   const scope = await visibilityScope(actorId, actor.role);
@@ -54,19 +77,40 @@ const listForStaff = async (actorId: string, input: StaffBugListInput) => {
     return { items: [], nextCursor: null };
   }
   const limit = input.limit ?? DEFAULT_PAGE_SIZE;
-  const bugs = await db.orm.public.BugReport.where((bug) =>
-    scope === "all"
-      ? bug.id.isNotNull()
-      : or(
-          ...(scope.taskIds.length ? [bug.taskId.in(scope.taskIds)] : []),
-          ...(scope.companyIds.length
-            ? [bug.clientCompanyId.in(scope.companyIds)]
-            : [])
-        )
+  const after = input.cursor ? decodeInboxCursor(input.cursor) : null;
+  const hidden = await loadArchivedIds();
+  const fetched = await db.orm.public.BugReport.where((bug) =>
+    and(
+      ...(input.status ? [bug.status.eq(input.status)] : []),
+      ...(hidden.taskIds.length ? [not(bug.taskId.in(hidden.taskIds))] : []),
+      ...(hidden.projectIds.length
+        ? [not(bug.projectId.in(hidden.projectIds))]
+        : [])
+    )
   )
+    .where((bug) =>
+      scope === "all"
+        ? bug.id.isNotNull()
+        : or(
+            ...(scope.taskIds.length ? [bug.taskId.in(scope.taskIds)] : []),
+            ...(scope.companyIds.length
+              ? [bug.clientCompanyId.in(scope.companyIds)]
+              : [])
+          )
+    )
+    .where((bug) =>
+      after
+        ? or(
+            bug.updatedAt.lt(after.createdAt),
+            and(bug.updatedAt.eq(after.createdAt), bug.id.lt(after.id))
+          )
+        : bug.id.isNotNull()
+    )
     .orderBy([(bug) => bug.updatedAt.desc(), (bug) => bug.id.desc()])
-    .limit(limit)
+    .limit(limit + 1)
     .all();
+  const bugs = fetched.slice(0, limit);
+  const last = fetched.length > limit ? bugs.at(-1) : undefined;
   const taskIds = bugs.map(({ taskId }) => taskId);
   const [tasks, projects, companies, slas, settings] = await Promise.all([
     db.orm.public.Task.where((task) => task.id.in(taskIds)).all(),
@@ -104,7 +148,12 @@ const listForStaff = async (actorId: string, input: StaffBugListInput) => {
       });
     }
   }
-  return { items, nextCursor: null };
+  return {
+    items,
+    nextCursor: last
+      ? encodeInboxCursor({ createdAt: last.updatedAt, id: last.id })
+      : null,
+  };
 };
 
 export const listStaffBugs = (actorId: string, input: StaffBugListInput) =>
