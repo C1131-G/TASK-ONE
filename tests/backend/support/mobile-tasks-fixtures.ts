@@ -40,6 +40,11 @@ const ROUTES: readonly {
     path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId/status",
   },
   {
+    load: () =>
+      import("../../../app/api/v1/workspace/tasks/[taskId]/comments/route"),
+    path: "/api/v1/workspace/tasks/:taskId/comments",
+  },
+  {
     load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId",
   },
@@ -240,6 +245,20 @@ export const seedSubtask = async (
     ]
   );
   return subtaskId;
+};
+
+// A client bug for the shared harness project and company.
+export const seedClientBug = async (
+  taskId: string,
+  companyId: string
+): Promise<string> => {
+  const bugId = randomUUID();
+  await authPool.query(
+    `INSERT INTO bug_report (id, "taskId", "projectId", "reporterId", status, severity, "discoverySource", environment, component, route, "reproductionSteps", "expectedBehavior", "actualBehavior", "clientCompanyId", "clientImpact")
+     VALUES ($1, $2, $3, $4, 'triaged', 'major', 'customer_report', 'production', 'Portal', '/', ARRAY['Open it'], 'Works', 'Breaks', $5, 'high')`,
+    [bugId, taskId, ids.projectId, personaId("client"), companyId]
+  );
+  return bugId;
 };
 
 export const seedComment = async (

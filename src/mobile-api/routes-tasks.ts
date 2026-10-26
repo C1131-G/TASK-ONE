@@ -280,6 +280,40 @@ export const subtaskStatusRoute = {
     "Mark a subtask done or not done. Needs the task version the caller last saw; a stale one answers 409.",
 } as const satisfies RouteDefinition;
 
+export const TaskCommentVisibilitySchema = Schema.Literals([
+  "public",
+  "internal",
+]);
+
+export const TaskCommentBodySchema = Schema.Struct({
+  body: Schema.String,
+  visibility: Schema.optional(TaskCommentVisibilitySchema),
+});
+
+export type MobileTaskCommentBody = typeof TaskCommentBodySchema.Type;
+
+export const TaskCommentSchema = Schema.Struct({
+  authorId: Schema.String,
+  body: Schema.String,
+  createdAt: Schema.String,
+  id: Schema.String,
+  taskId: Schema.String,
+  visibility: TaskCommentVisibilitySchema,
+});
+
+export type MobileTaskComment = typeof TaskCommentSchema.Type;
+
+export const taskCommentRoute = {
+  body: TaskCommentBodySchema,
+  data: TaskCommentSchema,
+  method: "post",
+  operationId: "addTaskComment",
+  params: TaskPathSchema,
+  path: "/api/v1/workspace/tasks/{taskId}/comments",
+  summary:
+    "Add a comment to a task. It is internal unless the caller makes a public reply on a client bug.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
   myWorkRoute,
   taskContextRoute,
@@ -288,4 +322,5 @@ export const taskRoutes = [
   subtaskAddRoute,
   subtaskChangeRoute,
   subtaskStatusRoute,
+  taskCommentRoute,
 ] as const satisfies readonly RouteDefinition[];
