@@ -26,7 +26,8 @@ export const renderWithTheme = async (
     setMode: noop,
   };
   const queryClient = new QueryClient({
-    defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
+    // gcTime 0 frees the cache timers so Jest can exit after the last test.
+    defaultOptions: { mutations: { retry: false }, queries: { gcTime: 0, retry: false } },
   });
   await render(
     createElement(

@@ -8,9 +8,11 @@
     "scheme": "metsys",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.cibi.metsys",
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.cibi.metsys",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -24,7 +26,10 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#fbfaf8",
+          "dark": {
+            "backgroundColor": "#1a1a19"
+          },
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
