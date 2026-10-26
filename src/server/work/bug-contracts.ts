@@ -155,6 +155,9 @@ export const BugSubmitApprovalInputSchema = Schema.Struct({
 
 export const BugApprovalDecisionInputSchema = Schema.Struct({
   approvalId: UUIDSchema,
+  // Present when the caller scopes the decision to a bug, as the mobile route
+  // does with its path parameter. The web action omits it.
+  bugId: Schema.optional(UUIDSchema),
   comment: Schema.NullOr(Schema.String.check(Schema.isMaxLength(10_000))),
   decision: Schema.Literals(["approved", "rejected"]),
   expectedVersion: Schema.Number.check(Schema.isInt(), Schema.isGreaterThan(0)),

@@ -186,6 +186,9 @@ export const decideApproval = async (
     }).first(),
     "The approval request was not found."
   );
+  if (input.bugId && approval.bugReportId !== input.bugId) {
+    required("The approval request does not belong to this bug.");
+  }
   if (approval.status !== "pending") {
     conflict();
   }
