@@ -3,9 +3,12 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { PortalApprovals } from "../../approvals/portal-approvals-service";
+import type { WorkspaceUser } from "../../auth/session-types";
 import { AppError } from "../../core/action-result";
 import { PortalBugs } from "../../portal/portal-contracts";
 import type { PortalActor } from "../../portal/portal-contracts";
+import { BugHistory } from "../../work/bug-history";
+import { getTaskContext } from "../../work/work-task-context";
 
 export interface OpenedTarget {
   readonly id: string;
@@ -106,4 +109,48 @@ export const openPortalTarget = (actor: PortalActor, notificationId: string) =>
     const bugId =
       target.type === "task" ? yield* bugOfTask(actor, target.id) : target.id;
     return yield* sameAnswer(openBug(actor, bugId));
+  });
+
+const openTask = (user: WorkspaceUser, taskId: string) =>
+  Effect.gen(function* openWorkspaceTask() {
+    const task = yield* getTaskContext(user, taskId);
+    if (task.isArchived) {
+      return yield* cannotOpen();
+    }
+    return {
+      id: task.id,
+      summary: { status: task.status, title: task.title },
+      type: "task" as const,
+    };
+  });
+
+const openStaffBug = (user: WorkspaceUser, bugId: string) =>
+  Effect.gen(function* openWorkspaceBug() {
+    const history = yield* BugHistory;
+    const { archived, bug } = yield* history.get(user.id, bugId);
+    if (archived) {
+      return yield* cannotOpen();
+    }
+    return {
+      id: bug.id,
+      summary: { status: bug.status, title: bug.title },
+      type: "bug" as const,
+    };
+  });
+
+// Staff open tasks and bugs through the readers their own screens use. They
+// have no screen for an approval request, so one is never opened here.
+export const openWorkspaceTarget = (
+  user: WorkspaceUser,
+  notificationId: string
+) =>
+  Effect.gen(function* open() {
+    const target = yield* loadTarget(user.id, notificationId);
+    if (target.type === "task") {
+      return yield* sameAnswer(openTask(user, target.id));
+    }
+    if (target.type === "bug") {
+      return yield* sameAnswer(openStaffBug(user, target.id));
+    }
+    return yield* cannotOpen();
   });

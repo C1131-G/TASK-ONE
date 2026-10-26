@@ -166,6 +166,16 @@ export const NotificationTargetSchema = Schema.Struct({
   type: Schema.Literals(["task", "bug", "approval"]),
 });
 
+export const getWorkspaceNotificationTargetRoute = {
+  data: NotificationTargetSchema,
+  method: "get",
+  operationId: "getWorkspaceNotificationTarget",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/workspace/notifications/{id}/target",
+  summary:
+    "The task or bug one of the caller's notifications opens, checked again now; answers not found when it cannot be opened.",
+} as const satisfies RouteDefinition;
+
 export const getPortalNotificationTargetRoute = {
   data: NotificationTargetSchema,
   method: "get",
@@ -185,5 +195,6 @@ export const notificationRoutes = [
   listPortalNotificationsRoute,
   markPortalNotificationReadRoute,
   markAllPortalNotificationsReadRoute,
+  getWorkspaceNotificationTargetRoute,
   getPortalNotificationTargetRoute,
 ] as const satisfies readonly RouteDefinition[];
