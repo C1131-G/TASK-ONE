@@ -485,6 +485,23 @@ const StaffPickBody = Schema.Struct({
   severity: Severity,
 });
 
+const StaffTriageBody = Schema.Struct({
+  assigneeIds: Schema.Array(Uuid).check(Schema.isMaxLength(100)),
+  expectedVersion: Version,
+  priority: Priority,
+  severity: Severity,
+});
+
+const StaffReassignBody = Schema.Struct({
+  employeeId: Uuid,
+  expectedVersion: Version,
+});
+
+const StaffRequestInfoBody = Schema.Struct({
+  expectedVersion: Version,
+  question: Text,
+});
+
 export const staffBugActionRoutes = {
   pick: {
     body: StaffPickBody,
@@ -495,6 +512,33 @@ export const staffBugActionRoutes = {
     path: "/api/v1/workspace/bugs/{bugId}/pick",
     summary:
       "Pick up a client report. Only a designated handler of the client's company may.",
+  },
+  reassign: {
+    body: StaffReassignBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "reassignWorkspaceBug",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/reassign",
+    summary: "Hand a picked client bug to exactly one employee.",
+  },
+  requestInfo: {
+    body: StaffRequestInfoBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "requestBugInfo",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/request-info",
+    summary: "Ask the client a question and wait for their answer.",
+  },
+  triage: {
+    body: StaffTriageBody,
+    data: WorkflowReceipt,
+    method: "post",
+    operationId: "triageWorkspaceBug",
+    params: BugIdParams,
+    path: "/api/v1/workspace/bugs/{bugId}/triage",
+    summary: "Set the assignees, priority and severity of a client report.",
   },
 } as const satisfies Record<string, RouteDefinition>;
 
@@ -508,4 +552,7 @@ export const bugRoutes = [
   staffBugContextRoute,
   staffBugApprovalInboxRoute,
   staffBugActionRoutes.pick,
+  staffBugActionRoutes.reassign,
+  staffBugActionRoutes.requestInfo,
+  staffBugActionRoutes.triage,
 ] as const satisfies readonly RouteDefinition[];

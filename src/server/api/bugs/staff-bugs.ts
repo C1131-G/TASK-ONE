@@ -6,3 +6,21 @@ export const pickWorkspaceBug = staffWorkflowWrite(
   "pick",
   "pick"
 );
+
+export const triageWorkspaceBug = staffWorkflowWrite(
+  staffBugActionRoutes.triage,
+  "triage",
+  "triage"
+);
+
+export const reassignWorkspaceBug = staffWorkflowWrite(
+  staffBugActionRoutes.reassign,
+  "reassign",
+  "reassign"
+);
+
+export const requestBugInfo = staffWorkflowWrite(
+  staffBugActionRoutes.requestInfo,
+  "requestInfo",
+  "request-info"
+);
