@@ -57,6 +57,14 @@ const storageError = () =>
     message: "Private file storage is unavailable.",
   });
 
+// How long each kind of signed URL works, in seconds. The mobile API reports the
+// same windows, so both read them from here.
+export const SIGNED_URL_SECONDS = {
+  download: 300,
+  preview: 300,
+  upload: 600,
+} as const;
+
 const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
 
 const endpoint = process.env["S3_ENDPOINT"];
@@ -172,7 +180,7 @@ export const StorageLive = Layer.succeed(
               ResponseContentDisposition: `attachment; filename*=UTF-8''${encodeDispositionFileName(fileName)}`,
               ResponseContentType: "application/octet-stream",
             }),
-            { expiresIn: 300 }
+            { expiresIn: SIGNED_URL_SECONDS.download }
           ),
       }),
     signPreview: (key, contentType) =>
@@ -187,7 +195,7 @@ export const StorageLive = Layer.succeed(
               ResponseContentDisposition: "inline",
               ResponseContentType: contentType,
             }),
-            { expiresIn: 300 }
+            { expiresIn: SIGNED_URL_SECONDS.preview }
           ),
       }),
     signUpload: (key, contentType, sizeBytes) =>
@@ -203,7 +211,7 @@ export const StorageLive = Layer.succeed(
               IfNoneMatch: "*",
               Key: key,
             }),
-            { expiresIn: 600 }
+            { expiresIn: SIGNED_URL_SECONDS.upload }
           ),
       }),
     verifyObject: (key, contentType, sizeBytes) =>
