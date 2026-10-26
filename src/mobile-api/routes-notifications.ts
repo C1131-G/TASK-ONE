@@ -158,6 +158,66 @@ export const markAllPortalNotificationsReadRoute = {
     "Mark every unread notification of the caller read; answers how many changed.",
 } as const satisfies RouteDefinition;
 
+// What a notification opens. The id is the one the task, bug or request
+// endpoints take, and the summary holds only what the caller may see there.
+export const NotificationTargetSchema = Schema.Struct({
+  id: Schema.String,
+  summary: Schema.Struct({ status: Schema.String, title: Schema.String }),
+  type: Schema.Literals(["task", "bug", "approval"]),
+});
+
+export const getWorkspaceNotificationTargetRoute = {
+  data: NotificationTargetSchema,
+  method: "get",
+  operationId: "getWorkspaceNotificationTarget",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/workspace/notifications/{id}/target",
+  summary:
+    "The task or bug one of the caller's notifications opens, checked again now; answers not found when it cannot be opened.",
+} as const satisfies RouteDefinition;
+
+export const getPortalNotificationTargetRoute = {
+  data: NotificationTargetSchema,
+  method: "get",
+  operationId: "getPortalNotificationTarget",
+  params: NotificationIdParamsSchema,
+  path: "/api/v1/portal/notifications/{id}/target",
+  summary:
+    "The bug or request one of the caller's notifications opens, checked again now; answers not found when it cannot be opened.",
+} as const satisfies RouteDefinition;
+
+// The kinds a client can receive: replies on their bugs and status changes.
+// Staff kinds (mentions, assignments, due dates) never reach a client, so the
+// client app neither lists nor accepts them.
+export const PORTAL_PREFERENCE_EVENTS = ["comment", "status"] as const;
+
+export const PortalNotificationPreferenceSchema = Schema.Struct({
+  channel: NotificationPreferenceSchema.fields.channel,
+  enabled: Schema.Boolean,
+  eventType: Schema.Literals(PORTAL_PREFERENCE_EVENTS),
+});
+
+export const getPortalNotificationPreferencesRoute = {
+  data: Schema.Struct({
+    preferences: Schema.Array(PortalNotificationPreferenceSchema),
+  }),
+  method: "get",
+  operationId: "getPortalNotificationPreferences",
+  path: "/api/v1/portal/notifications/preferences",
+  summary:
+    "The kinds of notification a client switched on or off, per channel; only kinds a client can receive.",
+} as const satisfies RouteDefinition;
+
+export const setPortalNotificationPreferenceRoute = {
+  body: PortalNotificationPreferenceSchema,
+  data: DoneSchema,
+  method: "patch",
+  operationId: "setPortalNotificationPreference",
+  path: "/api/v1/portal/notifications/preferences",
+  summary:
+    "Switch one kind of notification on or off for one channel; only replies and status changes can be set.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
   markWorkspaceNotificationReadRoute,
@@ -167,4 +227,8 @@ export const notificationRoutes = [
   listPortalNotificationsRoute,
   markPortalNotificationReadRoute,
   markAllPortalNotificationsReadRoute,
+  getWorkspaceNotificationTargetRoute,
+  getPortalNotificationTargetRoute,
+  getPortalNotificationPreferencesRoute,
+  setPortalNotificationPreferenceRoute,
 ] as const satisfies readonly RouteDefinition[];

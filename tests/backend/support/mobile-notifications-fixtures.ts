@@ -120,3 +120,90 @@ export const notificationRows = async (
   );
   return result.rows;
 };
+
+export interface OpenFixture {
+  readonly approvalId: string;
+  readonly bugId: string;
+  readonly bugTaskId: string;
+  readonly internalTaskId: string;
+  readonly otherBugId: string;
+  readonly projectId: string;
+  readonly staffTaskId: string;
+}
+
+// A project shared with both harness companies: a bug and a request of the
+// first company, a bug of the second, an internal task and a staff task.
+export const seedOpenFixture = async (
+  companyId: string,
+  otherCompanyId: string,
+  createdById: string
+): Promise<OpenFixture> => {
+  const fixture: OpenFixture = {
+    approvalId: randomUUID(),
+    bugId: randomUUID(),
+    bugTaskId: randomUUID(),
+    internalTaskId: randomUUID(),
+    otherBugId: randomUUID(),
+    projectId: randomUUID(),
+    staffTaskId: randomUUID(),
+  };
+  const otherBugTaskId = randomUUID();
+  const approvalTaskId = randomUUID();
+  await authPool.query(
+    'INSERT INTO project (id, key, name, "clientVisible") VALUES ($1, $2, $3, true)',
+    [
+      fixture.projectId,
+      `OP${randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`,
+      "Harness open target project",
+    ]
+  );
+  await authPool.query(
+    'INSERT INTO client_company_project (id, "companyId", "projectId") VALUES ($1, $2, $3), ($4, $5, $3)',
+    [randomUUID(), companyId, fixture.projectId, randomUUID(), otherCompanyId]
+  );
+  await authPool.query(
+    `INSERT INTO task (id, "projectId", "projectTaskNumber", title, "clientVisible", "createdById") VALUES
+      ($1, $2, 1, 'Client bug task', true, $3),
+      ($4, $2, 2, 'Other client bug task', true, $3),
+      ($5, $2, 3, 'Internal task', false, $3),
+      ($6, $2, 4, 'Approval task', true, $3),
+      ($7, $2, 5, 'Staff task', false, $3)`,
+    [
+      fixture.bugTaskId,
+      fixture.projectId,
+      createdById,
+      otherBugTaskId,
+      fixture.internalTaskId,
+      approvalTaskId,
+      fixture.staffTaskId,
+    ]
+  );
+  await authPool.query(
+    `INSERT INTO bug_report (id, "taskId", "projectId", "reporterId", severity, "discoverySource", environment, component, route, "expectedBehavior", "actualBehavior", "reproductionSteps", "clientCompanyId", "clientImpact") VALUES
+      ($1, $2, $3, $4, 'minor', 'customer_report', 'production', 'Client report', '/page', 'It works', 'It breaks', ARRAY['Open it'], $5, 'medium'),
+      ($6, $7, $3, $4, 'minor', 'customer_report', 'production', 'Client report', '/page', 'It works', 'It breaks', ARRAY['Open it'], $8, 'medium')`,
+    [
+      fixture.bugId,
+      fixture.bugTaskId,
+      fixture.projectId,
+      createdById,
+      companyId,
+      fixture.otherBugId,
+      otherBugTaskId,
+      otherCompanyId,
+    ]
+  );
+  await authPool.query(
+    `INSERT INTO approval_request (id, "projectId", "companyId", "taskId", "subjectKey", "subjectTitle", version, message, status, "requestedById", "requestedAt") VALUES
+      ($1, $2, $3, $4, $5, 'Design sign-off', 1, 'Please review', 'pending', $6, now())`,
+    [
+      fixture.approvalId,
+      fixture.projectId,
+      companyId,
+      approvalTaskId,
+      `task:${approvalTaskId}`,
+      createdById,
+    ]
+  );
+  return fixture;
+};

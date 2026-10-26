@@ -7,16 +7,22 @@ import type {
   markWorkspaceNotificationReadRoute,
   setWorkspaceNotificationPreferenceRoute,
 } from "../../../mobile-api/routes-notifications";
-import { NOTIFICATION_PAGE_DEFAULT_SIZE } from "../../../mobile-api/routes-notifications";
+import {
+  getWorkspaceNotificationTargetRoute,
+  NOTIFICATION_PAGE_DEFAULT_SIZE,
+} from "../../../mobile-api/routes-notifications";
 import { AuthSession } from "../../auth/session";
 import type { AppError } from "../../core/action-result";
 import type { InboxPage } from "../../notifications/contracts";
 import { Notifications, NotificationsLive } from "../../notifications/service";
+import { asStaffCaller } from "../bugs/caller";
+import type { PathParams } from "../bugs/caller";
 import {
   readNotificationPreferences,
   writeNotificationPreference,
 } from "./preferences";
 import { markAllNotificationsRead, markNotificationRead } from "./read-state";
+import { openWorkspaceTarget } from "./target";
 
 // A staff member's inbox. The person is the one the bearer token names.
 export const listWorkspaceInbox = (
@@ -78,3 +84,15 @@ export const writeWorkspacePreference = (
       input.idempotencyKey
     );
   });
+
+// Where a notification leads, checked against what the staff member may open now.
+export const openWorkspaceNotificationTarget = (
+  request: Request,
+  params: PathParams
+) =>
+  asStaffCaller(
+    getWorkspaceNotificationTargetRoute,
+    request,
+    params,
+    ({ input, user }) => openWorkspaceTarget(user, input.params.id)
+  );
