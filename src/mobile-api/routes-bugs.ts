@@ -496,6 +496,7 @@ const StaffBugEvidence = Schema.Struct({
   ),
   id: Uuid,
   kind: Schema.Literals(["before", "after", "other"]),
+  uploadedBy: Schema.Struct({ id: Schema.String, name: Schema.String }),
 });
 
 export const StaffBugHistory = Schema.Struct({
