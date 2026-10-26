@@ -186,6 +186,38 @@ export const getPortalNotificationTargetRoute = {
     "The bug or request one of the caller's notifications opens, checked again now; answers not found when it cannot be opened.",
 } as const satisfies RouteDefinition;
 
+// The kinds a client can receive: replies on their bugs and status changes.
+// Staff kinds (mentions, assignments, due dates) never reach a client, so the
+// client app neither lists nor accepts them.
+export const PORTAL_PREFERENCE_EVENTS = ["comment", "status"] as const;
+
+export const PortalNotificationPreferenceSchema = Schema.Struct({
+  channel: NotificationPreferenceSchema.fields.channel,
+  enabled: Schema.Boolean,
+  eventType: Schema.Literals(PORTAL_PREFERENCE_EVENTS),
+});
+
+export const getPortalNotificationPreferencesRoute = {
+  data: Schema.Struct({
+    preferences: Schema.Array(PortalNotificationPreferenceSchema),
+  }),
+  method: "get",
+  operationId: "getPortalNotificationPreferences",
+  path: "/api/v1/portal/notifications/preferences",
+  summary:
+    "The kinds of notification a client switched on or off, per channel; only kinds a client can receive.",
+} as const satisfies RouteDefinition;
+
+export const setPortalNotificationPreferenceRoute = {
+  body: PortalNotificationPreferenceSchema,
+  data: DoneSchema,
+  method: "patch",
+  operationId: "setPortalNotificationPreference",
+  path: "/api/v1/portal/notifications/preferences",
+  summary:
+    "Switch one kind of notification on or off for one channel; only replies and status changes can be set.",
+} as const satisfies RouteDefinition;
+
 export const notificationRoutes = [
   listWorkspaceNotificationsRoute,
   markWorkspaceNotificationReadRoute,
@@ -197,4 +229,6 @@ export const notificationRoutes = [
   markAllPortalNotificationsReadRoute,
   getWorkspaceNotificationTargetRoute,
   getPortalNotificationTargetRoute,
+  getPortalNotificationPreferencesRoute,
+  setPortalNotificationPreferenceRoute,
 ] as const satisfies readonly RouteDefinition[];

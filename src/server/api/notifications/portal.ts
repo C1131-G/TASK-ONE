@@ -1,10 +1,14 @@
 import { Effect } from "effect";
 
 import type { RouteInput } from "../../../mobile-api/route-definition";
-import { getPortalNotificationTargetRoute } from "../../../mobile-api/routes-notifications";
+import {
+  getPortalNotificationTargetRoute,
+  PORTAL_PREFERENCE_EVENTS,
+} from "../../../mobile-api/routes-notifications";
 import type {
   markAllPortalNotificationsReadRoute,
   markPortalNotificationReadRoute,
+  setPortalNotificationPreferenceRoute,
 } from "../../../mobile-api/routes-notifications";
 import { AuthSession } from "../../auth/session";
 import type { PortalUser } from "../../auth/session-types";
@@ -12,6 +16,10 @@ import type { PortalActor } from "../../portal/portal-contracts";
 import { listPortalNotificationInbox } from "../../portal/portal-notification-inbox";
 import { asPortalCaller } from "../bugs/caller";
 import type { PathParams } from "../bugs/caller";
+import {
+  readNotificationPreferences,
+  writeNotificationPreference,
+} from "./preferences";
 import { markAllNotificationsRead, markNotificationRead } from "./read-state";
 import { openPortalTarget } from "./target";
 
@@ -71,3 +79,33 @@ export const openPortalNotificationTarget = (
     params,
     ({ actor, input }) => openPortalTarget(actor, input.params.id)
   );
+
+const clientEvents: ReadonlySet<string> = new Set(PORTAL_PREFERENCE_EVENTS);
+
+// The same preference service as the workspace, cut down to the kinds a client
+// can receive. A row stored for any other kind is never shown.
+export const readPortalPreferences = (headers: Headers) =>
+  Effect.gen(function* readPortalPreferencesProgram() {
+    const sessions = yield* AuthSession;
+    const user = yield* sessions.requirePortalAccess(headers);
+    const { preferences } = yield* readNotificationPreferences(user.id);
+    return {
+      preferences: preferences.filter(({ eventType }) =>
+        clientEvents.has(eventType)
+      ),
+    };
+  });
+
+export const writePortalPreference = (
+  headers: Headers,
+  input: RouteInput<typeof setPortalNotificationPreferenceRoute>
+) =>
+  Effect.gen(function* writePortalPreferenceProgram() {
+    const sessions = yield* AuthSession;
+    const user = yield* sessions.requirePortalAccess(headers);
+    return yield* writeNotificationPreference(
+      user.id,
+      input.body,
+      input.idempotencyKey
+    );
+  });
