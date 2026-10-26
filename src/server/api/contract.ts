@@ -72,7 +72,9 @@ const operationOf = (
   const parameters = [
     ...(route.params ? parametersOf(route.params, "path", schemas) : []),
     ...(route.query ? parametersOf(route.query, "query", schemas) : []),
-    ...(isWrite ? [idempotencyKeyParameter] : []),
+    ...(isWrite && route.idempotency !== "none"
+      ? [idempotencyKeyParameter]
+      : []),
   ];
   const body = route.body ? documentOf(route.body) : null;
   if (body) {

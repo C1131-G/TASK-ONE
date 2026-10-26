@@ -85,3 +85,23 @@ it("keeps a plain read free of body, key and conflict", () => {
   expect(read?.parameters ?? []).toEqual([]);
   expect(Object.keys(read?.responses ?? {})).not.toContain("409");
 });
+
+const requestUpload = {
+  body: Schema.Struct({ name: Schema.String }),
+  data: Schema.Struct({ id: Schema.String }),
+  idempotency: "none",
+  method: "post",
+  operationId: "requestUpload",
+  path: "/api/v1/uploads",
+  summary: "A write that hands out a signed URL, so it is never replayed.",
+} as const satisfies RouteDefinition;
+
+it("documents no key for a write that opts out of idempotency", () => {
+  const document = buildOpenApiDocument([requestUpload]) as {
+    paths: Record<string, Record<string, Operation>>;
+  };
+  const operation = document.paths["/api/v1/uploads"]?.["post"];
+
+  expect(operation?.parameters ?? []).toEqual([]);
+  expect(operation?.requestBody?.required).toBe(true);
+});
