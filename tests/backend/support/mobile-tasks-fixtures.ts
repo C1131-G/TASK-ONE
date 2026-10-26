@@ -25,6 +25,16 @@ const ROUTES: readonly {
     path: "/api/v1/workspace/tasks",
   },
   {
+    load: () =>
+      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/route"),
+    path: "/api/v1/workspace/tasks/:taskId/subtasks",
+  },
+  {
+    load: () =>
+      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/route"),
+    path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId",
+  },
+  {
     load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId",
   },
@@ -194,15 +204,35 @@ export const taskState = async (taskId: string): Promise<unknown> => {
   };
 };
 
+interface SubtaskSeed {
+  readonly assigneeId?: string | null;
+  readonly completed?: boolean;
+  readonly description?: string | null;
+  readonly dueDate?: string | null;
+}
+
 export const seedSubtask = async (
   taskId: string,
   title: string,
-  position = 0
+  position = 0,
+  seed: SubtaskSeed = {}
 ): Promise<string> => {
   const subtaskId = randomUUID();
+  const completed = seed.completed ?? false;
   await authPool.query(
-    'INSERT INTO task_subtask (id, "taskId", title, position) VALUES ($1, $2, $3, $4)',
-    [subtaskId, taskId, title, position]
+    `INSERT INTO task_subtask (id, "taskId", title, position, "assigneeId", description, "dueDate", "isCompleted", "completedAt")
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [
+      subtaskId,
+      taskId,
+      title,
+      position,
+      seed.assigneeId ?? null,
+      seed.description ?? null,
+      seed.dueDate ?? null,
+      completed,
+      completed ? new Date() : null,
+    ]
   );
   return subtaskId;
 };
