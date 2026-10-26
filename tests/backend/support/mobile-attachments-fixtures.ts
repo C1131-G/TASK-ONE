@@ -1,8 +1,10 @@
+import { expect, spyOn } from "bun:test";
 import { randomUUID } from "node:crypto";
 
 import {
   DeleteObjectCommand,
   ListObjectsV2Command,
+  PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 
@@ -97,4 +99,86 @@ export const createTask = async (
     [taskId, projectId, next.rows[0]?.number ?? 1, "Attachment task", creatorId]
   );
   return taskId;
+};
+
+// Records everything the server writes while a request runs, so a test can
+// prove a signed link never reaches a log.
+export const watchLogs = () => {
+  const lines: string[] = [];
+  const keep = (...parts: unknown[]) => {
+    lines.push(parts.map(String).join(" "));
+  };
+  const spies = [
+    spyOn(console, "log").mockImplementation(keep),
+    spyOn(console, "info").mockImplementation(keep),
+    spyOn(console, "warn").mockImplementation(keep),
+    spyOn(console, "error").mockImplementation(keep),
+    spyOn(process.stdout, "write").mockImplementation((chunk: unknown) => {
+      keep(chunk);
+      return true;
+    }),
+    spyOn(process.stderr, "write").mockImplementation((chunk: unknown) => {
+      keep(chunk);
+      return true;
+    }),
+  ];
+  return {
+    lines,
+    stop: () => {
+      for (const spy of spies) {
+        spy.mockRestore();
+      }
+    },
+  };
+};
+
+export const expectNoSignedUrlLogged = (
+  logs: { readonly lines: readonly string[] },
+  url: string
+): void => {
+  const signature = new URL(url).searchParams.get("X-Amz-Signature") ?? "";
+  expect(signature).not.toBe("");
+  expect(logs.lines.some((line) => line.includes(signature))).toBe(false);
+  expect(logs.lines.some((line) => line.includes("X-Amz-Signature"))).toBe(
+    false
+  );
+};
+
+// The object key a ticket's signed URL points at (path style: /bucket/key).
+export const keyOfTicket = (ticket: UploadTicketReply): string =>
+  decodeURIComponent(new URL(ticket.uploadUrl).pathname)
+    .split("/")
+    .slice(2)
+    .join("/");
+
+// Puts an object the way a misbehaving client with its own credentials could,
+// to reach cases a signed URL would never allow (a different size or type).
+export const putObjectDirect = async (
+  key: string,
+  bytes: Uint8Array<ArrayBuffer>,
+  contentType: string
+): Promise<void> => {
+  await s3.send(
+    new PutObjectCommand({
+      Body: bytes,
+      Bucket: bucket,
+      ContentType: contentType,
+      Key: key,
+    })
+  );
+};
+
+export const expireIntent = async (uploadIntentId: string): Promise<void> => {
+  await authPool.query(
+    `UPDATE upload_intent SET "expiresAt" = now() - interval '1 minute' WHERE id = $1`,
+    [uploadIntentId]
+  );
+};
+
+export const intentState = async (uploadIntentId: string): Promise<string> => {
+  const result = await authPool.query<{ state: string }>(
+    "SELECT state FROM upload_intent WHERE id = $1",
+    [uploadIntentId]
+  );
+  return result.rows[0]?.state ?? "missing";
 };
