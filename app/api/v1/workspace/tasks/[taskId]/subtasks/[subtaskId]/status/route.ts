@@ -11,7 +11,6 @@ interface SubtaskStatusRouteContext {
   params: Promise<{ subtaskId: string; taskId: string }>;
 }
 
-// The app calls the task parameter `{id}`, while the folder is `[taskId]`.
 export const POST = async (
   request: Request,
   context: SubtaskStatusRouteContext
@@ -19,13 +18,10 @@ export const POST = async (
   const params = await context.params;
   return respondWith(
     Effect.gen(function* handle() {
-      const input = yield* readRouteInput(subtaskStatusRoute, request, {
-        id: params.taskId,
-        subtaskId: params.subtaskId,
-      });
+      const input = yield* readRouteInput(subtaskStatusRoute, request, params);
       return yield* setTaskSubtaskStatus(
         request.headers,
-        input.params.id,
+        input.params.taskId,
         input.params.subtaskId,
         input.body,
         input.idempotencyKey

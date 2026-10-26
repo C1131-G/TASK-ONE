@@ -300,3 +300,64 @@ it("lets an unrelated employee comment on a normal task but not on a client bug"
   expect(await commentRows(taskId)).toHaveLength(1);
   expect(await commentRows(bugTaskId)).toHaveLength(0);
 });
+
+it("never notifies the author about their own mention", async () => {
+  const taskId = await seedOwned();
+
+  const response = await comment(
+    taskId,
+    `Note to self @[${personaId("owner")}] and @[${personaId("outsider")}]`
+  );
+
+  expect(response.status).toBe(200);
+  const rows = await notifications(taskId);
+  expect(rows).toContainEqual({
+    type: "mention",
+    userId: personaId("outsider"),
+  });
+  expect(rows.filter(({ userId }) => userId === personaId("owner"))).toEqual(
+    []
+  );
+});
+
+it("notifies a person mentioned twice once", async () => {
+  const taskId = await seedOwned();
+  const mention = `@[${personaId("outsider")}]`;
+
+  const response = await comment(taskId, `${mention} look, ${mention} again`);
+
+  expect(response.status).toBe(200);
+  const rows = await notifications(taskId);
+  expect(rows.filter(({ type }) => type === "mention")).toEqual([
+    { type: "mention", userId: personaId("outsider") },
+  ]);
+});
+
+it("sends a mentioned assignee the mention only, not a second comment notice", async () => {
+  const taskId = await seedOwned();
+
+  const response = await comment(
+    taskId,
+    `@[${personaId("owner")}] please take a look`,
+    { as: "outsider" }
+  );
+
+  expect(response.status).toBe(200);
+  const rows = await notifications(taskId);
+  expect(rows.filter(({ userId }) => userId === personaId("owner"))).toEqual([
+    { type: "mention", userId: personaId("owner") },
+  ]);
+});
+
+it("keeps a client out of a public comment's mentions and notices on a client bug", async () => {
+  const { taskId } = await seedBug();
+
+  const refused = await comment(taskId, {
+    body: `@[${personaId("client")}] we fixed it`,
+    visibility: "public",
+  });
+
+  expect(refused.status).toBe(422);
+  const rows = await notifications(taskId);
+  expect(rows.filter(({ type }) => type === "mention")).toEqual([]);
+});
