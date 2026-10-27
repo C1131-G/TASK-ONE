@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import {
+  addWorkspaceBugEvidenceRoute,
   AttachmentFileSchema,
   downloadWorkspaceAttachmentRoute,
   finalizeWorkspaceUploadRoute,
@@ -10,6 +11,8 @@ import {
 } from "../../../mobile-api/routes-attachments";
 import { Idempotency } from "../../core/idempotency";
 import { Uploads } from "../../storage/uploads-contracts";
+import { BugWorkflowReceiptSchema } from "../../work/bug-workflow-internal";
+import { BugWorkflowManagement } from "../../work/bug-workflow-management";
 import { asStaffAttachmentCaller } from "./caller";
 import type { PathParams } from "./caller";
 import { summarizeFile, summarizeFiles } from "./file-summary";
@@ -107,5 +110,33 @@ export const previewWorkspaceAttachment = (
         const uploads = yield* Uploads;
         const url = yield* uploads.signedPreview(user.id, input.params.fileId);
         return { expiresAt: expiresIn("preview"), url };
+      })
+  );
+
+// The same service the web evidence action calls, so handlers, roles and the
+// version guard are the web's. A retry with the same key replays the receipt.
+export const addWorkspaceBugEvidence = (request: Request, params: PathParams) =>
+  asStaffAttachmentCaller(
+    addWorkspaceBugEvidenceRoute,
+    request,
+    params,
+    ({ input, user }) =>
+      Effect.gen(function* addEvidence() {
+        const workflow = yield* BugWorkflowManagement;
+        const idempotency = yield* Idempotency;
+        const { fileId, ...rest } = input.body;
+        const evidence = {
+          ...rest,
+          externalUrl: null,
+          fileAssetId: fileId,
+        };
+        return yield* idempotency.run({
+          actorId: user.id,
+          execute: () => workflow.addEvidence(user.id, evidence),
+          input: evidence,
+          key: input.idempotencyKey,
+          operation: "mobile.bug.evidence.add",
+          resultSchema: BugWorkflowReceiptSchema,
+        });
       })
   );

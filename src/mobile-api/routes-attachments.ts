@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import type { RouteDefinition } from "./route-definition";
+import { WorkflowReceipt } from "./routes-bugs";
 
 // Attachments: signed uploads, finalization, previews and downloads.
 // Owned by one branch, so adding routes here never conflicts with the others.
@@ -116,6 +117,30 @@ export const previewWorkspaceAttachmentRoute = {
   summary: "A short-lived link that shows one image or PDF inline.",
 } as const satisfies RouteDefinition;
 
+// Staff finish the web's evidence flow: the file is already finalized on the
+// bug's task, and this links it to the bug at the version the staff member saw.
+export const addWorkspaceBugEvidenceRoute = {
+  body: Schema.Struct({
+    bugId: Uuid,
+    caption: Schema.String.check(
+      Schema.isMinLength(1),
+      Schema.isMaxLength(2000)
+    ),
+    expectedVersion: Schema.Number.check(
+      Schema.isInt(),
+      Schema.isGreaterThan(0)
+    ),
+    fileId: Uuid,
+    fixAttemptId: Schema.NullOr(Uuid),
+    kind: Schema.Literals(["before", "after", "other"]),
+  }),
+  data: WorkflowReceipt,
+  method: "post",
+  operationId: "addWorkspaceBugEvidence",
+  path: "/api/v1/workspace/attachments/bug-evidence",
+  summary: "Links a finished upload to a bug as before or after evidence.",
+} as const satisfies RouteDefinition;
+
 // ---- Portal (client) ----
 
 // A client's file, shaped like the attachments the web portal shows on a bug.
@@ -186,6 +211,7 @@ export const attachmentRoutes = [
   listWorkspaceAttachmentsRoute,
   downloadWorkspaceAttachmentRoute,
   previewWorkspaceAttachmentRoute,
+  addWorkspaceBugEvidenceRoute,
   requestPortalUploadRoute,
   finalizePortalUploadRoute,
   listPortalAttachmentsRoute,
