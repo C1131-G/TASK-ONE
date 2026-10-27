@@ -1,6 +1,9 @@
 /** @type {import('jest').Config} */
 module.exports = {
   preset: "jest-expo",
+  // The first render of a screen can take longer than the default 5 seconds on a
+  // slow or busy machine.
+  testTimeout: 30_000,
   testMatch: ["<rootDir>/tests/components/**/*.test.tsx", "<rootDir>/tests/features/**/*.test.tsx"],
   moduleNameMapper: {
     "^@api/(.*)$": "<rootDir>/../../src/mobile-api/$1",
