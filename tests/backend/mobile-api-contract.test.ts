@@ -10,9 +10,9 @@ process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";
 const apiRoot = fileURLToPath(new URL("../../app/api/v1", import.meta.url));
 const SPEC_ROUTE = "openapi.json";
 
-// "me/route.ts" becomes "/api/v1/me"; "tasks/[id]/route.ts" becomes
-// "/api/v1/tasks/{}". Dynamic segments are compared by position, because the
-// route file and the published path may name the same segment differently.
+// "me/route.ts" becomes "/api/v1/me"; "tasks/[taskId]/route.ts" becomes
+// "/api/v1/tasks/{taskId}". Dynamic segments are compared by name, so a route
+// file and its published path cannot call the same segment two things.
 const routeFiles = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(directory, entry.name);
@@ -22,12 +22,6 @@ const routeFiles = (directory: string): string[] =>
     return entry.name === "route.ts" ? [full] : [];
   });
 
-const normalizePath = (route: string): string =>
-  route
-    .split("/")
-    .map((part) => (part.startsWith("{") && part.endsWith("}") ? "{}" : part))
-    .join("/");
-
 const publishedPaths = (): string[] =>
   routeFiles(apiRoot)
     .map((file) =>
@@ -35,7 +29,9 @@ const publishedPaths = (): string[] =>
         .relative(apiRoot, path.dirname(file))
         .split(path.sep)
         .map((part) =>
-          part.startsWith("[") && part.endsWith("]") ? "{}" : part
+          part.startsWith("[") && part.endsWith("]")
+            ? `{${part.slice(1, -1)}}`
+            : part
         )
         .join("/")
     )
@@ -75,9 +71,7 @@ it("describes /api/v1/me with bearer security and its response shape", async () 
 it("documents every route file and has no definition without a route", async () => {
   const spec = await loadSpec();
 
-  expect(Object.keys(spec.paths).map(normalizePath).toSorted()).toEqual(
-    publishedPaths()
-  );
+  expect(Object.keys(spec.paths).toSorted()).toEqual(publishedPaths());
 });
 
 it("publishes the subtask status path with the folder's parameter names", async () => {
