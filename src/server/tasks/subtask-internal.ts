@@ -139,11 +139,13 @@ export const validateAssignee = async (
     deactivatedAt: null,
     id: assigneeId,
   })
-    .select("id")
+    .select("id", "role")
     .first();
-  if (!user) {
+  // A client account can never own internal work.
+  if (!user || user.role === "client") {
     throw new AppError({
       code: "VALIDATION_FAILED",
+      field: "assigneeId",
       message: "Choose an active employee for the subtask.",
     });
   }
