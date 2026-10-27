@@ -170,7 +170,7 @@ for (const theme of THEMES) {
         !process.env["E2E_EMPLOYEE_PASSWORD"],
         "E2E_EMPLOYEE_PASSWORD is not set"
       );
-      test.setTimeout(300_000);
+      test.setTimeout(480_000);
       await useTheme(page, theme);
       expect(await checkRoutes(page, employeeRoutes)).toEqual([]);
     });

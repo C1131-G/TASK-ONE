@@ -90,7 +90,7 @@ jobs:
           done
           docker run --rm --network host -e MC_HOST_local=http://metsys:local-minio-password@localhost:9000 metsys-minio-client:ci mb --ignore-existing local/metsys-private
           bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
-          UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@metsys.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
+          UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@metsys.test UI_FIXTURE_CLIENT_EMAIL=client-one@acme.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
       - run: bunx playwright install --with-deps chromium
       - name: Build with instant-navigation testing API
         run: bun run build
