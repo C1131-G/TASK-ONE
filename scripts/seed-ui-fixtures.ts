@@ -18,6 +18,7 @@ import {
   WorkManagementLive,
 } from "../src/server/work/work-management";
 import { seedExtras } from "./seed-ui-extras";
+import { seedNotifications } from "./seed-ui-notifications";
 import { isoDate, findProjectId } from "./seed-ui-projects";
 
 const databaseUrl = process.env["DATABASE_URL"];
@@ -203,6 +204,12 @@ const program = Effect.gen(function* seedFixtures() {
   );
   yield* seedBase(actorId, adminId, employeeId);
   yield* seedExtras(actorId, adminId, employeeId);
+  // The inbox specs sign in as an account other than the fixture employee.
+  const notifiedEmail = process.env["UI_FIXTURE_NOTIFIED_EMAIL"];
+  if (notifiedEmail) {
+    const notifiedId = yield* Effect.promise(() => findUser(notifiedEmail));
+    yield* seedNotifications(actorId, notifiedId);
+  }
 });
 
 try {
