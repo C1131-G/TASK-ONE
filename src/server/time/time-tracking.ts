@@ -8,6 +8,7 @@ import { db } from "@/src/prisma/db";
 import { evaluateBudgetAlerts } from "../budgets/project-budgets";
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema, UUIDSchema } from "../core/input-schemas";
+import { isUniqueConstraintViolation } from "../core/prisma-errors";
 import {
   addDays,
   buildProjectReport,
@@ -85,13 +86,22 @@ export interface DateRange {
   readonly to: string;
 }
 
-const unavailable = (error: unknown): AppError =>
-  error instanceof AppError
-    ? error
-    : new AppError({
-        code: "UNAVAILABLE",
-        message: "Time could not be loaded or saved.",
-      });
+const unavailable = (error: unknown): AppError => {
+  if (error instanceof AppError) {
+    return error;
+  }
+  // A second timer for the same person is refused by the table's key.
+  if (isUniqueConstraintViolation(error)) {
+    return new AppError({
+      code: "CONFLICT",
+      message: "A timer is already running.",
+    });
+  }
+  return new AppError({
+    code: "UNAVAILABLE",
+    message: "Time could not be loaded or saved.",
+  });
+};
 
 const invalid = (field: string, message: string): AppError =>
   new AppError({ code: "VALIDATION_FAILED", field, message });
@@ -285,9 +295,18 @@ const saveTimer = async (
     (now.getTime() - timer.startedAt.getTime()) / MS_PER_MINUTE
   );
   const row = await db.transaction(async (transaction) => {
-    await transaction.orm.public.TimeTimer.where({
+    // Only the request that actually removes the timer may save its entry, so
+    // two stops (or a stop and a start) racing for the same timer save one.
+    const removed = await transaction.orm.public.TimeTimer.where({
+      startedAt: timer.startedAt,
       userId: timer.userId,
-    }).delete();
+    }).deleteAndCount();
+    if (removed === 0) {
+      throw new AppError({
+        code: "CONFLICT",
+        message: "This timer was already stopped.",
+      });
+    }
     return await transaction.orm.public.TimeEntry.create({
       billable: timer.billable,
       createdAt: now,

@@ -14,22 +14,28 @@ The Prisma ORM 8 contract is split into one model per `.prisma` file under `src/
 
 ## Roles and permissions
 
-| Capability | Admin | Employee |
-| --- | --- | --- |
-| View company projects and tasks | All | All |
-| Manage users, company settings, teams, and projects | Yes | No |
-| Create tasks | Yes | Yes |
-| Edit task details | All tasks | Tasks they created or are assigned to |
-| Assign/reassign employees | Yes | Yes, within editable tasks |
-| Comment on visible tasks | Yes | Yes |
-| Upload files to tasks | Any task | Tasks they can edit |
-| Remove comments or uploads | Any | Their own |
-| Archive projects and tasks | Yes | No |
-| Manage standalone project files and calendar events | Yes | No |
+There are three roles: **admin**, **employee** and **client**. The database enforces that a user has the `client` role exactly when it belongs to a client company (`user_client_company_matches_role` check on `User.clientCompanyId`), and that the role is one of the three. A client reaches only the client portal; admins and employees reach the workspace. An employee can also be a **handler** of one or more client companies (`ClientCompanyHandler`, unique per company and employee): only a designated handler may pick up a new report from that company.
 
-Enforce these rules in each Server Action or server-side query. Foreign keys and role fields describe the data; they do not provide authorization by themselves. Disable hard user deletion in Better Auth so task and audit history continues to reference its creator.
+| Capability | Admin | Employee | Client |
+| --- | --- | --- | --- |
+| View company projects and tasks | All | All | Only projects shared with their company and items marked client-visible |
+| Manage users, company settings, teams, and projects | Yes | No | No |
+| Create tasks | Yes | Yes | No (clients report bugs instead) |
+| Edit task details | All tasks | Tasks they created or are assigned to | No |
+| Assign/reassign employees | Yes | Yes, within editable tasks | No |
+| Comment | Yes | Yes | Public comments on their company's open bugs |
+| Upload files | Any task | Tasks they can edit | Evidence on their company's open bugs: images, PDF or MP4, up to 10 MB, up to 10 files per bug |
+| Remove comments or uploads | Any | Their own | No |
+| Archive projects and tasks | Yes | No | No |
+| Manage standalone project files and calendar events | Yes | No | No |
+| Report and track bugs | Triage and reassign any | Handle bugs for companies they are a handler of, or are assigned to | Own company's reports only |
+| Pick up a new client report | No | Designated handlers of that company only | No |
+| Confirm or reopen a fix, answer a question from the team | No | No | Own company's bugs only |
+| Decide a client approval request | No | No | Any user of the company, on requests shared with that company |
 
-The reference app also includes guests, pending invitations, and private projects. This schema follows the requested two-role model and company-wide project visibility instead; invitations and private-project access rules are not part of this rebuild phase. Billing, multiple workspaces, OAuth, and two-factor authentication are also excluded.
+Enforce these rules in the Effect services in `src/server/<domain>/`, which both Server Actions and the mobile API routes call. Foreign keys and role fields describe the data; they do not provide authorization by themselves. Disable hard user deletion in Better Auth so task and audit history continues to reference its creator. The mobile API's route-by-route permission matrix is in [`mobile-api.md`](mobile-api.md).
+
+The reference app also includes guests, pending invitations, and private projects. This schema follows the admin, employee and client model with company-wide visibility for staff instead; invitations and private-project access rules are not part of this rebuild phase. Billing, multiple workspaces, OAuth, and two-factor authentication are also excluded.
 
 ## Local database workflow
 

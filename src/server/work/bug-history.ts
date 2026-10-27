@@ -43,6 +43,12 @@ const getBugHistory = (
         message: "Sign in to continue.",
       });
     }
+    if (actor.role === "client") {
+      throw new AppError({
+        code: "FORBIDDEN",
+        message: "This area is only available to workspace members.",
+      });
+    }
     if (actor.mustChangePassword) {
       throw new AppError({
         code: "FORBIDDEN",

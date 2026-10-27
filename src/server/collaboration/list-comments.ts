@@ -14,12 +14,18 @@ export const listComments = (
     catch: mapError,
     try: async () => {
       const actor = await db.orm.public.User.where({ id: actorId })
-        .select("deactivatedAt", "mustChangePassword")
+        .select("deactivatedAt", "mustChangePassword", "role")
         .first();
       if (!actor || actor.deactivatedAt) {
         throw new AppError({
           code: "UNAUTHENTICATED",
           message: "Sign in to continue.",
+        });
+      }
+      if (actor.role === "client") {
+        throw new AppError({
+          code: "FORBIDDEN",
+          message: "This area is only available to workspace members.",
         });
       }
       if (actor.mustChangePassword) {

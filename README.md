@@ -28,9 +28,16 @@ The service, adapter, test coverage, and remaining work checklist is in [`docs/b
 
 ## UI and browser tests
 
-`bun run test:ui` runs the fast UI unit tests. `bun run test:e2e` runs the Playwright browser tests against a running app (`bun run dev`, or `bun run build` then `bun run start`). It requires manually prepared test accounts and workspace data; this repository does not include account or workspace seed scripts.
+`bun run test:ui` runs the fast UI unit tests. `bun run test:e2e` runs the Playwright browser tests against a running app (`bun run dev`, or `bun run build` then `bun run start`). It needs prepared test accounts and workspace data, which the seed scripts below create in a disposable database.
 
-Set `E2E_ADMIN_PASSWORD` and `E2E_EMPLOYEE_PASSWORD` for the prepared accounts in the ignored `.env.e2e.local` file, which Playwright loads automatically, or export them in your shell. Specs skip themselves for a role whose password is not set. Configure the accounts with the emails expected by the browser tests and create the projects, tasks, milestones, notifications, and files those tests exercise. Install the managed browser with `bunx playwright install chromium`.
+Set `E2E_ADMIN_PASSWORD`, `E2E_EMPLOYEE_PASSWORD` and `E2E_PORTAL_PASSWORD` in the ignored `.env.e2e.local` file, which Playwright loads automatically, or export them in your shell. The first two are the admin and employee accounts; the third is the password for the handlers and the client accounts of the seeded "Acme" company. Specs skip themselves for a role whose password is not set. Seed a disposable database (never your working one) after `bun run db:migrate`, with the three passwords exported:
+
+```bash
+bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
+UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
+```
+
+The first script creates the admin, two handlers, the Acme client company with its client users, and a linked project; the second adds the projects, tasks, milestones, files and notifications the browser tests use. The first script is safe to run again; for the second, start from a fresh database. Serving the app for tests with the instant-navigation test hooks (`EXPOSE_TESTING_API=1`) is refused in production unless `CI` is set. Install the managed browser with `bunx playwright install chromium`.
 
 Upload tests need working local storage. Set the S3 values in `.env` using `.env.example`, then run `docker compose up -d --build minio minio-init`. MinIO and its client are built from pinned upstream source releases because their previous container images are unavailable. The first build downloads and compiles Go dependencies. MinIO allows the exact `S3_BROWSER_ORIGIN` through `MINIO_API_CORS_ALLOW_ORIGIN`; the init service waits for readiness and creates the private bucket. [Upstream release build instructions](https://github.com/minio/minio/releases/tag/RELEASE.2025-10-15T17-29-55Z).
 

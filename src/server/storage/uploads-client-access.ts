@@ -68,6 +68,15 @@ export const assertClientUploadAllowed = async (
       message: "Files must be 10 MB or smaller.",
     });
   }
+  // The count below must see every ticket already issued, so requests for the
+  // same bug take turns: the next one waits here until the previous commits.
+  await transaction.query(
+    transaction.sql.public.bug_report
+      .select("id")
+      .where((field, fns) => fns.eq(field.taskId, taskId))
+      .forNoKeyUpdate()
+      .build()
+  );
   const now = new Date();
   const [files, intents] = await Promise.all([
     transaction.orm.public.FileAsset.where({ deletedAt: null, taskId })
