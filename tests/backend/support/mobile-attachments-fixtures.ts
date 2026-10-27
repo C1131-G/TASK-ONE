@@ -8,7 +8,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-import { authPool } from "./action-harness";
+import { authPool, ids, personaId } from "./action-harness";
 import type { Persona } from "./action-harness";
 import { countRows, reportBody, send } from "./mobile-bugs-fixtures";
 
@@ -197,4 +197,40 @@ export const submitBug = async (
     [bugId]
   );
   return { bugId, taskId: row.rows[0]?.taskId ?? "" };
+};
+
+// A finished file on a task without going through storage; enough for
+// access checks, which never read the bytes.
+export const insertFile = async (
+  taskId: string,
+  uploader: Persona,
+  name = "seeded.png",
+  contentType = "image/png"
+): Promise<string> => {
+  const fileId = randomUUID();
+  await authPool.query(
+    'INSERT INTO file_asset (id, "projectId", "taskId", "uploadedById", "originalName", "storageKey", "contentType", "sizeBytes") VALUES ($1, $2, $3, $4, $5, $6, $7, 100)',
+    [
+      fileId,
+      ids.projectId,
+      taskId,
+      personaId(uploader),
+      name,
+      `company/tasks/${taskId}/${fileId}`,
+      contentType,
+    ]
+  );
+  return fileId;
+};
+
+// Attaches a file to a bug as evidence, the way the web does after a finalize.
+export const insertEvidence = async (
+  bugId: string,
+  fileId: string,
+  uploader: Persona
+): Promise<void> => {
+  await authPool.query(
+    'INSERT INTO bug_evidence (id, "bugReportId", "fileAssetId", "uploadedById", kind, caption) VALUES ($1, $2, $3, $4, \'other\', \'seeded\')',
+    [randomUUID(), bugId, fileId, personaId(uploader)]
+  );
 };
