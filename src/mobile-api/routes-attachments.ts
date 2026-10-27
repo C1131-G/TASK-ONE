@@ -116,10 +116,79 @@ export const previewWorkspaceAttachmentRoute = {
   summary: "A short-lived link that shows one image or PDF inline.",
 } as const satisfies RouteDefinition;
 
+// ---- Portal (client) ----
+
+// A client's file, shaped like the attachments the web portal shows on a bug.
+export const PortalAttachmentSchema = Schema.Struct({
+  contentType: Schema.String,
+  createdAt: Schema.String,
+  fileId: Uuid,
+  fileName: Schema.String,
+  previewable: Schema.Boolean,
+  sizeBytes: Schema.Number,
+  uploaderName: Schema.String,
+});
+
+export const PortalAttachmentListSchema = Schema.Struct({
+  items: Schema.Array(PortalAttachmentSchema),
+});
+
+export const requestPortalUploadRoute = {
+  body: Schema.Struct({ ...UploadFields, bugId: Uuid }),
+  data: UploadTicketSchema,
+  idempotency: "none",
+  method: "post",
+  operationId: "requestPortalUpload",
+  path: "/api/v1/portal/attachments/uploads",
+  summary: "A signed URL for uploading one file to the client's own bug.",
+} as const satisfies RouteDefinition;
+
+export const finalizePortalUploadRoute = {
+  body: Schema.Struct({ bugId: Uuid }),
+  data: PortalAttachmentSchema,
+  method: "post",
+  operationId: "finalizePortalUpload",
+  params: UploadIntentParams,
+  path: "/api/v1/portal/attachments/uploads/{uploadIntentId}/finalize",
+  summary: "Turns a finished upload into an attachment of the bug.",
+} as const satisfies RouteDefinition;
+
+export const listPortalAttachmentsRoute = {
+  data: PortalAttachmentListSchema,
+  method: "get",
+  operationId: "listPortalAttachments",
+  path: "/api/v1/portal/attachments",
+  query: Schema.Struct({ bugId: Uuid }),
+  summary: "The files the client company attached to one of its bugs.",
+} as const satisfies RouteDefinition;
+
+export const downloadPortalAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "downloadPortalAttachment",
+  params: FileIdParams,
+  path: "/api/v1/portal/attachments/{fileId}/download",
+  summary: "A short-lived link that downloads one visible file.",
+} as const satisfies RouteDefinition;
+
+export const previewPortalAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "previewPortalAttachment",
+  params: FileIdParams,
+  path: "/api/v1/portal/attachments/{fileId}/preview",
+  summary: "A short-lived link that shows one visible image or PDF inline.",
+} as const satisfies RouteDefinition;
+
 export const attachmentRoutes = [
   requestWorkspaceUploadRoute,
   finalizeWorkspaceUploadRoute,
   listWorkspaceAttachmentsRoute,
   downloadWorkspaceAttachmentRoute,
   previewWorkspaceAttachmentRoute,
+  requestPortalUploadRoute,
+  finalizePortalUploadRoute,
+  listPortalAttachmentsRoute,
+  downloadPortalAttachmentRoute,
+  previewPortalAttachmentRoute,
 ] as const satisfies readonly RouteDefinition[];

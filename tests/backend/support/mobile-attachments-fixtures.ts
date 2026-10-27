@@ -9,7 +9,8 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { authPool } from "./action-harness";
-import { countRows } from "./mobile-bugs-fixtures";
+import type { Persona } from "./action-harness";
+import { countRows, reportBody, send } from "./mobile-bugs-fixtures";
 
 const endpoint = process.env["S3_ENDPOINT"];
 const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
@@ -181,4 +182,19 @@ export const intentState = async (uploadIntentId: string): Promise<string> => {
     [uploadIntentId]
   );
   return result.rows[0]?.state ?? "missing";
+};
+
+// A bug a client reports through the portal route, with the task behind it.
+export const submitBug = async (
+  persona: Persona,
+  title: string
+): Promise<{ bugId: string; taskId: string }> => {
+  const { POST } = await import("../../../app/api/v1/portal/bugs/route");
+  const reply = await send(POST, "POST", persona, { body: reportBody(title) });
+  const bugId = reply.body.data.bugId as string;
+  const row = await authPool.query<{ taskId: string }>(
+    'SELECT "taskId" FROM bug_report WHERE id = $1',
+    [bugId]
+  );
+  return { bugId, taskId: row.rows[0]?.taskId ?? "" };
 };
