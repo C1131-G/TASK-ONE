@@ -123,7 +123,8 @@ export const buildClient = <const Routes extends readonly RouteDefinition[]>(
       accept: "application/json",
       authorization: `Bearer ${options.token}`,
     };
-    if (input.idempotencyKey) {
+    // A route that opts out is never replayed, so no key goes with it.
+    if (input.idempotencyKey && route.idempotency !== "none") {
       headers[IDEMPOTENCY_KEY_HEADER] = input.idempotencyKey;
     }
     let body: string | undefined;

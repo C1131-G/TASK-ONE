@@ -124,3 +124,34 @@ it("refuses a write that has no key", async () => {
     ok: false,
   });
 });
+
+const requestUpload = {
+  body: Schema.Struct({ name: Schema.String }),
+  data: Schema.Struct({ id: Schema.String }),
+  idempotency: "none",
+  method: "post",
+  operationId: "requestUpload",
+  path: "/api/v1/uploads",
+  summary: "A write that hands out a signed URL, so it is never replayed.",
+} as const satisfies RouteDefinition;
+
+it("reads a write that opts out of idempotency without asking for a key", async () => {
+  const { readRouteInput } = await import("../../src/server/api/route-input");
+  const result = await runEffectResult(
+    readRouteInput(
+      requestUpload,
+      new Request("http://localhost:3000/api/v1/uploads", {
+        body: JSON.stringify({ name: "shot.png" }),
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      })
+    ),
+    "req-route-input-none"
+  );
+
+  expect(result).toEqual({
+    data: { body: { name: "shot.png" } },
+    ok: true,
+    requestId: "req-route-input-none",
+  });
+});

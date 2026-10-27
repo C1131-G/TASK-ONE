@@ -57,6 +57,27 @@ const storageError = () =>
     message: "Private file storage is unavailable.",
   });
 
+// Storage answers 404 for a key that was never written.
+const isMissingObject = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  "$metadata" in error &&
+  (error.$metadata as { httpStatusCode?: number }).httpStatusCode === 404;
+
+const objectNotUploaded = () =>
+  new AppError({
+    code: "VALIDATION_FAILED",
+    message: "The file has not been uploaded yet.",
+  });
+
+// How long each kind of signed URL works, in seconds. The mobile API reports the
+// same windows, so both read them from here.
+export const SIGNED_URL_SECONDS = {
+  download: 300,
+  preview: 300,
+  upload: 600,
+} as const;
+
 const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
 
 const endpoint = process.env["S3_ENDPOINT"];
@@ -172,7 +193,7 @@ export const StorageLive = Layer.succeed(
               ResponseContentDisposition: `attachment; filename*=UTF-8''${encodeDispositionFileName(fileName)}`,
               ResponseContentType: "application/octet-stream",
             }),
-            { expiresIn: 300 }
+            { expiresIn: SIGNED_URL_SECONDS.download }
           ),
       }),
     signPreview: (key, contentType) =>
@@ -187,7 +208,7 @@ export const StorageLive = Layer.succeed(
               ResponseContentDisposition: "inline",
               ResponseContentType: contentType,
             }),
-            { expiresIn: 300 }
+            { expiresIn: SIGNED_URL_SECONDS.preview }
           ),
       }),
     signUpload: (key, contentType, sizeBytes) =>
@@ -203,16 +224,18 @@ export const StorageLive = Layer.succeed(
               IfNoneMatch: "*",
               Key: key,
             }),
-            { expiresIn: 600 }
+            { expiresIn: SIGNED_URL_SECONDS.upload }
           ),
       }),
     verifyObject: (key, contentType, sizeBytes) =>
       Effect.tryPromise({
         catch: (error) => (error instanceof AppError ? error : storageError()),
         try: async () => {
-          const object = await s3.send(
-            new HeadObjectCommand({ Bucket: bucket, Key: key })
-          );
+          const object = await s3
+            .send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+            .catch((error: unknown) => {
+              throw isMissingObject(error) ? objectNotUploaded() : error;
+            });
           if (
             object.ContentLength !== sizeBytes ||
             object.ContentType?.split(";")[0]?.trim().toLowerCase() !==
