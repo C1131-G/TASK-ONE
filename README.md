@@ -34,7 +34,7 @@ Set `E2E_ADMIN_PASSWORD`, `E2E_EMPLOYEE_PASSWORD` and `E2E_PORTAL_PASSWORD` in t
 
 ```bash
 bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
-UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
+UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@metsys.test UI_FIXTURE_CLIENT_EMAIL=client-one@acme.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
 ```
 
 The first script creates the admin, two handlers, the Acme client company with its client users, and a linked project; the second adds the projects, tasks, milestones, files and notifications the browser tests use. The first script is safe to run again; for the second, start from a fresh database. Serving the app for tests with the instant-navigation test hooks (`EXPOSE_TESTING_API=1`) is refused in production unless `CI` is set. Install the managed browser with `bunx playwright install chromium`.

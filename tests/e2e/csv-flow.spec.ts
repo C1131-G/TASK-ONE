@@ -28,6 +28,20 @@ const openImportDialog = async (page: Page) => {
   ).toBeVisible();
 };
 
+// A task that was never imported (a failed run) is simply not there to archive.
+const archiveImported = async (page: Page, title: string) => {
+  const more = page.getByRole("button", {
+    exact: true,
+    name: `More actions for ${title}`,
+  });
+  if ((await more.count()) === 0) {
+    return;
+  }
+  await more.click();
+  await page.getByRole("menuitem", { name: "Archive task" }).click();
+  await expect(more).toHaveCount(0);
+};
+
 const feedUrlFromCard = async (page: Page): Promise<string> => {
   const link = page.getByLabel("Your private feed link");
   await expect(link).toBeVisible();
@@ -54,6 +68,24 @@ test.describe("CSV import, export and calendar feed", () => {
       !process.env["E2E_ADMIN_PASSWORD"],
       "E2E_ADMIN_PASSWORD is not set"
     );
+  });
+
+  // The import leaves real tasks behind; archive them so later specs (the
+  // timeline reads the first bar) do not meet them.
+  test.afterAll(async ({ browser }) => {
+    if (!process.env["E2E_ADMIN_PASSWORD"]) {
+      return;
+    }
+    const context = await browser.newContext({ storageState: ADMIN_STATE });
+    try {
+      const page = await context.newPage();
+      await page.goto(`/tasks?q=${encodeURIComponent(stamp)}`);
+      await page.waitForLoadState("networkidle");
+      await archiveImported(page, OPEN_TITLE);
+      await archiveImported(page, FORMULA_TITLE);
+    } finally {
+      await context.close();
+    }
   });
 
   test("an invalid file imports nothing and names each problem", async ({

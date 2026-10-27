@@ -203,6 +203,8 @@ test.describe("scheduling", () => {
       ((await timelineBar.getAttribute("aria-label")) ?? "").split(", ")[0] ??
       "";
     const original = await barDates(page, title);
+    // page.mouse does not scroll, so bring a bar that is off screen into view.
+    await timelineBar.scrollIntoViewIfNeeded();
     const box = await timelineBar.boundingBox();
     expect(box).not.toBeNull();
     if (!box) {
@@ -227,6 +229,7 @@ test.describe("scheduling", () => {
 
     // Move it back the same way; the drag above added two days.
     const back = page.locator("button.bar").filter({ hasText: title }).first();
+    await back.scrollIntoViewIfNeeded();
     const backBox = await back.boundingBox();
     if (!backBox) {
       return;
