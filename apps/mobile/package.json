@@ -11,7 +11,7 @@
     "@react-native-community/netinfo": "^12.0.1",
     "@tanstack/react-query": "^5.104.5",
     "@tanstack/react-store": "^0.11.2",
-    "effect": "^4.0.6",
+    "effect": "4.0.6",
     "expo": "~58.0.19",
     "expo-constants": "~58.0.13",
     "expo-font": "~58.0.10",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "7.29.10",
-    "@effect/vitest": "^4.0.6",
+    "@effect/vitest": "4.0.6",
     "@testing-library/react-native": "^14.1.0",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
