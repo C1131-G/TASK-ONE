@@ -86,7 +86,10 @@ test.describe("inbox and notifications as employee", () => {
     const rows = page.locator("a", { hasText: /UI Admin/u });
     const marks = page.getByRole("button", { name: /^Mark as read:/u });
     await expect(marks.first()).toBeVisible();
-    expect(await marks.count()).toBe(await rows.count());
+    // The list swaps from All to Unread a moment after the click.
+    await expect(async () => {
+      expect(await marks.count()).toBe(await rows.count());
+    }).toPass({ timeout: 10_000 });
   });
 });
 
