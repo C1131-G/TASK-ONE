@@ -4,6 +4,7 @@ import type {
   RouteDefinition,
   RouteInput,
 } from "../../mobile-api/route-definition";
+import { AuthSession, AuthSessionLive } from "../auth/session";
 import { AppError } from "../core/action-result";
 import { invalidInput } from "../core/server-action";
 import { readIdempotencyKey } from "./idempotency-key";
@@ -33,12 +34,35 @@ const readJsonBody = (request: Request): Effect.Effect<unknown, AppError> =>
 // Reads everything a route declares: path parameters, query string, JSON body
 // and, for writes that replay, the idempotency key. A route handler runs this first, so a
 // bad request is refused before any service work starts.
+const WORKSPACE_PREFIX = "/api/v1/workspace/";
+const PORTAL_PREFIX = "/api/v1/portal/";
+
+// Who may knock on a route is decided by where it lives, before anything the
+// caller sent is read, so a bad token or the wrong kind of account is refused
+// the same way whatever it put in the body.
+const requireAudience = (
+  path: string,
+  headers: Headers
+): Effect.Effect<void, AppError> => {
+  const isWorkspace = path.startsWith(WORKSPACE_PREFIX);
+  if (!isWorkspace && !path.startsWith(PORTAL_PREFIX)) {
+    return Effect.void;
+  }
+  return Effect.gen(function* gate() {
+    const session = yield* AuthSession;
+    yield* isWorkspace
+      ? session.requireWorkspaceAccess(headers)
+      : session.requirePortalAccess(headers);
+  }).pipe(Effect.provide(AuthSessionLive));
+};
+
 export const readRouteInput = <Route extends RouteDefinition>(
   route: Route,
   request: Request,
   params: Readonly<Record<string, string>> = {}
 ): Effect.Effect<RouteInput<Route>, AppError> =>
   Effect.gen(function* readInput() {
+    yield* requireAudience(route.path, request.headers);
     const input: Record<string, unknown> = {};
     if (route.params) {
       input["params"] = yield* decode(route.params, params);
