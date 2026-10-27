@@ -19,6 +19,10 @@ export interface RouteDefinition {
   readonly query?: Schema.Constraint;
   // The JSON request body of a write.
   readonly body?: Schema.Constraint;
+  // A write is safe to retry by default and needs an `Idempotency-Key`. A write
+  // that hands out a signed URL or a credential must never be stored for
+  // replay, so it declares `"none"` and neither asks for nor documents a key.
+  readonly idempotency?: "none";
 }
 
 // What a caller supplies for a route: its decoded path, query and body, plus
@@ -36,7 +40,9 @@ export type RouteInput<Route extends RouteDefinition> = (Route extends {
     : unknown) &
   (Route["method"] extends "get"
     ? unknown
-    : { readonly idempotencyKey: string });
+    : Route extends { readonly idempotency: "none" }
+      ? unknown
+      : { readonly idempotencyKey: string });
 
 export const ERROR_CODES = [
   "UNAUTHENTICATED",

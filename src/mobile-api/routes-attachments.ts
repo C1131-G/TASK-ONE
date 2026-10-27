@@ -1,6 +1,220 @@
+import { Schema } from "effect";
+
 import type { RouteDefinition } from "./route-definition";
+import { WorkflowReceipt } from "./routes-bugs";
 
 // Attachments: signed uploads, finalization, previews and downloads.
 // Owned by one branch, so adding routes here never conflicts with the others.
-export const attachmentRoutes =
-  [] as const satisfies readonly RouteDefinition[];
+// This file imports nothing from the server, so limits are spelled out here
+// and a test decodes real responses against it.
+
+const Uuid = Schema.String.check(Schema.isUUID());
+
+// The web lets any file up to 50 MB through for staff. Clients are held to a
+// smaller size and a short list of types by the upload service itself.
+export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+const MEDIA_TYPE = /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/iu;
+const MAX_FILE_NAME_LENGTH = 180;
+const MAX_MEDIA_TYPE_LENGTH = 255;
+
+const UploadFields = {
+  contentType: Schema.String.check(
+    Schema.isMaxLength(MAX_MEDIA_TYPE_LENGTH),
+    Schema.isPattern(MEDIA_TYPE, { message: "Enter a valid media type." })
+  ),
+  fileName: Schema.String.check(
+    Schema.isMinLength(1),
+    Schema.isMaxLength(MAX_FILE_NAME_LENGTH)
+  ),
+  sizeBytes: Schema.Number.check(
+    Schema.isInt(),
+    Schema.isBetween({ maximum: MAX_UPLOAD_BYTES, minimum: 1 })
+  ),
+};
+
+// The app PUTs the bytes to `uploadUrl` with these headers, before
+// `expiresAt`, then finalizes the intent.
+export const UploadTicketSchema = Schema.Struct({
+  expiresAt: Schema.String,
+  requiredHeaders: Schema.Struct({
+    "content-type": Schema.String,
+    "if-none-match": Schema.Literal("*"),
+  }),
+  uploadIntentId: Uuid,
+  uploadUrl: Schema.String,
+});
+
+// A file as the app lists it: what the web shows, plus the id the download
+// routes take and whether the preview route will serve it inline.
+export const AttachmentFileSchema = Schema.Struct({
+  contentType: Schema.String,
+  createdAt: Schema.String,
+  id: Uuid,
+  name: Schema.String,
+  previewable: Schema.Boolean,
+  sizeBytes: Schema.Number,
+  taskId: Schema.NullOr(Uuid),
+  uploadedBy: Schema.Struct({ id: Schema.String, name: Schema.String }),
+});
+
+export const AttachmentListSchema = Schema.Struct({
+  items: Schema.Array(AttachmentFileSchema),
+});
+
+// A link the app opens at once. It stops working at `expiresAt`, so the app
+// asks again instead of keeping it.
+export const SignedUrlSchema = Schema.Struct({
+  expiresAt: Schema.String,
+  url: Schema.String,
+});
+
+const FileIdParams = Schema.Struct({ fileId: Uuid });
+const UploadIntentParams = Schema.Struct({ uploadIntentId: Uuid });
+
+export const requestWorkspaceUploadRoute = {
+  body: Schema.Struct({ ...UploadFields, taskId: Uuid }),
+  data: UploadTicketSchema,
+  idempotency: "none",
+  method: "post",
+  operationId: "requestWorkspaceUpload",
+  path: "/api/v1/workspace/attachments/uploads",
+  summary: "A signed URL for uploading one file to a task.",
+} as const satisfies RouteDefinition;
+
+export const finalizeWorkspaceUploadRoute = {
+  data: AttachmentFileSchema,
+  method: "post",
+  operationId: "finalizeWorkspaceUpload",
+  params: UploadIntentParams,
+  path: "/api/v1/workspace/attachments/uploads/{uploadIntentId}/finalize",
+  summary: "Turns a finished upload into a file on the task.",
+} as const satisfies RouteDefinition;
+
+export const listWorkspaceAttachmentsRoute = {
+  data: AttachmentListSchema,
+  method: "get",
+  operationId: "listWorkspaceAttachments",
+  path: "/api/v1/workspace/attachments",
+  query: Schema.Struct({ taskId: Uuid }),
+  summary: "The files attached to a task.",
+} as const satisfies RouteDefinition;
+
+export const downloadWorkspaceAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "downloadWorkspaceAttachment",
+  params: FileIdParams,
+  path: "/api/v1/workspace/attachments/{fileId}/download",
+  summary: "A short-lived link that downloads one file.",
+} as const satisfies RouteDefinition;
+
+export const previewWorkspaceAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "previewWorkspaceAttachment",
+  params: FileIdParams,
+  path: "/api/v1/workspace/attachments/{fileId}/preview",
+  summary: "A short-lived link that shows one image or PDF inline.",
+} as const satisfies RouteDefinition;
+
+// Staff finish the web's evidence flow: the file is already finalized on the
+// bug's task, and this links it to the bug at the version the staff member saw.
+export const addWorkspaceBugEvidenceRoute = {
+  body: Schema.Struct({
+    bugId: Uuid,
+    caption: Schema.String.check(
+      Schema.isMinLength(1),
+      Schema.isMaxLength(2000)
+    ),
+    expectedVersion: Schema.Number.check(
+      Schema.isInt(),
+      Schema.isGreaterThan(0)
+    ),
+    fileId: Uuid,
+    fixAttemptId: Schema.NullOr(Uuid),
+    kind: Schema.Literals(["before", "after", "other"]),
+  }),
+  data: WorkflowReceipt,
+  method: "post",
+  operationId: "addWorkspaceBugEvidence",
+  path: "/api/v1/workspace/attachments/bug-evidence",
+  summary: "Links a finished upload to a bug as before or after evidence.",
+} as const satisfies RouteDefinition;
+
+// ---- Portal (client) ----
+
+// A client's file, shaped like the attachments the web portal shows on a bug.
+export const PortalAttachmentSchema = Schema.Struct({
+  contentType: Schema.String,
+  createdAt: Schema.String,
+  fileId: Uuid,
+  fileName: Schema.String,
+  previewable: Schema.Boolean,
+  sizeBytes: Schema.Number,
+  uploaderName: Schema.String,
+});
+
+export const PortalAttachmentListSchema = Schema.Struct({
+  items: Schema.Array(PortalAttachmentSchema),
+});
+
+export const requestPortalUploadRoute = {
+  body: Schema.Struct({ ...UploadFields, bugId: Uuid }),
+  data: UploadTicketSchema,
+  idempotency: "none",
+  method: "post",
+  operationId: "requestPortalUpload",
+  path: "/api/v1/portal/attachments/uploads",
+  summary: "A signed URL for uploading one file to the client's own bug.",
+} as const satisfies RouteDefinition;
+
+export const finalizePortalUploadRoute = {
+  body: Schema.Struct({ bugId: Uuid }),
+  data: PortalAttachmentSchema,
+  method: "post",
+  operationId: "finalizePortalUpload",
+  params: UploadIntentParams,
+  path: "/api/v1/portal/attachments/uploads/{uploadIntentId}/finalize",
+  summary: "Turns a finished upload into an attachment of the bug.",
+} as const satisfies RouteDefinition;
+
+export const listPortalAttachmentsRoute = {
+  data: PortalAttachmentListSchema,
+  method: "get",
+  operationId: "listPortalAttachments",
+  path: "/api/v1/portal/attachments",
+  query: Schema.Struct({ bugId: Uuid }),
+  summary: "The files the client company attached to one of its bugs.",
+} as const satisfies RouteDefinition;
+
+export const downloadPortalAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "downloadPortalAttachment",
+  params: FileIdParams,
+  path: "/api/v1/portal/attachments/{fileId}/download",
+  summary: "A short-lived link that downloads one visible file.",
+} as const satisfies RouteDefinition;
+
+export const previewPortalAttachmentRoute = {
+  data: SignedUrlSchema,
+  method: "get",
+  operationId: "previewPortalAttachment",
+  params: FileIdParams,
+  path: "/api/v1/portal/attachments/{fileId}/preview",
+  summary: "A short-lived link that shows one visible image or PDF inline.",
+} as const satisfies RouteDefinition;
+
+export const attachmentRoutes = [
+  requestWorkspaceUploadRoute,
+  finalizeWorkspaceUploadRoute,
+  listWorkspaceAttachmentsRoute,
+  downloadWorkspaceAttachmentRoute,
+  previewWorkspaceAttachmentRoute,
+  addWorkspaceBugEvidenceRoute,
+  requestPortalUploadRoute,
+  finalizePortalUploadRoute,
+  listPortalAttachmentsRoute,
+  downloadPortalAttachmentRoute,
+  previewPortalAttachmentRoute,
+] as const satisfies readonly RouteDefinition[];

@@ -82,3 +82,41 @@ it("leaves out query fields the caller did not set", async () => {
 
   expect(new URL(calls[0]?.url ?? "").search).toBe("");
 });
+
+const requestUpload = {
+  body: Schema.Struct({ name: Schema.String }),
+  data: Schema.Struct({ id: Schema.String }),
+  idempotency: "none",
+  method: "post",
+  operationId: "requestUpload",
+  path: "/api/v1/uploads",
+  summary: "A write that hands out a signed URL, so it is never replayed.",
+} as const satisfies RouteDefinition;
+
+it("sends a write that opts out of idempotency without a key", async () => {
+  const calls: Request[] = [];
+  const client = buildClient([requestUpload] as const, {
+    baseUrl: "http://localhost:3000",
+    fetch: (input, init) => {
+      calls.push(new Request(input, init));
+      return Promise.resolve(
+        Response.json({ data: { id: "u1" }, ok: true, requestId: "r1" })
+      );
+    },
+    token: "tok-123",
+  });
+
+  // The type asks for no key, and a key a caller adds anyway is not sent.
+  await client.requestUpload({ body: { name: "shot.png" } });
+  await client.requestUpload({
+    body: { name: "shot.png" },
+    // @ts-expect-error -- A route that opts out takes no idempotency key.
+    idempotencyKey: "retry-key-0001",
+  });
+
+  expect(calls).toHaveLength(2);
+  for (const request of calls) {
+    expect(request.method).toBe("POST");
+    expect(request.headers.get("idempotency-key")).toBeNull();
+  }
+});

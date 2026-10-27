@@ -31,7 +31,7 @@ const readJsonBody = (request: Request): Effect.Effect<unknown, AppError> =>
   });
 
 // Reads everything a route declares: path parameters, query string, JSON body
-// and, for writes, the idempotency key. A route handler runs this first, so a
+// and, for writes that replay, the idempotency key. A route handler runs this first, so a
 // bad request is refused before any service work starts.
 export const readRouteInput = <Route extends RouteDefinition>(
   route: Route,
@@ -52,7 +52,7 @@ export const readRouteInput = <Route extends RouteDefinition>(
     if (route.body) {
       input["body"] = yield* decode(route.body, yield* readJsonBody(request));
     }
-    if (route.method !== "get") {
+    if (route.method !== "get" && route.idempotency !== "none") {
       input["idempotencyKey"] = yield* readIdempotencyKey(request.headers);
     }
     return input as RouteInput<Route>;
