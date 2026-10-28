@@ -36,6 +36,7 @@ const readJsonBody = (request: Request): Effect.Effect<unknown, AppError> =>
 // bad request is refused before any service work starts.
 const WORKSPACE_PREFIX = "/api/v1/workspace/";
 const PORTAL_PREFIX = "/api/v1/portal/";
+const ME_PREFIX = "/api/v1/me";
 
 // Who may knock on a route is decided by where it lives, before anything the
 // caller sent is read, so a bad token or the wrong kind of account is refused
@@ -45,14 +46,21 @@ const requireAudience = (
   headers: Headers
 ): Effect.Effect<void, AppError> => {
   const isWorkspace = path.startsWith(WORKSPACE_PREFIX);
-  if (!isWorkspace && !path.startsWith(PORTAL_PREFIX)) {
+  const isPortal = path.startsWith(PORTAL_PREFIX);
+  // /me routes are for any signed-in account, including one that still has to
+  // change its password.
+  if (!isWorkspace && !isPortal && !path.startsWith(ME_PREFIX)) {
     return Effect.void;
   }
   return Effect.gen(function* gate() {
     const session = yield* AuthSession;
-    yield* isWorkspace
-      ? session.requireWorkspaceAccess(headers)
-      : session.requirePortalAccess(headers);
+    if (isWorkspace) {
+      yield* session.requireWorkspaceAccess(headers);
+    } else if (isPortal) {
+      yield* session.requirePortalAccess(headers);
+    } else {
+      yield* session.requireAuthenticated(headers);
+    }
   }).pipe(Effect.provide(AuthSessionLive));
 };
 

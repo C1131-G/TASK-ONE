@@ -22,6 +22,16 @@ export const findSignInTarget = async (
   return result.rows[0] ?? null;
 };
 
+export const findSignInTargetById = async (
+  userId: string
+): Promise<SignInTarget | null> => {
+  const result = await authPool.query<SignInTarget>(
+    'SELECT id, "lockedUntil", "failedLoginCount" FROM "user" WHERE id = $1',
+    [userId]
+  );
+  return result.rows[0] ?? null;
+};
+
 export const isLocked = (target: SignInTarget | null, now: Date): boolean =>
   Boolean(target?.lockedUntil && target.lockedUntil.getTime() > now.getTime());
 
