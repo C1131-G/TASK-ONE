@@ -5,13 +5,6 @@ import { BugSummarySchema, ProjectSummarySchema } from "./workspace";
 
 export const portalRoutes = [
   {
-    data: Schema.Struct({ projects: Schema.Array(ProjectSummarySchema) }),
-    method: "get",
-    operationId: "listPortalProjects",
-    path: "/api/v1/portal/projects",
-    summary: "Lists the client's projects with progress.",
-  },
-  {
     body: Schema.Struct({
       description: Schema.String,
       projectId: Schema.String,

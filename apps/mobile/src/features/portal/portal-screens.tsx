@@ -38,7 +38,7 @@ export const PortalHomeScreen = () => {
       {(projects.data?.projects ?? []).map((project) => (
         <WorkspaceListRow
           key={project.id}
-          subtitle={`${project.openTasks} open · ${project.progress}%`}
+          subtitle={project.key}
           title={`${project.key} ${project.name}`}
         />
       ))}

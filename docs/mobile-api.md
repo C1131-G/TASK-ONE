@@ -107,6 +107,19 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/work` | admin, employee | read | Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones. |
 | `GET` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | read | One task with its assignees, subtasks, discussion, version and what the caller may do with it. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | required | Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409. |
+| `GET` | `/api/v1/workspace/my-time` | admin, employee | read | The caller's own time entries for the week that holds `date` (today when left out), with totals per day. |
+| `GET` | `/api/v1/workspace/search` | admin, employee | read | Projects and tasks whose name matches the text. The answer is short by design: the best matches only. |
+| `GET` | `/api/v1/workspace/favorites` | admin, employee | read | The projects and tasks the caller starred, projects first, one page at a time. |
+| `GET` | `/api/v1/workspace/archive` | admin, employee | read | Archived projects and tasks, most recently archived first, one page at a time. The list reaches back over the latest 500 archived tasks. |
+| `GET` | `/api/v1/workspace/files` | admin, employee | read | The standalone files (not attached to a task) of one project, or of every active project when `projectId` is left out, newest first, one page at a time. Admins only, as on the web: for anyone else a named project answers 403 and the unnamed list is empty. |
+| `GET` | `/api/v1/workspace/activity` | admin, employee | read | The workspace's most recent activity, newest first, one page at a time. The feed reaches back over the latest 100 entries. |
+| `GET` | `/api/v1/workspace/workload` | admin, employee | read | Each person's open work over the coming weeks, in hours against the weekly capacity. |
+| `GET` | `/api/v1/workspace/members` | admin, employee | read | The employee directory, optionally narrowed by a search text, one page at a time. |
+| `GET` | `/api/v1/workspace/teams` | admin, employee | read | The teams with their member counts, one page at a time. |
+| `GET` | `/api/v1/workspace/clients` | admin, employee | read | The client companies with their project, user and open bug counts, one page at a time. |
+| `GET` | `/api/v1/workspace/projects` | admin, employee | read | The workspace's active projects with their task counts and progress, one page at a time. |
+| `GET` | `/api/v1/workspace/budgets` | admin, employee | read | Each project's time budget with what has been spent and its alert level, one page at a time. |
+| `GET` | `/api/v1/workspace/tasks` | admin, employee | read | The workspace's open tasks, newest first, one page at a time. Bugs and archived tasks are left out; filter by project, status or the caller's own assignments. |
 | `POST` | `/api/v1/workspace/tasks` | admin, employee | required | Create a task in an active project and assign it. Admins and employees follow the same rules as the web. |
 | `POST` | `/api/v1/workspace/tasks/{taskId}/subtasks` | admin, employee | required | Add a subtask to a task the caller may edit. Answers with the task's new version. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}/subtasks/{subtaskId}` | admin, employee | required | Update or toggle a subtask of a task the caller may edit. Fields left out keep their value. |
@@ -122,6 +135,7 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `POST` | `/api/v1/portal/bugs/{bugId}/comments` | client | required | Answer the team or reply on one of the company's bug reports. |
 | `POST` | `/api/v1/portal/bugs/{bugId}/confirm` | client | required | Confirm that the fix works, which closes the report. |
 | `POST` | `/api/v1/portal/bugs/{bugId}/reopen` | client | required | Say the fix did not work, with the reason, to send the report back. |
+| `GET` | `/api/v1/portal/projects` | client | read | The projects shared with the client's company, one page at a time. |
 | `GET` | `/api/v1/portal/approvals` | client | read | The client's pending and decided approvals. |
 | `GET` | `/api/v1/portal/approvals/{requestId}` | client | read | One approval request, with its files and earlier versions. |
 | `POST` | `/api/v1/portal/approvals/decide` | client | required | Approve a deliverable or ask the team for changes. |

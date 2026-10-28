@@ -67,18 +67,6 @@ export const SubtasksPageSchema = Schema.Struct({
 
 export const taskRoutes = [
   {
-    data: TasksPageSchema,
-    method: "get",
-    operationId: "listTasks",
-    path: "/api/v1/workspace/tasks",
-    query: Schema.Struct({
-      projectId: Schema.optional(Schema.String),
-      search: Schema.optional(Schema.String),
-      status: Schema.optional(TaskStatusSchema),
-    }),
-    summary: "Lists the workspace tasks with optional filters.",
-  },
-  {
     data: TaskDetailSchema,
     method: "get",
     operationId: "getTask",

@@ -74,7 +74,7 @@ export interface ActivityItem {
 export interface KindItem {
   readonly id: string;
   readonly kind: string;
-  readonly subtitle?: string;
+  readonly subtitle?: string | null;
   readonly title: string;
 }
 
@@ -86,19 +86,79 @@ export interface ArchivedItem {
 }
 
 interface DomainClient {
-  readonly listActivity: () => Promise<{ items: readonly ActivityItem[] }>;
-  readonly listArchive: () => Promise<{ items: readonly ArchivedItem[] }>;
-  readonly listBudgets: () => Promise<{ budgets: readonly BudgetSummary[] }>;
-  readonly listClientCompanies: () => Promise<{ companies: readonly ClientCompanySummary[] }>;
-  readonly listFavorites: () => Promise<{ items: readonly KindItem[] }>;
-  readonly listFiles: () => Promise<{ files: readonly FileSummary[] }>;
-  readonly listMembers: () => Promise<{ members: readonly MemberSummary[] }>;
-  readonly listMyTime: () => Promise<{ entries: readonly TimeEntry[] }>;
-  readonly listTeams: () => Promise<{ teams: readonly TeamSummary[] }>;
-  readonly listWorkload: () => Promise<{ people: readonly PersonLoad[] }>;
+  readonly listMyTime: () => Promise<{
+    entries: readonly {
+      id: string;
+      minutes: number;
+      taskReference: string;
+      taskTitle: string;
+      workDate: string;
+    }[];
+  }>;
+  readonly listActivity: () => Promise<{
+    items: readonly {
+      action: string;
+      actorName: string;
+      createdAt: string;
+      id: string;
+      projectName: string | null;
+      taskTitle: string | null;
+    }[];
+  }>;
+  readonly listArchive: () => Promise<{ items: readonly ArchivedItem[]; nextCursor: string | null }>;
+  readonly listBudgets: () => Promise<{
+    items: readonly {
+      budgetMinutes: number;
+      projectId: string;
+      projectName: string;
+      spentMinutes: number;
+    }[];
+  }>;
+  readonly listClientCompanies: () => Promise<{
+    items: readonly {
+      active: boolean;
+      id: string;
+      name: string;
+      openBugCount: number;
+      projectCount: number;
+    }[];
+  }>;
+  readonly listFavorites: () => Promise<{ items: readonly KindItem[]; nextCursor: string | null }>;
+  readonly listFiles: () => Promise<{
+    items: readonly {
+      copyState: "failed" | "pending" | "ready";
+      id: string;
+      originalName: string;
+      projectName: string;
+      sizeBytes: number;
+    }[];
+  }>;
+  readonly listMembers: () => Promise<{
+    items: readonly {
+      employeeId: string;
+      id: string;
+      jobTitle: string | null;
+      name: string;
+      role: "admin" | "employee";
+      teamName: string | null;
+    }[];
+  }>;
+  readonly listTeams: () => Promise<{ items: readonly TeamSummary[] }>;
+  readonly listWorkload: () => Promise<{
+    people: readonly {
+      name: string;
+      peakLoadHours: number;
+      unscheduled: { taskCount: number };
+      userId: string;
+      weeks: readonly { taskCount: number }[];
+    }[];
+  }>;
   readonly searchWorkspace: (input: {
     readonly query: { readonly q: string };
-  }) => Promise<{ hits: readonly KindItem[] }>;
+  }) => Promise<{
+    projects: readonly { id: string; name: string }[];
+    tasks: readonly { id: string; projectName: string; title: string }[];
+  }>;
 }
 
 const call = <A>(
@@ -119,47 +179,68 @@ export const myTimeProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listMyTime()), (page) =>
     rows(page.entries, (entry) => ({
       id: entry.id,
-      subtitle: `${entry.date} · ${entry.projectName} · ${entry.hours}h`,
-      title: entry.taskTitle ?? "General project time",
+      subtitle: `${entry.workDate} · ${entry.taskReference} · ${hoursOf(entry.minutes)}h`,
+      title: entry.taskTitle,
     })),
   );
+
+const openTasksOf = (person: {
+  readonly unscheduled: { readonly taskCount: number };
+  readonly weeks: readonly { readonly taskCount: number }[];
+}): number =>
+  person.weeks.reduce((sum, week) => sum + week.taskCount, person.unscheduled.taskCount);
 
 /** Workload: each person's open load. */
 export const workloadProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listWorkload()), (page) =>
     rows(page.people, (person) => ({
-      id: person.id,
-      subtitle: `${person.openTasks} open tasks · ${person.loadHours}h`,
+      id: person.userId,
+      subtitle: `${openTasksOf(person)} open tasks · peak ${person.peakLoadHours}h a week`,
       title: person.name,
     })),
   );
 
+const MINUTES_PER_HOUR = 60;
+const hoursOf = (minutes: number): number =>
+  Math.round((minutes / MINUTES_PER_HOUR) * 10) / 10;
+
 /** Budgets: planned versus billed hours. */
 export const budgetsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listBudgets()), (page) =>
-    rows(page.budgets, (budget) => ({
-      id: budget.id,
-      subtitle: `${budget.billedHours} of ${budget.plannedHours} hours billed`,
+    rows(page.items, (budget) => ({
+      id: budget.projectId,
+      subtitle: `${hoursOf(budget.spentMinutes)} of ${hoursOf(budget.budgetMinutes)} hours billed`,
       title: budget.projectName,
     })),
   );
 
+const BYTES_PER_KB = 1024;
+const sizeLabelOf = (bytes: number): string => {
+  if (bytes < BYTES_PER_KB) {
+    return `${bytes} B`;
+  }
+  const kb = bytes / BYTES_PER_KB;
+  return kb < BYTES_PER_KB
+    ? `${Math.round(kb)} KB`
+    : `${(kb / BYTES_PER_KB).toFixed(1)} MB`;
+};
+
 /** Files: standalone workspace files. */
 export const filesProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listFiles()), (page) =>
-    rows(page.files, (file) => ({
+    rows(page.items, (file) => ({
       id: file.id,
-      subtitle: `${file.projectName} · ${file.sizeLabel} · ${file.uploadedBy}`,
-      title: file.name,
+      subtitle: `${file.projectName} · ${sizeLabelOf(file.sizeBytes)} · ${file.copyState}`,
+      title: file.originalName,
     })),
   );
 
 /** Members: the employee directory. */
 export const membersProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listMembers()), (page) =>
-    rows(page.members, (member) => ({
+    rows(page.items, (member) => ({
       id: member.id,
-      subtitle: `${member.employeeNumber} · ${member.role}${member.teamName === null ? "" : ` · ${member.teamName}`}`,
+      subtitle: `${member.employeeId} · ${member.role}${member.teamName === null ? "" : ` · ${member.teamName}`}`,
       title: member.name,
     })),
   );
@@ -167,7 +248,7 @@ export const membersProgram = (api: Api) =>
 /** Teams: names and member counts. */
 export const teamsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listTeams()), (page) =>
-    rows(page.teams, (team) => ({
+    rows(page.items, (team) => ({
       id: team.id,
       subtitle: `${team.memberCount} members`,
       title: team.name,
@@ -177,9 +258,9 @@ export const teamsProgram = (api: Api) =>
 /** Clients: the client companies. */
 export const clientsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listClientCompanies()), (page) =>
-    rows(page.companies, (company) => ({
+    rows(page.items, (company) => ({
       id: company.id,
-      subtitle: company.contactEmail ?? "No contact on file",
+      subtitle: `${company.projectCount} projects · ${company.openBugCount} open bugs${company.active ? "" : " · inactive"}`,
       title: company.name,
     })),
   );
@@ -189,8 +270,8 @@ export const activityProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listActivity()), (page) =>
     rows(page.items, (item) => ({
       id: item.id,
-      subtitle: `${item.actorName} · ${item.at.slice(0, 10)}`,
-      title: item.detail,
+      subtitle: `${item.actorName} · ${item.createdAt.slice(0, 10)}`,
+      title: `${item.action.replaceAll("_", " ")}${item.taskTitle ?? item.projectName ? `: ${item.taskTitle ?? item.projectName}` : ""}`,
     })),
   );
 
@@ -215,15 +296,26 @@ export const archiveProgram = (api: Api) =>
     })),
   );
 
-/** Search: projects and tasks by text. */
+/** Search: projects and tasks by text, tasks first. */
 export const searchProgram = (api: Api, query: string) =>
   Effect.map(
     call(api, (client) => client.searchWorkspace({ query: { q: query } })),
     (page) =>
-      rows(page.hits, (hit) => ({
-        id: hit.id,
-        kind: hit.kind,
-        subtitle: hit.subtitle ?? hit.kind,
-        title: hit.title,
-      })),
+      rows(
+        [
+          ...page.tasks.map((task) => ({
+            id: task.id,
+            kind: "task",
+            subtitle: task.projectName,
+            title: task.title,
+          })),
+          ...page.projects.map((project) => ({
+            id: project.id,
+            kind: "project",
+            subtitle: "Project",
+            title: project.name,
+          })),
+        ],
+        (hit) => ({ id: hit.id, kind: hit.kind, subtitle: hit.subtitle, title: hit.title }),
+      ),
   );

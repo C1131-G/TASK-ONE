@@ -5,9 +5,8 @@ export const PORTAL_PROJECT_ID = "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e11";
 export const PORTAL_FIXTURES: readonly MockFixture[] = [
   {
     data: {
-      projects: [
-        { id: "proj-1", key: "WEB", name: "Website relaunch", openTasks: 4, progress: 62 },
-      ],
+      items: [{ id: "proj-1", key: "WEB", name: "Website relaunch" }],
+      nextCursor: null,
     },
     operationId: "listPortalProjects",
   },

@@ -28,13 +28,26 @@ interface TypedClient {
     readonly idempotencyKey: string;
   }) => Promise<{ readonly id: string }>;
   readonly listPortalBugs: () => Promise<readonly PortalBugRow[]>;
-  readonly listPortalProjects: () => Promise<{ readonly projects: readonly ProjectSummary[] }>;
+  readonly listPortalProjects: () => Promise<{
+    readonly items: readonly { readonly id: string; readonly key: string; readonly name: string }[];
+  }>;
 }
 
 export const listPortalProjects = (
   api: Api,
 ): Effect.Effect<{ readonly projects: readonly ProjectSummary[] }, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).listPortalProjects());
+  api.call(async (client) => {
+    const page = await (client as unknown as TypedClient).listPortalProjects();
+    return {
+      projects: page.items.map((project) => ({
+        id: project.id,
+        key: project.key,
+        name: project.name,
+        openTasks: 0,
+        progress: 0,
+      })),
+    };
+  });
 
 export const listPortalBugs = (
   api: Api,

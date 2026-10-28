@@ -40,7 +40,22 @@ export const TASKS = [T1, T2, T3];
 
 export const TASK_FIXTURES: readonly MockFixture[] = [
   {
-    data: { tasks: TASKS },
+    data: {
+      items: TASKS.map((task, index) => ({
+        assigneeIds: [],
+        assigneeNames: task.assigneeNames,
+        dueDate: task.dueAt,
+        id: task.id,
+        priority: task.priority,
+        projectId: task.projectId,
+        projectName: task.projectName,
+        reference: `WEB-${index + 1}`,
+        status: task.status,
+        title: task.title,
+        version: task.version,
+      })),
+      nextCursor: null,
+    },
     operationId: "listTasks",
   },
   {

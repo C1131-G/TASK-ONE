@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import type { RouteDefinition } from "./route-definition";
+import { NextCursorSchema, PageQuerySchema } from "./routes-paging";
 
 // Task actions: context, quick updates, discussions, subtasks, own timer.
 // Owned by one branch, so adding routes here never conflicts with the others.
@@ -388,7 +389,44 @@ export const stopMyTimerRoute = {
     "Stop the caller's timer and save its time as an entry. Answers 404 when none is running.",
 } as const satisfies RouteDefinition;
 
+const TaskListItemSchema = Schema.Struct({
+  assigneeIds: Schema.Array(Schema.String),
+  assigneeNames: Schema.Array(Schema.String),
+  dueDate: Schema.NullOr(Schema.String),
+  id: Schema.String,
+  priority: TaskPrioritySchema,
+  projectId: Schema.String,
+  projectName: Schema.String,
+  reference: Schema.String,
+  status: TaskStatusSchema,
+  title: Schema.String,
+  version: Schema.Number,
+});
+
+export const TaskListSchema = Schema.Struct({
+  items: Schema.Array(TaskListItemSchema),
+  nextCursor: NextCursorSchema,
+});
+
+export type MobileTaskList = typeof TaskListSchema.Type;
+
+export const taskListRoute = {
+  data: TaskListSchema,
+  method: "get",
+  operationId: "listTasks",
+  path: "/api/v1/workspace/tasks",
+  query: Schema.Struct({
+    ...PageQuerySchema.fields,
+    mine: Schema.optional(Schema.Literals(["true", "false"])),
+    projectId: Schema.optional(IdSchema),
+    status: Schema.optional(TaskStatusSchema),
+  }),
+  summary:
+    "The workspace's open tasks, newest first, one page at a time. Bugs and archived tasks are left out; filter by project, status or the caller's own assignments.",
+} as const satisfies RouteDefinition;
+
 export const taskRoutes = [
+  taskListRoute,
   myWorkRoute,
   taskContextRoute,
   taskChangeRoute,
