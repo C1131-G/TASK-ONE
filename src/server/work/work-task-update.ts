@@ -62,16 +62,21 @@ export const updateTask = (
             message: "Archived tasks are read only.",
           });
         }
+        // Who may edit comes before whether the version is current, so someone
+        // who may not edit never learns that the task changed.
+        const assignments = await transaction.orm.public.TaskAssignee.where({
+          taskId,
+        })
+          .select("userId")
+          .all();
+        assertTaskEditPermission(actor, actorId, task.createdById, assignments);
         if (task.version !== expectedVersion) {
           throw new AppError({
             code: "CONFLICT",
             message: "The task changed. Refresh and try again.",
           });
         }
-        const [assignments, activeAssignees, recurrence] = await Promise.all([
-          transaction.orm.public.TaskAssignee.where({ taskId })
-            .select("userId")
-            .all(),
+        const [activeAssignees, recurrence] = await Promise.all([
           // Client accounts are never task assignees, so they read as missing.
           transaction.orm.public.User.where((user) =>
             and(user.id.in(assigneeIds), user.role.neq("client"))
@@ -91,7 +96,6 @@ export const updateTask = (
             message: "Remove recurrence before clearing the task due date.",
           });
         }
-        assertTaskEditPermission(actor, actorId, task.createdById, assignments);
         assertActiveTaskAssignees(assigneeIds, activeAssignees);
         const now = new Date();
         const version = expectedVersion + 1;

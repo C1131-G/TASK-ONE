@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { assertOrdinaryTask } from "../work/work-internal";
+import { mayEditTaskRow } from "./task-edit-access";
 
 export interface TaskRelationInput {
   readonly labelIds: readonly string[];
@@ -146,6 +147,19 @@ const setTaskRelations = (
             message: "Archived work is read only.",
           });
         }
+        // Who may edit comes before whether the version is current.
+        if (
+          !(await mayEditTaskRow(
+            transaction,
+            { id: actorId, role: actor.role },
+            task
+          ))
+        ) {
+          throw new AppError({
+            code: "FORBIDDEN",
+            message: "You cannot edit this task.",
+          });
+        }
         if (task.version !== expectedVersion) {
           throw new AppError({
             code: "CONFLICT",
@@ -166,20 +180,6 @@ const setTaskRelations = (
           },
           update: { updatedAt: new Date() },
         });
-        if (actor.role !== "admin" && task.createdById !== actorId) {
-          const assignment = await transaction.orm.public.TaskAssignee.where({
-            taskId,
-            userId: actorId,
-          })
-            .select("taskId")
-            .first();
-          if (!assignment) {
-            throw new AppError({
-              code: "FORBIDDEN",
-              message: "You cannot edit this task.",
-            });
-          }
-        }
         if (labelIds.length > 0) {
           const labels = await transaction.orm.public.Label.where((label) =>
             label.id.in(labelIds)

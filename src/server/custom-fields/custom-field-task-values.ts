@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { isUniqueConstraintViolation } from "../core/prisma-errors";
+import { mayEditTask } from "../tasks/permissions";
 import type { Transaction } from "../work/work-internal";
 import { assertOrdinaryTask } from "../work/work-internal";
 import { assertTaskEditPermission } from "../work/work-task-state";
@@ -227,9 +228,15 @@ export const fieldsForTask = (actorId: string, taskId: string) =>
       const byField = new Map(values.map((row) => [row.fieldId, row]));
       const isLive = !task.archivedAt && !task.project.archivedAt;
       const mayEdit =
-        actor?.role === "admin" ||
-        task.createdById === actorId ||
-        assignments.some(({ userId }) => userId === actorId);
+        actor !== null &&
+        actor !== undefined &&
+        mayEditTask(
+          { id: actorId, role: actor.role },
+          {
+            assigneeIds: assignments.map(({ userId }) => userId),
+            creatorId: task.createdById,
+          }
+        );
       return {
         canEdit: isLive && mayEdit,
         fields: fields.map((field) => {
