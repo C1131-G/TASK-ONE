@@ -4,6 +4,7 @@ import { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { assertOrdinaryTask } from "../work/work-internal";
+import { mayEditTask } from "./permissions";
 
 export interface TaskPositionChange {
   readonly taskId: string;
@@ -130,9 +131,15 @@ const reorderTasks = (
             });
           }
           if (
-            actor.role !== "admin" &&
-            task.createdById !== actorId &&
-            !assignmentPairs.has(`${task.id}:${actorId}`)
+            !mayEditTask(
+              { id: actorId, role: actor.role },
+              {
+                assigneeIds: assignmentPairs.has(`${task.id}:${actorId}`)
+                  ? [actorId]
+                  : [],
+                creatorId: task.createdById,
+              }
+            )
           ) {
             throw new AppError({
               code: "FORBIDDEN",

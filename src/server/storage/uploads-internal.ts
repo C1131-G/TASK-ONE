@@ -7,6 +7,7 @@ import { db } from "@/src/prisma/db";
 import { AppError } from "../core/action-result";
 import { MimeTypeSchema } from "../core/input-schemas";
 import { isUniqueConstraintViolation } from "../core/prisma-errors";
+import { mayEditTaskRow } from "../tasks/task-edit-access";
 import { assertClientBugTask } from "./uploads-client-access";
 
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
@@ -154,16 +155,7 @@ export const getEditableTask = async (
     );
     return task;
   }
-  if (actor.role === "admin" || task.createdById === actor.id) {
-    return task;
-  }
-  const assignment = await transaction.orm.public.TaskAssignee.where({
-    taskId,
-    userId: actor.id,
-  })
-    .select("taskId")
-    .first();
-  if (!assignment) {
+  if (!(await mayEditTaskRow(transaction, actor, task))) {
     throw new AppError({
       code: "FORBIDDEN",
       message: "You cannot edit this task.",

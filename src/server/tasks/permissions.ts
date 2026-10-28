@@ -14,6 +14,20 @@ export interface TaskAccess {
   readonly isArchived: boolean;
 }
 
+// The one rule for who may edit a task: an admin, the person who created it, or
+// someone assigned to it. Every place that decides this calls this function (or
+// `mayEditTaskRow`, which loads the assignment first), so they cannot drift.
+export const mayEditTask = (
+  editor: { readonly id: string; readonly role: string },
+  task: {
+    readonly creatorId: string;
+    readonly assigneeIds: readonly string[];
+  }
+): boolean =>
+  editor.role === "admin" ||
+  task.creatorId === editor.id ||
+  task.assigneeIds.includes(editor.id);
+
 export class TaskPermissions extends Context.Service<
   TaskPermissions,
   {
@@ -46,12 +60,7 @@ export const TaskPermissionsLive = Layer.succeed(
         );
       }
 
-      const mayEdit =
-        editor.role === "admin" ||
-        task.creatorId === editor.id ||
-        task.assigneeIds.includes(editor.id);
-
-      if (!mayEdit) {
+      if (!mayEditTask(editor, task)) {
         return Effect.fail(
           new AppError({
             code: "FORBIDDEN",

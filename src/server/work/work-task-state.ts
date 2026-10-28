@@ -7,6 +7,7 @@ import type { db } from "@/src/prisma/db";
 
 import { AppError } from "../core/action-result";
 import { CalendarDateSchema } from "../core/input-schemas";
+import { mayEditTask } from "../tasks/permissions";
 import { sanitizeDescription } from "./sanitize-description";
 import type {
   CreateTaskInput,
@@ -89,9 +90,13 @@ export const assertTaskEditPermission = (
   assignments: readonly { readonly userId: string }[]
 ): void => {
   if (
-    actor.role !== "admin" &&
-    createdById !== actorId &&
-    !assignments.some(({ userId }) => userId === actorId)
+    !mayEditTask(
+      { id: actorId, role: actor.role },
+      {
+        assigneeIds: assignments.map(({ userId }) => userId),
+        creatorId: createdById,
+      }
+    )
   ) {
     throw new AppError({
       code: "FORBIDDEN",

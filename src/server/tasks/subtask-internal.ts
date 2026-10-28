@@ -17,6 +17,7 @@ import type {
   SubtaskEntry,
   UpdateSubtaskInput,
 } from "./subtask-contracts";
+import { mayEditTaskRow } from "./task-edit-access";
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type StoredSubtask = ResultType<typeof db.orm.public.TaskSubtask>;
@@ -112,25 +113,25 @@ export const requireEditableTask = async (
       message: "Bugs do not have subtasks.",
     });
   }
+  // Who may edit comes before whether the version is current, so someone who
+  // may not edit never learns that the task changed.
+  if (
+    !(await mayEditTaskRow(
+      transaction,
+      { id: actorId, role: actor.role },
+      task
+    ))
+  ) {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "You cannot edit this task.",
+    });
+  }
   if (task.version !== expectedVersion) {
     throw new AppError({
       code: "CONFLICT",
       message: "The task changed. Refresh and try again.",
     });
-  }
-  if (actor.role !== "admin" && task.createdById !== actorId) {
-    const assignment = await transaction.orm.public.TaskAssignee.where({
-      taskId,
-      userId: actorId,
-    })
-      .select("taskId")
-      .first();
-    if (!assignment) {
-      throw new AppError({
-        code: "FORBIDDEN",
-        message: "You cannot edit this task.",
-      });
-    }
   }
   return task;
 };
