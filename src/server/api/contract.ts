@@ -99,8 +99,13 @@ const operationOf = (
         },
         description: "The request succeeded.",
       },
-      401: failureResponse("Missing, expired or revoked bearer token."),
+      401: failureResponse(
+        "No usable session. `error.reason` is `session_ended` (missing, expired or revoked token), `deactivated` or `inactivity`."
+      ),
       403: failureResponse("The account may not do this."),
+      429: failureResponse(
+        "Too many requests. Wait `error.retryAfterSeconds` (also the Retry-After header)."
+      ),
       ...(route.params
         ? { 404: failureResponse("Nothing matches the path.") }
         : {}),
@@ -141,7 +146,7 @@ export const buildOpenApiDocument = (
         bearerAuth: { scheme: "bearer", type: "http" },
       },
     },
-    info: { title: "Metsys mobile API", version: "1.0.0" },
+    info: { title: "Metsys mobile API", version: "1.1.0" },
     openapi: "3.1.0",
     paths,
   };
