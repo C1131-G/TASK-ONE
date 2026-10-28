@@ -85,7 +85,7 @@
   },
   "info": {
     "title": "Metsys mobile API",
-    "version": "1.2.0"
+    "version": "1.3.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9309,6 +9309,39 @@
     "/api/v1/portal/notifications": {
       "get": {
         "operationId": "listPortalNotifications",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -9389,6 +9422,16 @@
                             "additionalProperties": true
                           }
                         },
+                        "nextCursor": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "unreadCount": {
                           "anyOf": [
                             {
@@ -9401,7 +9444,7 @@
                           ]
                         }
                       },
-                      "required": ["items", "unreadCount"],
+                      "required": ["items", "nextCursor", "unreadCount"],
                       "additionalProperties": true
                     },
                     "ok": {
@@ -9438,6 +9481,16 @@
             },
             "description": "The account may not do this."
           },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The path, query or body is invalid."
+          },
           "429": {
             "content": {
               "application/json": {
@@ -9454,7 +9507,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "The caller's notifications, newest first, each tied to a bug or request they can open now."
+        "summary": "The caller's notifications, newest first, one page at a time, each tied to a bug or request they can open now."
       }
     },
     "/api/v1/portal/notifications/{id}/read": {
