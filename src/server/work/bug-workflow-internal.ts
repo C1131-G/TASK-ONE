@@ -8,6 +8,7 @@ import { UUIDSchema } from "../core/input-schemas";
 import { enqueueWebhookEvent } from "../webhooks/webhook-enqueue";
 import { BugWorkflowStatusSchema } from "./bug-contracts";
 import { slaOnStatusChange } from "./bug-sla";
+import { canMoveBug } from "./bug-status-edges";
 import type { Transaction } from "./work-internal";
 
 export const BugWorkflowReceiptSchema = Schema.Struct({
@@ -202,6 +203,12 @@ export const updateBugStatus = async (
     readonly fields?: Record<string, unknown>;
   }
 ): Promise<BugWorkflowReceipt> => {
+  if (!canMoveBug(input.bug.status, input.nextStatus)) {
+    throw new AppError({
+      code: "CONFLICT",
+      message: "This bug cannot move to that status from where it is.",
+    });
+  }
   const version = input.bug.version + 1;
   const task = await transaction.orm.public.Task.where({
     id: input.bug.taskId,
