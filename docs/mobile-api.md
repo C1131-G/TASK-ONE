@@ -188,13 +188,23 @@ A static read of the schema and services plus the tests above. "Fixed" items hav
 
 - Any active staff member can read any task or bug by id, and download any task file; the mobile bug _list_ is narrower (bugs the caller handles or is assigned to; admins see all). Opening a notification therefore still works after a person is unassigned.
 - Any user of a client company can decide that company's approval requests; an admin can decide a fix approval they submitted themselves.
-- Approval requests have no expiry. Older notifications without a recorded target answer "cannot be opened". A concurrent duplicate request answers 409 and the retry gets the stored result.
+- Approval requests have no expiry. Older notifications without a recorded target answer "cannot be opened".
+- A concurrent duplicate request (the same `Idempotency-Key` while the first is still running) answers 409 "already being processed". The app waits a moment and sends the same key again; once the first finishes, the retry gets the stored result. The server does not hold the second request open.
 - The client idle timeout follows the account's last activity, not each device.
 
-**Open: found, not changed (web or background-job behavior)**
+**Fixed in the second batch** (each has a test that failed before the change)
 
-- The auto-close jobs for bugs waiting on a client read the bug twice, so a confirmation committed in between can be overwritten.
-- A soft-deleted file that is attached to an approval request may block the cleanup job's hard delete (`ON DELETE RESTRICT`), and approval detail still lists it. Not reproduced by a test.
-- Bug status changes are checked by each caller, not centrally, and the transition table disagrees with the inline checks in places.
-- No database check pairs the fix-verification fields, the task archive fields, or a subtask's completed flag and time.
-- The task edit rule exists in four copies; comments are allowed on tasks of archived projects; subtasks of bug tasks are editable through the subtask routes.
+- The auto-close jobs for bugs waiting on a client read the bug twice, so a confirmation committed in between could be overwritten. They now decide from the same row they update.
+- A removed file that an approval request still lists made the file cleanup job fail on every run, stopping all cleanup behind it. The job now skips such a file and carries on. Approval detail and lists no longer show or count a removed file.
+- Subtasks of a bug task were editable through the subtask routes (the web hides them) and the task context offered `manageSubtasks` for bugs. Both are refused now.
+- Comments were accepted on tasks of an archived project. They now answer 404, like archived tasks.
+- Who may edit a task (admin, creator or assignee) was decided in several places. It is one function now, and the update, subtask, label and upload routes check it before the version, so someone who may not edit gets 403 and never learns that the task changed.
+- The database now refuses a task archived without saying who archived it (or the reverse), a subtask whose completed flag disagrees with its completion time, and a fix attempt with a partly recorded verification.
+- A timer still saves its time when its task is archived while it runs (checked, and now covered by a test).
+
+**Open: found, not changed**
+
+- Bug status changes are checked by each caller, not centrally, and the transition table in `bug-workflow.ts` disagrees with the inline checks in places (withdraw, `needs_info` paths, a client reopen to `reported`, duplicates from more states). The fix is to rebuild the table from the real edges, check it inside `updateBugStatus`, and add a full transition test.
+- Lists without a page: `GET /portal/bugs` (silently capped at 200), `GET /portal/notifications` (capped at 50), `GET /portal/approvals` and `GET /workspace/bug-approvals` (no cap). Each needs a `limit` and `cursor` like the workspace notifications list.
+- A file that is on an approval request can still be removed by its owner (it is hidden from the request, but the row stays until nothing references it).
+- A few web actions still check the version before the edit permission (task reschedule, client visibility, approval requests), so a person who may not edit can see a version conflict instead of a refusal. The mobile routes are consistent.
