@@ -2,6 +2,7 @@ import { accountRoutes } from "./routes-account";
 import { attachmentRoutes } from "./routes-attachments";
 import { bugRoutes } from "./routes-bugs";
 import { directoryRoutes } from "./routes-directory";
+import { insightRoutes } from "./routes-insight";
 import { notificationRoutes } from "./routes-notifications";
 import { projectRoutes } from "./routes-projects";
 import { taskRoutes } from "./routes-tasks";
@@ -16,4 +17,5 @@ export const mobileRoutes = [
   ...attachmentRoutes,
   ...projectRoutes,
   ...directoryRoutes,
+  ...insightRoutes,
 ] as const;

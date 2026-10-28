@@ -107,6 +107,8 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/work` | admin, employee | read | Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones. |
 | `GET` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | read | One task with its assignees, subtasks, discussion, version and what the caller may do with it. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | required | Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409. |
+| `GET` | `/api/v1/workspace/activity` | admin, employee | read | The workspace's most recent activity, newest first, one page at a time. The feed reaches back over the latest 100 entries. |
+| `GET` | `/api/v1/workspace/workload` | admin, employee | read | Each person's open work over the coming weeks, in hours against the weekly capacity. |
 | `GET` | `/api/v1/workspace/members` | admin, employee | read | The employee directory, optionally narrowed by a search text, one page at a time. |
 | `GET` | `/api/v1/workspace/teams` | admin, employee | read | The teams with their member counts, one page at a time. |
 | `GET` | `/api/v1/workspace/clients` | admin, employee | read | The client companies with their project, user and open bug counts, one page at a time. |

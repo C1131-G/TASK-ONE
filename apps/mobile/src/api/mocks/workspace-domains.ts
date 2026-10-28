@@ -5,10 +5,12 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   {
     data: {
       people: [
-        { id: "p-1", loadHours: 31, name: "Ada Lovelace", openTasks: 6, overHours: 3 },
-        { id: "p-2", loadHours: 12, name: "Grace Hopper", openTasks: 2, overHours: 0 },
-        { id: "p-3", loadHours: 0, name: "Alan Turing", openTasks: 0, overHours: 0 },
+        { name: "Ada Lovelace", overdueCount: 1, overloadedWeekCount: 1, peakLoadHours: 31, unscheduled: { loadHours: 0, taskCount: 1 }, userId: "p-1", weeks: [{ loadHours: 31, overloaded: true, taskCount: 5, weekStart: "2026-10-26" }] },
+        { name: "Grace Hopper", overdueCount: 0, overloadedWeekCount: 0, peakLoadHours: 12, unscheduled: { loadHours: 0, taskCount: 0 }, userId: "p-2", weeks: [{ loadHours: 12, overloaded: false, taskCount: 2, weekStart: "2026-10-26" }] },
+        { name: "Alan Turing", overdueCount: 0, overloadedWeekCount: 0, peakLoadHours: 0, unscheduled: { loadHours: 0, taskCount: 0 }, userId: "p-3", weeks: [{ loadHours: 0, overloaded: false, taskCount: 0, weekStart: "2026-10-26" }] },
       ],
+      capacityHours: 30,
+      weeks: ["2026-10-26"],
     },
     operationId: "listWorkload",
   },
@@ -64,9 +66,10 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   {
     data: {
       items: [
-        { actorName: "Grace Hopper", at: "2026-10-24T15:02:00.000Z", detail: "moved Ship the landing page to review", id: "a-1", kind: "moved", taskTitle: "Ship the landing page" },
-        { actorName: "Ada Lovelace", at: "2026-10-24T09:15:00.000Z", detail: "commented on Draft the announcement", id: "a-2", kind: "comment", taskTitle: "Draft the announcement" },
+        { action: "task_moved", actorId: "p-2", actorName: "Grace Hopper", createdAt: "2026-10-24T15:02:00.000Z", id: "a-1", projectId: "proj-1", projectName: "Website relaunch", taskId: "task-1", taskTitle: "Ship the landing page" },
+        { action: "comment_added", actorId: "p-1", actorName: "Ada Lovelace", createdAt: "2026-10-24T09:15:00.000Z", id: "a-2", projectId: "proj-1", projectName: "Website relaunch", taskId: null, taskTitle: null },
       ],
+      nextCursor: null,
     },
     operationId: "listActivity",
   },

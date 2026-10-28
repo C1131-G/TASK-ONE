@@ -122,10 +122,8 @@ const list = <N extends string>(operationId: N, path: string, summary: string, d
 
 export const workspaceRoutes = [
   list("listBugs", "/api/v1/workspace/bugs", "Lists the workspace bugs.", Schema.Struct({ bugs: Schema.Array(BugSummarySchema) })),
-  list("listWorkload", "/api/v1/workspace/workload", "Lists each person's open load in hours.", Schema.Struct({ people: Schema.Array(PersonLoadSchema) })),
   list("listMyTime", "/api/v1/workspace/my-time", "Lists the signed-in user's time entries.", Schema.Struct({ entries: Schema.Array(TimeEntrySchema) })),
   list("listFiles", "/api/v1/workspace/files", "Lists the standalone workspace files.", Schema.Struct({ files: Schema.Array(FileSummarySchema) })),
-  list("listActivity", "/api/v1/workspace/activity", "Lists the workspace activity feed.", Schema.Struct({ items: Schema.Array(ActivityItemSchema) })),
   list("listFavorites", "/api/v1/workspace/favorites", "Lists the user's favorite projects and tasks.", Schema.Struct({ items: Schema.Array(FavoriteItemSchema) })),
   list("listArchive", "/api/v1/workspace/archive", "Lists the archived projects and tasks.", Schema.Struct({ items: Schema.Array(ArchivedItemSchema) })),
   {

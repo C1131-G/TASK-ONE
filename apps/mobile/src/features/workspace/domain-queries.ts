@@ -86,7 +86,16 @@ export interface ArchivedItem {
 }
 
 interface DomainClient {
-  readonly listActivity: () => Promise<{ items: readonly ActivityItem[] }>;
+  readonly listActivity: () => Promise<{
+    items: readonly {
+      action: string;
+      actorName: string;
+      createdAt: string;
+      id: string;
+      projectName: string | null;
+      taskTitle: string | null;
+    }[];
+  }>;
   readonly listArchive: () => Promise<{ items: readonly ArchivedItem[] }>;
   readonly listBudgets: () => Promise<{
     items: readonly {
@@ -119,7 +128,15 @@ interface DomainClient {
   }>;
   readonly listMyTime: () => Promise<{ entries: readonly TimeEntry[] }>;
   readonly listTeams: () => Promise<{ items: readonly TeamSummary[] }>;
-  readonly listWorkload: () => Promise<{ people: readonly PersonLoad[] }>;
+  readonly listWorkload: () => Promise<{
+    people: readonly {
+      name: string;
+      peakLoadHours: number;
+      unscheduled: { taskCount: number };
+      userId: string;
+      weeks: readonly { taskCount: number }[];
+    }[];
+  }>;
   readonly searchWorkspace: (input: {
     readonly query: { readonly q: string };
   }) => Promise<{ hits: readonly KindItem[] }>;
@@ -148,12 +165,18 @@ export const myTimeProgram = (api: Api) =>
     })),
   );
 
+const openTasksOf = (person: {
+  readonly unscheduled: { readonly taskCount: number };
+  readonly weeks: readonly { readonly taskCount: number }[];
+}): number =>
+  person.weeks.reduce((sum, week) => sum + week.taskCount, person.unscheduled.taskCount);
+
 /** Workload: each person's open load. */
 export const workloadProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listWorkload()), (page) =>
     rows(page.people, (person) => ({
-      id: person.id,
-      subtitle: `${person.openTasks} open tasks · ${person.loadHours}h`,
+      id: person.userId,
+      subtitle: `${openTasksOf(person)} open tasks · peak ${person.peakLoadHours}h a week`,
       title: person.name,
     })),
   );
@@ -217,8 +240,8 @@ export const activityProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listActivity()), (page) =>
     rows(page.items, (item) => ({
       id: item.id,
-      subtitle: `${item.actorName} · ${item.at.slice(0, 10)}`,
-      title: item.detail,
+      subtitle: `${item.actorName} · ${item.createdAt.slice(0, 10)}`,
+      title: `${item.action.replaceAll("_", " ")}${item.taskTitle ?? item.projectName ? `: ${item.taskTitle ?? item.projectName}` : ""}`,
     })),
   );
 
