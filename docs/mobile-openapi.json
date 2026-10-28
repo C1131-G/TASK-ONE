@@ -85,7 +85,7 @@
   },
   "info": {
     "title": "Metsys mobile API",
-    "version": "1.4.0"
+    "version": "1.5.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -310,6 +310,498 @@
           }
         ],
         "summary": "Replace the caller's password, which also ends their other sessions. Open to an account that must change its password first."
+      }
+    },
+    "/api/v1/workspace/tasks": {
+      "get": {
+        "operationId": "listTasks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["true", "false"]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["backlog", "todo", "progress", "review", "done"]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "assigneeIds": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "assigneeNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "dueDate": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "priority": {
+                                "type": "string",
+                                "enum": [
+                                  "urgent",
+                                  "high",
+                                  "medium",
+                                  "low",
+                                  "none"
+                                ]
+                              },
+                              "projectId": {
+                                "type": "string"
+                              },
+                              "projectName": {
+                                "type": "string"
+                              },
+                              "reference": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "backlog",
+                                  "todo",
+                                  "progress",
+                                  "review",
+                                  "done"
+                                ]
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "version": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["Infinity", "-Infinity", "NaN"]
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "assigneeIds",
+                              "assigneeNames",
+                              "dueDate",
+                              "id",
+                              "priority",
+                              "projectId",
+                              "projectName",
+                              "reference",
+                              "status",
+                              "title",
+                              "version"
+                            ],
+                            "additionalProperties": true
+                          }
+                        },
+                        "nextCursor": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["items", "nextCursor"],
+                      "additionalProperties": true
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["ok", "data", "requestId"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The request succeeded."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "No usable session. `error.reason` is `session_ended` (missing, expired or revoked token), `deactivated` or `inactivity`."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The account may not do this."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The path, query or body is invalid."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "Too many requests. Wait `error.retryAfterSeconds` (also the Retry-After header)."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The workspace's open tasks, newest first, one page at a time. Bugs and archived tasks are left out; filter by project, status or the caller's own assignments."
+      },
+      "post": {
+        "operationId": "createTask",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assigneeIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                      "format": "uuid"
+                    },
+                    "maxItems": 100
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "dueDate": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "priority": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["urgent", "high", "medium", "low", "none"]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "projectId": {
+                    "type": "string",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                    "format": "uuid"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "required": ["assigneeIds", "projectId", "title"],
+                "additionalProperties": true
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assigneeIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "dueDate": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "priority": {
+                          "type": "string",
+                          "enum": ["urgent", "high", "medium", "low", "none"]
+                        },
+                        "projectId": {
+                          "type": "string"
+                        },
+                        "reference": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "backlog",
+                            "todo",
+                            "progress",
+                            "review",
+                            "done"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity", "-Infinity", "NaN"]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "assigneeIds",
+                        "dueDate",
+                        "id",
+                        "priority",
+                        "projectId",
+                        "reference",
+                        "status",
+                        "title",
+                        "version"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["ok", "data", "requestId"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The request succeeded."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "No usable session. `error.reason` is `session_ended` (missing, expired or revoked token), `deactivated` or `inactivity`."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The account may not do this."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "A stale version, a reused key, or the same request still running."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The path, query or body is invalid."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "Too many requests. Wait `error.retryAfterSeconds` (also the Retry-After header)."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a task in an active project and assign it. Admins and employees follow the same rules as the web."
       }
     },
     "/api/v1/workspace/me/work": {
@@ -1126,239 +1618,6 @@
           }
         ],
         "summary": "Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409."
-      }
-    },
-    "/api/v1/workspace/tasks": {
-      "post": {
-        "operationId": "createTask",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": true,
-            "schema": {
-              "maxLength": 128,
-              "minLength": 8,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "assigneeIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
-                      "format": "uuid"
-                    },
-                    "maxItems": 100
-                  },
-                  "description": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "dueDate": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "priority": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "enum": ["urgent", "high", "medium", "low", "none"]
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "projectId": {
-                    "type": "string",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
-                    "format": "uuid"
-                  },
-                  "title": {
-                    "type": "string"
-                  }
-                },
-                "required": ["assigneeIds", "projectId", "title"],
-                "additionalProperties": true
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "assigneeIds": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "dueDate": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "id": {
-                          "type": "string"
-                        },
-                        "priority": {
-                          "type": "string",
-                          "enum": ["urgent", "high", "medium", "low", "none"]
-                        },
-                        "projectId": {
-                          "type": "string"
-                        },
-                        "reference": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": [
-                            "backlog",
-                            "todo",
-                            "progress",
-                            "review",
-                            "done"
-                          ]
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "version": {
-                          "anyOf": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "string",
-                              "enum": ["Infinity", "-Infinity", "NaN"]
-                            }
-                          ]
-                        }
-                      },
-                      "required": [
-                        "assigneeIds",
-                        "dueDate",
-                        "id",
-                        "priority",
-                        "projectId",
-                        "reference",
-                        "status",
-                        "title",
-                        "version"
-                      ],
-                      "additionalProperties": true
-                    },
-                    "ok": {
-                      "const": true
-                    },
-                    "requestId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["ok", "data", "requestId"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "The request succeeded."
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Failure"
-                }
-              }
-            },
-            "description": "No usable session. `error.reason` is `session_ended` (missing, expired or revoked token), `deactivated` or `inactivity`."
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Failure"
-                }
-              }
-            },
-            "description": "The account may not do this."
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Failure"
-                }
-              }
-            },
-            "description": "A stale version, a reused key, or the same request still running."
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Failure"
-                }
-              }
-            },
-            "description": "The path, query or body is invalid."
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Failure"
-                }
-              }
-            },
-            "description": "Too many requests. Wait `error.retryAfterSeconds` (also the Retry-After header)."
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create a task in an active project and assign it. Admins and employees follow the same rules as the web."
       }
     },
     "/api/v1/workspace/tasks/{taskId}/subtasks": {

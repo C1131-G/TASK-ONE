@@ -72,6 +72,27 @@ export interface CreatedTask {
 
 type Api = MobileApi["Service"];
 
+/** The live page: rows name the due day `dueDate` and add a task reference. */
+interface LiveTasksPage {
+  readonly items: readonly {
+    readonly assigneeNames: readonly string[];
+    readonly dueDate: string | null;
+    readonly id: string;
+    readonly priority: "high" | "low" | "medium" | "none" | "urgent";
+    readonly projectId: string;
+    readonly projectName: string;
+    readonly status: TaskStatus;
+    readonly title: string;
+    readonly version: number;
+  }[];
+  readonly nextCursor: string | null;
+}
+
+interface LiveTasksQuery {
+  readonly projectId?: string;
+  readonly status?: TaskStatus;
+}
+
 interface TypedClient {
   readonly createTask: (input: {
     readonly body: CreateTaskInput;
@@ -79,7 +100,7 @@ interface TypedClient {
   }) => Promise<CreatedTask>;
   readonly getTask: (input: { params: { readonly taskId: string } }) => Promise<TaskDetail>;
   readonly listSubtasks: (input: { params: { readonly taskId: string } }) => Promise<{ readonly subtasks: readonly Subtask[] }>;
-  readonly listTasks: (input: { readonly query?: TasksQuery }) => Promise<TasksPage>;
+  readonly listTasks: (input: { readonly query?: LiveTasksQuery }) => Promise<LiveTasksPage>;
   readonly setSubtaskStatus: (input: {
     readonly body: { readonly done: boolean; readonly expectedVersion: number };
     readonly idempotencyKey: string;
@@ -93,7 +114,27 @@ interface TypedClient {
 }
 
 export const listTasks = (api: Api, query: TasksQuery = {}): Effect.Effect<TasksPage, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).listTasks({ query }));
+  api.call(async (client) => {
+    const page = await (client as unknown as TypedClient).listTasks({
+      query: {
+        ...(query.projectId === undefined ? {} : { projectId: query.projectId }),
+        ...(query.status === undefined ? {} : { status: query.status }),
+      },
+    });
+    return {
+      tasks: page.items.map((task) => ({
+        assigneeNames: task.assigneeNames,
+        dueAt: task.dueDate,
+        id: task.id,
+        priority: task.priority === "none" ? "low" : task.priority,
+        projectId: task.projectId,
+        projectName: task.projectName,
+        status: task.status,
+        title: task.title,
+        version: task.version,
+      })),
+    };
+  });
 
 export const getTask = (api: Api, id: string): Effect.Effect<TaskDetail, AppFailure> =>
   api.call((client) => (client as unknown as TypedClient).getTask({ params: { taskId: id } }));

@@ -107,6 +107,7 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/work` | admin, employee | read | Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones. |
 | `GET` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | read | One task with its assignees, subtasks, discussion, version and what the caller may do with it. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | required | Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409. |
+| `GET` | `/api/v1/workspace/tasks` | admin, employee | read | The workspace's open tasks, newest first, one page at a time. Bugs and archived tasks are left out; filter by project, status or the caller's own assignments. |
 | `POST` | `/api/v1/workspace/tasks` | admin, employee | required | Create a task in an active project and assign it. Admins and employees follow the same rules as the web. |
 | `POST` | `/api/v1/workspace/tasks/{taskId}/subtasks` | admin, employee | required | Add a subtask to a task the caller may edit. Answers with the task's new version. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}/subtasks/{subtaskId}` | admin, employee | required | Update or toggle a subtask of a task the caller may edit. Fields left out keep their value. |
