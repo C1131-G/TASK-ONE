@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import type { RouteDefinition } from "./route-definition";
+import { NextCursorSchema, PageQuerySchema } from "./routes-paging";
 
 // Bug actions: staff and client context, pickup, information, evidence, verification, approvals.
 // Owned by one branch, so adding routes here never conflicts with the others.
@@ -260,6 +261,7 @@ const PortalApprovalItem = Schema.Struct({
 
 export const PortalApprovalList = Schema.Struct({
   items: Schema.Array(PortalApprovalItem),
+  nextCursor: NextCursorSchema,
 });
 
 const PortalApprovalParams = Schema.Struct({ requestId: Uuid });
@@ -334,7 +336,9 @@ export const portalApprovalRoutes = {
     method: "get",
     operationId: "listPortalApprovals",
     path: "/api/v1/portal/approvals",
-    summary: "The client's pending and decided approvals.",
+    query: PageQuerySchema,
+    summary:
+      "The client's pending and decided approvals, pending first, one page at a time.",
   },
 } as const satisfies Record<string, RouteDefinition>;
 
@@ -569,6 +573,7 @@ export const StaffBugApprovalInbox = Schema.Struct({
       status: BugApprovalStatus,
     })
   ),
+  nextCursor: NextCursorSchema,
 });
 
 export const staffBugApprovalInboxRoute = {
@@ -576,7 +581,9 @@ export const staffBugApprovalInboxRoute = {
   method: "get",
   operationId: "listBugApprovals",
   path: "/api/v1/workspace/bug-approvals",
-  summary: "The bug approvals with their status, newest first.",
+  query: PageQuerySchema,
+  summary:
+    "The bug approvals with their status, newest first, one page at a time.",
 } as const satisfies RouteDefinition;
 
 const WorkspaceApprovalBody = Schema.Struct({

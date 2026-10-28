@@ -64,6 +64,12 @@ Answers other than `401` have no `reason`.
 - **Request rate.** Each signed-in person may make 300 requests a minute to one server (set `MOBILE_API_RATE_LIMIT_PER_MINUTE` to change it). Past that the answer is `429` with `error.retryAfterSeconds` and a `Retry-After` header; wait that long. Requests with a bad token are not counted against anyone. The count lives in one server process, so the reverse proxy must enforce the limit that holds across servers and per address.
 - **Sign-in and password attempts** are limited separately: 5 wrong passwords lock an account for 15 minutes.
 
+### Pages
+
+A list that can grow takes `limit` (1 to 100, default 50) and `cursor`, and answers `items` plus `nextCursor`. Send the `nextCursor` of one answer as the `cursor` of the next request until it is `null`. The cursor names the last row you saw, so a page never repeats or skips a row while the list stays the same; if that row has since left the list (for example an approval was cancelled), the answer is `422` on `cursor` and the app starts again from the top.
+
+Paged today: `GET /workspace/notifications`, `GET /workspace/bugs`, `GET /portal/approvals` and `GET /workspace/bug-approvals`. `GET /portal/bugs` (capped at 200) answers a bare array, so it cannot gain a cursor inside `v1`; and `GET /portal/notifications` (capped at 50) is filtered after it is read. Both are listed as open below.
+
 ### Logs
 
 Every request writes one `Mobile API request` line with `requestId`, `method`, `operationId`, `status`, `code` (on failures), `userId` and `durationMs`. Bodies, query strings, headers and signed URLs are never logged. Support finds a failed request by the `requestId` the app shows (the `x-request-id` header).
@@ -201,10 +207,11 @@ A static read of the schema and services plus the tests above. "Fixed" items hav
 - Who may edit a task (admin, creator or assignee) was decided in several places. It is one function now, and the update, subtask, label and upload routes check it before the version, so someone who may not edit gets 403 and never learns that the task changed.
 - The database now refuses a task archived without saying who archived it (or the reverse), a subtask whose completed flag disagrees with its completion time, and a fix attempt with a partly recorded verification.
 - A timer still saves its time when its task is archived while it runs (checked, and now covered by a test).
+- Bug status changes were checked by each caller, and the transition table disagreed with the code (it lacked withdraw, asking for information, the client's answer, closing as not a bug, and a client reopen to `reported` or `in_progress`). There is one table now (`bug-status-edges.ts`), built from the moves the workflow really makes, and `updateBugStatus` refuses any other move. A test lists all 169 pairs.
+- `GET /portal/approvals` and `GET /workspace/bug-approvals` had no cap and now take `limit` and `cursor` (see Pages above).
 
 **Open: found, not changed**
 
-- Bug status changes are checked by each caller, not centrally, and the transition table in `bug-workflow.ts` disagrees with the inline checks in places (withdraw, `needs_info` paths, a client reopen to `reported`, duplicates from more states). The fix is to rebuild the table from the real edges, check it inside `updateBugStatus`, and add a full transition test.
-- Lists without a page: `GET /portal/bugs` (silently capped at 200), `GET /portal/notifications` (capped at 50), `GET /portal/approvals` and `GET /workspace/bug-approvals` (no cap). Each needs a `limit` and `cursor` like the workspace notifications list.
+- `GET /portal/bugs` is silently capped at 200 and `GET /portal/notifications` at 50. The bugs list answers a bare array, so giving it a cursor needs an object around it, which is a `/api/v2` change; the notifications list drops rows after reading them, so it needs a cursor in the query itself.
 - A file that is on an approval request can still be removed by its owner (it is hidden from the request, but the row stays until nothing references it).
 - A few web actions still check the version before the edit permission (task reschedule, client visibility, approval requests), so a person who may not edit can see a version conflict instead of a refusal. The mobile routes are consistent.

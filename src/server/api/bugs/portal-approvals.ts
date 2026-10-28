@@ -5,6 +5,7 @@ import type { ApprovalStatus } from "../../approvals/approval-contracts";
 import { ApprovalDecisionReceiptSchema } from "../../approvals/approval-contracts";
 import { PortalApprovals } from "../../approvals/portal-approvals-service";
 import { Idempotency } from "../../core/idempotency";
+import { pageOf } from "../paging";
 import { asPortalCaller } from "./caller";
 import type { PathParams } from "./caller";
 
@@ -20,18 +21,20 @@ const toListStatus = (
 };
 
 export const listPortalApprovals = (request: Request) =>
-  asPortalCaller(portalApprovalRoutes.list, request, {}, ({ actor }) =>
+  asPortalCaller(portalApprovalRoutes.list, request, {}, ({ actor, input }) =>
     Effect.gen(function* list() {
       const approvals = yield* PortalApprovals;
       const requests = yield* approvals.list(actor);
+      const page = yield* pageOf(requests, ({ id }) => id, input.query);
       return {
-        items: requests.map((approval) => ({
+        items: page.items.map((approval) => ({
           id: approval.id,
           projectName: approval.projectName,
           requestedBy: approval.requestedByName,
           status: toListStatus(approval.status),
           title: approval.subjectTitle,
         })),
+        nextCursor: page.nextCursor,
       };
     })
   );
