@@ -96,12 +96,29 @@ interface DomainClient {
       spentMinutes: number;
     }[];
   }>;
-  readonly listClientCompanies: () => Promise<{ companies: readonly ClientCompanySummary[] }>;
+  readonly listClientCompanies: () => Promise<{
+    items: readonly {
+      active: boolean;
+      id: string;
+      name: string;
+      openBugCount: number;
+      projectCount: number;
+    }[];
+  }>;
   readonly listFavorites: () => Promise<{ items: readonly KindItem[] }>;
   readonly listFiles: () => Promise<{ files: readonly FileSummary[] }>;
-  readonly listMembers: () => Promise<{ members: readonly MemberSummary[] }>;
+  readonly listMembers: () => Promise<{
+    items: readonly {
+      employeeId: string;
+      id: string;
+      jobTitle: string | null;
+      name: string;
+      role: "admin" | "employee";
+      teamName: string | null;
+    }[];
+  }>;
   readonly listMyTime: () => Promise<{ entries: readonly TimeEntry[] }>;
-  readonly listTeams: () => Promise<{ teams: readonly TeamSummary[] }>;
+  readonly listTeams: () => Promise<{ items: readonly TeamSummary[] }>;
   readonly listWorkload: () => Promise<{ people: readonly PersonLoad[] }>;
   readonly searchWorkspace: (input: {
     readonly query: { readonly q: string };
@@ -168,9 +185,9 @@ export const filesProgram = (api: Api) =>
 /** Members: the employee directory. */
 export const membersProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listMembers()), (page) =>
-    rows(page.members, (member) => ({
+    rows(page.items, (member) => ({
       id: member.id,
-      subtitle: `${member.employeeNumber} · ${member.role}${member.teamName === null ? "" : ` · ${member.teamName}`}`,
+      subtitle: `${member.employeeId} · ${member.role}${member.teamName === null ? "" : ` · ${member.teamName}`}`,
       title: member.name,
     })),
   );
@@ -178,7 +195,7 @@ export const membersProgram = (api: Api) =>
 /** Teams: names and member counts. */
 export const teamsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listTeams()), (page) =>
-    rows(page.teams, (team) => ({
+    rows(page.items, (team) => ({
       id: team.id,
       subtitle: `${team.memberCount} members`,
       title: team.name,
@@ -188,9 +205,9 @@ export const teamsProgram = (api: Api) =>
 /** Clients: the client companies. */
 export const clientsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listClientCompanies()), (page) =>
-    rows(page.companies, (company) => ({
+    rows(page.items, (company) => ({
       id: company.id,
-      subtitle: company.contactEmail ?? "No contact on file",
+      subtitle: `${company.projectCount} projects · ${company.openBugCount} open bugs${company.active ? "" : " · inactive"}`,
       title: company.name,
     })),
   );

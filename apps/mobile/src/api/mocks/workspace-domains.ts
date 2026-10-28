@@ -32,29 +32,32 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   },
   {
     data: {
-      members: [
-        { employeeNumber: "EMP000001", id: "p-1", name: "Ada Lovelace", role: "admin", teamName: "Design", title: "Lead designer" },
-        { employeeNumber: "EMP000002", id: "p-2", name: "Grace Hopper", role: "employee", teamName: "Engineering", title: "Engineer" },
-        { employeeNumber: "EMP000003", id: "p-3", name: "Alan Turing", role: "employee", teamName: null, title: null },
+      items: [
+        { activeProjectCount: 3, email: "ada@example.test", employeeId: "EMP000001", id: "p-1", jobTitle: "Lead designer", name: "Ada Lovelace", openAssignedTaskCount: 6, role: "admin", teamId: "t-1", teamName: "Design" },
+        { activeProjectCount: 2, email: "grace@example.test", employeeId: "EMP000002", id: "p-2", jobTitle: "Engineer", name: "Grace Hopper", openAssignedTaskCount: 2, role: "employee", teamId: "t-2", teamName: "Engineering" },
+        { activeProjectCount: 0, email: "alan@example.test", employeeId: "EMP000003", id: "p-3", jobTitle: null, name: "Alan Turing", openAssignedTaskCount: 0, role: "employee", teamId: null, teamName: null },
       ],
+      nextCursor: null,
     },
     operationId: "listMembers",
   },
   {
     data: {
-      teams: [
-        { id: "t-1", memberCount: 3, name: "Design" },
-        { id: "t-2", memberCount: 4, name: "Engineering" },
+      items: [
+        { color: "#3b82f6", description: null, id: "t-1", memberCount: 3, name: "Design" },
+        { color: "#10b981", description: "Builds the product", id: "t-2", memberCount: 4, name: "Engineering" },
       ],
+      nextCursor: null,
     },
     operationId: "listTeams",
   },
   {
     data: {
-      companies: [
-        { active: true, contactEmail: "ops@northwind.test", id: "c-1", name: "Northwind" },
-        { active: false, contactEmail: null, id: "c-2", name: "Contoso" },
+      items: [
+        { active: true, handlerCount: 2, id: "c-1", name: "Northwind", openBugCount: 3, projectCount: 2, userCount: 4, version: 1 },
+        { active: false, handlerCount: 0, id: "c-2", name: "Contoso", openBugCount: 0, projectCount: 0, userCount: 1, version: 2 },
       ],
+      nextCursor: null,
     },
     operationId: "listClientCompanies",
   },
