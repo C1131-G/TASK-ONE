@@ -64,8 +64,8 @@ const insertTask = async (options: {
   const id = randomUUID();
   taskNumber += 1;
   await authPool.query(
-    `INSERT INTO task (id, "projectId", "projectTaskNumber", title, status, priority, "createdById", "dueDate", estimate, "archivedAt")
-     VALUES ($1, $2, $3, 'Workload task', $4, $5, $6, $7, $8, $9)`,
+    `INSERT INTO task (id, "projectId", "projectTaskNumber", title, status, priority, "createdById", "dueDate", estimate, "archivedAt", "archivedById")
+     VALUES ($1, $2, $3, 'Workload task', $4, $5, $6, $7, $8, $9, $10)`,
     [
       id,
       options.project ?? projectId,
@@ -76,6 +76,7 @@ const insertTask = async (options: {
       options.dueDate,
       options.estimate ?? null,
       options.archived ? NOW : null,
+      options.archived ? adminId : null,
     ]
   );
   await authPool.query(

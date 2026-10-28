@@ -192,7 +192,7 @@ it("filters by status and leaves out archived bugs", async () => {
   const archived = await submit("client", "Filter: archived");
   await forceStatus(closed, "closed");
   await authPool.query(
-    'UPDATE task SET "archivedAt" = now() WHERE id = (SELECT "taskId" FROM bug_report WHERE id = $1)',
+    'UPDATE task SET "archivedAt" = now(), "archivedById" = "createdById" WHERE id = (SELECT "taskId" FROM bug_report WHERE id = $1)',
     [archived]
   );
 

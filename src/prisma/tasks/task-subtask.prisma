@@ -18,5 +18,6 @@ model TaskSubtask {
   @@index([taskId, position])
   @@index([assigneeId])
   @@index([dueDate])
+  @@check(expression: "\"isCompleted\" = (\"completedAt\" IS NOT NULL)", name: "task_subtask_completion_pair")
   @@map("task_subtask")
 }

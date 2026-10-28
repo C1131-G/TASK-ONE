@@ -12778,6 +12778,11 @@
                   "prefix": "bug_fix_attempt_verificationSteps_elem_not_null"
                 },
                 {
+                  "expression": "(\"verificationOutcome\" IS NULL) = (\"verifiedById\" IS NULL) AND (\"verificationOutcome\" IS NULL) = (\"verifiedAt\" IS NULL)",
+                  "name": "bug_fix_attempt_verification_complete_c743879b",
+                  "prefix": "bug_fix_attempt_verification_complete"
+                },
+                {
                   "expression": "\"version\" > 0",
                   "name": "bug_fix_attempt_version_positive_efca705d",
                   "prefix": "bug_fix_attempt_version_positive"
@@ -18527,6 +18532,11 @@
             "task": {
               "checks": [
                 {
+                  "expression": "(\"archivedAt\" IS NULL) = (\"archivedById\" IS NULL)",
+                  "name": "task_archive_pair_dc6ab2b4",
+                  "prefix": "task_archive_pair"
+                },
+                {
                   "expression": "\"priority\" IN ('urgent', 'high', 'medium', 'low', 'none')",
                   "name": "task_priority_check_50cc6a72",
                   "prefix": "task_priority_check"
@@ -19219,6 +19229,13 @@
               ]
             },
             "task_subtask": {
+              "checks": [
+                {
+                  "expression": "\"isCompleted\" = (\"completedAt\" IS NOT NULL)",
+                  "name": "task_subtask_completion_pair_be76e2dd",
+                  "prefix": "task_subtask_completion_pair"
+                }
+              ],
               "columns": {
                 "assigneeId": {
                   "codecId": "pg/text@1",
@@ -20859,7 +20876,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "fbda034d9cd4349b3f088c05c77ccdc8a435640a7f1ef609b7b893adbb931597"
+    "storageHash": "61afe3ffbbbe6842c629550003404982fb79f698f88a35dac7328c3ef16d27b6"
   },
   "execution": {
     "executionHash": "c81db46d91fe75b042799333d93566bc3c8bf0e06e1662364c480ab1dcc1250e",

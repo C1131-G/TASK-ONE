@@ -82,11 +82,18 @@ test.describe("inbox and notifications as employee", () => {
     await page.goto("/notifications");
     await page.waitForLoadState("networkidle");
     test.skip((await unreadCount(page)) === 0, "No unread notifications");
-    await page.getByRole("tab", { name: "Unread" }).click();
+    const unreadTab = page.getByRole("tab", { name: "Unread" });
+    // A click before hydration does nothing, so click again until it lands.
+    await expect(async () => {
+      await unreadTab.click();
+      await expect(unreadTab).toHaveAttribute("aria-selected", "true", {
+        timeout: 1500,
+      });
+    }).toPass();
     const rows = page.locator("a", { hasText: /UI Admin/u });
     const marks = page.getByRole("button", { name: /^Mark as read:/u });
     await expect(marks.first()).toBeVisible();
-    // The list swaps from All to Unread a moment after the click.
+    // The list swaps from All to Unread a moment after the tab is selected.
     await expect(async () => {
       expect(await marks.count()).toBe(await rows.count());
     }).toPass({ timeout: 10_000 });

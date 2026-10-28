@@ -315,9 +315,10 @@ export const setupHarness = async (): Promise<void> => {
     'INSERT INTO task (id, "projectId", "projectTaskNumber", title, "createdById") VALUES ($1, $2, 1, $3, $4), ($5, $2, 2, $6, $4)',
     [taskId, projectId, "Owned task", owner.id, archivedTaskId, "Archived task"]
   );
-  await authPool.query('UPDATE task SET "archivedAt" = now() WHERE id = $1', [
-    archivedTaskId,
-  ]);
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = now(), "archivedById" = "createdById" WHERE id = $1',
+    [archivedTaskId]
+  );
   // The directly inserted tasks use numbers 1 and 2, so the next number a real
   // task creation allocates must be 3.
   await authPool.query(

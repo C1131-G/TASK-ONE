@@ -164,7 +164,7 @@ it("applies the same filters the task page offers", async () => {
 it("leaves out archived tasks and tasks in archived projects", async () => {
   const archivedTask = randomUUID();
   await authPool.query(
-    `INSERT INTO task (id, "projectId", "projectTaskNumber", title, "createdById", "archivedAt") VALUES ($1, $2, 900, 'Archived task', $3, now())`,
+    `INSERT INTO task (id, "projectId", "projectTaskNumber", title, "createdById", "archivedAt", "archivedById") VALUES ($1, $2, 900, 'Archived task', $3, now(), $3)`,
     [archivedTask, projectId, actorId]
   );
   try {

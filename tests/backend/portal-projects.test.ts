@@ -91,7 +91,7 @@ beforeAll(async () => {
     ]
   );
   await authPool.query(
-    'INSERT INTO task (id, "projectId", "projectTaskNumber", title, status, "clientVisible", "archivedAt", "createdById") VALUES ($1, $2, 4, \'Archived but shared\', \'todo\', true, now(), $3)',
+    'INSERT INTO task (id, "projectId", "projectTaskNumber", title, status, "clientVisible", "archivedAt", "archivedById", "createdById") VALUES ($1, $2, 4, \'Archived but shared\', \'todo\', true, now(), $3, $3)',
     [fixture.archivedSharedTaskId, projectId, owner]
   );
   await authPool.query(
