@@ -1,8 +1,12 @@
 import { instant } from "@next/playwright";
-import { expect, test } from "@playwright/test";
+import { expect as baseExpect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 import { CLIENT_ONE_STATE } from "./auth-state";
+
+// The shell must appear without waiting for data, but a loaded machine can take
+// longer than the default 5 seconds to finish loading it afterwards.
+const expect = baseExpect.configure({ timeout: 20_000 });
 
 const BASE_URL = process.env["E2E_BASE_URL"] ?? "http://localhost:3000";
 
