@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 
-import type { MobileTaskList } from "../../../mobile-api/routes-tasks";
+import type {
+  MobileTaskList,
+  TaskStatusSchema,
+} from "../../../mobile-api/routes-tasks";
 import { AuthSession } from "../../auth/session";
 import type { AppError } from "../../core/action-result";
 import { listTaskPage } from "../../work/work-task-list";
@@ -10,7 +13,7 @@ export interface TaskListParams {
   readonly limit?: number | undefined;
   readonly mine?: "false" | "true" | undefined;
   readonly projectId?: string | undefined;
-  readonly status?: string | undefined;
+  readonly status?: typeof TaskStatusSchema.Type | undefined;
 }
 
 // Every open task for staff. Clients never reach it: the session refuses them.

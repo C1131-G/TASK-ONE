@@ -4,7 +4,10 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import { PAGE_DEFAULT_SIZE } from "../../mobile-api/routes-paging";
-import type { MobileTaskList } from "../../mobile-api/routes-tasks";
+import type {
+  MobileTaskList,
+  TaskStatusSchema,
+} from "../../mobile-api/routes-tasks";
 import type { AppError } from "../core/action-result";
 import {
   decodeInboxCursor,
@@ -18,7 +21,7 @@ export interface TaskListQuery {
   readonly limit?: number | undefined;
   readonly mine?: boolean | undefined;
   readonly projectId?: string | undefined;
-  readonly status?: string | undefined;
+  readonly status?: typeof TaskStatusSchema.Type | undefined;
 }
 
 // Ordinary, unarchived tasks across every project, newest first. The id breaks
