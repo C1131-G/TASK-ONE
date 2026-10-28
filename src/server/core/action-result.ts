@@ -27,12 +27,48 @@ export class AppError extends Data.TaggedError("AppError")<{
   readonly fieldErrors?: FieldErrors;
 }> {}
 
+// Why a request was refused with 401, so an app can tell a person whether to
+// sign in again, that the account was switched off, or that they were idle.
+// `session_ended` covers a token that is missing, unknown, expired or revoked:
+// the session store cannot tell those apart.
+export type UnauthenticatedReason =
+  | "session_ended"
+  | "deactivated"
+  | "inactivity";
+
+const UNAUTHENTICATED_REASONS: ReadonlySet<string> = new Set([
+  "session_ended",
+  "deactivated",
+  "inactivity",
+]);
+
 export interface ActionFailure {
   readonly code: AppErrorCode;
   readonly message: string;
   readonly requestId: string;
   readonly fieldErrors?: FieldErrors;
+  readonly reason?: UnauthenticatedReason;
+  // Seconds to wait before retrying, on RATE_LIMITED.
+  readonly retryAfterSeconds?: number;
 }
+
+const detailsOf = (error: AppError): Partial<ActionFailure> => {
+  const { details } = error;
+  if (typeof details !== "object" || details === null) {
+    return {};
+  }
+  const { reason, retryAfterSeconds } = details as Record<string, unknown>;
+  return {
+    ...(error.code === "UNAUTHENTICATED" &&
+    typeof reason === "string" &&
+    UNAUTHENTICATED_REASONS.has(reason)
+      ? { reason: reason as UnauthenticatedReason }
+      : {}),
+    ...(error.code === "RATE_LIMITED" && typeof retryAfterSeconds === "number"
+      ? { retryAfterSeconds }
+      : {}),
+  };
+};
 
 export type ActionResult<Result> =
   | { readonly ok: true; readonly data: Result; readonly requestId: string }
@@ -75,6 +111,7 @@ export const runEffectResult = async <Result, ErrorType>(
         message: failure.value.message,
         requestId: resolvedRequestId,
         ...(fieldErrors ? { fieldErrors } : {}),
+        ...detailsOf(failure.value),
       },
       ok: false,
     };

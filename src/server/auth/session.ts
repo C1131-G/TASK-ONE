@@ -46,9 +46,12 @@ export class AuthSession extends Context.Service<
   }
 >()("metsys/server/AuthSession") {}
 
-const notAuthenticated = () =>
+const notAuthenticated = (
+  reason: "session_ended" | "deactivated" = "session_ended"
+) =>
   new AppError({
     code: "UNAUTHENTICATED",
+    details: { reason },
     message: "Sign in to continue.",
   });
 
@@ -121,8 +124,11 @@ const loadSessionUser = (
           .first(),
     });
 
-    if (!user || user.deactivatedAt) {
+    if (!user) {
       return yield* Effect.fail(notAuthenticated());
+    }
+    if (user.deactivatedAt) {
+      return yield* Effect.fail(notAuthenticated("deactivated"));
     }
 
     if (

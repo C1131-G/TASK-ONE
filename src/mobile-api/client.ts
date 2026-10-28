@@ -5,6 +5,7 @@ import type {
   AppErrorCode,
   RouteDefinition,
   RouteInput,
+  UnauthenticatedReason,
 } from "./route-definition";
 import { mobileRoutes } from "./routes";
 
@@ -26,6 +27,8 @@ interface Failure {
   readonly message: string;
   readonly requestId: string;
   readonly fieldErrors?: Readonly<Record<string, string>> | undefined;
+  readonly reason?: UnauthenticatedReason | undefined;
+  readonly retryAfterSeconds?: number | undefined;
 }
 
 export class MobileApiError extends Error {
@@ -33,6 +36,9 @@ export class MobileApiError extends Error {
   readonly requestId: string;
   readonly status: number;
   readonly fieldErrors: Readonly<Record<string, string>> | undefined;
+  // On 401: why the session is gone. On 429: when to try again.
+  readonly reason: UnauthenticatedReason | undefined;
+  readonly retryAfterSeconds: number | undefined;
 
   constructor(status: number, failure: Failure) {
     super(failure.message);
@@ -41,6 +47,8 @@ export class MobileApiError extends Error {
     this.requestId = failure.requestId;
     this.status = status;
     this.fieldErrors = failure.fieldErrors;
+    this.reason = failure.reason;
+    this.retryAfterSeconds = failure.retryAfterSeconds;
   }
 }
 
