@@ -2,6 +2,7 @@ import { Schema } from "effect";
 
 import { AppError } from "../core/action-result";
 import { BugWorkflowStatusSchema } from "./bug-contracts";
+import { canMoveBug } from "./bug-status-edges";
 
 const BugRoleSchema = Schema.Literals(["admin", "employee"]);
 
@@ -67,26 +68,7 @@ export const transitionBugStatus = (
     fail("Only admins can perform this bug workflow transition.");
   }
 
-  const allowedTransitions: Record<
-    typeof BugWorkflowStatusSchema.Type,
-    readonly (typeof BugWorkflowStatusSchema.Type)[]
-  > = {
-    approved_for_release: ["released"],
-    awaiting_admin_approval: ["approved_for_release", "rejected"],
-    awaiting_client: ["closed", "triaged"],
-    closed: ["in_progress"],
-    duplicate: ["awaiting_client"],
-    in_progress: ["in_verification", "awaiting_admin_approval"],
-    in_verification: ["in_progress", "awaiting_admin_approval"],
-    needs_info: [],
-    rejected: ["in_progress"],
-    released: ["closed", "awaiting_client"],
-    reported: ["triaged", "duplicate"],
-    triaged: ["in_progress", "duplicate"],
-    withdrawn: [],
-  };
-
-  if (!allowedTransitions[currentStatus].includes(nextStatus)) {
+  if (!canMoveBug(currentStatus, nextStatus)) {
     fail("This bug workflow transition is not allowed.");
   }
   if (
