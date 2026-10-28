@@ -30,5 +30,6 @@ model BugFixAttempt {
   @@index([authorId, createdAt])
   @@index([verificationOutcome, verifiedAt])
   @@check(expression: "\"version\" > 0", name: "bug_fix_attempt_version_positive")
+  @@check(expression: "(\"verificationOutcome\" IS NULL) = (\"verifiedById\" IS NULL) AND (\"verificationOutcome\" IS NULL) = (\"verifiedAt\" IS NULL)", name: "bug_fix_attempt_verification_complete")
   @@map("bug_fix_attempt")
 }

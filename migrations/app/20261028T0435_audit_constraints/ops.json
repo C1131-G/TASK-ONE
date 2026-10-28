@@ -1,0 +1,157 @@
+[
+  {
+    "id": "data.audit_constraints.checkExistingRows",
+    "label": "Check that no existing row breaks the new constraints",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "no task has only one of archivedAt and archivedById",
+        "sql": "SELECT NOT EXISTS (SELECT 1 FROM \"public\".\"task\" WHERE (\"archivedAt\" IS NULL) <> (\"archivedById\" IS NULL)) AS \"result\""
+      },
+      {
+        "description": "no subtask has a completed flag that disagrees with completedAt",
+        "sql": "SELECT NOT EXISTS (SELECT 1 FROM \"public\".\"task_subtask\" WHERE \"isCompleted\" <> (\"completedAt\" IS NOT NULL)) AS \"result\""
+      },
+      {
+        "description": "no fix attempt has a partly recorded verification",
+        "sql": "SELECT NOT EXISTS (SELECT 1 FROM \"public\".\"bug_fix_attempt\" WHERE (\"verificationOutcome\" IS NULL) <> (\"verifiedById\" IS NULL) OR (\"verificationOutcome\" IS NULL) <> (\"verifiedAt\" IS NULL)) AS \"result\""
+      }
+    ],
+    "execute": [
+      {
+        "description": "nothing to change before the constraints",
+        "sql": "SELECT 1"
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "checkConstraint.bug_fix_attempt.bug_fix_attempt_verification_complete_c743879b",
+    "label": "Add check constraint \"bug_fix_attempt_verification_complete_c743879b\" on \"bug_fix_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "bug_fix_attempt_verification_complete_c743879b",
+        "table": "bug_fix_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bug_fix_attempt_verification_complete_c743879b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_fix_attempt_verification_complete_c743879b",
+          "public",
+          "\"public\".\"bug_fix_attempt\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"bug_fix_attempt_verification_complete_c743879b\"",
+        "sql": "ALTER TABLE \"public\".\"bug_fix_attempt\" ADD CONSTRAINT \"bug_fix_attempt_verification_complete_c743879b\" CHECK ((\"verificationOutcome\" IS NULL) = (\"verifiedById\" IS NULL) AND (\"verificationOutcome\" IS NULL) = (\"verifiedAt\" IS NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bug_fix_attempt_verification_complete_c743879b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bug_fix_attempt_verification_complete_c743879b",
+          "public",
+          "\"public\".\"bug_fix_attempt\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task.task_archive_pair_dc6ab2b4",
+    "label": "Add check constraint \"task_archive_pair_dc6ab2b4\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_archive_pair_dc6ab2b4",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_archive_pair_dc6ab2b4\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_archive_pair_dc6ab2b4",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_archive_pair_dc6ab2b4\"",
+        "sql": "ALTER TABLE \"public\".\"task\" ADD CONSTRAINT \"task_archive_pair_dc6ab2b4\" CHECK ((\"archivedAt\" IS NULL) = (\"archivedById\" IS NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_archive_pair_dc6ab2b4\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_archive_pair_dc6ab2b4",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.task_subtask.task_subtask_completion_pair_be76e2dd",
+    "label": "Add check constraint \"task_subtask_completion_pair_be76e2dd\" on \"task_subtask\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "task_subtask_completion_pair_be76e2dd",
+        "table": "task_subtask"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"task_subtask_completion_pair_be76e2dd\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_subtask_completion_pair_be76e2dd",
+          "public",
+          "\"public\".\"task_subtask\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"task_subtask_completion_pair_be76e2dd\"",
+        "sql": "ALTER TABLE \"public\".\"task_subtask\" ADD CONSTRAINT \"task_subtask_completion_pair_be76e2dd\" CHECK (\"isCompleted\" = (\"completedAt\" IS NOT NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"task_subtask_completion_pair_be76e2dd\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_subtask_completion_pair_be76e2dd",
+          "public",
+          "\"public\".\"task_subtask\""
+        ]
+      }
+    ]
+  }
+]
