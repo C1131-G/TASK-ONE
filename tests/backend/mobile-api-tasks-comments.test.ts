@@ -232,6 +232,20 @@ it("answers 404 for an archived task and creates nothing", async () => {
   expect(await taskState(taskId)).toEqual(before);
 });
 
+it("answers 404 for a task of an archived project and creates nothing", async () => {
+  const taskId = await seedTask({
+    assignees: [personaId("owner")],
+    projectId: ids.archivedProjectId,
+  });
+  const before = await taskState(taskId);
+
+  const response = await comment(taskId, "Project is archived");
+
+  expect(response.status).toBe(404);
+  expect(await commentRows(taskId)).toEqual([]);
+  expect(await taskState(taskId)).toEqual(before);
+});
+
 it("replays a retry with the same key as one comment and one notification", async () => {
   const taskId = await seedOwned();
   const key = newKey();
