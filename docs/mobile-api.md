@@ -37,6 +37,28 @@ Every response is JSON and carries the request ID in the `x-request-id` header a
 | `RATE_LIMITED`                                     | 429         |
 | `UNAVAILABLE`                                      | 503         |
 
+### Why a 401 happened
+
+A `401` carries `error.reason`, so the app can tell a person what to do:
+
+| `reason` | Meaning | What the app shows |
+| --- | --- | --- |
+| `session_ended` | The token is missing, was never issued, expired, or was revoked (signed out elsewhere, password changed). The session store cannot tell these apart. | Sign in again |
+| `deactivated` | The account was switched off. | Contact your administrator |
+| `inactivity` | A client account was idle for more than 2 hours. | Signed out for inactivity; sign in again |
+
+Answers other than `401` have no `reason`.
+
+### Limits
+
+- **Body size.** A JSON body over about 1 MiB answers `422` ("The request body is too large.") before any field is read. The reverse proxy should cap bodies as well.
+- **Request rate.** Each signed-in person may make 300 requests a minute to one server (set `MOBILE_API_RATE_LIMIT_PER_MINUTE` to change it). Past that the answer is `429` with `error.retryAfterSeconds` and a `Retry-After` header; wait that long. Requests with a bad token are not counted against anyone. The count lives in one server process, so the reverse proxy must enforce the limit that holds across servers and per address.
+- **Sign-in and password attempts** are limited separately: 5 wrong passwords lock an account for 15 minutes.
+
+### Logs
+
+Every request writes one `Mobile API request` line with `requestId`, `method`, `operationId`, `status`, `code` (on failures), `userId` and `durationMs`. Bodies, query strings, headers and signed URLs are never logged. Support finds a failed request by the `requestId` the app shows (the `x-request-id` header).
+
 ## Writes
 
 - Every `POST`, `PATCH` and `DELETE` needs an `Idempotency-Key` header of 8 to 128 characters. Resend the same key when retrying; the first result is replayed instead of acting twice. A key reused for a different request returns `409`. `readIdempotencyKey` (`src/server/api/idempotency-key.ts`) reads it, and the service passes it to `Idempotency.run`.
