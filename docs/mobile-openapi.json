@@ -85,7 +85,7 @@
   },
   "info": {
     "title": "Metsys mobile API",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -2776,6 +2776,7 @@
     },
     "/api/v1/portal/bugs": {
       "get": {
+        "deprecated": true,
         "operationId": "listPortalBugs",
         "parameters": [
           {
@@ -2982,7 +2983,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "The company's bug reports."
+        "summary": "Deprecated: use listPortalBugPage. The company's newest 200 bug reports, with no way to reach older ones."
       },
       "post": {
         "operationId": "submitPortalBug",
@@ -3196,6 +3197,265 @@
           }
         ],
         "summary": "Report a bug for the client's company."
+      }
+    },
+    "/api/v1/portal/bug-reports": {
+      "get": {
+        "operationId": "listPortalBugPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["true", "false"]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "in_progress",
+                    "waiting_for_reply",
+                    "fix_ready",
+                    "closed",
+                    "merged",
+                    "not_a_bug",
+                    "withdrawn"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                                "format": "uuid"
+                              },
+                              "impact": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["low", "medium", "high", "urgent"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "isMine": {
+                                "type": "boolean"
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "projectId": {
+                                "type": "string",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|[fF]{8}-[fF]{4}-[fF]{4}-[fF]{4}-[fF]{12})$",
+                                "format": "uuid"
+                              },
+                              "projectName": {
+                                "type": "string"
+                              },
+                              "reporterName": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "submitted",
+                                  "acknowledged",
+                                  "in_progress",
+                                  "waiting_for_reply",
+                                  "fix_ready",
+                                  "closed",
+                                  "merged",
+                                  "not_a_bug",
+                                  "withdrawn"
+                                ]
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "createdAt",
+                              "id",
+                              "impact",
+                              "isMine",
+                              "key",
+                              "projectId",
+                              "projectName",
+                              "reporterName",
+                              "status",
+                              "title",
+                              "updatedAt"
+                            ],
+                            "additionalProperties": true
+                          }
+                        },
+                        "nextCursor": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["items", "nextCursor"],
+                      "additionalProperties": true
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["ok", "data", "requestId"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The request succeeded."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "No usable session. `error.reason` is `session_ended` (missing, expired or revoked token), `deactivated` or `inactivity`."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The account may not do this."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "The path, query or body is invalid."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                }
+              }
+            },
+            "description": "Too many requests. Wait `error.retryAfterSeconds` (also the Retry-After header)."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The company's bug reports, newest first, one page at a time. Takes the same filters as the older list."
       }
     },
     "/api/v1/portal/bugs/{bugId}": {

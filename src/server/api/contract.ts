@@ -82,6 +82,9 @@ const operationOf = (
   }
 
   return {
+    // A route is retired by starting its summary with "Deprecated:", so the
+    // wording and the flag cannot disagree.
+    ...(route.summary.startsWith("Deprecated:") ? { deprecated: true } : {}),
     operationId: route.operationId,
     ...(parameters.length ? { parameters } : {}),
     ...(body
@@ -146,7 +149,7 @@ export const buildOpenApiDocument = (
         bearerAuth: { scheme: "bearer", type: "http" },
       },
     },
-    info: { title: "Metsys mobile API", version: "1.3.0" },
+    info: { title: "Metsys mobile API", version: "1.4.0" },
     openapi: "3.1.0",
     paths,
   };
