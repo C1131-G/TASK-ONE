@@ -80,6 +80,11 @@ export const PortalBugSummary = Schema.Struct({
   updatedAt: Schema.String,
 });
 
+export const PortalBugPage = Schema.Struct({
+  items: Schema.Array(PortalBugSummary),
+  nextCursor: NextCursorSchema,
+});
+
 const PortalComment = Schema.Struct({
   authorName: Schema.String,
   body: Schema.String,
@@ -182,7 +187,22 @@ export const portalBugRoutes = {
       projectId: Schema.optional(Uuid),
       status: Schema.optional(ClientStatus),
     }),
-    summary: "The company's bug reports.",
+    summary:
+      "Deprecated: use listPortalBugPage. The company's newest 200 bug reports, with no way to reach older ones.",
+  },
+  page: {
+    data: PortalBugPage,
+    method: "get",
+    operationId: "listPortalBugPage",
+    path: "/api/v1/portal/bug-reports",
+    query: Schema.Struct({
+      ...PageQuerySchema.fields,
+      mine: Schema.optional(Flag),
+      projectId: Schema.optional(Uuid),
+      status: Schema.optional(ClientStatus),
+    }),
+    summary:
+      "The company's bug reports, newest first, one page at a time. Takes the same filters as the older list.",
   },
   submit: {
     body: PortalReportBody,
@@ -824,6 +844,7 @@ export const staffBugCommentRoute = {
 
 export const bugRoutes = [
   portalBugRoutes.list,
+  portalBugRoutes.page,
   portalBugRoutes.submit,
   portalBugRoutes.detail,
   portalBugActionRoutes.comment,

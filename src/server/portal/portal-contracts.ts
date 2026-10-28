@@ -200,6 +200,20 @@ export class PortalBugs extends Context.Service<
       actor: PortalActor,
       input: ListCompanyBugsInput
     ) => Effect.Effect<readonly PortalBugSummary[], AppError>;
+    readonly listBugPage: (
+      actor: PortalActor,
+      input: ListCompanyBugsInput,
+      options?: {
+        readonly cursor?: string | undefined;
+        readonly limit?: number | undefined;
+      }
+    ) => Effect.Effect<
+      {
+        readonly items: readonly PortalBugSummary[];
+        readonly nextCursor: string | null;
+      },
+      AppError
+    >;
     readonly getBug: (
       actor: PortalActor,
       bugId: string

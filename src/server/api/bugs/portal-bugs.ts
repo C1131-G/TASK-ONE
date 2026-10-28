@@ -26,6 +26,23 @@ export const listPortalBugs = (request: Request) =>
     })
   );
 
+export const listPortalBugPage = (request: Request) =>
+  asPortalCaller(portalBugRoutes.page, request, {}, ({ actor, input }) =>
+    Effect.gen(function* page() {
+      const bugs = yield* PortalBugs;
+      const { cursor, limit, mine, projectId, status } = input.query;
+      return yield* bugs.listBugPage(
+        actor,
+        {
+          ...(mine === undefined ? {} : { mine: mine === "true" }),
+          ...(projectId === undefined ? {} : { projectId }),
+          ...(status === undefined ? {} : { status }),
+        },
+        { cursor, limit }
+      );
+    })
+  );
+
 export const getPortalBug = (request: Request, params: PathParams) =>
   asPortalCaller(portalBugRoutes.detail, request, params, ({ actor, input }) =>
     Effect.gen(function* detail() {

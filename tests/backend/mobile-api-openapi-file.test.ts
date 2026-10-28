@@ -34,3 +34,16 @@ it("documents the 429 answer on every operation", async () => {
 
   expect(missing).toEqual([]);
 });
+
+it("flags a route whose summary starts with Deprecated as deprecated", async () => {
+  const document = (await generated()) as unknown as {
+    paths: Record<string, Record<string, { deprecated?: boolean }>>;
+  };
+  const flagged = Object.entries(document.paths).flatMap(([path, methods]) =>
+    Object.entries(methods)
+      .filter(([, operation]) => operation.deprecated === true)
+      .map(([method]) => `${method.toUpperCase()} ${path}`)
+  );
+
+  expect(flagged).toEqual(["GET /api/v1/portal/bugs"]);
+});
