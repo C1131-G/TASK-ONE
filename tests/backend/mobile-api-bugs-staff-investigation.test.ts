@@ -245,9 +245,10 @@ it("refuses an attempt from an outsider, a client, a closed, an archived and a r
   await forceStatus(closedBug, "closed");
   const archivedBug = await triagedBug("Attempt archived");
   const archivedRow = await bugRow(archivedBug);
-  await authPool.query('UPDATE task SET "archivedAt" = now() WHERE id = $1', [
-    archivedRow.taskId,
-  ]);
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = now(), "archivedById" = "createdById" WHERE id = $1',
+    [archivedRow.taskId]
+  );
   const { POST } = await fixAttemptRoute();
 
   const outsider = await send(POST, "POST", "outsider", {

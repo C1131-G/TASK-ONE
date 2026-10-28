@@ -43,8 +43,8 @@ it("duplicates active task structure without carrying comments or completion", a
       Effect.provide(create, WorkManagementLive)
     );
     await authPool.query(
-      `INSERT INTO task_subtask (id, "taskId", title, "isCompleted", position)
-       VALUES ($1, $2, 'Confirm copy', true, 0)`,
+      `INSERT INTO task_subtask (id, "taskId", title, "isCompleted", "completedAt", position)
+       VALUES ($1, $2, 'Confirm copy', true, now(), 0)`,
       [randomUUID(), source.id]
     );
     await authPool.query(

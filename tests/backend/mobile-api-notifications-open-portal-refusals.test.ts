@@ -60,10 +60,10 @@ const freshClient = async (companyId: string = ids.clientCompanyId) => {
 };
 
 const setTaskArchivedAt = async (taskId: string, archivedAt: Date | null) => {
-  await authPool.query('UPDATE task SET "archivedAt" = $2 WHERE id = $1', [
-    taskId,
-    archivedAt,
-  ]);
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = $2, "archivedById" = CASE WHEN $2::timestamptz IS NULL THEN NULL ELSE "createdById" END WHERE id = $1',
+    [taskId, archivedAt]
+  );
 };
 
 it("opens the bug behind a task target, since the bug is what a client can open", async () => {

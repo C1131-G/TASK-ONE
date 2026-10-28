@@ -154,9 +154,10 @@ it("refuses triage from an employee, a client, a closed bug and an archived bug"
   const archivedBug = await submit("Archived triage");
   const archivedRow = await bugRow(archivedBug);
   const archivedTaskId = archivedRow.taskId;
-  await authPool.query('UPDATE task SET "archivedAt" = now() WHERE id = $1', [
-    archivedTaskId,
-  ]);
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = now(), "archivedById" = "createdById" WHERE id = $1',
+    [archivedTaskId]
+  );
   const { POST } = await triageRoute();
 
   const employee = await send(POST, "POST", "owner", {
