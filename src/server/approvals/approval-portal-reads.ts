@@ -87,10 +87,10 @@ export const listApprovals = (
         transaction,
         requests.map(({ requestedById }) => requestedById)
       ),
-      transaction.orm.public.ApprovalRequestFile.where((attached) =>
-        attached.requestId.in(requests.map(({ id }) => id))
-      )
-        .select("requestId")
+      transaction.orm.public.ApprovalRequestFile.include("file")
+        .where((attached) =>
+          attached.requestId.in(requests.map(({ id }) => id))
+        )
         .all(),
     ]);
     return requests
@@ -100,7 +100,9 @@ export const listApprovals = (
           request,
           projects,
           names,
-          files.filter(({ requestId }) => requestId === request.id).length
+          files.filter(
+            ({ file, requestId }) => requestId === request.id && !file.deletedAt
+          ).length
         )
       );
   });
@@ -129,7 +131,7 @@ export const getApproval = (
     if (!found) {
       throw approvalNotFound();
     }
-    const [{ projects, requests }, attached] = await Promise.all([
+    const [{ projects, requests }, listed] = await Promise.all([
       loadVisibleRequests(transaction, actor.clientCompanyId, {
         subjectKey: found.subjectKey,
       }),
@@ -137,6 +139,8 @@ export const getApproval = (
         .where({ requestId: found.id })
         .all(),
     ]);
+    // A file removed after it was attached is gone for the client too.
+    const attached = listed.filter(({ file }) => !file.deletedAt);
     const names = await namesOf(
       transaction,
       requests.flatMap(({ decidedById, requestedById }) => [

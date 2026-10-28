@@ -93,8 +93,9 @@ export const describeRequests = async (
         ? (userNames.get(row.decidedById) ?? null)
         : null,
       decisionComment: row.decisionComment,
+      // A file removed after it was attached is no longer listed.
       files: attachments.flatMap(({ file, requestId }) =>
-        requestId === row.id
+        requestId === row.id && !file.deletedAt
           ? [{ fileId: file.id, fileName: file.originalName }]
           : []
       ),
