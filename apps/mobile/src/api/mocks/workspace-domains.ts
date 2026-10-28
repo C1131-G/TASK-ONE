@@ -96,10 +96,11 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   },
   {
     data: {
-      budgets: [
-        { billedHours: 41, id: "b-1", plannedHours: 60, projectName: "Website relaunch" },
-        { billedHours: 88, id: "b-2", plannedHours: 80, projectName: "Client portal" },
+      items: [
+        { billableOnly: false, budgetAmountCents: null, budgetMinutes: 3600, currency: "USD", hourlyRateCents: null, kind: "one_off", level: "ok", percent: 68, period: { from: null, key: "all", to: null }, projectId: "proj-1", projectKey: "WEB", projectName: "Website relaunch", remainingMinutes: 1140, spentAmountCents: null, spentMinutes: 2460, warningPercent: 80 },
+        { billableOnly: false, budgetAmountCents: null, budgetMinutes: 4800, currency: "USD", hourlyRateCents: null, kind: "retainer", level: "overrun", percent: 110, period: { from: "2026-10-01", key: "2026-10", to: "2026-10-31" }, projectId: "proj-2", projectKey: "PORT", projectName: "Client portal", remainingMinutes: 0, spentAmountCents: null, spentMinutes: 5280, warningPercent: 80 },
       ],
+      nextCursor: null,
     },
     operationId: "listBudgets",
   },

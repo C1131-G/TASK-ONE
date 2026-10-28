@@ -24,7 +24,15 @@ type Api = MobileApi["Service"];
 
 interface TypedClient {
   readonly listBugs: () => Promise<{ readonly bugs: readonly BugSummary[] }>;
-  readonly listProjects: () => Promise<{ readonly projects: readonly ProjectSummary[] }>;
+  readonly listProjects: () => Promise<{
+    readonly items: readonly {
+      readonly id: string;
+      readonly key: string;
+      readonly name: string;
+      readonly openTaskCount: number;
+      readonly progress: number;
+    }[];
+  }>;
 }
 
 export const listBugs = (api: Api): Effect.Effect<{ readonly bugs: readonly BugSummary[] }, AppFailure> =>
@@ -33,4 +41,15 @@ export const listBugs = (api: Api): Effect.Effect<{ readonly bugs: readonly BugS
 export const listProjects = (
   api: Api,
 ): Effect.Effect<{ readonly projects: readonly ProjectSummary[] }, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).listProjects());
+  api.call(async (client) => {
+    const page = await (client as unknown as TypedClient).listProjects();
+    return {
+      projects: page.items.map((project) => ({
+        id: project.id,
+        key: project.key,
+        name: project.name,
+        openTasks: project.openTaskCount,
+        progress: project.progress,
+      })),
+    };
+  });

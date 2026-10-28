@@ -88,7 +88,14 @@ export interface ArchivedItem {
 interface DomainClient {
   readonly listActivity: () => Promise<{ items: readonly ActivityItem[] }>;
   readonly listArchive: () => Promise<{ items: readonly ArchivedItem[] }>;
-  readonly listBudgets: () => Promise<{ budgets: readonly BudgetSummary[] }>;
+  readonly listBudgets: () => Promise<{
+    items: readonly {
+      budgetMinutes: number;
+      projectId: string;
+      projectName: string;
+      spentMinutes: number;
+    }[];
+  }>;
   readonly listClientCompanies: () => Promise<{ companies: readonly ClientCompanySummary[] }>;
   readonly listFavorites: () => Promise<{ items: readonly KindItem[] }>;
   readonly listFiles: () => Promise<{ files: readonly FileSummary[] }>;
@@ -134,12 +141,16 @@ export const workloadProgram = (api: Api) =>
     })),
   );
 
+const MINUTES_PER_HOUR = 60;
+const hoursOf = (minutes: number): number =>
+  Math.round((minutes / MINUTES_PER_HOUR) * 10) / 10;
+
 /** Budgets: planned versus billed hours. */
 export const budgetsProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listBudgets()), (page) =>
-    rows(page.budgets, (budget) => ({
-      id: budget.id,
-      subtitle: `${budget.billedHours} of ${budget.plannedHours} hours billed`,
+    rows(page.items, (budget) => ({
+      id: budget.projectId,
+      subtitle: `${hoursOf(budget.spentMinutes)} of ${hoursOf(budget.budgetMinutes)} hours billed`,
       title: budget.projectName,
     })),
   );

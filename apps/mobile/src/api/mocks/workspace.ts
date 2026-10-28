@@ -26,10 +26,11 @@ export const WORKSPACE_FIXTURES: readonly MockFixture[] = [
   },
   {
     data: {
-      projects: [
-        { id: "proj-1", key: "WEB", name: "Website relaunch", openTasks: 4, progress: 62 },
-        { id: "proj-2", key: "PORT", name: "Client portal", openTasks: 9, progress: 30 },
+      items: [
+        { clientVisible: true, dueDate: null, id: "proj-1", key: "WEB", name: "Website relaunch", openTaskCount: 4, overdueTaskCount: 0, progress: 62, status: "active", taskCount: 10 },
+        { clientVisible: false, dueDate: "2026-12-01", id: "proj-2", key: "PORT", name: "Client portal", openTaskCount: 9, overdueTaskCount: 2, progress: 30, status: "risk", taskCount: 13 },
       ],
+      nextCursor: null,
     },
     operationId: "listProjects",
   },

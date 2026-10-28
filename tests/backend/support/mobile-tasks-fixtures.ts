@@ -83,7 +83,11 @@ const matchRoute = (
       return { load: route.load, params };
     }
   }
-  throw new Error(`No route is registered for ${pathname}`);
+  // A path with no parameters is the folder under app/ that holds its route.
+  return {
+    load: () => import(`../../../${`app${pathname}`}/route`),
+    params: {},
+  };
 };
 
 export interface ApiResponse<Data = unknown> {
