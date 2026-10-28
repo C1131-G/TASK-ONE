@@ -53,11 +53,14 @@ test.describe("Custom fields (/projects/[projectId]/fields)", () => {
 
       await page.goto(`${href}?view=table`);
       await page.waitForLoadState("networkidle");
-      await page
+      const openDetails = page
         .getByRole("button", { name: /^Open details for/u })
-        .first()
-        .click();
-      await expect(page).toHaveURL(TASK_PARAM, { timeout: 30_000 });
+        .first();
+      // A click before hydration does nothing, so click again until it lands.
+      await expect(async () => {
+        await openDetails.click();
+        await expect(page).toHaveURL(TASK_PARAM, { timeout: 3000 });
+      }).toPass({ timeout: 30_000 });
       const fields = page
         .getByRole("dialog")
         .getByRole("region", { name: "Fields" });
