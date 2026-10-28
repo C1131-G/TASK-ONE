@@ -30,6 +30,7 @@
     "db:plan": "prisma migration plan",
     "db:migrate": "prisma db migrate",
     "db:verify": "prisma db verify",
+    "openapi:write": "bun --preload ./tests/backend/support/server-only-stub.ts scripts/write-mobile-openapi.ts && ultracite fix docs/mobile-openapi.json",
     "test:e2e": "playwright test"
   },
   "dependencies": {

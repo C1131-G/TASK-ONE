@@ -15,8 +15,17 @@ The mobile app calls versioned JSON routes under `app/api/v1`. They are thin ada
 - `GET /api/v1/openapi.json` is generated from that list.
 - `src/mobile-api/client.ts` is the typed client generated from the same list.
 - `tests/backend/mobile-api-contract.test.ts` fails when a route file has no entry in the list, or an entry has no route file.
+- `docs/mobile-openapi.json` is the same contract as a file the app team can read without running the server. `tests/backend/mobile-api-openapi-file.test.ts` fails while it differs from what the code generates; refresh it with `bun run openapi:write` and commit it with the route change.
 
-Add a route by: writing the route file, adding its entry to `mobileRoutes`, and testing it through the route handler.
+Add a route by: writing the route file, adding its entry to `mobileRoutes`, testing it through the route handler, and running `bun run openapi:write`.
+
+## Versioning
+
+- Everything under `/api/v1` stays compatible with the apps already released. Inside `v1` we only add: new routes, new optional request fields, new response fields, new values the app must tolerate in `error.reason` and other open lists. An app must ignore response fields it does not know.
+- A change that would break a released app (removing or renaming a route, field or error code, making an optional field required, changing a field's meaning or type, tightening who may call a route) goes to `/api/v2`, and `v1` keeps working beside it.
+- A route or field that will go away is first marked deprecated in `docs/mobile-openapi.json` and in the route's summary. `v1` keeps it for at least 6 months after the first app release that stops using it, and is switched off only after the release notes announce a date.
+- `info.version` in the contract is the contract's own version: the minor number rises when something is added, and the major number only changes with a new `/api/v{n}`.
+- A pull request that changes `docs/mobile-openapi.json` must say in its description whether it only adds; reviewers reject a removal inside `v1`.
 
 ## Responses
 
