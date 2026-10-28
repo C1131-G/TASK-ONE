@@ -13,7 +13,7 @@ import {
   listProjects,
   responseTimes,
 } from "./portal-bug-lists";
-import { getBug, listBugs } from "./portal-bug-reads";
+import { getBug, listBugPage, listBugs } from "./portal-bug-reads";
 import { editBug, submitBug, withdrawBug } from "./portal-bug-submission";
 import { PortalBugs } from "./portal-contracts";
 
@@ -25,6 +25,7 @@ export const PortalBugsLive = Layer.succeed(
     confirmFix,
     editBug,
     getBug,
+    listBugPage,
     listBugs,
     listNotifications,
     listProjects,
