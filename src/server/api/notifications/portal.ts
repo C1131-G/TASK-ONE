@@ -6,6 +6,7 @@ import {
   PORTAL_PREFERENCE_EVENTS,
 } from "../../../mobile-api/routes-notifications";
 import type {
+  listPortalNotificationsRoute,
   markAllPortalNotificationsReadRoute,
   markPortalNotificationReadRoute,
   setPortalNotificationPreferenceRoute,
@@ -33,13 +34,20 @@ const toPortalActor = (user: PortalUser): PortalActor => ({
 
 // The app shows a title and ignores the body. The row keeps its text, and the
 // mobile adapter repeats it as `title`; the web portal shape is untouched.
-export const listPortalInbox = (headers: Headers) =>
+export const listPortalInbox = (
+  headers: Headers,
+  input: RouteInput<typeof listPortalNotificationsRoute>
+) =>
   Effect.gen(function* listPortalInboxProgram() {
     const sessions = yield* AuthSession;
     const user = yield* sessions.requirePortalAccess(headers);
-    const inbox = yield* listPortalNotificationInbox(toPortalActor(user));
+    const inbox = yield* listPortalNotificationInbox(toPortalActor(user), {
+      cursor: input.query.cursor,
+      limit: input.query.limit,
+    });
     return {
       items: inbox.items.map((item) => ({ ...item, title: item.text })),
+      nextCursor: inbox.nextCursor,
       unreadCount: inbox.unreadCount,
     };
   });

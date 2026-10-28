@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import type { RouteDefinition } from "./route-definition";
+import { NextCursorSchema, PageQuerySchema } from "./routes-paging";
 
 // Notifications: inbox, read state, preferences, targets.
 // Owned by one branch, so adding routes here never conflicts with the others.
@@ -127,6 +128,7 @@ export const PortalNotificationSchema = Schema.Struct({
 
 export const PortalInboxSchema = Schema.Struct({
   items: Schema.Array(PortalNotificationSchema),
+  nextCursor: NextCursorSchema,
   unreadCount: Schema.Number,
 });
 
@@ -135,8 +137,9 @@ export const listPortalNotificationsRoute = {
   method: "get",
   operationId: "listPortalNotifications",
   path: "/api/v1/portal/notifications",
+  query: PageQuerySchema,
   summary:
-    "The caller's notifications, newest first, each tied to a bug or request they can open now.",
+    "The caller's notifications, newest first, one page at a time, each tied to a bug or request they can open now.",
 } as const satisfies RouteDefinition;
 
 export const markPortalNotificationReadRoute = {
