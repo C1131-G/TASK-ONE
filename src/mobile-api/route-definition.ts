@@ -56,12 +56,24 @@ export const ERROR_CODES = [
 
 export type AppErrorCode = (typeof ERROR_CODES)[number];
 
+export const UNAUTHENTICATED_REASONS = [
+  "session_ended",
+  "deactivated",
+  "inactivity",
+] as const;
+
+export type UnauthenticatedReason = (typeof UNAUTHENTICATED_REASONS)[number];
+
 export const FailureSchema = Schema.Struct({
   error: Schema.Struct({
     code: Schema.Literals(ERROR_CODES),
     fieldErrors: Schema.optional(Schema.Record(Schema.String, Schema.String)),
     message: Schema.String,
+    // On 401: why. `session_ended` also covers expired and revoked sessions.
+    reason: Schema.optional(Schema.Literals(UNAUTHENTICATED_REASONS)),
     requestId: Schema.String,
+    // On 429: seconds to wait; the same value is in the Retry-After header.
+    retryAfterSeconds: Schema.optional(Schema.Number),
   }),
   ok: Schema.Literal(false),
 });

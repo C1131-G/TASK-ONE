@@ -32,13 +32,15 @@ export const changePasswordRoute = {
     "Replace the caller's password, which also ends their other sessions. Open to an account that must change its password first.",
 } as const satisfies RouteDefinition;
 
+export const getMeRoute = {
+  data: MeSchema,
+  method: "get",
+  operationId: "getMe",
+  path: "/api/v1/me",
+  summary: "Who the bearer token belongs to.",
+} as const satisfies RouteDefinition;
+
 export const accountRoutes = [
-  {
-    data: MeSchema,
-    method: "get",
-    operationId: "getMe",
-    path: "/api/v1/me",
-    summary: "Who the bearer token belongs to.",
-  },
+  getMeRoute,
   changePasswordRoute,
 ] as const satisfies readonly RouteDefinition[];
