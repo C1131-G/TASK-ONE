@@ -23,6 +23,7 @@ it("rejects requests that have no authenticated session", async () => {
     error: {
       code: "UNAUTHENTICATED",
       message: "Sign in to continue.",
+      reason: "session_ended",
       requestId: "req-auth-session-anonymous",
     },
     ok: false,
