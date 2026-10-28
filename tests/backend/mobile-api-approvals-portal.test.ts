@@ -259,6 +259,38 @@ it("returns one approval with files, history and the staff-only detail hidden", 
   expect(revoked.status).toBe(401);
 });
 
+it("does not list a file that was removed after it was attached", async () => {
+  const requestId = await seedApproval({
+    taskId: await seedTask("Removed file approval"),
+    title: "Removed file approval",
+  });
+  const removedFileId = randomUUID();
+  await authPool.query(
+    `INSERT INTO file_asset (id, "projectId", "taskId", "uploadedById", "originalName", "storageKey", "contentType", "sizeBytes", "deletedAt", "deletedById")
+     VALUES ($1, $2, $3, $4, 'removed.txt', $5, 'text/plain', 5, now(), $4)`,
+    [
+      removedFileId,
+      ids.projectId,
+      ids.taskId,
+      personaId("owner"),
+      `removed/${removedFileId}`,
+    ]
+  );
+  await attachFile(requestId);
+  await attachFile(requestId, removedFileId);
+  const { GET } = await detailRoute();
+
+  const reply = await send(GET, "GET", "client", { params: { requestId } });
+
+  expect(reply.status).toBe(200);
+  expect(reply.body.data.fileCount).toBe(1);
+  expect(
+    (reply.body.data.files as { fileName: string }[]).map(
+      ({ fileName }) => fileName
+    )
+  ).toEqual(["owned.txt"]);
+});
+
 it("approves, asks for changes and keeps a decision immutable", async () => {
   const approvedTask = await seedTask("Approve decision");
   const approvedId = await seedApproval({

@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { db } from "@/src/prisma/db";
 
 import type { AppError } from "../core/action-result";
+import { isForeignKeyViolation } from "../core/prisma-errors";
 import type { StorageApi } from "./storage";
 import * as internal from "./uploads-internal";
 
@@ -85,13 +86,22 @@ export const makeUploadCleanupOperations = (storage: StorageApi) => {
         if (activeUndo) {
           continue;
         }
+        // An approval request keeps a hard reference to the files it lists, so
+        // a removed file on one cannot be deleted for good yet. Skip it and
+        // carry on, or the oldest such file would stop every run.
         const deleted = yield* Effect.tryPromise({
-          catch: internal.mapError,
+          catch: (error) => error,
           try: () =>
             db.orm.public.FileAsset.where((current) =>
               and(current.id.eq(file.id), current.deletedAt.lte(removalCutoff))
             ).delete(),
-        });
+        }).pipe(
+          Effect.catch((error) =>
+            isForeignKeyViolation(error)
+              ? Effect.succeed(null)
+              : Effect.fail(internal.mapError(error))
+          )
+        );
         if (deleted) {
           yield* storage.deleteObject(file.storageKey);
           filesRemoved += 1;
