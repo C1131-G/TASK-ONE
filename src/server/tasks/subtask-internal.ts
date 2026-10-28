@@ -105,6 +105,13 @@ export const requireEditableTask = async (
       message: "Archived work is read only.",
     });
   }
+  // A bug is worked through its own workflow; the web shows it no subtasks.
+  if (task.type !== "task") {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "Bugs do not have subtasks.",
+    });
+  }
   if (task.version !== expectedVersion) {
     throw new AppError({
       code: "CONFLICT",

@@ -307,3 +307,22 @@ it("refuses a note over 500 characters and writes nothing", async () => {
   expect(await ownerTimers()).toHaveLength(0);
   expect(await entriesFor(taskId)).toHaveLength(0);
 });
+
+// Time already worked is not lost because someone archived the task while the
+// timer ran: starting on archived work is refused, but stopping is not.
+it("still saves the time when the task was archived while the timer ran", async () => {
+  const taskId = await seedTask({ assignees: [personaId("owner")] });
+  const started = await startTimer({ billable: true, taskId });
+  expect(started.status).toBe(200);
+  await authPool.query(
+    'UPDATE task SET "archivedAt" = now(), "archivedById" = $2 WHERE id = $1',
+    [taskId, personaId("admin")]
+  );
+
+  const stopped = await stopTimer();
+
+  expect(stopped.status).toBe(200);
+  expect(stopped.body.data).toMatchObject({ taskId });
+  expect(await entriesFor(taskId)).toHaveLength(1);
+  expect(await ownerTimers()).toHaveLength(0);
+});

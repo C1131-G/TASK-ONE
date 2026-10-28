@@ -55,11 +55,9 @@ const permittedActionsOf = (
       viewer.role === "admin" ||
       task.assigneeIds.includes(viewer.id);
     const actions: TaskAction[] = [];
+    // Only a plain task is edited or given subtasks; a bug has its own workflow.
     if (mayEdit && task.type === "task") {
-      actions.push("update");
-    }
-    if (mayEdit) {
-      actions.push("manageSubtasks");
+      actions.push("update", "manageSubtasks");
     }
     if (mayComment) {
       actions.push("comment");
