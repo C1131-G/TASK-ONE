@@ -153,7 +153,16 @@ export const createCommentInTransaction = async (
   })
     .select("createdById", "id", "projectId")
     .first();
-  if (!task) {
+  // Work in an archived project is read only, like an archived task.
+  const project = task
+    ? await transaction.orm.public.Project.where({
+        archivedAt: null,
+        id: task.projectId,
+      })
+        .select("id")
+        .first()
+    : null;
+  if (!task || !project) {
     throw new AppError({
       code: "NOT_FOUND",
       message: "The active task was not found.",
