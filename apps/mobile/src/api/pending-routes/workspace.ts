@@ -122,16 +122,4 @@ const list = <N extends string>(operationId: N, path: string, summary: string, d
 
 export const workspaceRoutes = [
   list("listBugs", "/api/v1/workspace/bugs", "Lists the workspace bugs.", Schema.Struct({ bugs: Schema.Array(BugSummarySchema) })),
-  list("listMyTime", "/api/v1/workspace/my-time", "Lists the signed-in user's time entries.", Schema.Struct({ entries: Schema.Array(TimeEntrySchema) })),
-  list("listFiles", "/api/v1/workspace/files", "Lists the standalone workspace files.", Schema.Struct({ files: Schema.Array(FileSummarySchema) })),
-  list("listFavorites", "/api/v1/workspace/favorites", "Lists the user's favorite projects and tasks.", Schema.Struct({ items: Schema.Array(FavoriteItemSchema) })),
-  list("listArchive", "/api/v1/workspace/archive", "Lists the archived projects and tasks.", Schema.Struct({ items: Schema.Array(ArchivedItemSchema) })),
-  {
-    data: Schema.Struct({ hits: Schema.Array(SearchHitSchema) }),
-    method: "get",
-    operationId: "searchWorkspace",
-    path: "/api/v1/workspace/search",
-    query: Schema.Struct({ q: Schema.String }),
-    summary: "Searches projects and tasks by text.",
-  },
 ] as const satisfies readonly MobileRouteDefinition[];

@@ -149,7 +149,7 @@ export const buildOpenApiDocument = (
         bearerAuth: { scheme: "bearer", type: "http" },
       },
     },
-    info: { title: "Metsys mobile API", version: "1.8.0" },
+    info: { title: "Metsys mobile API", version: "1.9.0" },
     openapi: "3.1.0",
     paths,
   };

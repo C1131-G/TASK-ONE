@@ -16,19 +16,24 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   },
   {
     data: {
+      billableMinutes: 210,
+      days: [{ date: "2026-10-24", minutes: 210 }],
       entries: [
-        { date: "2026-10-24", hours: 3.5, id: "te-1", projectName: "Website relaunch", taskId: "task-1", taskTitle: "Ship the landing page" },
-        { date: "2026-10-23", hours: 5, id: "te-2", projectName: "Client portal", taskId: null, taskTitle: null },
+        { billable: true, id: "te-1", minutes: 210, note: null, taskId: "task-1", taskReference: "WEB-1", taskTitle: "Ship the landing page", userId: "p-1", userName: "Ada Lovelace", workDate: "2026-10-24" },
+        { billable: false, id: "te-2", minutes: 300, note: null, taskId: "task-2", taskReference: "PORT-3", taskTitle: "Set up the staging database", userId: "p-1", userName: "Ada Lovelace", workDate: "2026-10-23" },
       ],
+      totalMinutes: 510,
+      weekStart: "2026-10-19",
     },
     operationId: "listMyTime",
   },
   {
     data: {
-      files: [
-        { copyStatus: "none", id: "f-1", name: "brand-guidelines.pdf", projectId: "proj-1", projectName: "Website relaunch", sizeLabel: "2.4 MB", uploadedBy: "Ada Lovelace" },
-        { copyStatus: "ready", id: "f-2", name: "launch-shot.png", projectId: "proj-1", projectName: "Website relaunch", sizeLabel: "812 KB", uploadedBy: "Grace Hopper" },
+      items: [
+        { contentType: "application/pdf", copyState: "ready", createdAt: "2026-10-20T09:00:00.000Z", id: "f-1", originalName: "brand-guidelines.pdf", projectId: "proj-1", projectName: "Website relaunch", sizeBytes: 2516582, taskId: null, uploadedById: "p-1" },
+        { contentType: "image/png", copyState: "pending", createdAt: "2026-10-19T09:00:00.000Z", id: "f-2", originalName: "launch-shot.png", projectId: "proj-1", projectName: "Website relaunch", sizeBytes: 831488, taskId: null, uploadedById: "p-2" },
       ],
+      nextCursor: null,
     },
     operationId: "listFiles",
   },
@@ -76,27 +81,27 @@ export const WORKSPACE_DOMAIN_FIXTURES: readonly MockFixture[] = [
   {
     data: {
       items: [
-        { id: "fav-1", kind: "project", subtitle: "4 open · 62%", title: "WEB Website relaunch" },
-        { id: "fav-2", kind: "task", subtitle: "In progress", title: "Ship the landing page" },
+        { id: "fav-1", kind: "project", subtitle: null, title: "Website relaunch" },
+        { id: "fav-2", kind: "task", subtitle: "Website relaunch", title: "Ship the landing page" },
       ],
+      nextCursor: null,
     },
     operationId: "listFavorites",
   },
   {
     data: {
       items: [
-        { archivedAt: "2026-09-30T10:00:00.000Z", id: "ar-1", kind: "project", title: "Old marketing site" },
-        { archivedAt: "2026-10-02T08:30:00.000Z", id: "ar-2", kind: "task", title: "Audit deprecated endpoints" },
+        { archivedAt: "2026-10-02T08:30:00.000Z", id: "ar-2", kind: "task", projectName: "Website relaunch", title: "Audit deprecated endpoints", version: 2 },
+        { archivedAt: "2026-09-30T10:00:00.000Z", id: "ar-1", kind: "project", projectName: null, title: "Old marketing site", version: 4 },
       ],
+      nextCursor: null,
     },
     operationId: "listArchive",
   },
   {
     data: {
-      hits: [
-        { id: "s-1", kind: "task", subtitle: "Website relaunch", title: "Ship the landing page" },
-        { id: "s-2", kind: "project", subtitle: "4 open", title: "Website relaunch" },
-      ],
+      projects: [{ id: "proj-1", name: "Website relaunch" }],
+      tasks: [{ id: "task-1", projectId: "proj-1", projectName: "Website relaunch", title: "Ship the landing page" }],
     },
     operationId: "searchWorkspace",
   },

@@ -107,6 +107,11 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/work` | admin, employee | read | Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones. |
 | `GET` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | read | One task with its assignees, subtasks, discussion, version and what the caller may do with it. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | required | Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409. |
+| `GET` | `/api/v1/workspace/my-time` | admin, employee | read | The caller's own time entries for the week that holds `date` (today when left out), with totals per day. |
+| `GET` | `/api/v1/workspace/search` | admin, employee | read | Projects and tasks whose name matches the text. The answer is short by design: the best matches only. |
+| `GET` | `/api/v1/workspace/favorites` | admin, employee | read | The projects and tasks the caller starred, projects first, one page at a time. |
+| `GET` | `/api/v1/workspace/archive` | admin, employee | read | Archived projects and tasks, most recently archived first, one page at a time. The list reaches back over the latest 500 archived tasks. |
+| `GET` | `/api/v1/workspace/files` | admin, employee | read | The standalone files (not attached to a task) of one project, or of every active project when `projectId` is left out, newest first, one page at a time. Admins only, as on the web: for anyone else a named project answers 403 and the unnamed list is empty. |
 | `GET` | `/api/v1/workspace/activity` | admin, employee | read | The workspace's most recent activity, newest first, one page at a time. The feed reaches back over the latest 100 entries. |
 | `GET` | `/api/v1/workspace/workload` | admin, employee | read | Each person's open work over the coming weeks, in hours against the weekly capacity. |
 | `GET` | `/api/v1/workspace/members` | admin, employee | read | The employee directory, optionally narrowed by a search text, one page at a time. |

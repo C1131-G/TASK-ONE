@@ -74,7 +74,7 @@ export interface ActivityItem {
 export interface KindItem {
   readonly id: string;
   readonly kind: string;
-  readonly subtitle?: string;
+  readonly subtitle?: string | null;
   readonly title: string;
 }
 
@@ -86,6 +86,15 @@ export interface ArchivedItem {
 }
 
 interface DomainClient {
+  readonly listMyTime: () => Promise<{
+    entries: readonly {
+      id: string;
+      minutes: number;
+      taskReference: string;
+      taskTitle: string;
+      workDate: string;
+    }[];
+  }>;
   readonly listActivity: () => Promise<{
     items: readonly {
       action: string;
@@ -96,7 +105,7 @@ interface DomainClient {
       taskTitle: string | null;
     }[];
   }>;
-  readonly listArchive: () => Promise<{ items: readonly ArchivedItem[] }>;
+  readonly listArchive: () => Promise<{ items: readonly ArchivedItem[]; nextCursor: string | null }>;
   readonly listBudgets: () => Promise<{
     items: readonly {
       budgetMinutes: number;
@@ -114,8 +123,16 @@ interface DomainClient {
       projectCount: number;
     }[];
   }>;
-  readonly listFavorites: () => Promise<{ items: readonly KindItem[] }>;
-  readonly listFiles: () => Promise<{ files: readonly FileSummary[] }>;
+  readonly listFavorites: () => Promise<{ items: readonly KindItem[]; nextCursor: string | null }>;
+  readonly listFiles: () => Promise<{
+    items: readonly {
+      copyState: "failed" | "pending" | "ready";
+      id: string;
+      originalName: string;
+      projectName: string;
+      sizeBytes: number;
+    }[];
+  }>;
   readonly listMembers: () => Promise<{
     items: readonly {
       employeeId: string;
@@ -126,7 +143,6 @@ interface DomainClient {
       teamName: string | null;
     }[];
   }>;
-  readonly listMyTime: () => Promise<{ entries: readonly TimeEntry[] }>;
   readonly listTeams: () => Promise<{ items: readonly TeamSummary[] }>;
   readonly listWorkload: () => Promise<{
     people: readonly {
@@ -139,7 +155,10 @@ interface DomainClient {
   }>;
   readonly searchWorkspace: (input: {
     readonly query: { readonly q: string };
-  }) => Promise<{ hits: readonly KindItem[] }>;
+  }) => Promise<{
+    projects: readonly { id: string; name: string }[];
+    tasks: readonly { id: string; projectName: string; title: string }[];
+  }>;
 }
 
 const call = <A>(
@@ -160,8 +179,8 @@ export const myTimeProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listMyTime()), (page) =>
     rows(page.entries, (entry) => ({
       id: entry.id,
-      subtitle: `${entry.date} · ${entry.projectName} · ${entry.hours}h`,
-      title: entry.taskTitle ?? "General project time",
+      subtitle: `${entry.workDate} · ${entry.taskReference} · ${hoursOf(entry.minutes)}h`,
+      title: entry.taskTitle,
     })),
   );
 
@@ -195,13 +214,24 @@ export const budgetsProgram = (api: Api) =>
     })),
   );
 
+const BYTES_PER_KB = 1024;
+const sizeLabelOf = (bytes: number): string => {
+  if (bytes < BYTES_PER_KB) {
+    return `${bytes} B`;
+  }
+  const kb = bytes / BYTES_PER_KB;
+  return kb < BYTES_PER_KB
+    ? `${Math.round(kb)} KB`
+    : `${(kb / BYTES_PER_KB).toFixed(1)} MB`;
+};
+
 /** Files: standalone workspace files. */
 export const filesProgram = (api: Api) =>
   Effect.map(call(api, (client) => client.listFiles()), (page) =>
-    rows(page.files, (file) => ({
+    rows(page.items, (file) => ({
       id: file.id,
-      subtitle: `${file.projectName} · ${file.sizeLabel} · ${file.uploadedBy}`,
-      title: file.name,
+      subtitle: `${file.projectName} · ${sizeLabelOf(file.sizeBytes)} · ${file.copyState}`,
+      title: file.originalName,
     })),
   );
 
@@ -266,15 +296,26 @@ export const archiveProgram = (api: Api) =>
     })),
   );
 
-/** Search: projects and tasks by text. */
+/** Search: projects and tasks by text, tasks first. */
 export const searchProgram = (api: Api, query: string) =>
   Effect.map(
     call(api, (client) => client.searchWorkspace({ query: { q: query } })),
     (page) =>
-      rows(page.hits, (hit) => ({
-        id: hit.id,
-        kind: hit.kind,
-        subtitle: hit.subtitle ?? hit.kind,
-        title: hit.title,
-      })),
+      rows(
+        [
+          ...page.tasks.map((task) => ({
+            id: task.id,
+            kind: "task",
+            subtitle: task.projectName,
+            title: task.title,
+          })),
+          ...page.projects.map((project) => ({
+            id: project.id,
+            kind: "project",
+            subtitle: "Project",
+            title: project.name,
+          })),
+        ],
+        (hit) => ({ id: hit.id, kind: hit.kind, subtitle: hit.subtitle, title: hit.title }),
+      ),
   );
