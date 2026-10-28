@@ -2,7 +2,7 @@ import { it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
 import { expect } from "vitest";
 
-import { TASK_FIXTURES } from "@/api/mocks/tasks";
+import { TASK_FIXTURES, TASKS } from "@/api/mocks/tasks";
 import { makeMockMobileApiLayer } from "@/api/mock/mock-fetch";
 import { MobileApi, TokenSource } from "@/services/mobile-api";
 import { makeIdempotencyKeys, IdempotencyKeys } from "@/services/idempotency-keys";
@@ -47,7 +47,7 @@ it.effect("reads one task's detail", () =>
     Effect.gen(function* () {
       const api = yield* Effect.service(MobileApi);
 
-      const detail = yield* getTask(api, "task-1");
+      const detail = yield* getTask(api, TASKS[0]!.id);
 
       expect(detail.subtasks.length).toBe(2);
       expect(detail.labels).toEqual(["design", "launch"]);
@@ -63,13 +63,14 @@ it.effect("creates a task under an idempotency key", () =>
 
       const created = yield* keys.run("new-task", (key) =>
         createTask(api, key, {
+          assigneeIds: [],
           priority: "high",
-          projectId: "proj-1",
+          projectId: TASKS[0]!.projectId,
           title: "New from mobile",
         }),
       );
 
-      expect(created.number).toBe(14);
+      expect(created.reference).toBe("WEB-14");
     }),
   ),
 );
@@ -81,7 +82,7 @@ it.effect("moves a task status with the optimistic version", () =>
       const keys = yield* Effect.service(IdempotencyKeys);
 
       const moved = yield* keys.run("move-task-1", (key) =>
-        setTaskStatus(api, key, "task-1", 3, "done"),
+        setTaskStatus(api, key, TASKS[0]!.id, 3, "done"),
       );
 
       expect(moved.version).toBe(4);
@@ -95,11 +96,11 @@ it.effect("toggles a subtask", () =>
       const api = yield* Effect.service(MobileApi);
       const keys = yield* Effect.service(IdempotencyKeys);
 
-      const subtasks = yield* listSubtasks(api, "task-1");
+      const subtasks = yield* listSubtasks(api, TASKS[0]!.id);
       const target = subtasks.subtasks[1]!;
 
       const toggled = yield* keys.run(`sub-${target.id}`, (key) =>
-        setSubtaskStatus(api, key, "task-1", target.id, 3, !target.done),
+        setSubtaskStatus(api, key, TASKS[0]!.id, target.id, 3, !target.done),
       );
 
       expect(toggled.done).toBe(true);

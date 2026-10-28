@@ -57,7 +57,8 @@ export interface TasksQuery {
 }
 
 export interface CreateTaskInput {
-  readonly dueAt?: string | null;
+  readonly assigneeIds: readonly string[];
+  readonly dueDate?: string | null;
   readonly priority: TaskPriority;
   readonly projectId: string;
   readonly title: string;
@@ -65,7 +66,7 @@ export interface CreateTaskInput {
 
 export interface CreatedTask {
   readonly id: string;
-  readonly number: number;
+  readonly reference: string;
   readonly version: number;
 }
 

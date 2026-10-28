@@ -3,9 +3,9 @@ import type { MockFixture } from "@/api/mock/mock-fetch";
 const T1 = {
   assigneeNames: ["Ada Lovelace"],
   dueAt: "2026-11-02T00:00:00.000Z",
-  id: "task-1",
+  id: "a1b2c3d4-1111-4a11-8a11-a1b2c3d40001",
   priority: "high",
-  projectId: "proj-1",
+  projectId: "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e11",
   projectName: "Website relaunch",
   status: "progress",
   title: "Ship the landing page",
@@ -15,9 +15,9 @@ const T1 = {
 const T2 = {
   assigneeNames: ["Grace Hopper"],
   dueAt: null,
-  id: "task-2",
+  id: "a1b2c3d4-1111-4a11-8a11-a1b2c3d40002",
   priority: "medium",
-  projectId: "proj-1",
+  projectId: "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e11",
   projectName: "Website relaunch",
   status: "todo",
   title: "Draft the launch announcement",
@@ -27,9 +27,9 @@ const T2 = {
 const T3 = {
   assigneeNames: [],
   dueAt: null,
-  id: "task-3",
+  id: "a1b2c3d4-1111-4a11-8a11-a1b2c3d40003",
   priority: "low",
-  projectId: "proj-2",
+  projectId: "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e12",
   projectName: "Client portal",
   status: "done",
   title: "Set up the staging database",
@@ -56,8 +56,8 @@ export const TASK_FIXTURES: readonly MockFixture[] = [
       projectName: T1.projectName,
       status: T1.status,
       subtasks: [
-        { done: true, id: "sub-1", title: "Hero art" },
-        { done: false, id: "sub-2", title: "Launch checklist" },
+        { done: true, id: "e5f6a7b8-2222-4b22-9b22-e5f6a7b80001", title: "Hero art" },
+        { done: false, id: "e5f6a7b8-2222-4b22-9b22-e5f6a7b80002", title: "Launch checklist" },
       ],
       title: T1.title,
       version: T1.version,
@@ -65,7 +65,17 @@ export const TASK_FIXTURES: readonly MockFixture[] = [
     operationId: "getTask",
   },
   {
-    data: { id: "task-new", number: 14, version: 1 },
+    data: {
+      assigneeIds: [],
+      dueDate: null,
+      id: "task-new",
+      priority: "medium",
+      projectId: "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e11",
+      reference: "WEB-14",
+      status: "todo",
+      title: "New task",
+      version: 1,
+    },
     operationId: "createTask",
   },
   {
@@ -75,8 +85,8 @@ export const TASK_FIXTURES: readonly MockFixture[] = [
   {
     data: {
       subtasks: [
-        { done: true, id: "sub-1", title: "Hero art" },
-        { done: false, id: "sub-2", title: "Launch checklist" },
+        { done: true, id: "e5f6a7b8-2222-4b22-9b22-e5f6a7b80001", title: "Hero art" },
+        { done: false, id: "e5f6a7b8-2222-4b22-9b22-e5f6a7b80002", title: "Launch checklist" },
       ],
     },
     operationId: "listSubtasks",
