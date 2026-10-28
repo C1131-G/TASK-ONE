@@ -18,18 +18,43 @@ const stillWaiting = (
 ): boolean =>
   bug[sinceField]?.getTime() === since.getTime() && bug.status === status;
 
+// Loads the bug once and decides from that same row, so the version that guards
+// the update is the version the decision was made on. A client who answers
+// while the job runs either makes this answer false, or makes the guarded
+// update fail instead of being overwritten.
+const loadIfStillWaiting = async (
+  transaction: Transaction,
+  bugId: string,
+  status: string,
+  since: Date,
+  sinceField: "needsInfoSince" | "awaitingClientSince"
+) => {
+  const found = await transaction.orm.public.BugReport.where({
+    id: bugId,
+  }).first();
+  if (!found || !stillWaiting(found, status, since, sinceField)) {
+    return null;
+  }
+  const loaded = await loadBug(transaction, bugId);
+  return stillWaiting(loaded.bug, status, since, sinceField) ? loaded : null;
+};
+
 export const remindNeedsInfo = async (
   transaction: Transaction,
   bugId: string,
   since: Date
 ): Promise<boolean> => {
-  const found = await transaction.orm.public.BugReport.where({
-    id: bugId,
-  }).first();
-  if (!found || !stillWaiting(found, "needs_info", since, "needsInfoSince")) {
+  const loaded = await loadIfStillWaiting(
+    transaction,
+    bugId,
+    "needs_info",
+    since,
+    "needsInfoSince"
+  );
+  if (!loaded) {
     return false;
   }
-  const { bug, project, task } = await loadBug(transaction, bugId);
+  const { bug, project, task } = loaded;
   await notifyClients(transaction, bug, project, task, {
     actorId: null,
     now: new Date(),
@@ -43,13 +68,17 @@ export const autoCloseNeedsInfo = async (
   bugId: string,
   since: Date
 ): Promise<boolean> => {
-  const found = await transaction.orm.public.BugReport.where({
-    id: bugId,
-  }).first();
-  if (!found || !stillWaiting(found, "needs_info", since, "needsInfoSince")) {
+  const loaded = await loadIfStillWaiting(
+    transaction,
+    bugId,
+    "needs_info",
+    since,
+    "needsInfoSince"
+  );
+  if (!loaded) {
     return false;
   }
-  const { bug, project, task } = await loadBug(transaction, bugId);
+  const { bug, project, task } = loaded;
   const now = new Date();
   await updateBugStatus(transaction, {
     actorId: systemActorId(bug),
@@ -83,16 +112,17 @@ export const autoCloseAwaitingClient = async (
   bugId: string,
   since: Date
 ): Promise<boolean> => {
-  const found = await transaction.orm.public.BugReport.where({
-    id: bugId,
-  }).first();
-  if (
-    !found ||
-    !stillWaiting(found, "awaiting_client", since, "awaitingClientSince")
-  ) {
+  const loaded = await loadIfStillWaiting(
+    transaction,
+    bugId,
+    "awaiting_client",
+    since,
+    "awaitingClientSince"
+  );
+  if (!loaded) {
     return false;
   }
-  const { bug, project, task } = await loadBug(transaction, bugId);
+  const { bug, project, task } = loaded;
   const now = new Date();
   await updateBugStatus(transaction, {
     actorId: systemActorId(bug),
