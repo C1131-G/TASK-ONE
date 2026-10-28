@@ -88,19 +88,6 @@ export const taskRoutes = [
   },
   {
     body: Schema.Struct({
-      dueAt: Schema.optional(Schema.NullOr(Schema.String)),
-      priority: TaskPrioritySchema,
-      projectId: Schema.String,
-      title: Schema.String,
-    }),
-    data: CreatedTaskSchema,
-    method: "post",
-    operationId: "createTask",
-    path: "/api/v1/workspace/tasks",
-    summary: "Creates a task; requires an idempotency key.",
-  },
-  {
-    body: Schema.Struct({
       expectedVersion: Schema.Number,
       status: TaskStatusSchema,
     }),
@@ -118,20 +105,5 @@ export const taskRoutes = [
     params: Schema.Struct({ id: Schema.String }),
     path: "/api/v1/workspace/tasks/{id}/subtasks",
     summary: "Lists a task's subtasks in order.",
-  },
-  {
-    body: Schema.Struct({
-      done: Schema.Boolean,
-      expectedVersion: Schema.Number,
-    }),
-    data: Schema.Struct({
-      done: Schema.Boolean,
-      version: Schema.Number,
-    }),
-    method: "post",
-    operationId: "setSubtaskStatus",
-    params: Schema.Struct({ id: Schema.String, subtaskId: Schema.String }),
-    path: "/api/v1/workspace/tasks/{id}/subtasks/{subtaskId}/status",
-    summary: "Toggles one subtask with an optimistic version.",
   },
 ] as const satisfies readonly MobileRouteDefinition[];

@@ -17,19 +17,4 @@ export const PortalNotificationSchema = Schema.Struct({
   title: Schema.String,
 });
 
-export const portalMoreRoutes = [
-  {
-    data: Schema.Struct({ items: Schema.Array(ApprovalItemSchema) }),
-    method: "get",
-    operationId: "listPortalApprovals",
-    path: "/api/v1/portal/approvals",
-    summary: "Lists the client's pending and decided approvals.",
-  },
-  {
-    data: Schema.Struct({ items: Schema.Array(PortalNotificationSchema) }),
-    method: "get",
-    operationId: "listPortalNotifications",
-    path: "/api/v1/portal/notifications",
-    summary: "Lists the client's portal notifications.",
-  },
-] as const satisfies readonly MobileRouteDefinition[];
+export const portalMoreRoutes = [] as const satisfies readonly MobileRouteDefinition[];
