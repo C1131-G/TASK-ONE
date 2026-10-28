@@ -82,8 +82,11 @@ test.describe("Bugs (/bugs)", () => {
   }) => {
     await page.goto("/bugs");
 
-    await page.getByRole("link", { name: "Include archived" }).click();
-    await expect(page).toHaveURL(/archived=true/u);
+    // A click before the page hydrates is swallowed, so click until it lands.
+    await expect(async () => {
+      await page.getByRole("link", { name: "Include archived" }).click();
+      await expect(page).toHaveURL(/archived=true/u, { timeout: 2000 });
+    }).toPass({ timeout: 20_000 });
     await page.getByRole("link", { name: "Active bugs" }).click();
     await expect(page).not.toHaveURL(/archived=true/u);
     await expect(
