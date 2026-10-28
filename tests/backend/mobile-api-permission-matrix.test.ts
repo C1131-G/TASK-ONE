@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, expect, it } from "bun:test";
-import { randomUUID } from "node:crypto";
 
 import type { RouteDefinition } from "../../src/mobile-api/route-definition";
 import { mobileRoutes } from "../../src/mobile-api/routes";
@@ -11,6 +10,8 @@ import {
   teardownHarness,
 } from "./support/action-harness";
 import type { Persona } from "./support/action-harness";
+import { callRoute } from "./support/mobile-route-caller";
+import type { Answer } from "./support/mobile-route-caller";
 
 // The same gate answers every route, so the matrix asks each route as each kind
 // of caller and checks only who is let through the door. What a route does for
@@ -32,80 +33,6 @@ const audienceOf = (route: RouteDefinition): Audience | "unknown" => {
   return route.path === "/api/v1/me" || route.path.startsWith("/api/v1/me/")
     ? "any"
     : "unknown";
-};
-
-const isParameter = (segment: string): boolean =>
-  segment.startsWith("{") && segment.endsWith("}");
-
-type RouteModule = Readonly<
-  Record<
-    string,
-    (
-      request: Request,
-      context: { params: Promise<Record<string, string>> }
-    ) => Promise<Response>
-  >
->;
-
-interface Answer {
-  readonly message: string;
-  readonly path: string;
-  readonly status: number;
-}
-
-const callRoute = async (
-  route: RouteDefinition,
-  token: string
-): Promise<Answer> => {
-  const segments = route.path.replace("/api/v1/", "").split("/");
-  const folder = segments
-    .map((segment) =>
-      isParameter(segment) ? `[${segment.slice(1, -1)}]` : segment
-    )
-    .join("/");
-  const params: Record<string, string> = {};
-  const url = segments
-    .map((segment) => {
-      if (!isParameter(segment)) {
-        return segment;
-      }
-      const name = segment.slice(1, -1);
-      params[name] = randomUUID();
-      return params[name];
-    })
-    .join("/");
-  const routeModule = (await import(
-    `../../app/api/v1/${folder}/route`
-  )) as RouteModule;
-  const handler = routeModule[route.method.toUpperCase()];
-  if (!handler) {
-    throw new Error(`${route.method} is not exported for ${route.path}`);
-  }
-  const headers = new Headers();
-  if (token) {
-    headers.set("authorization", `Bearer ${token}`);
-  }
-  const isRead = route.method === "get";
-  if (!isRead) {
-    headers.set("idempotency-key", `matrix-${randomUUID()}`);
-    headers.set("content-type", "application/json");
-  }
-  const response = await handler(
-    new Request(`http://localhost:3000/api/v1/${url}`, {
-      ...(isRead ? {} : { body: "{}" }),
-      headers,
-      method: route.method.toUpperCase(),
-    }),
-    { params: Promise.resolve(params) }
-  );
-  const body = (await response.json().catch(() => null)) as {
-    error?: { message?: string };
-  } | null;
-  return {
-    message: body?.error?.message ?? "",
-    path: `${route.method.toUpperCase()} ${route.path}`,
-    status: response.status,
-  };
 };
 
 const askAll = (token: string): Promise<Answer[]> =>
