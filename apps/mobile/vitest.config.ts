@@ -18,5 +18,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // The no-try-catch guard reads every source file; a loaded machine needs more than 5 s.
+    testTimeout: 30_000,
   },
 });

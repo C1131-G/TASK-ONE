@@ -57,7 +57,8 @@ export interface TasksQuery {
 }
 
 export interface CreateTaskInput {
-  readonly dueAt?: string | null;
+  readonly assigneeIds: readonly string[];
+  readonly dueDate?: string | null;
   readonly priority: TaskPriority;
   readonly projectId: string;
   readonly title: string;
@@ -65,7 +66,7 @@ export interface CreateTaskInput {
 
 export interface CreatedTask {
   readonly id: string;
-  readonly number: number;
+  readonly reference: string;
   readonly version: number;
 }
 
@@ -76,18 +77,18 @@ interface TypedClient {
     readonly body: CreateTaskInput;
     readonly idempotencyKey: string;
   }) => Promise<CreatedTask>;
-  readonly getTask: (input: { params: { readonly id: string } }) => Promise<TaskDetail>;
-  readonly listSubtasks: (input: { params: { readonly id: string } }) => Promise<{ readonly subtasks: readonly Subtask[] }>;
+  readonly getTask: (input: { params: { readonly taskId: string } }) => Promise<TaskDetail>;
+  readonly listSubtasks: (input: { params: { readonly taskId: string } }) => Promise<{ readonly subtasks: readonly Subtask[] }>;
   readonly listTasks: (input: { readonly query?: TasksQuery }) => Promise<TasksPage>;
   readonly setSubtaskStatus: (input: {
     readonly body: { readonly done: boolean; readonly expectedVersion: number };
     readonly idempotencyKey: string;
-    readonly params: { readonly id: string; readonly subtaskId: string };
+    readonly params: { readonly subtaskId: string; readonly taskId: string };
   }) => Promise<{ readonly done: boolean; readonly version: number }>;
   readonly setTaskStatus: (input: {
     readonly body: { readonly expectedVersion: number; readonly status: TaskStatus };
     readonly idempotencyKey: string;
-    readonly params: { readonly id: string };
+    readonly params: { readonly taskId: string };
   }) => Promise<{ readonly status: TaskStatus; readonly version: number }>;
 }
 
@@ -95,13 +96,13 @@ export const listTasks = (api: Api, query: TasksQuery = {}): Effect.Effect<Tasks
   api.call((client) => (client as unknown as TypedClient).listTasks({ query }));
 
 export const getTask = (api: Api, id: string): Effect.Effect<TaskDetail, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).getTask({ params: { id } }));
+  api.call((client) => (client as unknown as TypedClient).getTask({ params: { taskId: id } }));
 
 export const listSubtasks = (
   api: Api,
   id: string,
 ): Effect.Effect<{ readonly subtasks: readonly Subtask[] }, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).listSubtasks({ params: { id } }));
+  api.call((client) => (client as unknown as TypedClient).listSubtasks({ params: { taskId: id } }));
 
 export const createTask = (
   api: Api,
@@ -123,7 +124,7 @@ export const setTaskStatus = (
     (client as unknown as TypedClient).setTaskStatus({
       body: { expectedVersion, status },
       idempotencyKey: key,
-      params: { id },
+      params: { taskId: id },
     }),
   );
 
@@ -139,6 +140,6 @@ export const setSubtaskStatus = (
     (client as unknown as TypedClient).setSubtaskStatus({
       body: { done, expectedVersion },
       idempotencyKey: key,
-      params: { id, subtaskId },
+      params: { subtaskId, taskId: id },
     }),
   );

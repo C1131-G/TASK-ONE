@@ -12,13 +12,6 @@ export const portalRoutes = [
     summary: "Lists the client's projects with progress.",
   },
   {
-    data: Schema.Struct({ bugs: Schema.Array(BugSummarySchema) }),
-    method: "get",
-    operationId: "listPortalBugs",
-    path: "/api/v1/portal/bugs",
-    summary: "Lists the client's reported bugs.",
-  },
-  {
     body: Schema.Struct({
       description: Schema.String,
       projectId: Schema.String,

@@ -68,7 +68,16 @@ const apiServing = (data: {
         catch: () => new ValidationFailed({ fieldErrors: {} }),
         try: () =>
           run({
-            listPortalBugs: () => Promise.resolve({ bugs: data.bugs ?? [] }),
+            // The live route answers with a plain array of bug summaries.
+            listPortalBugs: () =>
+              Promise.resolve(
+                (data.bugs ?? []).map((bug) => ({
+                  ...bug,
+                  impact: "medium",
+                  projectId: "proj-1",
+                  projectName: "Website relaunch",
+                })),
+              ),
             listPortalProjects: () => Promise.resolve({ projects: data.projects ?? [] }),
           }),
       }),

@@ -20,13 +20,6 @@ export const WorkspaceNotificationSchema = Schema.Struct({
 
 export const workspaceMoreRoutes = [
   {
-    data: Schema.Struct({ items: Schema.Array(ApprovalRequestSchema) }),
-    method: "get",
-    operationId: "listBugApprovals",
-    path: "/api/v1/workspace/bug-approvals",
-    summary: "Lists the bug approval requests with their status.",
-  },
-  {
     data: Schema.Struct({ items: Schema.Array(WorkspaceNotificationSchema) }),
     method: "get",
     operationId: "listNotifications",
