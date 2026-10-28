@@ -70,7 +70,9 @@ A list that can grow takes `limit` (1 to 100, default 50) and `cursor`, and answ
 
 On `GET /portal/notifications` a page is filled with rows the client can open now: rows whose bug or request is no longer visible are skipped while reading on, so a page can be shorter than `limit` only at the end of the list.
 
-Paged today: `GET /workspace/notifications`, `GET /workspace/bugs`, `GET /portal/notifications`, `GET /portal/approvals` and `GET /workspace/bug-approvals`. `GET /portal/bugs` (capped at 200) answers a bare array, so it cannot gain a cursor inside `v1`; it is listed as open below.
+Paged today: `GET /workspace/notifications`, `GET /workspace/bugs`, `GET /portal/notifications`, `GET /portal/bug-reports`, `GET /portal/approvals` and `GET /workspace/bug-approvals`.
+
+`GET /portal/bugs` answers a bare array capped at 200, so it could not gain a cursor without breaking released apps. It stays as it is, marked deprecated in the contract, and `GET /portal/bug-reports` takes its place with the same filters (`mine`, `projectId`, `status`) and the page fields. Per the versioning rules below it is kept for at least 6 months after the first app release that stops using it. The portal bug reports cursor is the last bug's position in time (newest first, id as the tie-breaker), and a page skips bugs whose task is archived while reading on, as the older list did.
 
 ### Logs
 
@@ -113,7 +115,8 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/timer` | admin, employee | read | The caller's running timer, or null when no timer is running. |
 | `POST` | `/api/v1/workspace/me/timer/start` | admin, employee | required | Start the caller's timer on an open task, saving the timer that was running before. |
 | `POST` | `/api/v1/workspace/me/timer/stop` | admin, employee | required | Stop the caller's timer and save its time as an entry. Answers 404 when none is running. |
-| `GET` | `/api/v1/portal/bugs` | client | read | The company's bug reports. |
+| `GET` | `/api/v1/portal/bugs` | client | read | Deprecated: use `/api/v1/portal/bug-reports`. The company's newest 200 bug reports, with no way to reach older ones. |
+| `GET` | `/api/v1/portal/bug-reports` | client | read | The company's bug reports, newest first, one page at a time, with the same filters. |
 | `POST` | `/api/v1/portal/bugs` | client | required | Report a bug for the client's company. |
 | `GET` | `/api/v1/portal/bugs/{bugId}` | client | read | One of the company's bug reports, with only what a client may see. |
 | `POST` | `/api/v1/portal/bugs/{bugId}/comments` | client | required | Answer the team or reply on one of the company's bug reports. |
@@ -211,10 +214,11 @@ A static read of the schema and services plus the tests above. "Fixed" items hav
 - A timer still saves its time when its task is archived while it runs (checked, and now covered by a test).
 - Bug status changes were checked by each caller, and the transition table disagreed with the code (it lacked withdraw, asking for information, the client's answer, closing as not a bug, and a client reopen to `reported` or `in_progress`). There is one table now (`bug-status-edges.ts`), built from the moves the workflow really makes, and `updateBugStatus` refuses any other move. A test lists all 169 pairs.
 - `GET /portal/approvals` and `GET /workspace/bug-approvals` had no cap and now take `limit` and `cursor` (see Pages above). `GET /portal/notifications` read only the newest 50 rows and skipped the ones the client could no longer open, so a client could never reach older notifications; it now pages through all of them.
-- `GET /portal/notifications` skipped the rate limit and the request log, because it never went through the same gate as the other routes. It does now.
+- `GET /portal/notifications` skipped the rate limit and the request log, because it never went through the same gate as the other routes. It does now, and a test calls every route and fails, naming it, if one skips the gate.
+- A client could only ever see the company's newest 200 bug reports. `GET /portal/bug-reports` pages through all of them.
 
 **Open: found, not changed**
 
-- `GET /portal/bugs` is silently capped at 200. It answers a bare array, so giving it a cursor needs an object around it, which is a `/api/v2` change.
+- `GET /portal/bugs` is still silently capped at 200 until it is switched off; it is deprecated in favour of `GET /portal/bug-reports`.
 - A file that is on an approval request can still be removed by its owner (it is hidden from the request, but the row stays until nothing references it).
 - A few web actions still check the version before the edit permission (task reschedule, client visibility, approval requests), so a person who may not edit can see a version conflict instead of a refusal. The mobile routes are consistent.
