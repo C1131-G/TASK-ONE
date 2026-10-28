@@ -29,7 +29,9 @@ const audienceOf = (route: RouteDefinition): Audience | "unknown" => {
   if (route.path.startsWith("/api/v1/portal/")) {
     return "client";
   }
-  return route.path === "/api/v1/me" ? "any" : "unknown";
+  return route.path === "/api/v1/me" || route.path.startsWith("/api/v1/me/")
+    ? "any"
+    : "unknown";
 };
 
 const isParameter = (segment: string): boolean =>
@@ -120,8 +122,6 @@ const askRoutes = async (
   return answers.filter(({ path }) => paths.has(path));
 };
 
-const ME_ONLY: ReadonlySet<string> = new Set(["GET /api/v1/me"]);
-
 const routesOf = (audience: Audience): Set<string> =>
   new Set(
     mobileRoutes
@@ -172,11 +172,17 @@ it("answers 401 on every route for a deactivated account", async () => {
 
 it("lets an account that must change its password reach only /me", async () => {
   const answers = await askAs("forced");
+  const meRoutes = routesOf("any");
 
+  expect(meRoutes.size).toBeGreaterThan(1);
   expect(
-    offenders(answers, ({ path, status }) =>
-      path === "GET /api/v1/me" ? status === 200 : status === 403
-    )
+    offenders(answers, ({ path, status }) => {
+      if (path === "GET /api/v1/me") {
+        return status === 200;
+      }
+      // The empty body is refused by the route itself, which is past the door.
+      return meRoutes.has(path) ? status === 422 : status === 403;
+    })
   ).toEqual([]);
 });
 
@@ -232,9 +238,12 @@ it("lets clients of either company through the door of every portal route", asyn
 it("answers /me for every signed-in kind of account", async () => {
   for (const persona of ["admin", "owner", "client", "otherClient"] as const) {
     // eslint-disable-next-line no-await-in-loop
-    const answers = await askRoutes(persona, ME_ONLY);
+    const answers = await askRoutes(persona, routesOf("any"));
 
-    expect(answers.map(({ status }) => status)).toEqual([200]);
+    expect(offenders(answers, (answer) => !isGate(answer))).toEqual([]);
+    expect(answers.find(({ path }) => path === "GET /api/v1/me")?.status).toBe(
+      200
+    );
   }
 });
 

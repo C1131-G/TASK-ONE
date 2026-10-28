@@ -62,6 +62,7 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | Method | Path | Who | Idempotency-Key | Purpose |
 | --- | --- | --- | --- | --- |
 | `GET` | `/api/v1/me` | any signed-in account | read | Who the bearer token belongs to. |
+| `POST` | `/api/v1/me/password` | any signed-in account | not used | Replace the caller's password, which also ends their other sessions. Open to an account that must change its password first. |
 | `GET` | `/api/v1/workspace/me/work` | admin, employee | read | Open tasks assigned to the caller: all of them, those due today or earlier, or only the overdue ones. |
 | `GET` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | read | One task with its assignees, subtasks, discussion, version and what the caller may do with it. |
 | `PATCH` | `/api/v1/workspace/tasks/{taskId}` | admin, employee | required | Change a task's status, priority, due date or assignees. Needs the version the caller last saw; a stale one answers 409. |
@@ -122,14 +123,20 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 
 ## Who may call what
 
-Every route under `/api/v1/workspace/` is for admins and employees, every route under `/api/v1/portal/` is for client accounts, and `/api/v1/me` is for any signed-in account. The gate runs before anything the caller sent is read (`readRouteInput`), so every kind of caller gets the same answer whatever is in the body:
+Every route under `/api/v1/workspace/` is for admins and employees, every route under `/api/v1/portal/` is for client accounts, and `/api/v1/me` and `/api/v1/me/password` are for any signed-in account. The gate runs before anything the caller sent is read (`readRouteInput`), so every kind of caller gets the same answer whatever is in the body:
 
 | Caller | `/me` | `/workspace/*` | `/portal/*` |
 | --- | --- | --- | --- |
 | No token, a token that was never issued, a revoked session, a deactivated account | 401 | 401 | 401 |
-| Account that must change its password first | 200 | 403 | 403 |
-| Admin or employee | 200 | allowed in | 403 |
-| Client (any company) | 200 | 403 | allowed in |
+| Account that must change its password first | allowed in | 403 | 403 |
+| Admin or employee | allowed in | allowed in | 403 |
+| Client (any company) | allowed in | 403 | allowed in |
+
+### Changing the password
+
+A new employee or client signs in with a temporary password and every workspace and portal route answers `403` ("Change your password before continuing.") until it is replaced. The app sends `POST /api/v1/me/password` with `{ "currentPassword": "…", "newPassword": "…" }` and the bearer token; no `Idempotency-Key` is needed, and the password is never stored for replay. The new password must be 12 to 128 characters. On success the answer is `{ "changed": true }`, the account is no longer forced, every other session of the account ends (this one stays), and the change is audited.
+
+A wrong current password answers `422`. Wrong current passwords count against the same lock as wrong sign-ins: after 5 in a row the account is locked for 15 minutes, and the route answers `429` (`RATE_LIMITED`) until the lock runs out. A correct change resets the count.
 
 "Allowed in" only means the caller passed the door; what the route then does is decided by the service. In particular: only a designated handler of a company may pick up its reports; only an admin, the creator or an assignee may edit a task; a client sees only its own company's bugs, approvals, files and notifications, never internal notes; and every refused write leaves the database unchanged. `tests/backend/mobile-api-permission-matrix.test.ts` asks every route in this table as each kind of caller, and `tests/backend/mobile-api-docs.test.ts` fails when this table and the route list disagree.
 
