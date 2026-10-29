@@ -13,19 +13,6 @@ import {
 import { asPortalCaller } from "./caller";
 import type { PathParams } from "./caller";
 
-export const listPortalBugs = (request: Request) =>
-  asPortalCaller(portalBugRoutes.list, request, {}, ({ actor, input }) =>
-    Effect.gen(function* list() {
-      const bugs = yield* PortalBugs;
-      const { mine, projectId, status } = input.query;
-      return yield* bugs.listBugs(actor, {
-        ...(mine === undefined ? {} : { mine: mine === "true" }),
-        ...(projectId === undefined ? {} : { projectId }),
-        ...(status === undefined ? {} : { status }),
-      });
-    })
-  );
-
 export const listPortalBugPage = (request: Request) =>
   asPortalCaller(portalBugRoutes.page, request, {}, ({ actor, input }) =>
     Effect.gen(function* page() {

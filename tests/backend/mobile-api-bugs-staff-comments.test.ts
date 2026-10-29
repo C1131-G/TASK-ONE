@@ -147,7 +147,8 @@ it("keeps an internal note out of every portal read and notice", async () => {
   });
 
   const detail = await portalDetail(bugId);
-  const { GET: list } = await submitRoute();
+  const { GET: list } =
+    await import("../../app/api/v1/portal/bug-reports/route");
   const listed = await send(list, "GET", "client");
   const notices = await authPool.query(
     'SELECT 1 FROM notification WHERE "userId" = $1 AND snippet LIKE $2',

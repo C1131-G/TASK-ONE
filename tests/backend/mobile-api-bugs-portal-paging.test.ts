@@ -45,17 +45,6 @@ const seedBug = async (
   return bugId;
 };
 
-const legacy = async (): Promise<string[]> => {
-  const { GET } = await import("../../app/api/v1/portal/bugs/route");
-  const reply = await callRoute<readonly Row[]>(
-    GET,
-    "GET",
-    "/api/v1/portal/bugs",
-    { token: personaBearerToken("client") }
-  );
-  return reply.body.data.map(({ id }) => id);
-};
-
 const page = async (query: Record<string, string>) => {
   const { GET } = await import("../../app/api/v1/portal/bug-reports/route");
   return callRoute<Page>(GET, "GET", "/api/v1/portal/bug-reports", {
@@ -85,7 +74,7 @@ const walk = async (
   return seen;
 };
 
-it("pages the company's bugs and returns what the unpaged list returns, in the same order", async () => {
+it("pages the company's bugs, newest first, in the same order as one big page", async () => {
   for (let index = 0; index < 7; index += 1) {
     // eslint-disable-next-line no-await-in-loop
     await seedBug(index * 3);
@@ -94,10 +83,10 @@ it("pages the company's bugs and returns what the unpaged list returns, in the s
   const foreign = await seedBug(1, { company: ids.otherClientCompanyId });
   const archived = await seedBug(2, { archived: true });
 
-  const unpaged = await legacy();
+  const whole = await walk(100);
   const paged = await walk(2);
 
-  expect(paged).toEqual(unpaged);
+  expect(paged).toEqual(whole);
   expect(paged.length).toBeGreaterThanOrEqual(7);
   expect(paged).not.toContain(foreign);
   expect(paged).not.toContain(archived);
@@ -131,9 +120,9 @@ it("gives no cursor when the list fits, and refuses a bad cursor or limit", asyn
   expect([badCursor.status, zero.status, huge.status]).toEqual([422, 422, 422]);
 });
 
-it("marks the old list as the capped one", async () => {
+it("names the paged list in the contract", async () => {
   const { portalBugRoutes } = await import("../../src/mobile-api/routes-bugs");
 
-  expect(portalBugRoutes.list.summary).toContain("Deprecated");
   expect(portalBugRoutes.page.operationId).toBe("listPortalBugPage");
+  expect("list" in portalBugRoutes).toBe(false);
 });

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Metsys",
+    "name": "Taskora",
     "slug": "metsys",
     "version": "0.0.1",
     "orientation": "portrait",
@@ -8,13 +8,12 @@
     "scheme": "metsys",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.cibi.metsys",
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.cibi.metsys"
     },
     "android": {
       "package": "com.cibi.metsys",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#4B5BD6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -31,7 +30,7 @@
             "backgroundColor": "#1a1a19"
           },
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 140
         }
       ]
     ],
