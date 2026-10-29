@@ -106,7 +106,13 @@ export const ProjectsScreen = () => {
 const THEME_MODES = ["system", "light", "dark"] as const;
 
 /** The settings screen: live theme controls through ThemePreferences. */
-export const SettingsScreen = ({ onSignOut }: { readonly onSignOut: () => void }) => {
+export const SettingsScreen = ({
+  onOpenNotifications,
+  onSignOut,
+}: {
+  readonly onOpenNotifications?: () => void;
+  readonly onSignOut: () => void;
+}) => {
   const { isDark, mode, setMode } = useTheme();
   const [picked, setPicked] = useState(mode);
   const { accent } = useTheme();
@@ -139,6 +145,16 @@ export const SettingsScreen = ({ onSignOut }: { readonly onSignOut: () => void }
             Effective theme: {isDark ? "dark" : "light"} · accent {accent}
           </Text>
         </View>
+        {onOpenNotifications === undefined ? null : (
+          <Pressable
+            accessibilityRole="button"
+            onPress={onOpenNotifications}
+            style={styles.radioRow}
+          >
+            <Text style={[typeStyle("md"), { color: theme.light.text }]}>Notifications</Text>
+            <Text>›</Text>
+          </Pressable>
+        )}
         <Pressable accessibilityRole="button" onPress={onSignOut} style={styles.signOut}>
           <Text style={{ color: theme.light.red }}>Sign out</Text>
         </Pressable>

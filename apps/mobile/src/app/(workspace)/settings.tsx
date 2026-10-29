@@ -10,6 +10,7 @@ export default function SettingsRoute() {
 
   return (
     <SettingsScreen
+      onOpenNotifications={() => router.push("/notification-settings")}
       onSignOut={() => {
         if (session !== null) {
           void Effect.runPromiseExit(session.signOut);
