@@ -28,4 +28,4 @@ export class PortalApprovals extends Context.Service<
       input: DecideApprovalInput
     ) => Effect.Effect<ApprovalDecisionReceipt, AppError>;
   }
->()("metsys/server/PortalApprovals") {}
+>()("taskora/server/PortalApprovals") {}

@@ -36,7 +36,7 @@ const useTheme = async (page: Page, theme: (typeof THEMES)[number]) => {
   await page.emulateMedia({ colorScheme: theme });
   await page.addInitScript((value) => {
     try {
-      localStorage.setItem("metsys-system-theme", value);
+      localStorage.setItem("taskora-system-theme", value);
     } catch {
       // Storage can be unavailable; the media query still picks the theme.
     }

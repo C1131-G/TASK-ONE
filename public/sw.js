@@ -11,11 +11,11 @@ self.addEventListener("push", (event) => {
   }
 
   const title =
-    typeof message.title === "string" ? message.title : "Metsys update";
+    typeof message.title === "string" ? message.title : "Taskora update";
   const options = {
     body: typeof message.body === "string" ? message.body : "",
     data: { url: message.url },
-    tag: typeof message.tag === "string" ? message.tag : "metsys-update",
+    tag: typeof message.tag === "string" ? message.tag : "taskora-update",
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });

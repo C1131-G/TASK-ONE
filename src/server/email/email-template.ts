@@ -57,7 +57,7 @@ const compose = (
       "",
     ]),
     "--",
-    `You get this because of your Metsys email settings. Unsubscribe: ${unsubscribe}`,
+    `You get this because of your Taskora email settings. Unsubscribe: ${unsubscribe}`,
   ].join("\n");
   const itemsHtml = items
     .map(
@@ -65,7 +65,7 @@ const compose = (
         `<p><a href="${escapeHtml(absoluteUrl(context.baseUrl, item.url))}"><strong>${escapeHtml(item.title)}</strong></a>${item.body ? `<br>${escapeHtml(item.body)}` : ""}</p>`
     )
     .join("");
-  const html = `<p>Hi ${escapeHtml(context.recipientName)},</p>${itemsHtml}<hr><p style="font-size:12px;color:#666">You get this because of your Metsys email settings. <a href="${escapeHtml(unsubscribe)}">Unsubscribe</a></p>`;
+  const html = `<p>Hi ${escapeHtml(context.recipientName)},</p>${itemsHtml}<hr><p style="font-size:12px;color:#666">You get this because of your Taskora email settings. <a href="${escapeHtml(unsubscribe)}">Unsubscribe</a></p>`;
   return {
     headers: {
       "List-Unsubscribe": `<${unsubscribe}>`,
@@ -93,6 +93,6 @@ export const renderDigestEmail = (
 ): RenderedEmail =>
   compose(
     input,
-    `Your Metsys digest: ${input.items.length} update${input.items.length === 1 ? "" : "s"}`,
+    `Your Taskora digest: ${input.items.length} update${input.items.length === 1 ? "" : "s"}`,
     input.items
   );

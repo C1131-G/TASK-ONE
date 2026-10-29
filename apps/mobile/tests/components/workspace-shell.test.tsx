@@ -99,7 +99,7 @@ it("shows the account identity and signs out", async () => {
   const user = userEvent.setup();
   await renderWithTheme(
     <WorkspaceAccountMenu
-      email="ada@metsys.test"
+      email="ada@taskora.test"
       name="Ada Lovelace"
       onClose={() => undefined}
       onSignOut={() => (signedOut = true)}
@@ -108,7 +108,7 @@ it("shows the account identity and signs out", async () => {
   );
 
   expect(screen.getByText("Ada Lovelace")).toBeTruthy();
-  expect(screen.getByText("ada@metsys.test")).toBeTruthy();
+  expect(screen.getByText("ada@taskora.test")).toBeTruthy();
 
   await user.press(screen.getByRole("button", { name: "Sign out" }));
 

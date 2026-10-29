@@ -9,8 +9,8 @@ import { RequestAccessSteps } from "@/features/user/components/request-access-st
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
-  description: "Request an employee account for the Metsys workspace.",
-  title: "Request access | Metsys",
+  description: "Request an employee account for the Taskora workspace.",
+  title: "Request access | Taskora",
 };
 
 const WORKSPACE_PATH: Route = "/";
@@ -31,7 +31,7 @@ const Page = () => (
   <PageTransition>
     <AuthCard
       badge={<UserPlus size={22} weight="duotone" />}
-      description="Metsys accounts are created by an administrator."
+      description="Taskora accounts are created by an administrator."
       title="Request access"
       titleId="signup-title"
     >

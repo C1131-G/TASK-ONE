@@ -10,7 +10,7 @@ import {
   WorkloadGridSkeleton,
 } from "@/features/workload/components/workload-grid";
 
-export const metadata: Metadata = { title: "Workload | Metsys" };
+export const metadata: Metadata = { title: "Workload | Taskora" };
 
 const WorkloadPage = () => (
   <PageTransition>

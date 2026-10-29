@@ -24,7 +24,7 @@ export interface PushTransportApi {
 export class PushTransport extends Context.Service<
   PushTransport,
   PushTransportApi
->()("metsys/server/PushTransport") {}
+>()("taskora/server/PushTransport") {}
 
 const makePushTransport = (): PushTransportApi => ({
   send: (subscription, message) =>

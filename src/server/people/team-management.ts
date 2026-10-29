@@ -47,7 +47,7 @@ export class TeamManagement extends Context.Service<
       teamId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/TeamManagement") {}
+>()("taskora/server/TeamManagement") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

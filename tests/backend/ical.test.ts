@@ -43,7 +43,7 @@ it("writes date-only task due dates as all-day values and timed events in UTC", 
         title: "Planning; kickoff",
       },
     ],
-    name: "Metsys",
+    name: "Taskora",
     now,
     tasks: [
       {
@@ -58,11 +58,11 @@ it("writes date-only task due dates as all-day values and timed events in UTC", 
 
   expect(text.endsWith("\r\n")).toBe(true);
   expect(text.startsWith("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n")).toBe(true);
-  expect(text).toContain("PRODID:-//Metsys//Calendar feed//EN\r\n");
+  expect(text).toContain("PRODID:-//Taskora//Calendar feed//EN\r\n");
   expect(text).toContain("DTSTART;VALUE=DATE:20260331\r\n");
   expect(text).toContain("DTEND;VALUE=DATE:20260401\r\n");
   expect(text).toContain(
-    "UID:task-22222222-2222-4222-8222-222222222222@metsys\r\n"
+    "UID:task-22222222-2222-4222-8222-222222222222@taskora\r\n"
   );
   expect(text).toContain("SUMMARY:Ship it\r\n");
   expect(text).toContain("DTSTART:20260305T090000Z\r\n");
@@ -76,7 +76,7 @@ it("writes date-only task due dates as all-day values and timed events in UTC", 
 it("cannot be tricked into new properties by line breaks in titles", () => {
   const text = buildCalendar({
     events: [],
-    name: "Metsys",
+    name: "Taskora",
     now,
     tasks: [
       {
@@ -94,7 +94,7 @@ it("cannot be tricked into new properties by line breaks in titles", () => {
 });
 
 it("renders an empty feed as a valid calendar", () => {
-  const text = buildCalendar({ events: [], name: "Metsys", now, tasks: [] });
+  const text = buildCalendar({ events: [], name: "Taskora", now, tasks: [] });
   expect(text).not.toContain("BEGIN:VEVENT");
   expect(text).toContain("END:VCALENDAR\r\n");
 });

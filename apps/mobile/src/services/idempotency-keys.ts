@@ -56,7 +56,7 @@ export class IdempotencyKeys extends Context.Service<
     /** Drops the stored key for an intent (used when a screen abandons an unsettled write). */
     readonly forget: (intent: string) => Effect.Effect<void>;
   }
->()("metsys/mobile/IdempotencyKeys") {}
+>()("taskora/mobile/IdempotencyKeys") {}
 
 const newKey = Effect.map(
   Effect.all([Random.nextIntBetween(0x10000, 0xfffff), Random.nextIntBetween(0x10000, 0xfffff)]),

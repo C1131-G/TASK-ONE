@@ -43,7 +43,7 @@ const MembersSection = async ({
 
 const MembersCount = async () => {
   const employees = readOrThrow(await listAllEmployees(), "Members");
-  return `${employees.length} people in your Metsys workspace.`;
+  return `${employees.length} people in your Taskora workspace.`;
 };
 
 // Only admins add members; others see no action, so there is no space to hold.

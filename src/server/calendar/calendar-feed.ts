@@ -245,7 +245,7 @@ const render = (token: string, now: Date) =>
       ]);
       return buildCalendar({
         events,
-        name: `Metsys - ${user.name}`,
+        name: `Taskora - ${user.name}`,
         now,
         tasks,
       });
@@ -268,7 +268,7 @@ export class CalendarFeed extends Context.Service<
       now: Date
     ) => Effect.Effect<string, AppError>;
   }
->()("metsys/server/CalendarFeed") {}
+>()("taskora/server/CalendarFeed") {}
 
 export const CalendarFeedLive = Layer.succeed(CalendarFeed, {
   render,

@@ -29,7 +29,7 @@ describe("mail transport", () => {
     const sent: unknown[] = [];
     const config = mailConfigFromEnv(
       parseEmailEnv({
-        EMAIL_FROM: "Metsys <no-reply@example.com>",
+        EMAIL_FROM: "Taskora <no-reply@example.com>",
         SMTP_HOST: "smtp.example.com",
         SMTP_PASSWORD: "secret-password",
         SMTP_USER: "mailer",
@@ -44,7 +44,7 @@ describe("mail transport", () => {
     expect(await Effect.runPromise(transport.send(message))).toBe("sent");
     expect(sent).toEqual([
       {
-        from: "Metsys <no-reply@example.com>",
+        from: "Taskora <no-reply@example.com>",
         headers: message.headers,
         html: message.html,
         subject: message.subject,

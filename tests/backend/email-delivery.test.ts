@@ -240,7 +240,7 @@ describe("daily email digest", () => {
       ({ to }) => to === `${userId}@email-delivery.example`
     );
     expect(digests).toHaveLength(1);
-    expect(digests[0]?.subject).toBe("Your Metsys digest: 2 updates");
+    expect(digests[0]?.subject).toBe("Your Taskora digest: 2 updates");
     expect(digests[0]?.text).toContain("Assigned to you");
     expect(digests[0]?.text).not.toContain("Not enabled");
     expect(digests[0]?.text).not.toContain("Too old");
@@ -314,7 +314,7 @@ describe("daily email digest", () => {
     const digest = sentMessages.find(
       ({ to }) => to === `${userId}@email-delivery.example`
     );
-    expect(digest?.subject).toBe("Your Metsys digest: 1 update");
+    expect(digest?.subject).toBe("Your Taskora digest: 1 update");
   });
 
   it("sends nothing outside the local morning hour or without news", async () => {

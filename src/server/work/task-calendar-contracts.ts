@@ -79,4 +79,4 @@ export class TaskCalendar extends Context.Service<
       query: TaskCalendarQuery
     ) => Effect.Effect<readonly TaskCalendarEntry[], AppError>;
   }
->()("metsys/server/TaskCalendar") {}
+>()("taskora/server/TaskCalendar") {}

@@ -16,7 +16,7 @@ export class Haptics extends Context.Service<
     /** A warning notification: a conflict or refused action. */
     readonly warning: Effect.Effect<void>;
   }
->()("metsys/mobile/Haptics") {}
+>()("taskora/mobile/Haptics") {}
 
 /** The recorded calls of the stub layer. */
 export interface HapticsCalls {

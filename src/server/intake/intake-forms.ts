@@ -211,7 +211,7 @@ export class IntakeFormManagement extends Context.Service<
       input: SetIntakeFormEnabledInput
     ) => Effect.Effect<IntakeFormReceipt, AppError>;
   }
->()("metsys/server/IntakeFormManagement") {}
+>()("taskora/server/IntakeFormManagement") {}
 
 export const IntakeFormManagementLive = Layer.succeed(
   IntakeFormManagement,

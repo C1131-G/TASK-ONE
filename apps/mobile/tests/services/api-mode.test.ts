@@ -50,7 +50,7 @@ it.effect("answers a pending operation from its fixture and sends live ones to t
     yield* Effect.exit(api.call((client) => client.getMe()));
 
     expect(bugs.items.length).toBeGreaterThan(0);
-    expect(liveUrls).toEqual(["https://mock.metsys.invalid/api/v1/me"]);
+    expect(liveUrls).toEqual(["https://mock.taskora.invalid/api/v1/me"]);
   }),
 );
 

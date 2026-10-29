@@ -36,7 +36,7 @@ export class TaskRelations extends Context.Service<
       input: TaskRelationInput
     ) => Effect.Effect<TaskRelationResult, AppError>;
   }
->()("metsys/server/TaskRelations") {}
+>()("taskora/server/TaskRelations") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

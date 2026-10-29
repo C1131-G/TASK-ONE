@@ -92,7 +92,7 @@ export const WorkspaceBottomNavigation = ({
           side="left"
         >
           <SheetHeader>
-            <SheetTitle>Metsys</SheetTitle>
+            <SheetTitle>Taskora</SheetTitle>
           </SheetHeader>
           <nav aria-label="Workspace" className="mobile-navigation-scroll">
             {mobileNavigation}

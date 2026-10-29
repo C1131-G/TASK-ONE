@@ -106,7 +106,7 @@ export class BugApprovalInbox extends Context.Service<
       actorId: string
     ) => Effect.Effect<readonly BugApprovalInboxItem[], AppError>;
   }
->()("metsys/server/BugApprovalInbox") {}
+>()("taskora/server/BugApprovalInbox") {}
 
 export const BugApprovalInboxLive = Layer.succeed(
   BugApprovalInbox,

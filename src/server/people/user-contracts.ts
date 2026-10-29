@@ -137,4 +137,4 @@ export class UserManagement extends Context.Service<
       userId: string
     ) => Effect.Effect<boolean, AppError>;
   }
->()("metsys/server/UserManagement") {}
+>()("taskora/server/UserManagement") {}

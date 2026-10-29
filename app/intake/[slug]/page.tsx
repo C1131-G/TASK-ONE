@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Report a problem to the team.",
   referrer: "no-referrer",
   robots: { follow: false, index: false },
-  title: "Report a problem | Metsys",
+  title: "Report a problem | Taskora",
 };
 
 const Page = ({ params }: PageProps<"/intake/[slug]">) => (

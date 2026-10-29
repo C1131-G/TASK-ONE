@@ -37,7 +37,7 @@ interface WorkspaceComboboxProps {
   readonly value?: string;
 }
 
-const EMPTY_VALUE = "__metsys_empty_combobox_value__";
+const EMPTY_VALUE = "__taskora_empty_combobox_value__";
 
 const WorkspaceCombobox = ({
   ariaLabel,

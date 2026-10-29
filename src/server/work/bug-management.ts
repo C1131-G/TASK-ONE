@@ -208,7 +208,7 @@ export class BugManagement extends Context.Service<
       input: BugListInput
     ) => Effect.Effect<typeof BugListSchema.Type, AppError>;
   }
->()("metsys/server/BugManagement") {}
+>()("taskora/server/BugManagement") {}
 
 export const BugManagementLive = Layer.succeed(
   BugManagement,

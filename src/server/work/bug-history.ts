@@ -21,7 +21,7 @@ export class BugHistory extends Context.Service<
       bugId: string
     ) => Effect.Effect<typeof BugHistorySchema.Type, AppError>;
   }
->()("metsys/server/BugHistory") {}
+>()("taskora/server/BugHistory") {}
 
 interface StaffCandidate {
   readonly deactivatedAt: Date | null;

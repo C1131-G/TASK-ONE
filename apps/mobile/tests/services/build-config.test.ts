@@ -19,8 +19,8 @@ it("builds an installable APK for the preview profile", () => {
 });
 
 it("gives the app a stable package and bundle id for both stores", () => {
-  expect(expo.android.package).toBe("com.cibi.metsys");
-  expect(expo.ios.bundleIdentifier).toBe("com.cibi.metsys");
+  expect(expo.android.package).toBe("com.cibi.taskora");
+  expect(expo.ios.bundleIdentifier).toBe("com.cibi.taskora");
 });
 
 it("only uses API modes the app understands, and ships production live", () => {

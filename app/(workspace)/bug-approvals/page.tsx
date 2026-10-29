@@ -8,7 +8,7 @@ import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { BugApprovalList } from "@/features/bugs/components/bug-approval-list";
 
-export const metadata: Metadata = { title: "Bug approvals | Metsys" };
+export const metadata: Metadata = { title: "Bug approvals | Taskora" };
 
 const BugApprovalPage = () => (
   <PageTransition>

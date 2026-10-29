@@ -81,7 +81,7 @@ export async function GET(
     return new Response(outcome.calendar, {
       headers: {
         "cache-control": `private, max-age=${POLL_CACHE_SECONDS}`,
-        "content-disposition": 'inline; filename="metsys.ics"',
+        "content-disposition": 'inline; filename="taskora.ics"',
         "content-type": "text/calendar; charset=utf-8",
         "referrer-policy": "no-referrer",
         "x-content-type-options": "nosniff",

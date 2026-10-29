@@ -69,7 +69,7 @@ it.effect("signs in, persists the token and exposes the me payload", () =>
   Effect.gen(function* () {
     const session = yield* Effect.service(Session);
 
-    const state = yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+    const state = yield* session.signIn({ email: "c@taskora.test", password: "secret" });
 
     expect(state.kind).toBe("authenticated");
     expect(state.kind === "authenticated" ? state.me.role : null).toBe("client");
@@ -97,7 +97,7 @@ it.effect("restore validates a stored token and reports anonymous without one", 
 it.effect("sign out revokes the server session and clears state", () =>
   Effect.gen(function* () {
     const session = yield* Effect.service(Session);
-    yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+    yield* session.signIn({ email: "c@taskora.test", password: "secret" });
 
     yield* session.signOut;
 
@@ -110,7 +110,7 @@ it.effect("signs a client out after the idle timeout in the background", () =>
     Effect.gen(function* () {
       const lifecycle = yield* makeAppLifecycleTest();
       const session = yield* Effect.service(Session);
-      yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+      yield* session.signIn({ email: "c@taskora.test", password: "secret" });
       yield* SubscriptionRef.set(lifecycle.ref, "background");
 
       yield* Effect.forkScoped(session.watchClientIdle(lifecycle.changes, "2 hours"));
@@ -129,7 +129,7 @@ it.effect("keeps a client signed in when the app returns to the foreground", () 
     Effect.gen(function* () {
       const lifecycle = yield* makeAppLifecycleTest();
       const session = yield* Effect.service(Session);
-      yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+      yield* session.signIn({ email: "c@taskora.test", password: "secret" });
       yield* SubscriptionRef.set(lifecycle.ref, "background");
 
       yield* Effect.forkScoped(session.watchClientIdle(lifecycle.changes, "2 hours"));
@@ -164,7 +164,7 @@ it.effect("never times out a staff session", () =>
 it.effect("changes the password and surfaces the server field error", () =>
   Effect.gen(function* () {
     const session = yield* Effect.service(Session);
-    yield* session.signIn({ email: "c@metsys.test", password: "secret" });
+    yield* session.signIn({ email: "c@taskora.test", password: "secret" });
 
     yield* session.changeOwnPassword({ currentPassword: "old-pass", newPassword: "new-pass" });
 

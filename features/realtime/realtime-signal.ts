@@ -1,4 +1,4 @@
-const REALTIME_REFRESHED = "metsys:realtime-refreshed";
+const REALTIME_REFRESHED = "taskora:realtime-refreshed";
 
 // Tells client state that holds its own copy of server data, such as the open
 // task drawer, that the server reported a change and it should read again.

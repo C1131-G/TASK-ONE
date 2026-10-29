@@ -10,7 +10,7 @@ import {
   FavoriteWorkSkeleton,
 } from "@/features/discovery/components/favorite-work";
 
-export const metadata: Metadata = { title: "Favorites | Metsys" };
+export const metadata: Metadata = { title: "Favorites | Taskora" };
 
 const FavoritesPage = () => (
   <PageTransition>

@@ -111,7 +111,7 @@ test("the notify publisher sends one JSON payload per event on the channel", asy
   expect(calls).toHaveLength(1);
   expect(calls[0]?.sql).toContain("pg_notify");
   expect(calls[0]?.values).toEqual([
-    "metsys_realtime",
+    "taskora_realtime",
     [JSON.stringify(event)],
   ]);
 });

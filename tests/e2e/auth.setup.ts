@@ -21,7 +21,7 @@ setup("admin signs in once", async ({ page }) => {
   );
   await page.goto("/login");
   await expect(page.locator('form[data-hydrated="true"]')).toBeVisible();
-  await page.fill('input[name="email"]', "ui-admin@metsys.test");
+  await page.fill('input[name="email"]', "ui-admin@taskora.test");
   await page.fill(
     'input[name="password"]',
     process.env["E2E_ADMIN_PASSWORD"] ?? ""
@@ -43,7 +43,7 @@ setup("employee signs in once", async ({ page }) => {
   );
   await page.goto("/login");
   await expect(page.locator('form[data-hydrated="true"]')).toBeVisible();
-  await page.fill('input[name="email"]', "ui-employee@metsys.test");
+  await page.fill('input[name="email"]', "ui-employee@taskora.test");
   await page.fill(
     'input[name="password"]',
     process.env["E2E_EMPLOYEE_PASSWORD"] ?? ""

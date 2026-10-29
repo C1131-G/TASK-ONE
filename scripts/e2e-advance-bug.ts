@@ -13,7 +13,7 @@ import {
 // spec calls it in place of clicking through the internal fix pages.
 //
 // Usage: bun scripts/e2e-advance-bug.ts "<exact bug title>"
-// The assignee does the engineering steps; ui-admin@metsys.test approves and
+// The assignee does the engineering steps; ui-admin@taskora.test approves and
 // releases.
 
 const title = process.argv.at(2);
@@ -36,7 +36,7 @@ const found = await authPool.query<{
   [title]
 );
 const admin = await authPool.query<{ id: string }>(
-  'SELECT id FROM "user" WHERE "emailNormalized" = \'ui-admin@metsys.test\''
+  'SELECT id FROM "user" WHERE "emailNormalized" = \'ui-admin@taskora.test\''
 );
 const [bug] = found.rows;
 const adminId = admin.rows[0]?.id;

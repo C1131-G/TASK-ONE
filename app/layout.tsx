@@ -19,9 +19,8 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description:
-    "Metsys Task System keeps your team’s projects and work in one workspace.",
-  title: "Metsys Task System",
+  description: "Taskora: plan smarter. Get more done.",
+  title: "Taskora",
 };
 
 export const viewport: Viewport = {

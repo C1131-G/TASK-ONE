@@ -3,7 +3,7 @@ import { Effect, Schema } from "effect";
 import { NotFound } from "@/errors";
 
 /**
- * Deep links arrive as metsys://<area>/<id>?<query> or app-scheme https
+ * Deep links arrive as taskora://<area>/<id>?<query> or app-scheme https
  * URLs. Everything is decoded with Schema; anything that does not fit is
  * NotFound and the caller renders the not-found screen.
  */
@@ -50,7 +50,7 @@ export const parseDeepLink = (url: string): Effect.Effect<DeepLink, NotFound> =>
   Effect.flatMap(
     Effect.try({
       catch: () => new NotFound(),
-      try: () => new URL(url.replace(/^metsys:\/\//u, "https://deep-link.invalid/")),
+      try: () => new URL(url.replace(/^taskora:\/\//u, "https://deep-link.invalid/")),
     }),
     (parsed) => {
       const rawPath = parsed.pathname.replace(/\/+$/u, "") || "/";

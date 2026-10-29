@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
 // The Postgres NOTIFY channel every process listens on.
-export const REALTIME_CHANNEL = "metsys_realtime";
+export const REALTIME_CHANNEL = "taskora_realtime";
 
 const uuid = Schema.String.check(Schema.isUUID());
 

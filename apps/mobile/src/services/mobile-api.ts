@@ -17,7 +17,7 @@ export class TokenSource extends Context.Service<
     /** Reacts to a 401 by clearing the session. */
     readonly onUnauthenticated: Effect.Effect<void>;
   }
->()("metsys/mobile/TokenSource") {}
+>()("taskora/mobile/TokenSource") {}
 
 export interface MobileApiDeps {
   /** The app origin, without a trailing slash. */
@@ -36,7 +36,7 @@ export class MobileApi extends Context.Service<
      */
     readonly call: <A>(run: (client: MobileClient) => Promise<A>) => Effect.Effect<A, AppFailure>;
   }
->()("metsys/mobile/MobileApi") {}
+>()("taskora/mobile/MobileApi") {}
 
 export const makeMobileApi = (deps: MobileApiDeps) =>
   Effect.map(Effect.service(TokenSource), (tokens) =>

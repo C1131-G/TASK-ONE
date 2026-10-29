@@ -51,7 +51,7 @@ export class WebhookManagement extends Context.Service<
       deliveryId: string
     ) => Effect.Effect<WebhookDeliverySummary, AppError>;
   }
->()("metsys/server/WebhookManagement") {}
+>()("taskora/server/WebhookManagement") {}
 
 const attempt = <Value>(run: () => Promise<Value>) =>
   Effect.tryPromise({ catch: mapError, try: run });

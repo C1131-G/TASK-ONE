@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Not found | Metsys" };
+export const metadata: Metadata = { title: "Not found | Taskora" };
 
 // Rendered inside the portal shell when a bug page calls notFound().
 const PortalNotFound = () => (

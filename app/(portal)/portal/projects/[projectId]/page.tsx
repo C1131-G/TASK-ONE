@@ -16,7 +16,7 @@ export const generateMetadata = async ({
 }: PageProps<"/portal/projects/[projectId]">): Promise<Metadata> => {
   const { projectId } = await params;
   const result = await getPortalSharedProjectById(projectId);
-  return { title: `${result.ok ? result.data.name : "Project"} | Metsys` };
+  return { title: `${result.ok ? result.data.name : "Project"} | Taskora` };
 };
 
 const Page = ({ params }: PageProps<"/portal/projects/[projectId]">) => (

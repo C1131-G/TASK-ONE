@@ -14,7 +14,7 @@ const GlobalError = ({ retry }: { readonly retry: () => void }) => {
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <title>Application error | Metsys</title>
+        <title>Application error | Taskora</title>
         <main className="grid min-h-dvh place-items-center p-6">
           <section
             aria-live="polite"

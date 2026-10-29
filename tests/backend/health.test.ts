@@ -23,7 +23,7 @@ process.env["BETTER_AUTH_SECRET"] ??=
 const passing = () => Promise.resolve();
 const SLOW_PROBE_MS = 200;
 const slow = () => Bun.sleep(SLOW_PROBE_MS);
-const SECRET_DETAIL = "password authentication failed for user metsys";
+const SECRET_DETAIL = "password authentication failed for user taskora";
 
 it("reports liveness without touching any dependency", async () => {
   const { GET } = await import("../../app/api/health/live/route");

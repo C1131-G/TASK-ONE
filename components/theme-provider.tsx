@@ -10,7 +10,7 @@ const ThemeProvider = ({
     attribute="class"
     defaultTheme="system"
     enableSystem
-    storageKey="metsys-system-theme"
+    storageKey="taskora-system-theme"
     disableTransitionOnChange
     {...props}
   >

@@ -16,7 +16,7 @@ import {
 } from "@/features/people/components/members-section";
 import { parseMembersSection } from "@/features/people/members-section-param";
 
-export const metadata: Metadata = { title: "Members | Metsys" };
+export const metadata: Metadata = { title: "Members | Taskora" };
 
 const MembersPage = ({ searchParams }: PageProps<"/members">) => (
   <PageTransition>

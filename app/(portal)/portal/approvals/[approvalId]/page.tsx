@@ -17,7 +17,7 @@ export const generateMetadata = async ({
   const { approvalId } = await params;
   const result = await getPortalApprovalById(approvalId);
   return {
-    title: `${result.ok ? result.data.subjectTitle : "Approval"} | Metsys`,
+    title: `${result.ok ? result.data.subjectTitle : "Approval"} | Taskora`,
   };
 };
 

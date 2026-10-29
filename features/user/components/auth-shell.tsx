@@ -23,7 +23,7 @@ const AuthLogo = () => (
         />
       </svg>
     </span>
-    Metsys
+    Taskora
   </span>
 );
 
@@ -47,7 +47,7 @@ const AuthShell = ({ children }: { readonly children: ReactNode }) => (
     </main>
     <footer className="auth-foot">
       <LockSimple aria-hidden="true" size={12} weight="bold" />
-      Secured workspace sign-in · Metsys
+      Secured workspace sign-in · Taskora
     </footer>
   </div>
 );

@@ -228,4 +228,4 @@ export class ProjectManagement extends Context.Service<
       projectId: string
     ) => Effect.Effect<ProjectMilestonesResult, AppError>;
   }
->()("metsys/server/ProjectManagement") {}
+>()("taskora/server/ProjectManagement") {}

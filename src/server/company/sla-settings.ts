@@ -152,7 +152,7 @@ export class SlaSettingsManagement extends Context.Service<
       input: SlaSettingsInput
     ) => Effect.Effect<SlaSettingsValues, AppError>;
   }
->()("metsys/server/SlaSettingsManagement") {}
+>()("taskora/server/SlaSettingsManagement") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

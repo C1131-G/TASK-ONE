@@ -142,7 +142,7 @@ export const auth = betterAuth({
   advanced: {
     ipAddress: { ipAddressHeaders: [RESOLVED_CLIENT_IP_HEADER] },
   },
-  appName: "Metsys",
+  appName: "Taskora",
   baseURL: process.env["BETTER_AUTH_URL"],
   database: authPool,
   databaseHooks: {

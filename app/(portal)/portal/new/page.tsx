@@ -13,7 +13,7 @@ import { parsePortalReportFrom } from "@/features/portal/portal-filters";
 
 export const metadata: Metadata = {
   description: "Report a bug on one of your projects.",
-  title: "Report a bug | Metsys",
+  title: "Report a bug | Taskora",
 };
 
 const Page = ({ searchParams }: PageProps<"/portal/new">) => (

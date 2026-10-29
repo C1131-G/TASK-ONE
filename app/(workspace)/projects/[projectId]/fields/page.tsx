@@ -12,7 +12,7 @@ import {
   ProjectCustomFieldsSkeleton,
 } from "@/features/custom-fields/components/project-custom-fields";
 
-export const metadata: Metadata = { title: "Custom fields | Metsys" };
+export const metadata: Metadata = { title: "Custom fields | Taskora" };
 
 const ProjectCustomFieldsPage = ({
   params,

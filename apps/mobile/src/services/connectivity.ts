@@ -11,7 +11,7 @@ export class Connectivity extends Context.Service<
     readonly changes: Stream.Stream<boolean>;
     readonly isOnline: Effect.Effect<boolean>;
   }
->()("metsys/mobile/Connectivity") {}
+>()("taskora/mobile/Connectivity") {}
 
 /** The service value screens and wiring receive. */
 export type ConnectivityService = Connectivity["Service"];

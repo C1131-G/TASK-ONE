@@ -10,7 +10,7 @@ import {
   ArchivedWork,
 } from "@/features/archive/components/archived-work";
 
-export const metadata: Metadata = { title: "Archive | Metsys" };
+export const metadata: Metadata = { title: "Archive | Taskora" };
 
 const ArchivePage = () => (
   <PageTransition>

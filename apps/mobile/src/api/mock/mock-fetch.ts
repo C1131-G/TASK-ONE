@@ -139,7 +139,7 @@ export const createHybridFetch = (options: HybridFetchOptions): typeof fetch => 
   };
 };
 
-export const MOCK_BASE_URL = "https://mock.metsys.invalid";
+export const MOCK_BASE_URL = "https://mock.taskora.invalid";
 
 /** Assembles the MobileApi layer whose mocked domains answer from fixtures. */
 export const makeMockMobileApiLayer = (

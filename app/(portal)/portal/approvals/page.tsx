@@ -12,7 +12,7 @@ import {
 
 export const metadata: Metadata = {
   description: "Deliverables the team asks your company to review.",
-  title: "Approvals | Metsys",
+  title: "Approvals | Taskora",
 };
 
 const Page = () => (

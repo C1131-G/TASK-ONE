@@ -80,7 +80,7 @@ const textLine = (name: string, value: string): string =>
 
 const taskLines = (task: FeedTask, stamp: string): string[] => [
   "BEGIN:VEVENT",
-  `UID:task-${task.id}@metsys`,
+  `UID:task-${task.id}@taskora`,
   `DTSTAMP:${stamp}`,
   `DTSTART;VALUE=DATE:${compactDate(task.dueDate)}`,
   `DTEND;VALUE=DATE:${compactDate(nextDate(task.dueDate))}`,
@@ -93,7 +93,7 @@ const taskLines = (task: FeedTask, stamp: string): string[] => [
 
 const eventLines = (event: FeedEvent, stamp: string): string[] => [
   "BEGIN:VEVENT",
-  `UID:event-${event.id}@metsys`,
+  `UID:event-${event.id}@taskora`,
   `DTSTAMP:${stamp}`,
   `DTSTART:${utcStamp(event.startsAt)}`,
   ...(event.endsAt ? [`DTEND:${utcStamp(event.endsAt)}`] : []),
@@ -108,7 +108,7 @@ export const buildCalendar = (input: CalendarInput): string => {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Metsys//Calendar feed//EN",
+    "PRODID:-//Taskora//Calendar feed//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     textLine("X-WR-CALNAME", input.name),

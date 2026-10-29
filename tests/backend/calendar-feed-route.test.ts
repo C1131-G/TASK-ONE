@@ -64,7 +64,7 @@ it("serves a calendar feed without any cookie and with the right headers", async
     expect(response.headers.get("x-content-type-options")).toBe("nosniff");
     const body = await response.text();
     expect(body.startsWith("BEGIN:VCALENDAR\r\n")).toBe(true);
-    expect(body).toContain("X-WR-CALNAME:Metsys - Route Viewer");
+    expect(body).toContain("X-WR-CALNAME:Taskora - Route Viewer");
 
     const bare = await call(token, "198.51.100.10");
     expect(bare.status).toBe(200);

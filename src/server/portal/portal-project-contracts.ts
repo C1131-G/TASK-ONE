@@ -69,4 +69,4 @@ export class PortalProjects extends Context.Service<
       projectId: string
     ) => Effect.Effect<PortalSharedProjectDetail, AppError>;
   }
->()("metsys/server/PortalProjects") {}
+>()("taskora/server/PortalProjects") {}

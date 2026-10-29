@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const EMPTY_VALUE = "__metsys_empty_select_value__";
+const EMPTY_VALUE = "__taskora_empty_select_value__";
 
 const WorkspaceSelect = ({
   ariaInvalid,

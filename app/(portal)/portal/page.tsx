@@ -17,7 +17,7 @@ import {
 
 export const metadata: Metadata = {
   description: "Every bug your company has reported.",
-  title: "Company bugs | Metsys",
+  title: "Company bugs | Taskora",
 };
 
 const Page = ({ searchParams }: PageProps<"/portal">) => (

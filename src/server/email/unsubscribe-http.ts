@@ -21,7 +21,7 @@ const invalidLink = (): Response =>
   page(
     400,
     "This link is not valid",
-    "<p>Open the unsubscribe link from a recent Metsys email, or change your email settings in Metsys.</p>"
+    "<p>Open the unsubscribe link from a recent Taskora email, or change your email settings in Taskora.</p>"
   );
 
 const userFromRequest = (request: Request): string | null => {
@@ -41,7 +41,7 @@ export const unsubscribePage = (request: Request): Response => {
   const action = `${new URL(request.url).pathname}${new URL(request.url).search}`;
   return page(
     200,
-    "Unsubscribe from Metsys email?",
+    "Unsubscribe from Taskora email?",
     `<p>You will stop receiving email notifications and digests. In-app notifications are not affected.</p><form method="post" action="${action.replaceAll('"', "&quot;")}"><button type="submit">Unsubscribe</button></form>`
   );
 };
@@ -70,6 +70,6 @@ export const unsubscribe = async (request: Request): Promise<Response> => {
   return page(
     200,
     "You are unsubscribed",
-    "<p>You will no longer receive Metsys email. You can turn it back on in Settings, Notifications.</p>"
+    "<p>You will no longer receive Taskora email. You can turn it back on in Settings, Notifications.</p>"
   );
 };

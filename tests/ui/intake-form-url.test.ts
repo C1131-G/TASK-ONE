@@ -8,8 +8,8 @@ import {
 } from "../../features/intake/intake-form-url";
 
 it("builds the public form address from the origin and slug", () => {
-  expect(intakeFormUrl("https://metsys.example/", "abc_DEF-123")).toBe(
-    "https://metsys.example/intake/abc_DEF-123"
+  expect(intakeFormUrl("https://taskora.example/", "abc_DEF-123")).toBe(
+    "https://taskora.example/intake/abc_DEF-123"
   );
   expect(intakeFormPath("abc")).toBe(`${INTAKE_PATH_PREFIX}abc`);
 });

@@ -9,7 +9,7 @@ import {
 } from "@/features/dashboard/components/workspace-home";
 import { parseHomeTaskView } from "@/features/dashboard/home-task-view";
 
-export const metadata: Metadata = { title: "Home | Metsys" };
+export const metadata: Metadata = { title: "Home | Taskora" };
 
 const HomePage = ({ searchParams }: PageProps<"/">) => (
   <PageTransition>

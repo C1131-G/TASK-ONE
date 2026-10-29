@@ -265,7 +265,7 @@ export class IntakeSubmissions extends Context.Service<
       input: EmailSubmissionInput
     ) => Effect.Effect<EmailIntakeReceipt, AppError>;
   }
->()("metsys/server/IntakeSubmissions") {}
+>()("taskora/server/IntakeSubmissions") {}
 
 const findDuplicate = async (formId: string, messageId: string) =>
   await db.orm.public.IntakeSubmission.where({ formId, messageId })

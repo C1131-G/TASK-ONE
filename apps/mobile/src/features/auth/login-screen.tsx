@@ -85,7 +85,7 @@ export const LoginScreen = ({ session: sessionProp }: LoginScreenProps) => {
             invalid={fieldErrors.email !== undefined}
             keyboardType="email-address"
             onChangeText={setEmail}
-            placeholder="you@metsys.test"
+            placeholder="you@taskora.test"
             value={email}
           />
         </WorkspaceField>

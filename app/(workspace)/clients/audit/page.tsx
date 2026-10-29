@@ -13,7 +13,7 @@ import {
   AuditLogSkeleton,
 } from "@/features/clients/components/audit-log-view";
 
-export const metadata: Metadata = { title: "Audit log | Metsys" };
+export const metadata: Metadata = { title: "Audit log | Taskora" };
 
 const AuditLogPage = ({ searchParams }: PageProps<"/clients/audit">) => (
   <PageTransition>

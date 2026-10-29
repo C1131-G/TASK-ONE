@@ -258,4 +258,4 @@ export class PortalBugs extends Context.Service<
       actor: PortalActor
     ) => Effect.Effect<PortalNotificationList, AppError>;
   }
->()("metsys/server/PortalBugs") {}
+>()("taskora/server/PortalBugs") {}

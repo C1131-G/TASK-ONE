@@ -34,11 +34,11 @@ const databaseName = decodeURIComponent(database.pathname.slice(1));
 if (
   process.env["NODE_ENV"] === "production" ||
   !["localhost", "127.0.0.1", "::1"].includes(database.hostname) ||
-  !databaseName.startsWith("metsys") ||
+  !databaseName.startsWith("taskora") ||
   databaseName.endsWith("_test")
 ) {
   throw new Error(
-    "UI fixtures can only be seeded into a local, non-test Metsys database."
+    "UI fixtures can only be seeded into a local, non-test Taskora database."
   );
 }
 
@@ -196,11 +196,11 @@ const seedBase = (actorId: string, adminId: string, employeeId: string) =>
 const program = Effect.gen(function* seedFixtures() {
   const actorId = yield* Effect.promise(findSeedAdministrator);
   const adminId = yield* Effect.promise(() =>
-    findUser(process.env["UI_FIXTURE_ADMIN_EMAIL"] ?? "cibi@admin.metsys.test")
+    findUser(process.env["UI_FIXTURE_ADMIN_EMAIL"] ?? "cibi@admin.taskora.test")
   );
   const employeeId = yield* Effect.promise(() =>
     findUser(
-      process.env["UI_FIXTURE_EMPLOYEE_EMAIL"] ?? "cibi@employee.metsys.test"
+      process.env["UI_FIXTURE_EMPLOYEE_EMAIL"] ?? "cibi@employee.taskora.test"
     )
   );
   yield* seedBase(actorId, adminId, employeeId);

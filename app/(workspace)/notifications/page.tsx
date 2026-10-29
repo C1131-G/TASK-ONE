@@ -10,7 +10,7 @@ import {
   NotificationFeedSkeleton,
 } from "@/features/notifications/components/notification-feed";
 
-export const metadata: Metadata = { title: "Notifications | Metsys" };
+export const metadata: Metadata = { title: "Notifications | Taskora" };
 
 const NotificationsPage = () => (
   <PageTransition>

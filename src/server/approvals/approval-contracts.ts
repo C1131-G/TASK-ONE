@@ -179,4 +179,4 @@ export class Approvals extends Context.Service<
       projectId: string
     ) => Effect.Effect<ProjectApprovals, AppError>;
   }
->()("metsys/server/Approvals") {}
+>()("taskora/server/Approvals") {}

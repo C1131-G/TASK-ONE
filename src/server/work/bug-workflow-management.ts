@@ -125,7 +125,7 @@ export class BugWorkflowManagement extends Context.Service<
       input: BugVersionInput
     ) => Effect.Effect<BugWorkflowReceipt, AppError>;
   }
->()("metsys/server/BugWorkflowManagement") {}
+>()("taskora/server/BugWorkflowManagement") {}
 
 const operation =
   <Input, Output>(

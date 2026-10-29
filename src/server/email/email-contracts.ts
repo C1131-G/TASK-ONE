@@ -53,4 +53,4 @@ export class EmailNotifications extends Context.Service<
     /** Turns off every email for the person. Used by the footer link. */
     readonly unsubscribe: (userId: string) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/EmailNotifications") {}
+>()("taskora/server/EmailNotifications") {}

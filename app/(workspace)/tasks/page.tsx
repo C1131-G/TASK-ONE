@@ -11,7 +11,7 @@ import {
 } from "@/features/tasks/components/all-tasks";
 import { parseTaskIdParam } from "@/features/tasks/task-param";
 
-export const metadata: Metadata = { title: "Tasks | Metsys" };
+export const metadata: Metadata = { title: "Tasks | Taskora" };
 
 const TasksPage = ({ searchParams }: PageProps<"/tasks">) => (
   <PageTransition>

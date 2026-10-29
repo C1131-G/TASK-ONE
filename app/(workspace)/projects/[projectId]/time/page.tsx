@@ -18,7 +18,7 @@ import {
 import { projectReportRange } from "@/features/time/time-params";
 import { getUtcToday } from "@/src/lib/utc-today";
 
-export const metadata: Metadata = { title: "Project time | Metsys" };
+export const metadata: Metadata = { title: "Project time | Taskora" };
 
 const ProjectTimePage = ({
   params,

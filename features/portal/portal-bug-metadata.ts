@@ -7,7 +7,7 @@ const portalBugMetadata = async (bugId: string): Promise<Metadata> => {
   const title = result.ok
     ? `${result.data.key} ${result.data.title}`
     : "Bug details";
-  return { title: `${title} | Metsys` };
+  return { title: `${title} | Taskora` };
 };
 
 export { portalBugMetadata };

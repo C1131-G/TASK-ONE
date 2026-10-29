@@ -8,16 +8,16 @@ import { authPool } from "../src/server/auth/database";
 // with two client users, two handlers and one linked project. It is safe to
 // run again; rows are found by email or name and passwords are reset.
 //
-// E2E_ADMIN_PASSWORD   password for ui-admin@metsys.test (created if missing)
+// E2E_ADMIN_PASSWORD   password for ui-admin@taskora.test (created if missing)
 // E2E_PORTAL_PASSWORD  password for the handlers and the client users
 export const E2E_ACCOUNTS = {
-  admin: "ui-admin@metsys.test",
+  admin: "ui-admin@taskora.test",
   clientOne: "client-one@acme.test",
   clientTwo: "client-two@acme.test",
   lockoutClient: "lockout-client@acme.test",
   newClient: "new-client@acme.test",
-  handlerOne: "handler-one@metsys.test",
-  handlerTwo: "handler-two@metsys.test",
+  handlerOne: "handler-one@taskora.test",
+  handlerTwo: "handler-two@taskora.test",
 } as const;
 
 const COMPANY_NAME = "Acme";
@@ -130,7 +130,7 @@ const adminId = await upsertUser({
   role: "admin",
 });
 await upsertUser({
-  email: "ui-employee@metsys.test",
+  email: "ui-employee@taskora.test",
   name: "UI Employee",
   password: employeePassword,
   role: "employee",

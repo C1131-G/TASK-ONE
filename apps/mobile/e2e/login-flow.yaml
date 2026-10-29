@@ -1,4 +1,4 @@
-appId: com.cibi.metsys
+appId: com.cibi.taskora
 ---
 # Login: sign in with the seeded account and land on the workspace.
 - launchApp

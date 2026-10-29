@@ -37,4 +37,4 @@ export class PushNotifications extends Context.Service<
       message: PushMessage
     ) => Effect.Effect<DeliveryResult, AppError>;
   }
->()("metsys/server/PushNotifications") {}
+>()("taskora/server/PushNotifications") {}

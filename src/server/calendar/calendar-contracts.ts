@@ -56,4 +56,4 @@ export class CalendarManagement extends Context.Service<
       eventId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/CalendarManagement") {}
+>()("taskora/server/CalendarManagement") {}

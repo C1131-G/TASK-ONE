@@ -38,7 +38,7 @@ export class ThemePreferences extends Context.Service<
     /** Persists a partial patch, keeping unspecified values. */
     readonly save: (patch: Partial<ThemeValues>) => Effect.Effect<void, StorageFailure>;
   }
->()("metsys/mobile/ThemePreferences") {}
+>()("taskora/mobile/ThemePreferences") {}
 
 const makePreferences = (store: StoreOps) => {
   const readStored = Effect.flatMap(

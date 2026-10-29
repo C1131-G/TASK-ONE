@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-// Receivers verify `X-Metsys-Signature` as v1=HMAC-SHA256(secret, "<timestamp>.<raw body>")
+// Receivers verify `X-Taskora-Signature` as v1=HMAC-SHA256(secret, "<timestamp>.<raw body>")
 // and should reject timestamps outside a few minutes to stop replays.
 
 export const SIGNATURE_TOLERANCE_SECONDS = 300;

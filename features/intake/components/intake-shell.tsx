@@ -22,7 +22,7 @@ const IntakeShell = ({ children }: { readonly children: ReactNode }) => (
             />
           </svg>
         </span>
-        Metsys
+        Taskora
       </span>
     </header>
     <main className="auth-main" id="intake-main" tabIndex={-1}>

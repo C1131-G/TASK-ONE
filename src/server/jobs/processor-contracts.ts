@@ -67,4 +67,4 @@ export class JobProcessor extends Context.Service<
       limit: number
     ) => Effect.Effect<JobBatchResult, AppError>;
   }
->()("metsys/server/JobProcessor") {}
+>()("taskora/server/JobProcessor") {}

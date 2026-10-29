@@ -19,5 +19,5 @@ export interface JobHandlersApi {
 }
 
 export class JobHandlers extends Context.Service<JobHandlers, JobHandlersApi>()(
-  "metsys/server/JobHandlers"
+  "taskora/server/JobHandlers"
 ) {}

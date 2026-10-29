@@ -113,7 +113,7 @@ const PortalShell = ({ children }: { readonly children: ReactNode }) => (
           <span aria-hidden="true" className="portal-mark">
             M
           </span>
-          <span>Metsys</span>
+          <span>Taskora</span>
         </Link>
         <Suspense fallback={<p className="portal-company" />}>
           <PortalCompanyName />

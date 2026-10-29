@@ -137,7 +137,7 @@ it("publishes after commit and never for a rolled back transaction", async () =>
       received.push(message.payload);
     }
   });
-  await listener.query("LISTEN metsys_realtime");
+  await listener.query("LISTEN taskora_realtime");
   try {
     const rolledBack = randomUUID();
     await db
@@ -166,7 +166,7 @@ it("delivers a user's inbox event only to that user", async () => {
   const bystander = await connect("outsider");
   await target.take();
   await bystander.take();
-  await authPool.query("SELECT pg_notify('metsys_realtime', $1)", [
+  await authPool.query("SELECT pg_notify('taskora_realtime', $1)", [
     JSON.stringify({ kind: "inbox", userId: personaId("owner") }),
   ]);
   expect(await target.take()).toContain("event: change");
@@ -176,8 +176,8 @@ it("delivers a user's inbox event only to that user", async () => {
 it("ignores a forged or malformed notification payload", async () => {
   const watcher = await connect("owner");
   await watcher.take();
-  await authPool.query("SELECT pg_notify('metsys_realtime', $1)", ["{nope"]);
-  await authPool.query("SELECT pg_notify('metsys_realtime', $1)", [
+  await authPool.query("SELECT pg_notify('taskora_realtime', $1)", ["{nope"]);
+  await authPool.query("SELECT pg_notify('taskora_realtime', $1)", [
     JSON.stringify({ kind: "inbox", userId: "not-a-uuid" }),
   ]);
   expect(await watcher.take()).not.toContain("event: change");
@@ -188,7 +188,7 @@ it("stops delivering after the request is aborted", async () => {
   await watcher.take();
   watcher.abort.abort();
   await sleep(100);
-  await authPool.query("SELECT pg_notify('metsys_realtime', $1)", [
+  await authPool.query("SELECT pg_notify('taskora_realtime', $1)", [
     JSON.stringify({ kind: "inbox", userId: personaId("owner") }),
   ]);
   expect(await watcher.take()).not.toContain("event: change");

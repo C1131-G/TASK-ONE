@@ -92,4 +92,4 @@ export class Collaboration extends Context.Service<
       emoji: string
     ) => Effect.Effect<{ readonly active: boolean }, AppError>;
   }
->()("metsys/server/Collaboration") {}
+>()("taskora/server/Collaboration") {}

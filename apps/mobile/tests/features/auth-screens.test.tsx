@@ -43,10 +43,10 @@ it("validates credentials before calling the session", () => {
   expect(bad.ok ? null : bad.errors.email).toBe("Enter your email");
   expect(bad.ok ? null : bad.errors.password).toContain("8 characters");
 
-  const good = validateCredentials({ email: " ada@metsys.test ", password: "longenough" });
+  const good = validateCredentials({ email: " ada@taskora.test ", password: "longenough" });
 
   expect(good.ok).toBe(true);
-  expect(good.ok ? good.values.email : null).toBe("ada@metsys.test");
+  expect(good.ok ? good.values.email : null).toBe("ada@taskora.test");
 });
 
 it("signs in through the session and shows the server field error", async () => {
@@ -65,12 +65,12 @@ it("signs in through the session and shows the server field error", async () => 
     />,
   );
 
-  await user.type(screen.getByLabelText("Email"), "ada@metsys.test");
+  await user.type(screen.getByLabelText("Email"), "ada@taskora.test");
   await user.type(screen.getByLabelText("Password"), "longenough");
   await user.press(screen.getByRole("button", { name: "Sign in" }));
 
   await waitFor(() => expect(screen.getByText("Wrong credentials")).toBeTruthy());
-  expect(attempts).toEqual(["ada@metsys.test"]);
+  expect(attempts).toEqual(["ada@taskora.test"]);
 });
 
 it("blocks submission when the local fields fail", async () => {

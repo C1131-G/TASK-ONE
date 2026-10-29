@@ -8,7 +8,7 @@ import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import { PanelSkeleton } from "@/components/workspace/panel-skeleton";
 import { InboxFeed } from "@/features/notifications/components/inbox-feed";
 
-export const metadata: Metadata = { title: "Inbox | Metsys" };
+export const metadata: Metadata = { title: "Inbox | Taskora" };
 
 const InboxPage = () => (
   <PageTransition>

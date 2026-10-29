@@ -31,7 +31,7 @@ export class IdempotencyResponseStore extends Context.Service<
       response: typeof Schema.Json.Type
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/IdempotencyResponseStore") {}
+>()("taskora/server/IdempotencyResponseStore") {}
 
 export const IdempotencyResponseStoreLive = Layer.succeed(
   IdempotencyResponseStore,

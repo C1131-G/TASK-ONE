@@ -165,4 +165,4 @@ export class Uploads extends Context.Service<
       AppError
     >;
   }
->()("metsys/server/Uploads") {}
+>()("taskora/server/Uploads") {}

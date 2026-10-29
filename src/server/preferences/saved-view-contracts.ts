@@ -81,4 +81,4 @@ export class SavedViewManagement extends Context.Service<
       viewId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/SavedViewManagement") {}
+>()("taskora/server/SavedViewManagement") {}

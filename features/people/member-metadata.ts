@@ -7,7 +7,7 @@ const memberMetadata = async (employeeId: string): Promise<Metadata> => {
   const employee = result.ok
     ? result.data.find((item) => item.id === employeeId)
     : undefined;
-  return { title: `${employee?.name ?? "Member profile"} | Metsys` };
+  return { title: `${employee?.name ?? "Member profile"} | Taskora` };
 };
 
 export { memberMetadata };

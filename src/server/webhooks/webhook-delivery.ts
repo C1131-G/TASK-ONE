@@ -23,7 +23,7 @@ const HTTP_OK_MIN = 200;
 const HTTP_OK_MAX = 299;
 const HTTP_SERVER_ERROR_MIN = 500;
 const RETRYABLE_CLIENT_ERRORS = new Set([408, 429]);
-const USER_AGENT = "Metsys-Webhooks/1";
+const USER_AGENT = "Taskora-Webhooks/1";
 
 export interface DeliveryDeps {
   readonly resolve: HostResolver;
@@ -107,10 +107,10 @@ const prepare = (
     }
     const timestamp = Math.floor(deps.now().getTime() / 1000);
     const secret = decryptSecret(endpoint.secretCiphertext, deps.keyMaterial);
-    headers["x-metsys-delivery"] = event.id;
-    headers["x-metsys-event"] = event.type;
-    headers["x-metsys-signature"] = signWebhook(secret, timestamp, body);
-    headers["x-metsys-timestamp"] = String(timestamp);
+    headers["x-taskora-delivery"] = event.id;
+    headers["x-taskora-event"] = event.type;
+    headers["x-taskora-signature"] = signWebhook(secret, timestamp, body);
+    headers["x-taskora-timestamp"] = String(timestamp);
   }
   // Same rules as when the admin saved it, applied again because the stored
   // row or the deployment mode may have changed since.

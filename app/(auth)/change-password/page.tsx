@@ -12,8 +12,8 @@ import {
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
-  description: "Change the temporary password for your Metsys account.",
-  title: "Set your password | Metsys",
+  description: "Change the temporary password for your Taskora account.",
+  title: "Set your password | Taskora",
 };
 
 const LOGIN_PATH: Route = "/login";

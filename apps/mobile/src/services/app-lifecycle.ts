@@ -13,7 +13,7 @@ export class AppLifecycle extends Context.Service<
     readonly changes: Stream.Stream<LifecycleState>;
     readonly isActive: Effect.Effect<boolean>;
   }
->()("metsys/mobile/AppLifecycle") {}
+>()("taskora/mobile/AppLifecycle") {}
 
 /** The service value screens and wiring receive. */
 export type AppLifecycleService = AppLifecycle["Service"];

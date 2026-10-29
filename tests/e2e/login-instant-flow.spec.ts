@@ -15,7 +15,7 @@ test("login form is in the initial-load shell", async ({ page }) => {
         page.getByRole("heading", { name: "Welcome back" })
       ).toBeVisible();
       await expect(
-        page.getByText("Sign in to your Metsys workspace")
+        page.getByText("Sign in to your Taskora workspace")
       ).toBeVisible();
     },
     { baseURL: BASE_URL }
@@ -40,7 +40,7 @@ test("login to request-access navigation renders the destination instantly", asy
       page.getByRole("heading", { name: "Request access" })
     ).toBeVisible();
     await expect(
-      page.getByText("Metsys accounts are created by an administrator.")
+      page.getByText("Taskora accounts are created by an administrator.")
     ).toBeVisible();
   });
 });

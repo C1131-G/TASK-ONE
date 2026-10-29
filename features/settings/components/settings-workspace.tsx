@@ -133,7 +133,7 @@ const SettingsWorkspace = ({
           <section className="panel">
             <div className="panel-h">
               <h2>Appearance</h2>
-              <p>Customize how Metsys looks on this device.</p>
+              <p>Customize how Taskora looks on this device.</p>
             </div>
             <div className="panel-b stack">
               <div>

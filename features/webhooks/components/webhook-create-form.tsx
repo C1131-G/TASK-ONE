@@ -114,7 +114,7 @@ export const WebhookCreateForm = () => {
             placeholder={
               kind === "slack"
                 ? "https://hooks.slack.com/services/…"
-                : "https://example.com/hooks/metsys"
+                : "https://example.com/hooks/taskora"
             }
             {...fieldProps("url")}
           />

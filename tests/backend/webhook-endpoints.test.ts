@@ -75,7 +75,7 @@ const genericInput = {
   events: ["task.created", "comment.added"] as const,
   kind: "generic" as const,
   name: "Build bot",
-  url: "https://hooks.example.com/metsys?token=abc",
+  url: "https://hooks.example.com/taskora?token=abc",
 };
 
 it("shows the signing secret once and stores it encrypted", async () => {
@@ -94,7 +94,7 @@ it("shows the signing secret once and stores it encrypted", async () => {
   });
   expect(JSON.stringify(created.endpoint)).not.toContain(created.secret ?? "");
   // The query string can carry a token, so the display form drops it.
-  expect(created.endpoint.displayUrl).toBe("https://hooks.example.com/metsys");
+  expect(created.endpoint.displayUrl).toBe("https://hooks.example.com/taskora");
 
   const row = await authPool.query<{
     secretCiphertext: string;

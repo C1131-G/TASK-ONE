@@ -6,7 +6,7 @@ const DEFAULT_TRUSTED_PROXY_HOPS = 1;
 
 // Better Auth keys rate limits and session IPs on this header. Only the auth
 // route writes it, after discarding whatever value the client sent.
-export const RESOLVED_CLIENT_IP_HEADER = "x-metsys-client-ip";
+export const RESOLVED_CLIENT_IP_HEADER = "x-taskora-client-ip";
 
 export interface ClientIpConfig {
   // Header the trusted reverse proxy sets, such as x-real-ip,

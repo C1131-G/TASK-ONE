@@ -54,7 +54,7 @@ it("publishes an OpenAPI document for the mobile API", async () => {
   const spec = await loadSpec();
 
   expect(spec.openapi).toBe("3.1.0");
-  expect(spec.info.title).toBe("Metsys mobile API");
+  expect(spec.info.title).toBe("Taskora mobile API");
 });
 
 it("describes /api/v1/me with bearer security and its response shape", async () => {

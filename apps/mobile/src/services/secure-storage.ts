@@ -7,7 +7,7 @@ import {
 } from "@/services/storage-adapter";
 
 export class SecureStorage extends Context.Service<SecureStorage, StoreOps>()(
-  "metsys/mobile/SecureStorage",
+  "taskora/mobile/SecureStorage",
 ) {}
 
 /** expo-secure-store-backed live layer for tokens and secrets. */

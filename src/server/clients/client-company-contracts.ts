@@ -200,4 +200,4 @@ export class ClientCompanyManagement extends Context.Service<
       input: CreateClientUserInput
     ) => Effect.Effect<CreatedClientUser, AppError>;
   }
->()("metsys/server/ClientCompanyManagement") {}
+>()("taskora/server/ClientCompanyManagement") {}

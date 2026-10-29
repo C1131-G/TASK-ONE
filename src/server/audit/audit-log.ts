@@ -145,7 +145,7 @@ export class AuditLog extends Context.Service<
       actorId: string
     ) => Effect.Effect<typeof LockedAccountListSchema.Type, AppError>;
   }
->()("metsys/server/AuditLog") {}
+>()("taskora/server/AuditLog") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

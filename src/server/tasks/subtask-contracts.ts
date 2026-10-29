@@ -99,4 +99,4 @@ export class SubtaskManagement extends Context.Service<
       expectedTaskVersion: number
     ) => Effect.Effect<CreatedTask, AppError>;
   }
->()("metsys/server/SubtaskManagement") {}
+>()("taskora/server/SubtaskManagement") {}

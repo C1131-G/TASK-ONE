@@ -32,7 +32,7 @@ export class SessionManagement extends Context.Service<
       sessionId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/SessionManagement") {}
+>()("taskora/server/SessionManagement") {}
 
 const toUnavailable = (): AppError =>
   new AppError({

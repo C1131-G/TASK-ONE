@@ -5,11 +5,11 @@ import { parseServerEnv } from "../../src/server/core/env";
 const validEnv = {
   BETTER_AUTH_SECRET: "a-test-secret-that-is-at-least-thirty-two-chars",
   BETTER_AUTH_URL: "http://localhost:3000",
-  DATABASE_URL: "postgresql://user:pass@localhost:5432/metsys",
+  DATABASE_URL: "postgresql://user:pass@localhost:5432/taskora",
 } as const;
 
 const smtp = {
-  EMAIL_FROM: "Metsys <no-reply@example.com>",
+  EMAIL_FROM: "Taskora <no-reply@example.com>",
   SMTP_HOST: "smtp.example.com",
   SMTP_PORT: "587",
 } as const;

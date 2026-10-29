@@ -7,7 +7,7 @@ const projectMetadata = async (projectId: string): Promise<Metadata> => {
   const project = result.ok
     ? result.data.find(({ id }) => id === projectId)
     : undefined;
-  return { title: `${project?.name ?? "Project"} | Metsys` };
+  return { title: `${project?.name ?? "Project"} | Taskora` };
 };
 
 export { projectMetadata };

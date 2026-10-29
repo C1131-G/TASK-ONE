@@ -15,7 +15,7 @@ import {
   ClientCompanyListSkeleton,
 } from "@/features/clients/components/client-company-list";
 
-export const metadata: Metadata = { title: "Clients | Metsys" };
+export const metadata: Metadata = { title: "Clients | Taskora" };
 
 const ClientsPage = () => (
   <PageTransition>

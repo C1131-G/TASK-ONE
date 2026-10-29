@@ -16,7 +16,7 @@ const TAG_BYTES = 16;
 const KEY_BYTES = 32;
 const HINT_LENGTH = 4;
 const FORMAT = "v1";
-const KEY_INFO = "metsys.webhook.secret.v1";
+const KEY_INFO = "taskora.webhook.secret.v1";
 
 export const generateSecret = (): string =>
   `${SECRET_PREFIX}${randomBytes(SECRET_BYTES).toString("base64url")}`;
@@ -26,7 +26,7 @@ export const secretHint = (secret: string): string =>
 
 const deriveKey = (keyMaterial: string): Buffer =>
   Buffer.from(
-    hkdfSync("sha256", keyMaterial, "metsys-webhooks", KEY_INFO, KEY_BYTES)
+    hkdfSync("sha256", keyMaterial, "taskora-webhooks", KEY_INFO, KEY_BYTES)
   );
 
 export const encryptSecret = (secret: string, keyMaterial: string): string => {

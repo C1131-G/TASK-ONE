@@ -34,7 +34,7 @@ const seedProject = async (): Promise<Seeded> => {
       "SELECT id FROM client_company WHERE name = 'Acme'"
     );
     const admin = await pool.query<{ id: string }>(
-      `SELECT id FROM "user" WHERE "emailNormalized" = 'ui-admin@metsys.test'`
+      `SELECT id FROM "user" WHERE "emailNormalized" = 'ui-admin@taskora.test'`
     );
     const companyId = company.rows[0]?.id;
     const adminId = admin.rows[0]?.id;

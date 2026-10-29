@@ -7,7 +7,7 @@ const bugMetadata = async (bugId: string): Promise<Metadata> => {
   const title = result.ok
     ? `${result.data.projectKey}-${result.data.projectTaskNumber} ${result.data.title}`
     : "Bug details";
-  return { title: `${title} | Metsys` };
+  return { title: `${title} | Taskora` };
 };
 
 export { bugMetadata };

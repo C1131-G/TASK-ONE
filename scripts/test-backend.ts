@@ -20,9 +20,9 @@ if (!process.env["TEST_DATABASE_URL"]) {
   const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(
     testUrl.hostname
   );
-  if (!isLocalHost || !databaseName.startsWith("metsys")) {
+  if (!isLocalHost || !databaseName.startsWith("taskora")) {
     throw new Error(
-      "Set TEST_DATABASE_URL to a dedicated metsys_test database; refusing to run against a non-local database."
+      "Set TEST_DATABASE_URL to a dedicated taskora_test database; refusing to run against a non-local database."
     );
   }
   databaseName = `${databaseName.endsWith("_test") ? databaseName.slice(0, -5) : databaseName}_test`;
@@ -30,14 +30,14 @@ if (!process.env["TEST_DATABASE_URL"]) {
 }
 
 const hasSafeTestDatabaseName =
-  databaseName.startsWith("metsys") &&
+  databaseName.startsWith("taskora") &&
   databaseName.endsWith("_test") &&
   [...databaseName].every((character) =>
     "abcdefghijklmnopqrstuvwxyz0123456789_".includes(character)
   );
 if (!hasSafeTestDatabaseName) {
   throw new Error(
-    "TEST_DATABASE_URL must point to a database named metsys*_test."
+    "TEST_DATABASE_URL must point to a database named taskora*_test."
   );
 }
 

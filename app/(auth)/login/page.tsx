@@ -12,8 +12,8 @@ import { parseSignInNotice } from "@/features/user/user-sign-in-notice";
 import { getPageSession } from "@/src/server/auth/page-session";
 
 export const metadata: Metadata = {
-  description: "Sign in to your Metsys workspace.",
-  title: "Sign in | Metsys",
+  description: "Sign in to your Taskora workspace.",
+  title: "Sign in | Taskora",
 };
 
 const CHANGE_PASSWORD_PATH: Route<"/change-password"> = "/change-password";
@@ -34,7 +34,7 @@ const LoginRedirect = async ({ notice }: { readonly notice: string }) => {
 const Page = ({ searchParams }: PageProps<"/login">) => (
   <PageTransition>
     <AuthCard
-      description="Sign in to your Metsys workspace"
+      description="Sign in to your Taskora workspace"
       title="Welcome back"
       titleId="login-title"
     >

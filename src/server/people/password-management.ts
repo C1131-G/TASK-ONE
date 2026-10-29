@@ -24,7 +24,7 @@ export class PasswordManagement extends Context.Service<
       newPassword: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/PasswordManagement") {}
+>()("taskora/server/PasswordManagement") {}
 
 const changeOwnPassword = (
   headers: Headers,

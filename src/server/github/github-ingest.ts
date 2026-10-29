@@ -136,7 +136,7 @@ export class GithubIngest extends Context.Service<
       request: GithubDeliveryRequest
     ) => Effect.Effect<GithubIngestOutcome, AppError>;
   }
->()("metsys/server/GithubIngest") {}
+>()("taskora/server/GithubIngest") {}
 
 export const GithubIngestLive = Layer.succeed(
   GithubIngest,

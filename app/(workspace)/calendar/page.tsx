@@ -14,7 +14,7 @@ import {
   CalendarViewSkeleton,
 } from "@/features/calendar/components/calendar-view";
 
-export const metadata: Metadata = { title: "Calendar | Metsys" };
+export const metadata: Metadata = { title: "Calendar | Taskora" };
 
 const CalendarPage = ({ searchParams }: PageProps<"/calendar">) => (
   <PageTransition>

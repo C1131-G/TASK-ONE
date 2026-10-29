@@ -16,7 +16,7 @@ import {
 } from "@/features/projects/components/project-directory";
 import { parseProjectFilters } from "@/features/projects/project-filters";
 
-export const metadata: Metadata = { title: "Projects | Metsys" };
+export const metadata: Metadata = { title: "Projects | Taskora" };
 
 const ProjectsPage = ({ searchParams }: PageProps<"/projects">) => (
   <PageTransition>

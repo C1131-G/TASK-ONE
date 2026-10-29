@@ -10,7 +10,7 @@ import {
   PortalNotificationsSkeleton,
 } from "@/features/portal/components/portal-notifications";
 
-export const metadata: Metadata = { title: "Notifications | Metsys" };
+export const metadata: Metadata = { title: "Notifications | Taskora" };
 
 const Page = () => (
   <PageTransition>

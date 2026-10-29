@@ -10,7 +10,7 @@ import {
   PortalAccountSkeleton,
 } from "@/features/portal/components/portal-account";
 
-export const metadata: Metadata = { title: "Account | Metsys" };
+export const metadata: Metadata = { title: "Account | Taskora" };
 
 const Page = () => (
   <PageTransition>

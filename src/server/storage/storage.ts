@@ -48,7 +48,7 @@ export interface StorageApi {
 }
 
 export class Storage extends Context.Service<Storage, StorageApi>()(
-  "metsys/server/Storage"
+  "taskora/server/Storage"
 ) {}
 
 const storageError = () =>
@@ -78,7 +78,7 @@ export const SIGNED_URL_SECONDS = {
   upload: 600,
 } as const;
 
-const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
+const bucket = process.env["S3_BUCKET"] ?? "taskora-private";
 
 const endpoint = process.env["S3_ENDPOINT"];
 const publicEndpoint = process.env["S3_PUBLIC_ENDPOINT"] ?? endpoint;

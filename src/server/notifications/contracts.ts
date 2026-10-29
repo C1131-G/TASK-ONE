@@ -108,4 +108,4 @@ export class Notifications extends Context.Service<
       scheduledAt: Date
     ) => Effect.Effect<{ readonly usersNotified: number }, AppError>;
   }
->()("metsys/server/Notifications") {}
+>()("taskora/server/Notifications") {}

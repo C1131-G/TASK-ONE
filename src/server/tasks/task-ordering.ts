@@ -32,7 +32,7 @@ export class TaskOrdering extends Context.Service<
       changes: readonly TaskPositionChange[]
     ) => Effect.Effect<readonly OrderedTask[], AppError>;
   }
->()("metsys/server/TaskOrdering") {}
+>()("taskora/server/TaskOrdering") {}
 
 const databaseError = (error: unknown): AppError => {
   if (error instanceof AppError) {

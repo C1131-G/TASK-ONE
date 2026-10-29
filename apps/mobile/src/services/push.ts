@@ -15,7 +15,7 @@ export class Push extends Context.Service<
     /** Removes this device's push endpoint. */
     readonly unregister: (endpoint: string) => Effect.Effect<void, AppFailure>;
   }
->()("metsys/mobile/Push") {}
+>()("taskora/mobile/Push") {}
 
 /** The recorded calls of the stub push service. */
 export interface PushStubCalls {

@@ -14,7 +14,7 @@ import {
   BugTrackerSkeleton,
 } from "@/features/bugs/components/bug-tracker";
 
-export const metadata: Metadata = { title: "Bugs | Metsys" };
+export const metadata: Metadata = { title: "Bugs | Taskora" };
 
 const BugsPage = ({ searchParams }: PageProps<"/bugs">) => (
   <PageTransition>

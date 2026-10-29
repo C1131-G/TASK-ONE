@@ -100,4 +100,4 @@ export class DiscoveryManagement extends Context.Service<
       query: string
     ) => Effect.Effect<WorkspaceSearchResults, AppError>;
   }
->()("metsys/server/DiscoveryManagement") {}
+>()("taskora/server/DiscoveryManagement") {}

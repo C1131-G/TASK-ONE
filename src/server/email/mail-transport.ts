@@ -25,7 +25,7 @@ export interface MailTransportApi {
 export class MailTransport extends Context.Service<
   MailTransport,
   MailTransportApi
->()("metsys/server/MailTransport") {}
+>()("taskora/server/MailTransport") {}
 
 export interface MailConfig {
   readonly host: string;

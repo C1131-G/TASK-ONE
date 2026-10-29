@@ -116,7 +116,7 @@ bun run db:verify
 bun run dev
 ```
 
-`bun run test:backend` (alias: `bun run test`) creates or reuses a dedicated local `metsys_test` database, applies migrations there, verifies the Prisma contract against it, and runs Bun behavior tests. It refuses to derive a test database from a non-local `DATABASE_URL`. Set `TEST_DATABASE_URL` and optionally `TEST_DATABASE_ADMIN_URL` for another isolated PostgreSQL server. Tests do not migrate the ordinary development database.
+`bun run test:backend` (alias: `bun run test`) creates or reuses a dedicated local `taskora_test` database, applies migrations there, verifies the Prisma contract against it, and runs Bun behavior tests. It refuses to derive a test database from a non-local `DATABASE_URL`. Set `TEST_DATABASE_URL` and optionally `TEST_DATABASE_ADMIN_URL` for another isolated PostgreSQL server. Tests do not migrate the ordinary development database.
 
 Run the durable worker with `bun run worker`. The bounded HTTP scheduler is `POST /api/internal/jobs` with `Authorization: Bearer $SCHEDULER_TOKEN`. Production must invoke that endpoint hourly from an external scheduler or run a dedicated worker service so the processor can scan each employee's local 9 a.m. reminder window; business work does not depend on a server timer.
 

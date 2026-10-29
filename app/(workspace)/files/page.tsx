@@ -10,7 +10,7 @@ import {
   WorkspaceFiles,
 } from "@/features/files/components/workspace-files";
 
-export const metadata: Metadata = { title: "Files | Metsys" };
+export const metadata: Metadata = { title: "Files | Taskora" };
 
 const FilesPage = () => (
   <PageTransition>

@@ -8,7 +8,7 @@ import { SuspenseReveal } from "@/components/ui/suspense-reveal";
 import { MyTime, MyTimeSkeleton } from "@/features/time/components/my-time";
 import { parseDateParam } from "@/features/time/time-params";
 
-export const metadata: Metadata = { title: "My Time | Metsys" };
+export const metadata: Metadata = { title: "My Time | Taskora" };
 
 const MyTimePage = ({ searchParams }: PageProps<"/my-time">) => (
   <PageTransition>

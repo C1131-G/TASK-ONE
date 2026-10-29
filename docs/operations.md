@@ -1,6 +1,6 @@
 # Operations
 
-How to build, deploy, back up and restore Metsys when it is self-hosted with Docker. The README covers local development.
+How to build, deploy, back up and restore Taskora when it is self-hosted with Docker. The README covers local development.
 
 ## Images
 
@@ -23,8 +23,8 @@ Next.js embeds `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` into the build output, so th
 
 ```bash
 export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(openssl rand -base64 32)"   # once; store it in your secret manager
-docker build --secret id=next_server_actions_encryption_key,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY -t metsys-app .
-docker build --target worker -t metsys-worker .
+docker build --secret id=next_server_actions_encryption_key,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY -t taskora-app .
+docker build --target worker -t taskora-worker .
 ```
 
 The build fails if the secret is missing. Every replica must run an image built with the **identical** key, and the key should stay the same across releases; otherwise a Server Action posted to a replica built with another key fails with "Failed to find Server Action". `docker compose build` reads the key from the environment or `.env` through the `secrets:` entry in `docker-compose.yml`.
@@ -57,11 +57,11 @@ Run migrations once per release, from the `migrate` service or a CI deploy step,
 Choose one:
 
 - **Managed Postgres (preferred).** Turn on point-in-time recovery (PITR) with at least 7 days of WAL retention, plus the provider's daily snapshots. PITR covers "restore to just before the bad deploy"; snapshots cover loss of the instance.
-- **Self-hosted Postgres in compose.** Run `docker/backup.sh` from the project directory on a schedule. It runs `pg_dump --format=custom` inside the `postgres` container, checks the dump with `pg_restore --list`, writes `backups/metsys-<UTC timestamp>.dump` with owner-only permissions, and deletes dumps older than `BACKUP_RETENTION_DAYS` (default 14).
+- **Self-hosted Postgres in compose.** Run `docker/backup.sh` from the project directory on a schedule. It runs `pg_dump --format=custom` inside the `postgres` container, checks the dump with `pg_restore --list`, writes `backups/taskora-<UTC timestamp>.dump` with owner-only permissions, and deletes dumps older than `BACKUP_RETENTION_DAYS` (default 14).
 
   ```cron
   # Every 6 hours; the host keeps 14 days locally.
-  0 */6 * * * cd /srv/metsys && BACKUP_DIR=/var/backups/metsys docker/backup.sh >> /var/log/metsys-backup.log 2>&1
+  0 */6 * * * cd /srv/taskora && BACKUP_DIR=/var/backups/taskora docker/backup.sh >> /var/log/taskora-backup.log 2>&1
   ```
 
   Set `BACKUP_DATABASE_URL` to dump a database reachable from the host instead (requires a local `pg_dump` of Postgres 18 or newer).
@@ -72,7 +72,7 @@ Local dumps die with the host. Copy each dump off-host, for example to a separat
 
 Uploaded files live only in the S3 bucket; the database holds their keys.
 
-- Enable **bucket versioning** so an overwritten or deleted object can be recovered (`mc version enable local/metsys-private` on MinIO, or the provider console).
+- Enable **bucket versioning** so an overwritten or deleted object can be recovered (`mc version enable local/taskora-private` on MinIO, or the provider console).
 - Add a **lifecycle rule** that expires non-current versions after 30 days and aborts incomplete multipart uploads after 1 day, so versioning does not grow storage without bound.
 - For disaster recovery, replicate the bucket to a second region or provider (`mc mirror --watch`, or provider replication). Snapshot the MinIO volume if MinIO is the only copy.
 
@@ -87,12 +87,12 @@ Back up `.env` (or the secret manager entries) separately from the data. A datab
 Run this quarterly, and after any change to the backup job. Record the date, dump name and time to restore.
 
 1. Pick the newest off-host dump and copy it to the drill machine.
-2. Start an empty Postgres 18: `docker run -d --name metsys-restore -e POSTGRES_PASSWORD=drill -p 127.0.0.1:5499:5432 postgres:18-alpine`.
-3. Restore: `docker exec -i metsys-restore pg_restore -U postgres --create --no-owner -d postgres < metsys-<timestamp>.dump`.
-4. Verify the schema matches the release that took the dump: `DATABASE_URL=postgresql://postgres:drill@127.0.0.1:5499/metsys?sslmode=disable bun run db:verify`.
+2. Start an empty Postgres 18: `docker run -d --name taskora-restore -e POSTGRES_PASSWORD=drill -p 127.0.0.1:5499:5432 postgres:18-alpine`.
+3. Restore: `docker exec -i taskora-restore pg_restore -U postgres --create --no-owner -d postgres < taskora-<timestamp>.dump`.
+4. Verify the schema matches the release that took the dump: `DATABASE_URL=postgresql://postgres:drill@127.0.0.1:5499/taskora?sslmode=disable bun run db:verify`.
 5. Spot-check data: row counts for users, tasks and files against production, and that the newest task is from shortly before the dump time.
 6. Point a local app at the restored database and a copy of the bucket, sign in, and open a task with an attachment.
-7. Remove the drill database: `docker rm -f metsys-restore`.
+7. Remove the drill database: `docker rm -f taskora-restore`.
 
 To restore production, stop `app` and `worker`, restore into a fresh database, run `bun run db:verify`, switch `DATABASE_URL_DOCKER` to it, then start `worker` and `app`.
 

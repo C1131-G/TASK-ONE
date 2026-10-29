@@ -281,4 +281,4 @@ export class WorkManagement extends Context.Service<
       changes: BulkTaskChanges
     ) => Effect.Effect<readonly CreatedTask[], AppError>;
   }
->()("metsys/server/WorkManagement") {}
+>()("taskora/server/WorkManagement") {}

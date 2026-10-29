@@ -103,13 +103,13 @@ export const WorkspaceSidebar = ({ framePromise }: SectionProps) => {
     <>
       <div className="side-top">
         <Link
-          aria-label="Metsys home"
+          aria-label="Taskora home"
           className="ws"
           href="/"
           transitionTypes={[getNavigationTransitionType(pathname, "/")]}
         >
           <span aria-hidden="true" className="ws-logo" data-initial="M" />
-          <span className="ws-name trunc">Metsys</span>
+          <span className="ws-name trunc">Taskora</span>
         </Link>
       </div>
       <div className="side-scroll">
@@ -170,7 +170,7 @@ export const WorkspaceTopbarMenu = ({ framePromise }: SectionProps) => {
         side="left"
       >
         <SheetHeader>
-          <SheetTitle>Metsys</SheetTitle>
+          <SheetTitle>Taskora</SheetTitle>
         </SheetHeader>
         <nav aria-label="Workspace" className="mobile-navigation-scroll">
           <MobileNavigation data={data} />

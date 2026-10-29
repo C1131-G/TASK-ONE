@@ -438,7 +438,7 @@ export class ProjectBudgets extends Context.Service<
       projectId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/ProjectBudgets") {}
+>()("taskora/server/ProjectBudgets") {}
 
 export const ProjectBudgetsLive = Layer.succeed(ProjectBudgets, {
   clear,

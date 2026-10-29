@@ -10,7 +10,7 @@ import { AuthCard } from "@/features/user/components/auth-card";
 export const metadata: Metadata = {
   referrer: "no-referrer",
   robots: { follow: false, index: false },
-  title: "Report received | Metsys",
+  title: "Report received | Taskora",
 };
 
 const REFERENCE_PATTERN = /^INT-[A-Z0-9]{8}$/u;

@@ -79,4 +79,4 @@ export class ClientLogos extends Context.Service<
       companyId: string
     ) => Effect.Effect<string | null, AppError>;
   }
->()("metsys/server/ClientLogos") {}
+>()("taskora/server/ClientLogos") {}

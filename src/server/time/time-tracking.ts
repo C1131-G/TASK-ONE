@@ -683,7 +683,7 @@ export class TimeTracking extends Context.Service<
       range: DateRange
     ) => Effect.Effect<string, AppError>;
   }
->()("metsys/server/TimeTracking") {}
+>()("taskora/server/TimeTracking") {}
 
 export const TimeTrackingLive = Layer.succeed(TimeTracking, {
   addEntry,

@@ -17,7 +17,7 @@ export interface IntakeObjectStoreApi {
 export class IntakeObjectStore extends Context.Service<
   IntakeObjectStore,
   IntakeObjectStoreApi
->()("metsys/server/IntakeObjectStore") {}
+>()("taskora/server/IntakeObjectStore") {}
 
 export const IntakeObjectStoreLive = Layer.effect(
   IntakeObjectStore,

@@ -41,7 +41,7 @@ export class Idempotency extends Context.Service<
       input: IdempotencyRunInput<ResultSchema>
     ) => Effect.Effect<ResultSchema["Type"], AppError>;
   }
->()("metsys/server/Idempotency") {}
+>()("taskora/server/Idempotency") {}
 
 const mapError = (error: unknown): AppError => {
   if (error instanceof AppError) {

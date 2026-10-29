@@ -10,7 +10,7 @@ import {
   ActivityFeedSkeleton,
 } from "@/features/activity/components/activity-feed";
 
-export const metadata: Metadata = { title: "Activity | Metsys" };
+export const metadata: Metadata = { title: "Activity | Taskora" };
 
 const ActivityPage = () => (
   <PageTransition>

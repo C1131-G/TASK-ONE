@@ -91,7 +91,7 @@ export class LabelManagement extends Context.Service<
       labelId: string
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/LabelManagement") {}
+>()("taskora/server/LabelManagement") {}
 
 const labelSummary = (label: {
   readonly color: string;

@@ -245,7 +245,7 @@ export class GithubConnections extends Context.Service<
       connectionId: string
     ) => Effect.Effect<{ readonly secret: string }, AppError>;
   }
->()("metsys/server/GithubConnections") {}
+>()("taskora/server/GithubConnections") {}
 
 const attempt = <Value>(run: () => Promise<Value>) =>
   Effect.tryPromise({ catch: mapError, try: run });

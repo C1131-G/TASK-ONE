@@ -1,17 +1,17 @@
 {
   "expo": {
     "name": "Taskora",
-    "slug": "metsys",
+    "slug": "taskora",
     "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "metsys",
+    "scheme": "taskora",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.cibi.metsys"
+      "bundleIdentifier": "com.cibi.taskora"
     },
     "android": {
-      "package": "com.cibi.metsys",
+      "package": "com.cibi.taskora",
       "adaptiveIcon": {
         "backgroundColor": "#4B5BD6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

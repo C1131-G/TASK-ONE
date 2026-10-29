@@ -11,7 +11,7 @@ import {
 } from "@/features/settings/components/settings-panel";
 import { parseSettingsSection } from "@/features/settings/settings-section";
 
-export const metadata: Metadata = { title: "Settings | Metsys" };
+export const metadata: Metadata = { title: "Settings | Taskora" };
 
 const SettingsPage = ({ searchParams }: PageProps<"/settings">) => (
   <PageTransition>

@@ -36,7 +36,7 @@ export interface CalendarTask {
 export type CalendarEvent = CalendarEventSummary;
 
 // Drag data type for a task chip. The day cell reads it on drop.
-export const TASK_DRAG_TYPE = "application/x-metsys-task";
+export const TASK_DRAG_TYPE = "application/x-taskora-task";
 
 const MoveTaskForm = ({
   dueDate,

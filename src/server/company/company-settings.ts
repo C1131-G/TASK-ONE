@@ -81,7 +81,7 @@ export class CompanySettingsManagement extends Context.Service<
       input: CompanySettingsInput
     ) => Effect.Effect<CompanySettingsValues, AppError>;
   }
->()("metsys/server/CompanySettingsManagement") {}
+>()("taskora/server/CompanySettingsManagement") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

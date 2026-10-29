@@ -13,7 +13,7 @@ import type { Persona } from "./action-harness";
 import { countRows, reportBody, send } from "./mobile-bugs-fixtures";
 
 const endpoint = process.env["S3_ENDPOINT"];
-const bucket = process.env["S3_BUCKET"] ?? "metsys-private";
+const bucket = process.env["S3_BUCKET"] ?? "taskora-private";
 const accessKeyId = process.env["S3_ACCESS_KEY_ID"];
 const secretAccessKey = process.env["S3_SECRET_ACCESS_KEY"];
 

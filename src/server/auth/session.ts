@@ -15,7 +15,7 @@ import type {
 // once a minute.
 export const CLIENT_IDLE_LIMIT_MS = 2 * 60 * 60 * 1000;
 const ACTIVITY_THROTTLE_MS = 60 * 1000;
-export const PORTAL_PREVIEW_COOKIE = "metsys_portal_preview";
+export const PORTAL_PREVIEW_COOKIE = "taskora_portal_preview";
 
 const readCookie = (headers: Headers, name: string): string | null => {
   const cookies = headers.get("cookie") ?? "";
@@ -44,7 +44,7 @@ export class AuthSession extends Context.Service<
       headers: Headers
     ) => Effect.Effect<PortalUser, AppError>;
   }
->()("metsys/server/AuthSession") {}
+>()("taskora/server/AuthSession") {}
 
 const notAuthenticated = (
   reason: "session_ended" | "deactivated" = "session_ended"

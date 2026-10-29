@@ -7,7 +7,7 @@ import Link from "next/link";
 import { AuthCard } from "@/features/user/components/auth-card";
 import { AuthShell } from "@/features/user/components/auth-shell";
 
-export const metadata: Metadata = { title: "Not found | Metsys" };
+export const metadata: Metadata = { title: "Not found | Taskora" };
 
 // Unmatched URLs render outside the workspace shell, so this uses the public chrome.
 const RootNotFound = () => (
@@ -19,7 +19,7 @@ const RootNotFound = () => (
       titleId="not-found-title"
     >
       <Link className="auth-submit auth-submit-link" href="/">
-        Go to Metsys
+        Go to Taskora
         <ArrowRight
           aria-hidden="true"
           className="auth-submit-arrow"

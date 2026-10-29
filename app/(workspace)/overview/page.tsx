@@ -12,7 +12,7 @@ import {
   WorkspaceOverview,
 } from "@/features/dashboard/components/workspace-overview";
 
-export const metadata: Metadata = { title: "Overview | Metsys" };
+export const metadata: Metadata = { title: "Overview | Taskora" };
 
 const OverviewPage = () => (
   <PageTransition>
@@ -20,7 +20,7 @@ const OverviewPage = () => (
       <div className="ph">
         <div>
           <h1>Workspace overview</h1>
-          <p>Health of every project in Metsys.</p>
+          <p>Health of every project in Taskora.</p>
         </div>
         <SectionErrorBoundary title="Overview actions couldn't load">
           <SuspenseReveal fallback={<WorkspaceOverviewActionsSkeleton />}>

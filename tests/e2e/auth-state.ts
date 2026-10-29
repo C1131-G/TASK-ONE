@@ -14,8 +14,8 @@ export const HANDLER_TWO_STATE = "tests/e2e/.auth/handler-two.json";
 export const PORTAL_ACCOUNTS = {
   clientOne: "client-one@acme.test",
   clientTwo: "client-two@acme.test",
-  handler: "handler-one@metsys.test",
-  handlerTwo: "handler-two@metsys.test",
+  handler: "handler-one@taskora.test",
+  handlerTwo: "handler-two@taskora.test",
   lockoutClient: "lockout-client@acme.test",
   newClient: "new-client@acme.test",
 } as const;

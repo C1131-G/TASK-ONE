@@ -10,7 +10,7 @@ import {
   BudgetListSkeleton,
 } from "@/features/projects/components/budget-list";
 
-export const metadata: Metadata = { title: "Budgets | Metsys" };
+export const metadata: Metadata = { title: "Budgets | Taskora" };
 
 const BudgetsPage = () => (
   <PageTransition>

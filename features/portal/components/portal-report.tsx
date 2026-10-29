@@ -61,8 +61,8 @@ const PortalReportBody = ({
         </span>
         <h2 className="es-h">No active projects yet</h2>
         <p>
-          Your company has no active projects to report bugs on. Ask your Metsys
-          contact to set one up.
+          Your company has no active projects to report bugs on. Ask your
+          Taskora contact to set one up.
         </p>
       </div>
     );

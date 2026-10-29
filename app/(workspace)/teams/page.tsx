@@ -10,7 +10,7 @@ import {
   TeamListSkeleton,
 } from "@/features/people/components/team-list";
 
-export const metadata: Metadata = { title: "Teams | Metsys" };
+export const metadata: Metadata = { title: "Teams | Taskora" };
 
 const TeamsPage = () => (
   <PageTransition>

@@ -48,7 +48,7 @@ export class AutomationManagement extends Context.Service<
       limit: number
     ) => Effect.Effect<readonly AutomationRunSummary[], AppError>;
   }
->()("metsys/server/AutomationManagement") {}
+>()("taskora/server/AutomationManagement") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

@@ -143,8 +143,8 @@ it("falls back to a shared tag and title when the payload has none", async () =>
 
   expect(notifications).toEqual([
     {
-      options: { body: "", data: { url: "/tasks" }, tag: "metsys-update" },
-      title: "Metsys update",
+      options: { body: "", data: { url: "/tasks" }, tag: "taskora-update" },
+      title: "Taskora update",
     },
   ]);
 });
@@ -152,7 +152,7 @@ it("falls back to a shared tag and title when the payload has none", async () =>
 it("does not pass a non string tag through to the notification", async () => {
   const notifications = await deliver(() => ({ tag: 42, title: "Hi" }));
 
-  expect(notifications[0]?.options["tag"]).toBe("metsys-update");
+  expect(notifications[0]?.options["tag"]).toBe("taskora-update");
 });
 
 it("shows nothing for a payload that is not valid JSON", async () => {

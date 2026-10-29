@@ -18,28 +18,28 @@ jobs:
       postgres:
         image: postgres:18-alpine
         env:
-          POSTGRES_USER: metsys
+          POSTGRES_USER: taskora
           POSTGRES_PASSWORD: local-dev-password
-          POSTGRES_DB: metsys_ci
+          POSTGRES_DB: taskora_ci
         ports:
           - 5433:5432
         options: >-
-          --health-cmd "pg_isready -U metsys -d metsys_ci" --health-interval 5s --health-timeout 5s --health-retries 12
+          --health-cmd "pg_isready -U taskora -d taskora_ci" --health-interval 5s --health-timeout 5s --health-retries 12
     env:
-      DATABASE_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci?sslmode=disable
+      DATABASE_URL: postgresql://taskora:local-dev-password@localhost:5433/taskora_ci?sslmode=disable
       BETTER_AUTH_SECRET: ci-only-secret-that-is-long-enough-for-auth
       BETTER_AUTH_URL: http://localhost:3000
       BETTER_AUTH_TRUSTED_ORIGINS: http://localhost:3000
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       SCHEDULER_TOKEN: ci-only-scheduler-token-long-enough
-      TEST_DATABASE_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci_test?sslmode=disable
-      TEST_DATABASE_ADMIN_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci?sslmode=disable
-      MIGRATION_CHECK_DATABASE_URL: postgresql://metsys:local-dev-password@localhost:5433/metsys_ci_migrations?sslmode=disable
+      TEST_DATABASE_URL: postgresql://taskora:local-dev-password@localhost:5433/taskora_ci_test?sslmode=disable
+      TEST_DATABASE_ADMIN_URL: postgresql://taskora:local-dev-password@localhost:5433/taskora_ci?sslmode=disable
+      MIGRATION_CHECK_DATABASE_URL: postgresql://taskora:local-dev-password@localhost:5433/taskora_ci_migrations?sslmode=disable
       S3_ENDPOINT: http://localhost:9000
       S3_PUBLIC_ENDPOINT: http://localhost:9000
       S3_REGION: us-east-1
-      S3_BUCKET: metsys-private
-      S3_ACCESS_KEY_ID: metsys
+      S3_BUCKET: taskora-private
+      S3_ACCESS_KEY_ID: taskora
       S3_SECRET_ACCESS_KEY: local-minio-password
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -58,12 +58,12 @@ jobs:
         run: bun audit --audit-level=high
       - name: Check migrations reproduce the contract
         run: |
-          PGPASSWORD=local-dev-password createdb -h localhost -p 5433 -U metsys metsys_ci_migrations
+          PGPASSWORD=local-dev-password createdb -h localhost -p 5433 -U taskora taskora_ci_migrations
           DATABASE_URL="$MIGRATION_CHECK_DATABASE_URL" bun run db:migrate
           DATABASE_URL="$MIGRATION_CHECK_DATABASE_URL" bun run db:verify
       - name: Create and initialize isolated databases
         run: |
-          PGPASSWORD=local-dev-password createdb -h localhost -p 5433 -U metsys metsys_ci_test
+          PGPASSWORD=local-dev-password createdb -h localhost -p 5433 -U taskora taskora_ci_test
           bun run db:init
           DATABASE_URL="$TEST_DATABASE_URL" bun run db:init
           bun run db:verify
@@ -75,14 +75,14 @@ jobs:
         run: |
           # MinIO ships as source only, so build the server and client from the
           # same Dockerfile compose uses instead of pulling Docker Hub images.
-          docker build -f docker/minio.Dockerfile --target server -t metsys-minio-server:ci .
-          docker build -f docker/minio.Dockerfile --target client -t metsys-minio-client:ci .
-          docker run -d --name metsys-minio -p 9000:9000 -e MINIO_ROOT_USER=metsys -e MINIO_ROOT_PASSWORD=local-minio-password metsys-minio-server:ci server /data
+          docker build -f docker/minio.Dockerfile --target server -t taskora-minio-server:ci .
+          docker build -f docker/minio.Dockerfile --target client -t taskora-minio-client:ci .
+          docker run -d --name taskora-minio -p 9000:9000 -e MINIO_ROOT_USER=taskora -e MINIO_ROOT_PASSWORD=local-minio-password taskora-minio-server:ci server /data
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
             sleep 2
           done
-          docker run --rm --network host -e MC_HOST_local=http://metsys:local-minio-password@localhost:9000 metsys-minio-client:ci mb --ignore-existing local/metsys-private
+          docker run --rm --network host -e MC_HOST_local=http://taskora:local-minio-password@localhost:9000 taskora-minio-client:ci mb --ignore-existing local/taskora-private
       - run: bun run test:backend
       - name: Generate ephemeral browser credentials
         run: |
@@ -92,7 +92,7 @@ jobs:
       - name: Seed browser test data
         run: |
           bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
-          UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@metsys.test UI_FIXTURE_CLIENT_EMAIL=client-one@acme.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
+          UI_FIXTURE_ADMIN_EMAIL=ui-admin@taskora.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@taskora.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@taskora.test UI_FIXTURE_CLIENT_EMAIL=client-one@acme.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
       - run: bunx playwright install --with-deps chromium
       - name: Build with instant-navigation testing API
         run: bun run build
@@ -100,7 +100,7 @@ jobs:
           EXPOSE_TESTING_API: "1"
       - name: Run production server and browser checks
         run: |
-          EXPOSE_TESTING_API=1 bun run start --port 3000 > /tmp/metsys-next.log 2>&1 &
+          EXPOSE_TESTING_API=1 bun run start --port 3000 > /tmp/taskora-next.log 2>&1 &
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://localhost:3000/api/health; then break; fi
             sleep 2

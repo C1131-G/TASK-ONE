@@ -36,7 +36,7 @@ export class TaskPermissions extends Context.Service<
       task: TaskAccess
     ) => Effect.Effect<void, AppError>;
   }
->()("metsys/server/TaskPermissions") {}
+>()("taskora/server/TaskPermissions") {}
 
 export const TaskPermissionsLive = Layer.succeed(
   TaskPermissions,

@@ -33,7 +33,7 @@ export class ActivityManagement extends Context.Service<
       limit: number
     ) => Effect.Effect<readonly ActivityEntry[], AppError>;
   }
->()("metsys/server/ActivityManagement") {}
+>()("taskora/server/ActivityManagement") {}
 
 const list: ActivityManagement["Service"]["list"] = (
   actorId,

@@ -5,12 +5,12 @@ test.use({ storageState: { cookies: [], origins: [] } });
 
 const roles = [
   {
-    email: "ui-admin@metsys.test",
+    email: "ui-admin@taskora.test",
     name: "admin",
     passwordEnv: "E2E_ADMIN_PASSWORD",
   },
   {
-    email: "ui-employee@metsys.test",
+    email: "ui-employee@taskora.test",
     name: "employee",
     passwordEnv: "E2E_EMPLOYEE_PASSWORD",
   },

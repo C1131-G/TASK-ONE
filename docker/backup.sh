@@ -16,7 +16,7 @@ backup_dir="${BACKUP_DIR:-./backups}"
 retention_days="${BACKUP_RETENTION_DAYS:-14}"
 compose_files="${COMPOSE_FILES:--f docker-compose.yml -f docker-compose.prod.yml}"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
-target="${backup_dir}/metsys-${timestamp}.dump"
+target="${backup_dir}/taskora-${timestamp}.dump"
 partial="${target}.partial"
 
 mkdir -p "${backup_dir}"
@@ -41,4 +41,4 @@ fi
 mv "${partial}" "${target}"
 echo "Wrote ${target}"
 
-find "${backup_dir}" -name 'metsys-*.dump' -type f -mtime "+${retention_days}" -print -delete
+find "${backup_dir}" -name 'taskora-*.dump' -type f -mtime "+${retention_days}" -print -delete

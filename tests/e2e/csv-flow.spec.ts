@@ -117,7 +117,7 @@ test.describe("CSV import, export and calendar feed", () => {
     const path = await importFile(
       testInfo,
       "valid.csv",
-      `title,status,priority,due_date,description,assignees\n${OPEN_TITLE},todo,high,2026-12-24,"Imported, with a comma",ui-admin@metsys.test\n${FORMULA_TITLE},review,low,,,\n`
+      `title,status,priority,due_date,description,assignees\n${OPEN_TITLE},todo,high,2026-12-24,"Imported, with a comma",ui-admin@taskora.test\n${FORMULA_TITLE},review,low,,,\n`
     );
     await page.getByLabel("CSV file").setInputFiles(path);
     await page.getByRole("button", { name: "Import tasks" }).click();

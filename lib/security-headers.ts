@@ -37,7 +37,7 @@ export const storageOriginFromEnv = (
   if (endpoint) {
     return toOrigin(endpoint);
   }
-  const bucket = env["S3_BUCKET"] ?? "metsys-private";
+  const bucket = env["S3_BUCKET"] ?? "taskora-private";
   const region = env["S3_REGION"] ?? "us-east-1";
   return `https://${bucket}.s3.${region}.amazonaws.com`;
 };

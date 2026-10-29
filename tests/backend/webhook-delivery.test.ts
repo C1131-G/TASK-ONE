@@ -211,16 +211,16 @@ it("signs the body with the endpoint secret and records success", async () => {
   expect(sent).toHaveLength(1);
   const [request] = sent;
   expect(request?.address).toBe("93.184.216.34");
-  expect(request?.headers["x-metsys-event"]).toBe("task.created");
-  expect(request?.headers["x-metsys-delivery"]).toBe(delivery?.eventId ?? "");
-  const timestamp = Number(request?.headers["x-metsys-timestamp"]);
+  expect(request?.headers["x-taskora-event"]).toBe("task.created");
+  expect(request?.headers["x-taskora-delivery"]).toBe(delivery?.eventId ?? "");
+  const timestamp = Number(request?.headers["x-taskora-timestamp"]);
   expect(timestamp).toBe(Date.parse("2026-10-21T10:00:00.000Z") / 1000);
   expect(
     verifyWebhookSignature(
       endpoint.secret,
       timestamp,
       request?.body ?? "",
-      request?.headers["x-metsys-signature"] ?? "",
+      request?.headers["x-taskora-signature"] ?? "",
       timestamp
     )
   ).toBe(true);
@@ -373,7 +373,7 @@ it("sends Slack endpoints a plain text message without signature headers", async
   expect(JSON.parse(sent[0]?.body ?? "{}")).toEqual({
     text: "Task created: Hello &lt;!here&gt;",
   });
-  expect(sent[0]?.headers["x-metsys-signature"]).toBeUndefined();
+  expect(sent[0]?.headers["x-taskora-signature"]).toBeUndefined();
 });
 
 it("skips deliveries for a disabled endpoint", async () => {

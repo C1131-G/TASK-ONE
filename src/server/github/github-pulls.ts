@@ -80,7 +80,7 @@ export class GithubPulls extends Context.Service<
       taskId: string
     ) => Effect.Effect<readonly LinkedPull[], AppError>;
   }
->()("metsys/server/GithubPulls") {}
+>()("taskora/server/GithubPulls") {}
 
 export const GithubPullsLive = Layer.succeed(
   GithubPulls,

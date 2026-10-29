@@ -187,7 +187,7 @@ export class PersonalPreferences extends Context.Service<
       widths: unknown
     ) => Effect.Effect<PersonalPreferenceValues, AppError>;
   }
->()("metsys/server/PersonalPreferences") {}
+>()("taskora/server/PersonalPreferences") {}
 
 export const PersonalPreferencesLive = Layer.succeed(PersonalPreferences, {
   get: readValues,

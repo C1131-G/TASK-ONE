@@ -25,7 +25,7 @@ const openFiles = async (page: Page) => {
   await page.waitForLoadState("networkidle");
 };
 
-const choose = (page: Page, name: string, body = "metsys e2e upload") =>
+const choose = (page: Page, name: string, body = "taskora e2e upload") =>
   page.getByLabel("Choose files to upload").setInputFiles({
     buffer: Buffer.from(body),
     mimeType: "text/plain",
@@ -79,7 +79,7 @@ test.describe("project file uploads", () => {
     await openFiles(page);
     const name = `e2e-retry-${Date.now()}.txt`;
     let failures = 1;
-    await page.route(/\/metsys-[^/]*\/.*[?&]X-Amz-/u, async (route) => {
+    await page.route(/\/taskora-[^/]*\/.*[?&]X-Amz-/u, async (route) => {
       if (route.request().method() === "PUT" && failures > 0) {
         failures -= 1;
         await route.fulfill({ status: 500 });
@@ -108,7 +108,7 @@ test.describe("project file uploads", () => {
     await openFiles(page);
     const name = `e2e-cancel-${Date.now()}.txt`;
     // Hold the storage PUT so the Cancel control stays on screen.
-    await page.route(/\/metsys-[^/]*\/.*[?&]X-Amz-/u, async (route) => {
+    await page.route(/\/taskora-[^/]*\/.*[?&]X-Amz-/u, async (route) => {
       if (route.request().method() === "PUT") {
         await sleep(10_000);
       }

@@ -10,7 +10,7 @@ import {
   WebhooksPanelSkeleton,
 } from "@/features/webhooks/components/webhooks-panel";
 
-export const metadata: Metadata = { title: "Webhooks | Metsys" };
+export const metadata: Metadata = { title: "Webhooks | Taskora" };
 
 const WebhooksPage = () => (
   <PageTransition>

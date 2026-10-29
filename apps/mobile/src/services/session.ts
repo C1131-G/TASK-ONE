@@ -57,7 +57,7 @@ export class Session extends Context.Service<
       idle: Parameters<typeof Effect.sleep>[0],
     ) => Effect.Effect<never>;
   }
->()("metsys/mobile/Session") {}
+>()("taskora/mobile/Session") {}
 
 export interface SessionDeps {
   readonly baseUrl: string;

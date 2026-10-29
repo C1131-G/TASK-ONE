@@ -76,7 +76,7 @@ describe("notification emails", () => {
       userId: "user-1",
     });
 
-    expect(email.subject).toBe("Your Metsys digest: 2 updates");
+    expect(email.subject).toBe("Your Taskora digest: 2 updates");
     expect(email.text).toContain("First");
     expect(email.text).toContain(`${BASE_URL}/tasks/2`);
     expect(email.html).toContain("Second");

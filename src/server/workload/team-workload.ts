@@ -140,6 +140,6 @@ export class TeamWorkload extends Context.Service<
       now: Date
     ) => Effect.Effect<WorkloadView, AppError>;
   }
->()("metsys/server/TeamWorkload") {}
+>()("taskora/server/TeamWorkload") {}
 
 export const TeamWorkloadLive = Layer.succeed(TeamWorkload, { view });

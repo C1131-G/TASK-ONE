@@ -9,7 +9,7 @@ import {
 const validEnv = {
   BETTER_AUTH_SECRET: "a-test-secret-that-is-at-least-thirty-two-chars",
   BETTER_AUTH_URL: "http://localhost:3000",
-  DATABASE_URL: "postgresql://user:pass@localhost:5432/metsys",
+  DATABASE_URL: "postgresql://user:pass@localhost:5432/taskora",
 } as const;
 
 const parseError = (source: Record<string, string | undefined>): string => {
@@ -44,7 +44,7 @@ describe("parseServerEnv", () => {
     const message = parseError({
       BETTER_AUTH_SECRET: "too-short-secret",
       DATABASE_POOL_MAX: "0",
-      DATABASE_URL: "mysql://localhost/metsys",
+      DATABASE_URL: "mysql://localhost/taskora",
       INTAKE_EMAIL_SECRET: "short-intake",
       SCHEDULER_TOKEN: "short-token",
     });

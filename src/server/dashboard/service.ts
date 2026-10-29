@@ -92,7 +92,7 @@ export class Dashboard extends Context.Service<
       userId: string
     ) => Effect.Effect<DashboardOverview, AppError>;
   }
->()("metsys/server/Dashboard") {}
+>()("taskora/server/Dashboard") {}
 
 const mapError = (error: unknown): AppError =>
   error instanceof AppError

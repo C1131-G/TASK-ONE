@@ -7,7 +7,7 @@ import {
 } from "@/services/storage-adapter";
 
 export class KeyValueStore extends Context.Service<KeyValueStore, StoreOps>()(
-  "metsys/mobile/KeyValueStore",
+  "taskora/mobile/KeyValueStore",
 ) {}
 
 /** AsyncStorage-backed live layer. The module import is deferred so Node tests never touch it. */

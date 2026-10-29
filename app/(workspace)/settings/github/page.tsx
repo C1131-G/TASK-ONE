@@ -10,7 +10,7 @@ import {
   GithubPanelSkeleton,
 } from "@/features/github/components/github-panel";
 
-export const metadata: Metadata = { title: "GitHub | Metsys" };
+export const metadata: Metadata = { title: "GitHub | Taskora" };
 
 const GithubPage = () => (
   <PageTransition>
