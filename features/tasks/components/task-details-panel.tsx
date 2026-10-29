@@ -3,7 +3,7 @@
 
 "use client";
 
-import { use, useCallback, useRef, useState } from "react";
+import { use, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,6 +17,7 @@ import { TaskDetailsHeading } from "@/features/tasks/components/task-details-hea
 import { TaskDiscardDialog } from "@/features/tasks/components/task-discard-dialog";
 import { TaskWorkSections } from "@/features/tasks/components/task-work-sections";
 import { useTaskBundle } from "@/features/tasks/hooks/use-task-bundle";
+import { useTaskPanelOpen } from "@/features/tasks/hooks/use-task-panel-open";
 import { useTaskPanelSave } from "@/features/tasks/hooks/use-task-panel-save";
 import { useTaskSubtaskActions } from "@/features/tasks/hooks/use-task-subtask-actions";
 import type {
@@ -42,6 +43,15 @@ const TaskPanelError = ({
       </button>
     </p>
   ) : null;
+
+// The panel may edit when the task is not loaded yet, when the task is at the
+// version the caller holds, or when this panel itself produced that version.
+const isVersionCurrent = (
+  task: { readonly version: number } | null,
+  version: number,
+  trustedVersion: number | null
+): boolean =>
+  task === null || task.version === version || trustedVersion === version;
 
 // One panel per task. Everything it edits is read from the server when it opens,
 // so a caller only needs the task's ID, project and version. Closing with unsaved
@@ -85,19 +95,11 @@ export const TaskDetailsPanel = ({
   // A deep-link bundle is resolved by the nearest Suspense boundary before
   // the panel mounts; its rejection is handled by the section boundary.
   const initialBundle = initialBundlePromise ? use(initialBundlePromise) : null;
-  const [localOpen, setLocalOpen] = useState(false);
-  const isOpen = open ?? localOpen;
-  const [discardOpen, setDiscardOpen] = useState(false);
   const [trustedVersion, setTrustedVersion] = useState<number | null>(null);
   const recordVersionChange = (nextVersion: number) => {
     setTrustedVersion(nextVersion);
     onVersionChange(nextVersion);
   };
-  // A ref, not state: the dirty flag only decides what a close does.
-  const detailsDirtyRef = useRef(false);
-  const setDetailsDirty = useCallback((dirty: boolean) => {
-    detailsDirtyRef.current = dirty;
-  }, []);
   const isBug = taskType === "bug";
   // Set only when this panel shows a bug, so bug-only reads and views key off it.
   const bugDetailId = isBug ? bugId : undefined;
@@ -146,35 +148,26 @@ export const TaskDetailsPanel = ({
     taskTitle: task?.title ?? taskTitle ?? "task",
   });
 
-  const setOpen = (next: boolean) => {
-    if (open === undefined) {
-      setLocalOpen(next);
-    }
-    onOpenChange?.(next);
-  };
-
-  const requestOpenChange = (next: boolean) => {
-    if (next) {
-      if (!isOpen && !initialBundle) {
-        refresh();
-      }
-      setOpen(true);
-      return;
-    }
-    if (detailsDirtyRef.current || comments.body.trim()) {
-      setDiscardOpen(true);
-      return;
-    }
-    setOpen(false);
-  };
-
-  const discardAndClose = () => {
-    setDiscardOpen(false);
-    comments.setBody("");
-    comments.setVisibility("internal");
-    detailsDirtyRef.current = false;
-    setOpen(false);
-  };
+  const {
+    discardAndClose,
+    discardOpen,
+    isOpen,
+    requestOpenChange,
+    setDetailsDirty,
+    setDiscardOpen,
+  } = useTaskPanelOpen({
+    commentDraft: {
+      hasText: Boolean(comments.body.trim()),
+      reset: () => {
+        comments.setBody("");
+        comments.setVisibility("internal");
+      },
+    },
+    hasInitialBundle: Boolean(initialBundle),
+    onOpenChange,
+    open,
+    refresh,
+  });
 
   return (
     <section className="task-details-panel">
@@ -221,11 +214,11 @@ export const TaskDetailsPanel = ({
                 task={task}
                 taskId={taskId}
                 version={version}
-                versionIsCurrent={
-                  task === null ||
-                  task.version === version ||
-                  trustedVersion === version
-                }
+                versionIsCurrent={isVersionCurrent(
+                  task,
+                  version,
+                  trustedVersion
+                )}
               />
             )}
             <TaskTimeSection
