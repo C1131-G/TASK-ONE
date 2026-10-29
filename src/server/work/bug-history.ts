@@ -23,6 +23,36 @@ export class BugHistory extends Context.Service<
   }
 >()("metsys/server/BugHistory") {}
 
+interface StaffCandidate {
+  readonly deactivatedAt: Date | null;
+  readonly mustChangePassword: boolean;
+  readonly role: string;
+}
+
+// Signed in, not a client, and past the forced password change, in this order.
+const assertStaffActor: <Actor extends StaffCandidate>(
+  actor: Actor | null
+) => asserts actor is Actor = (actor) => {
+  if (!actor || actor.deactivatedAt) {
+    throw new AppError({
+      code: "UNAUTHENTICATED",
+      message: "Sign in to continue.",
+    });
+  }
+  if (actor.role === "client") {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "This area is only available to workspace members.",
+    });
+  }
+  if (actor.mustChangePassword) {
+    throw new AppError({
+      code: "FORBIDDEN",
+      message: "Change your password before continuing.",
+    });
+  }
+};
+
 const getBugHistory = (
   actorId: string,
   bugId: string
@@ -37,24 +67,7 @@ const getBugHistory = (
     const actor = await transaction.orm.public.User.where({ id: actorId })
       .select("deactivatedAt", "mustChangePassword", "role")
       .first();
-    if (!actor || actor.deactivatedAt) {
-      throw new AppError({
-        code: "UNAUTHENTICATED",
-        message: "Sign in to continue.",
-      });
-    }
-    if (actor.role === "client") {
-      throw new AppError({
-        code: "FORBIDDEN",
-        message: "This area is only available to workspace members.",
-      });
-    }
-    if (actor.mustChangePassword) {
-      throw new AppError({
-        code: "FORBIDDEN",
-        message: "Change your password before continuing.",
-      });
-    }
+    assertStaffActor(actor);
     const bug = await transaction.orm.public.BugReport.where({
       id: bugId,
     }).first();
