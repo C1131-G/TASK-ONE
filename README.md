@@ -1,5 +1,7 @@
 # Taskora
 
+> Type: readme · Status: current · Updated: 2026-10-29
+
 Taskora is a project and work management platform for teams and their clients. It includes a web application, a companion mobile app, and a server that handles authentication, workspace data, files, notifications, and background jobs.
 
 The repository is open source under the [MIT License](LICENSE). Taskora is built with Next.js, React, PostgreSQL, Prisma ORM 8, Better Auth, and Effect. The mobile client uses Expo and React Native.
@@ -21,6 +23,7 @@ Taskora is actively developed. The web app and server are the primary product. T
 
 ## Contents
 
+- [Documentation](#documentation)
 - [Requirements](#requirements)
 - [Run the web app locally](#run-the-web-app-locally)
 - [Create the first administrator](#create-the-first-administrator)
@@ -33,6 +36,10 @@ Taskora is actively developed. The web app and server are the primary product. T
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
+
+## Documentation
+
+Use the [documentation hub](docs/README.md) to find the [system architecture](docs/architecture.md) and the [mobile API reference](docs/mobile-api.md). The generated [OpenAPI document](docs/mobile-openapi.json) describes the same mobile API contract.
 
 ## Requirements
 
@@ -148,18 +155,23 @@ The mobile client consumes the server's `/api/v1` endpoints. Run `bun run openap
 
 ## Tests and quality checks
 
-Run the web checks from the repository root:
+| Command | Run from | Purpose |
+| --- | --- | --- |
+| `bun run lint` | Repository root | Check formatting and lint rules for web and mobile code. |
+| `bun run typecheck` | Repository root | Generate Next.js route types and type-check the web app. |
+| `bun run test:ui` | Repository root | Run web UI unit tests. |
+| `bun run test:backend` | Repository root | Run backend tests against a dedicated local test database. |
+| `bun run test:e2e` | Repository root | Run Playwright browser tests against a running app. |
+| `bun run lint` | `apps/mobile/` | Lint the Expo app. |
+| `bun run typecheck` | `apps/mobile/` | Type-check the Expo app. |
+| `bun run test:effect` | `apps/mobile/` | Run mobile Effect tests. |
+| `bun run test:ui` | `apps/mobile/` | Run mobile UI tests. |
 
-```bash
-bun run lint
-bun run typecheck
-bun run test:ui
-bun run test:backend
-```
+CI also builds the production web app and Docker images and runs Playwright against Chromium.
 
 The backend test runner creates or migrates a dedicated local `taskora*_test` database and checks for leftover fixture rows. If `TEST_DATABASE_URL` is unset, it derives a test database name from a local `taskora` database URL. It refuses to derive a test database from a remote URL. Never point it at data you need to keep.
 
-The mobile checks are listed above. CI also builds the web Docker image and runs browser tests against Chromium.
+The mobile checks are listed in the table.
 
 ### Browser tests
 
@@ -270,7 +282,7 @@ The web application uses Next.js App Router. Product pages, queries, Server Acti
 | `scripts/` | Database, test, bootstrap, worker, and API contract scripts. |
 | `docker/` | Container build and backup support files. |
 
-Operational reads are kept fresh. Tagged reference data uses Next.js caching and is invalidated by its writers. Mutating actions refresh the affected UI after success. These conventions help keep role checks, validation, persistence, and view code in their intended layers.
+See [Architecture](docs/architecture.md) for the verified web, mobile, API, service, and persistence boundaries.
 
 ## Contributing
 

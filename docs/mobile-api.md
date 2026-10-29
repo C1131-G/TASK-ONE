@@ -1,9 +1,19 @@
-# Mobile API
+---
+title: Mobile API reference
+type: reference
+status: current
+updated: 2026-10-29
+---
 
-All routes use the authenticated mobile API. Paths use braces for route parameters.
+This reference lists the mobile API operations and their access requirements. The route inventory mirrors [`mobileRoutes`](../src/mobile-api/routes.ts); the canonical schema is the generated [OpenAPI document](mobile-openapi.json), served at `GET /api/v1/openapi.json`.
+
+## API routes
+
+Product API operations below require an authenticated bearer token. Paths use braces for route parameters.
 
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
+| `GET` | `/api/v1/openapi.json` | Public | The generated OpenAPI contract. No bearer token is required. |
 | `GET` | `/api/v1/me` | Authenticated bearer token | Who the bearer token belongs to. |
 | `POST` | `/api/v1/me/password` | Authenticated bearer token | Replace the caller's password, which also ends their other sessions. Open to an account that must change its password first. |
 | `GET` | `/api/v1/workspace/tasks` | Authenticated bearer token | The workspace's open tasks, newest first, one page at a time. Bugs and archived tasks are left out; filter by project, status or the caller's own assignments. |
@@ -76,3 +86,7 @@ All routes use the authenticated mobile API. Paths use braces for route paramete
 | `GET` | `/api/v1/workspace/favorites` | Authenticated bearer token | The projects and tasks the caller starred, projects first, one page at a time. |
 | `GET` | `/api/v1/workspace/archive` | Authenticated bearer token | Archived projects and tasks, most recently archived first, one page at a time. The list reaches back over the latest 500 archived tasks. |
 | `GET` | `/api/v1/workspace/files` | Authenticated bearer token | The standalone files (not attached to a task) of one project, or of every active project when `projectId` is left out, newest first, one page at a time. Admins only, as on the web: for anyone else a named project answers 403 and the unnamed list is empty. |
+
+## OpenAPI schema
+
+The public endpoint is implemented in [`app/api/v1/openapi.json/route.ts`](../app/api/v1/openapi.json/route.ts) and returns the document built by [`buildOpenApiDocument`](../src/server/api/contract.ts). The checked-in [generated JSON](mobile-openapi.json) is produced with `bun run openapi:write`; this reference links to the schema instead of duplicating it.
