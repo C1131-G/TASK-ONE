@@ -27,16 +27,6 @@ export interface RegisteredFixture {
   readonly route: RouteDefinition;
 }
 
-const STATUS_BY_CODE: Record<AppErrorCode, number> = {
-  CONFLICT: 409,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  RATE_LIMITED: 429,
-  UNAUTHENTICATED: 401,
-  UNAVAILABLE: 503,
-  VALIDATION_FAILED: 422,
-};
-
 /**
  * Validates every fixture against its route's schema up front, so a fixture
  * that drifts from the live contract fails loudly instead of serving stale
@@ -75,7 +65,6 @@ export const registerFixtures = (
               ok: true,
               requestId,
             };
-      const status = fixture.error !== undefined ? fixture.error.status : 200;
       return [
         `${fixture.operationId}`,
         {
@@ -113,6 +102,8 @@ export interface HybridFetchOptions {
   /** OperationId prefixes (lowercase) routed to fixtures; everything else goes live. */
   readonly liveFetch: typeof fetch;
   readonly mockedDomains: ReadonlySet<string>;
+  /** Operations answered from fixtures wherever their domain is otherwise live. */
+  readonly mockedOperations?: ReadonlySet<string>;
   readonly registered: ReadonlyMap<string, RegisteredFixture>;
 }
 
@@ -126,15 +117,17 @@ export const createHybridFetch = (options: HybridFetchOptions): typeof fetch => 
   );
   return (input, init) => {
     const request = input instanceof Request ? new Request(input, init) : new Request(input, init);
-    const domain = domainOfPath(new URL(request.url).pathname);
-    if (!options.mockedDomains.has(domain)) {
-      return options.liveFetch(request);
-    }
+    const { pathname } = new URL(request.url);
     const match = [...registeredByPath].find(
       ([key]) =>
         key.startsWith(`${request.method.toUpperCase()} `) &&
-        pathMatches(key.slice(request.method.length + 1), new URL(request.url).pathname),
+        pathMatches(key.slice(request.method.length + 1), pathname),
     );
+    const mockedByOperation =
+      match !== undefined && options.mockedOperations?.has(match[1].route.operationId) === true;
+    if (!options.mockedDomains.has(domainOfPath(pathname)) && !mockedByOperation) {
+      return options.liveFetch(request);
+    }
     const status = match === undefined ? 404 : match[1].failure === undefined ? 200 : match[1].failure.status;
     const body = match === undefined ? { ok: false, requestId: "mock-miss" } : match[1].response;
     return Promise.resolve(
@@ -153,10 +146,12 @@ export const makeMockMobileApiLayer = (
   fixtures: readonly MockFixture[],
   mockedDomains: ReadonlySet<string>,
   liveFetch: typeof fetch = fetch,
+  mockedOperations: ReadonlySet<string> = new Set(),
+  baseUrl: string = MOCK_BASE_URL,
 ): Effect.Effect<Layer.Layer<MobileApi, never, TokenSource>> =>
   Effect.map(registerFixtures(fixtures), (registered) =>
     makeMobileApiLayer({
-      baseUrl: MOCK_BASE_URL,
-      fetchImpl: createHybridFetch({ liveFetch, mockedDomains, registered }),
+      baseUrl,
+      fetchImpl: createHybridFetch({ liveFetch, mockedDomains, mockedOperations, registered }),
     }),
   );

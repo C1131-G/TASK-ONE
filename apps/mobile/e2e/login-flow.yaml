@@ -1,13 +1,13 @@
 appId: com.cibi.metsys
 ---
-# Login: sign in with the prepared test account and land on the workspace.
+# Login: sign in with the seeded account and land on the workspace.
 - launchApp
 - assertVisible: "Sign in"
 - tapOn:
-    id: "Email"
-- inputText: "ui-admin@metsys.test"
+    text: "Email"
+- inputText: ${ADMIN_EMAIL}
 - tapOn:
-    id: "Password"
-- inputText: "e2e-password"
+    text: "Password"
+- inputText: ${ADMIN_PASSWORD}
 - tapOn: "Sign in"
-- assertVisible: "Home"
+- assertVisible: "Hello"

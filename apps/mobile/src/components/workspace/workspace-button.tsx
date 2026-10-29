@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/theme/theme-provider";

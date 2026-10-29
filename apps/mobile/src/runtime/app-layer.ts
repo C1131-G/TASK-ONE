@@ -1,10 +1,12 @@
-import { Config, Effect, Layer } from "effect";
+import { Layer } from "effect";
+
+import { makeApiLayer, resolveApiMode } from "@/api/api-mode";
 
 import { AppLifecycle, AppLifecycleLive } from "@/services/app-lifecycle";
 import { Connectivity, ConnectivityLive } from "@/services/connectivity";
 import { makeIdempotencyKeys, IdempotencyKeys } from "@/services/idempotency-keys";
 import { Haptics, HapticsLive } from "@/services/haptics";
-import { makeMobileApiLayer, MobileApi, TokenSource } from "@/services/mobile-api";
+import { MobileApi, TokenSource } from "@/services/mobile-api";
 import { SecureStorageLive } from "@/services/secure-storage";
 import { makeSessionLayer, Session, TokenSourceFromSession } from "@/services/session";
 import {
@@ -19,15 +21,13 @@ const resolveBaseUrl = (): string =>
     ? "http://10.0.2.2:3000"
     : process.env.EXPO_PUBLIC_API_URL;
 
-void Config;
-
 const SessionLive = Layer.provide(
   makeSessionLayer({ baseUrl: resolveBaseUrl() }),
   SecureStorageLive,
 );
 const TokenSourceLive = Layer.provide(TokenSourceFromSession, SessionLive);
 const MobileApiLive = Layer.provide(
-  makeMobileApiLayer({ baseUrl: resolveBaseUrl() }),
+  makeApiLayer(resolveApiMode(process.env.EXPO_PUBLIC_API_MODE), resolveBaseUrl()),
   TokenSourceLive,
 );
 const IdempotencyKeysLive = makeIdempotencyKeys();

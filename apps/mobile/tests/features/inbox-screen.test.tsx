@@ -7,36 +7,38 @@ import { ValidationFailed } from "@/errors";
 import type { ApiContextValue, KeysContextValue } from "@/runtime/api-hooks";
 import { renderWithTheme } from "../components/support/theme";
 
+const item = (overrides: Partial<InboxItem>): InboxItem => ({
+  actorId: null,
+  actorName: null,
+  createdAt: "2026-10-24T09:15:00.000Z",
+  id: "notif-1",
+  projectId: null,
+  projectName: null,
+  readAt: null,
+  snippet: null,
+  taskId: null,
+  text: "",
+  type: "update",
+  ...overrides,
+});
+
 const ITEMS: readonly InboxItem[] = [
-  {
-    createdAt: "2026-10-24T09:15:00.000Z",
+  item({
     id: "notif-1",
-    kind: "assignment",
-    readAt: null,
+    projectName: "Website relaunch",
     taskId: "task-1",
-    taskTitle: "Ship the landing page",
-    title: "Ada assigned you a task",
-  },
-  {
-    createdAt: "2026-10-24T08:00:00.000Z",
-    id: "notif-2",
-    kind: "mention",
-    readAt: null,
-    taskId: null,
-    taskTitle: null,
-    title: "Grace mentioned you",
-  },
-  {
-    createdAt: "2026-10-23T17:30:00.000Z",
+    text: "Ada assigned you a task",
+    type: "assignment",
+  }),
+  item({ id: "notif-2", text: "Grace mentioned you", type: "mention" }),
+  item({
     id: "notif-3",
-    kind: "comment",
     readAt: "2026-10-23T18:00:00.000Z",
     taskId: "task-2",
-    taskTitle: "Draft the announcement",
-    title: "New comment on your task",
-  },
+    text: "New comment on your task",
+    type: "comment",
+  }),
 ];
-
 it("splits the inbox into all and unread", () => {
   const groups = splitInbox(ITEMS);
 
@@ -55,9 +57,8 @@ const apiStub: ApiContextValue = {
       catch: () => new ValidationFailed({ fieldErrors: {} }),
       try: () =>
         run({
-          markAllInboxRead: () => Promise.resolve({ unread: 0 }),
-          markInboxItemRead: (input: { readonly params: { readonly id: string } }) =>
-            Promise.resolve({ id: input.params.id, readAt: "2026-10-25T09:00:00.000Z" }),
+          markAllWorkspaceNotificationsRead: () => Promise.resolve({ count: 0 }),
+          markWorkspaceNotificationRead: () => Promise.resolve({ done: true }),
         }),
     }),
 } as unknown as ApiContextValue;
@@ -86,10 +87,10 @@ it("marks an unread item and opens its task", async () => {
         catch: () => new ValidationFailed({ fieldErrors: {} }),
         try: () =>
           run({
-            markAllInboxRead: () => Promise.resolve({ unread: 0 }),
-            markInboxItemRead: (input: { readonly params: { readonly id: string } }) => {
+            markAllWorkspaceNotificationsRead: () => Promise.resolve({ count: 0 }),
+            markWorkspaceNotificationRead: (input: { readonly params: { readonly id: string } }) => {
               readIds.push(input.params.id);
-              return Promise.resolve({ id: input.params.id, readAt: "r" });
+              return Promise.resolve({ done: true });
             },
           }),
       }),
@@ -119,12 +120,11 @@ it("marks everything read at once", async () => {
         catch: () => new ValidationFailed({ fieldErrors: {} }),
         try: () =>
           run({
-            markAllInboxRead: (input: { readonly idempotencyKey: string }) => {
+            markAllWorkspaceNotificationsRead: (input: { readonly idempotencyKey: string }) => {
               markedAll.push(input.idempotencyKey);
-              return Promise.resolve({ unread: 0 });
+              return Promise.resolve({ count: 2 });
             },
-            markInboxItemRead: (input: { readonly params: { readonly id: string } }) =>
-              Promise.resolve({ id: input.params.id, readAt: "r" }),
+            markWorkspaceNotificationRead: () => Promise.resolve({ done: true }),
           }),
       }),
   } as unknown as ApiContextValue;

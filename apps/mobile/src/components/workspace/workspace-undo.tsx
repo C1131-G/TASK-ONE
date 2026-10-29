@@ -21,7 +21,6 @@ export const WorkspaceUndoToast = ({
   visible,
 }: WorkspaceUndoToastProps) => {
   const { isDark } = useTheme();
-  const palette = isDark ? theme.dark : theme.light;
 
   if (!visible) {
     return null;

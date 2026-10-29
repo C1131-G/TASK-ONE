@@ -5,7 +5,7 @@ import { WorkspaceEmptyState } from "@/components/workspace/workspace-empty-stat
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { TaskDetailScreen } from "@/features/tasks/task-screens";
-import { getTask, type TaskDetail } from "@/features/tasks/queries";
+import { getTaskContext, type MobileTaskContext } from "@/features/tasks/queries";
 import { useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
 
@@ -15,8 +15,8 @@ export default function TaskDetailRoute() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = typeof params.id === "string" ? params.id : "";
 
-  const program: Effect.Effect<TaskDetail | null, AppFailure> =
-    api === null || id.length === 0 ? Effect.succeed(null) : getTask(api, id);
+  const program: Effect.Effect<MobileTaskContext | null, AppFailure> =
+    api === null || id.length === 0 ? Effect.succeed(null) : getTaskContext(api, id);
 
   const task = useApiQuery({
     enabled: api !== null && id.length > 0,
@@ -46,6 +46,11 @@ export default function TaskDetailRoute() {
       task={{
         projectName: detail.projectName,
         status: detail.status,
+        subtasks: detail.subtasks.map((subtask) => ({
+          completed: subtask.completed,
+          id: subtask.id,
+          title: subtask.title,
+        })),
         title: detail.title,
         version: detail.version,
       }}

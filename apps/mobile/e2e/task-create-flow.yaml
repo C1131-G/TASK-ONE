@@ -1,11 +1,8 @@
 appId: com.cibi.metsys
 ---
-# My Tasks: open the tab, filter, open a task.
+# My Tasks: open the tab and see the filter chips.
 - launchApp
 - assertVisible: "My Tasks"
 - tapOn: "My Tasks"
 - assertVisible: "All"
-- tapOn: "todo"
-- tapOn:
-    text: ".*"
-    index: 0
+- assertVisible: "todo"

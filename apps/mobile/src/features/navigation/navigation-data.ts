@@ -1,3 +1,5 @@
+import type { Href } from "expo-router";
+
 /**
  * The mobile navigation, re-declared from the web app's
  * components/workspace/workspace-navigation-data.ts with React Native icons.
@@ -7,7 +9,7 @@
 
 export interface MobileNavItem {
   readonly adminOnly?: boolean;
-  readonly href: string;
+  readonly href: Extract<Href, string>;
   readonly icon: string;
   readonly label: string;
 }

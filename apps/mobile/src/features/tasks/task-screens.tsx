@@ -9,20 +9,14 @@ import { WorkspaceEmptyState } from "@/components/workspace/workspace-empty-stat
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceListRow } from "@/components/workspace/workspace-list-row";
 import { WorkspaceScreen } from "@/components/workspace/workspace-screen";
-import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { TaskStatusTrigger } from "@/features/tasks/task-status-sheet";
 import {
-  listSubtasks,
+  changeTask,
   setSubtaskStatus,
-  setTaskStatus,
+  type TaskPriority,
   type TaskStatus,
 } from "@/features/tasks/queries";
-import {
-  failureOf,
-  useApiQuery,
-  type ApiContextValue,
-  type KeysContextValue,
-} from "@/runtime/api-hooks";
+import type { ApiContextValue, KeysContextValue } from "@/runtime/api-hooks";
 import { useTheme } from "@/theme/theme-provider";
 import { typeStyle } from "@/theme/type-scale";
 import { spacing, theme } from "@/theme/tokens.generated";
@@ -38,7 +32,7 @@ const STATUS_FILTERS: readonly (TaskStatus | "all")[] = [
 export interface TaskRowModel {
   readonly dueAt: string | null;
   readonly id: string;
-  readonly priority: "high" | "low" | "medium" | "urgent";
+  readonly priority: TaskPriority;
   readonly projectName: string;
   readonly status: TaskStatus;
   readonly title: string;
@@ -103,7 +97,15 @@ export const MyTasksScreen = ({
   );
 };
 
-/** The task detail: status mover and subtasks with optimistic toggles. */
+export interface TaskDetailModel {
+  readonly projectName: string;
+  readonly status: TaskStatus;
+  readonly subtasks: readonly { readonly completed: boolean; readonly id: string; readonly title: string }[];
+  readonly title: string;
+  readonly version: number;
+}
+
+/** The task detail: status mover and subtasks, each write under its own key. */
 export const TaskDetailScreen = ({
   api,
   keys,
@@ -112,35 +114,25 @@ export const TaskDetailScreen = ({
 }: {
   readonly api: ApiContextValue;
   readonly keys: KeysContextValue;
-  readonly task: {
-    readonly projectName: string;
-    readonly status: TaskStatus;
-    readonly title: string;
-    readonly version: number;
-  };
+  readonly task: TaskDetailModel;
   readonly taskId: string;
 }) => {
   const queryClient = useQueryClient();
   const { isDark } = useTheme();
   const palette = isDark ? theme.dark : theme.light;
+  const [failure, setFailure] = useState<AppFailure | null>(null);
 
-  const subtasks = useApiQuery({
-    program: listSubtasks(api, taskId),
-    queryKey: ["tasks", taskId, "subtasks"],
-  });
-  const failure: AppFailure | undefined = subtasks.error ?? undefined;
-
-  const toggle = (subtaskId: string, done: boolean): void => {
+  // Every write reports a failure on screen and refreshes the task on success.
+  const run = (write: Effect.Effect<unknown, AppFailure>): void => {
+    setFailure(null);
     void Effect.runPromise(
-      Effect.andThen(
-        keys.run(`toggle-${subtaskId}`, (key) =>
-          setSubtaskStatus(api, key, taskId, subtaskId, task.version, done),
-        ),
-        Effect.andThen(
-          Effect.sync(() => queryClient.invalidateQueries({ queryKey: ["tasks", taskId] })),
-          Effect.void,
-        ),
-      ),
+      Effect.matchEffect(write, {
+        onFailure: (error) => Effect.sync(() => setFailure(error)),
+        onSuccess: () =>
+          Effect.sync(() => {
+            void queryClient.invalidateQueries({ queryKey: ["tasks"] });
+          }),
+      }),
     );
   };
 
@@ -151,40 +143,39 @@ export const TaskDetailScreen = ({
       </Text>
       <TaskStatusTrigger
         current={task.status}
-        onMove={(status) => {
-          void Effect.runPromise(
+        onMove={(status) =>
+          run(
             keys.run(`move-${taskId}`, (key) =>
-              setTaskStatus(api, key, taskId, task.version, status),
+              changeTask(api, key, taskId, { expectedVersion: task.version, status }),
             ),
-          );
-          void queryClient.invalidateQueries({ queryKey: ["tasks"] });
-        }}
+          )
+        }
       />
-      {subtasks.isPending ? (
-        <WorkspaceSkeleton variant="panel" />
-      ) : failure !== undefined ? (
-        <WorkspaceErrorState failure={failure} onRetry={() => void subtasks.refetch()} />
-      ) : (
-        <View style={styles.subtasks}>
-          {(subtasks.data?.subtasks ?? []).map((subtask) => (
-            <WorkspaceListRow
-              accessibilityLabel={`Toggle subtask ${subtask.title}`}
-              key={subtask.id}
-              onPress={() => toggle(subtask.id, !subtask.done)}
-              title={subtask.title}
-              trailing={
-                <Text style={{ color: subtask.done ? palette.green : palette.text3 }}>
-                  {subtask.done ? "Done" : "Open"}
-                </Text>
-              }
-            />
-          ))}
-        </View>
-      )}
+      {failure === null ? null : <WorkspaceErrorState failure={failure} />}
+      <View style={styles.subtasks}>
+        {task.subtasks.map((subtask) => (
+          <WorkspaceListRow
+            accessibilityLabel={`Toggle subtask ${subtask.title}`}
+            key={subtask.id}
+            onPress={() =>
+              run(
+                keys.run(`toggle-${subtask.id}`, (key) =>
+                  setSubtaskStatus(api, key, taskId, subtask.id, task.version, !subtask.completed),
+                ),
+              )
+            }
+            title={subtask.title}
+            trailing={
+              <Text style={{ color: subtask.completed ? palette.green : palette.text3 }}>
+                {subtask.completed ? "Done" : "Open"}
+              </Text>
+            }
+          />
+        ))}
+      </View>
     </WorkspaceScreen>
   );
 };
-
 const styles = StyleSheet.create({
   filters: {
     flexDirection: "row",

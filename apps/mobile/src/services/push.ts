@@ -1,12 +1,11 @@
 import { Context, Effect, Layer } from "effect";
 
 import type { AppFailure } from "@/errors";
-import type { MobileApi } from "@/services/mobile-api";
 
 /**
  * Registers web-push subscriptions for the signed-in account. The server
- * endpoint is still pending; registerThroughApi posts through the API when
- * the route lands, and the stub layer records the intent for tests.
+ * endpoint is still pending, so the stub layer records the intent for tests
+ * until the route lands.
  */
 export class Push extends Context.Service<
   Push,
@@ -17,34 +16,6 @@ export class Push extends Context.Service<
     readonly unregister: (endpoint: string) => Effect.Effect<void, AppFailure>;
   }
 >()("metsys/mobile/Push") {}
-
-interface RegistrationClient {
-  readonly registerPush: (input: {
-    readonly body: { readonly endpoint: string };
-    readonly idempotencyKey: string;
-  }) => Promise<{ readonly ok: true }>;
-  readonly unregisterPush: (input: {
-    readonly body: { readonly endpoint: string };
-    readonly idempotencyKey: string;
-  }) => Promise<{ readonly ok: true }>;
-}
-
-const makeLive = (api: MobileApi["Service"]): Push["Service"] => ({
-  register: (endpoint) =>
-    api.call((client) =>
-      (client as unknown as RegistrationClient).registerPush({
-        body: { endpoint },
-        idempotencyKey: `push-reg-${endpoint.length}`,
-      }),
-    ),
-  unregister: (endpoint) =>
-    api.call((client) =>
-      (client as unknown as RegistrationClient).unregisterPush({
-        body: { endpoint },
-        idempotencyKey: `push-unreg-${endpoint.length}`,
-      }),
-    ),
-});
 
 /** The recorded calls of the stub push service. */
 export interface PushStubCalls {

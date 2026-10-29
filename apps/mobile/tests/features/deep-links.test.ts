@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { NotFound } from "@/errors";
 import { parseDeepLink } from "@/features/navigation/deep-links";
 
 describe("deep link parsing", () => {

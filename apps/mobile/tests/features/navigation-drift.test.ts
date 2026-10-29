@@ -57,7 +57,7 @@ describe("the mobile navigation data", () => {
   it("mirrors the web sidebar entries, including admin-only flags", () => {
     // The More menu excludes the bottom tabs, which the web sidebar lists
     // alongside the rest of the personal section.
-    const tabHrefs = new Set(mobileTabs.map((item) => item.href));
+    const tabHrefs = new Set<string>(mobileTabs.map((item) => item.href));
     const moreSections = webSections.map((section) =>
       section.filter((item) => !tabHrefs.has(item.href)),
     );

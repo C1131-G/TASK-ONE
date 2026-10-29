@@ -115,3 +115,50 @@ it.live("exhausts retries and returns the last failure", () =>
     expect(exit._tag).toBe("Failure");
   }).pipe(Effect.provide(service)),
 );
+
+it.effect("starts a new write after the last one succeeded", () =>
+  Effect.gen(function* () {
+    const keys = yield* Effect.service(IdempotencyKeys);
+
+    const first = yield* keys.run("move-task", (key) => Effect.succeed(key));
+    const second = yield* keys.run("move-task", (key) => Effect.succeed(key));
+
+    expect(second).not.toBe(first);
+  }).pipe(Effect.provide(service)),
+);
+
+it.effect("starts a new write after the server definitively refused the last one", () =>
+  Effect.gen(function* () {
+    const keys = yield* Effect.service(IdempotencyKeys);
+    const seen: string[] = [];
+    const refuse = (key: string) =>
+      Effect.suspend(() => {
+        seen.push(key);
+        return Effect.fail(new Conflict({})) as Effect.Effect<never, AppFailure>;
+      });
+
+    yield* Effect.exit(keys.run("edit-task", refuse));
+    yield* Effect.exit(keys.run("edit-task", refuse));
+
+    expect(seen.length).toBe(2);
+    expect(seen[1]).not.toBe(seen[0]);
+  }).pipe(Effect.provide(service)),
+);
+
+it.live("keeps the key when the outcome is unknown so a later retry cannot double-apply", () =>
+  Effect.gen(function* () {
+    const keys = yield* Effect.service(IdempotencyKeys);
+    const seen: string[] = [];
+    const lost = (key: string) =>
+      Effect.suspend(() => {
+        seen.push(key);
+        return Effect.fail(new Offline()) as Effect.Effect<never, AppFailure>;
+      });
+
+    yield* Effect.exit(keys.run("submit-report", lost));
+    const later = yield* keys.run("submit-report", (key) => Effect.succeed(key));
+
+    expect(new Set(seen).size).toBe(1);
+    expect(later).toBe(seen[0]);
+  }).pipe(Effect.provide(service)),
+);

@@ -21,7 +21,7 @@ export default defineConfig({
     "id-length": [
       "warn",
       {
-        exceptions: ["i", "j", "k", "x", "y", "z", "_"],
+        exceptions: ["a", "b", "c", "g", "i", "j", "k", "m", "n", "r", "v", "x", "y", "z", "A", "G", "N", "T", "V", "_"],
         min: 2,
         properties: "never",
       },

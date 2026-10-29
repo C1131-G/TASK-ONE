@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { mobileRoutes } from "@api/routes";
 import { pendingRoutes } from "@/api/pending-routes";
+import { TaskPrioritySchema, TaskStatusSchema } from "@/api/pending-routes/tasks";
+import {
+  TaskPrioritySchema as LiveTaskPrioritySchema,
+  TaskStatusSchema as LiveTaskStatusSchema,
+} from "@api/routes-tasks";
 
 describe("the mobile route contract", () => {
   it("keeps every operationId unique across live and pending routes", () => {
@@ -29,5 +34,10 @@ describe("the mobile route contract", () => {
     for (const route of mobileRoutes) {
       expect(route.summary.length).toBeGreaterThan(4);
     }
+  });
+
+  it("keeps the pending task literals equal to the live ones", () => {
+    expect(TaskStatusSchema.literals).toEqual(LiveTaskStatusSchema.literals);
+    expect(TaskPrioritySchema.literals).toEqual(LiveTaskPrioritySchema.literals);
   });
 });

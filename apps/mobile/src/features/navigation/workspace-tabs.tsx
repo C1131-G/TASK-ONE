@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from "expo-router";
+import { type Href, usePathname, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import {
@@ -101,7 +101,7 @@ export const MoreMenu = ({ onClose, visible }: MoreMenuProps) => {
   const role = state.kind === "authenticated" ? state.me.role : "employee";
   const pathname = usePathname();
 
-  const navigate = (href: string): void => {
+  const navigate = (href: Extract<Href, string>): void => {
     onClose();
     if (!isActiveHref(pathname, href)) {
       router.push(href);
@@ -150,7 +150,7 @@ export const WorkspaceTabShell = ({ children }: { children: React.ReactNode }) =
   return (
     <View style={styles.shell}>
       <View style={styles.content}>{children}</View>
-      <View style={styles.bar}>
+      <View style={styles.tabRow}>
         <WorkspaceTabs />
         <Pressable
           accessibilityLabel="More"
@@ -171,7 +171,7 @@ export const WorkspaceTabShell = ({ children }: { children: React.ReactNode }) =
 };
 
 const styles = StyleSheet.create({
-  bar: {
+  tabRow: {
     flexDirection: "row",
   },
   content: {

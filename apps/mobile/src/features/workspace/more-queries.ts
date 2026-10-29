@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { AppFailure } from "@/errors";
+import { listInbox } from "@/features/inbox/queries";
 import { listTasks, type TaskSummary } from "@/features/tasks/queries";
 import type { ListRow } from "@/features/workspace/domain-list-screen";
 import type { MobileApi } from "@/services/mobile-api";
@@ -15,17 +16,8 @@ export interface ApprovalRequest {
   readonly status: "approved" | "pending" | "rejected";
 }
 
-export interface WorkspaceNotification {
-  readonly createdAt: string;
-  readonly id: string;
-  readonly kind: "assignment" | "comment" | "mention" | "update";
-  readonly readAt: string | null;
-  readonly title: string;
-}
-
 interface MoreClient {
   readonly listBugApprovals: () => Promise<{ items: readonly ApprovalRequest[] }>;
-  readonly listNotifications: () => Promise<{ items: readonly WorkspaceNotification[] }>;
 }
 
 const call = <A>(api: Api, run: (client: MoreClient) => Promise<A>): Effect.Effect<A, AppFailure> =>
@@ -43,11 +35,11 @@ export const bugApprovalsProgram = (api: Api) =>
 
 /** The notifications page list. */
 export const notificationsProgram = (api: Api) =>
-  Effect.map(call(api, (client) => client.listNotifications()), (page) => ({
+  Effect.map(listInbox(api), (page) => ({
     rows: page.items.map<ListRow>((item) => ({
       id: item.id,
-      subtitle: `${item.kind} · ${item.createdAt.slice(0, 10)}${item.readAt === null ? " · unread" : ""}`,
-      title: item.title,
+      subtitle: `${item.type} · ${item.createdAt.slice(0, 10)}${item.readAt === null ? " · unread" : ""}`,
+      title: item.text,
     })),
   }));
 

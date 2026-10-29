@@ -4,6 +4,7 @@ import { expect } from "vitest";
 
 import { WORKSPACE_DOMAIN_FIXTURES } from "@/api/mocks/workspace-domains";
 import { WORKSPACE_FIXTURES } from "@/api/mocks/workspace";
+import { NOTIFICATION_FIXTURES } from "@/api/mocks/notifications";
 import { WORKSPACE_MORE_FIXTURES } from "@/api/mocks/workspace-more";
 import { TASK_FIXTURES } from "@/api/mocks/tasks";
 import { PORTAL_MORE_FIXTURES } from "@/api/mocks/portal-more";
@@ -38,6 +39,7 @@ const ALL_FIXTURES = [
   ...WORKSPACE_FIXTURES,
   ...WORKSPACE_DOMAIN_FIXTURES,
   ...WORKSPACE_MORE_FIXTURES,
+  ...NOTIFICATION_FIXTURES,
   ...TASK_FIXTURES,
   ...PORTAL_MORE_FIXTURES,
 ];
@@ -54,6 +56,7 @@ const MOCKED = new Set([
   "members",
   "my-time",
   "notifications",
+  "me",
   "projects",
   "search",
   "tasks",

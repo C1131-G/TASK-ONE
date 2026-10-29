@@ -6,7 +6,7 @@ import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
 import { InboxScreen } from "@/features/inbox/inbox-screen";
 import { listInbox } from "@/features/inbox/queries";
-import { failureOf, useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
+import { useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
 import type { InboxPage } from "@/features/inbox/queries";
 
@@ -16,7 +16,7 @@ export default function InboxRoute() {
   const router = useRouter();
 
   const program: Effect.Effect<InboxPage, AppFailure> =
-    api === null ? Effect.succeed({ items: [], unread: 0 }) : listInbox(api);
+    api === null ? Effect.succeed({ items: [], nextCursor: null, unreadCount: 0, unreadInboxCount: 0 }) : listInbox(api);
 
   const inbox = useApiQuery({ enabled: api !== null, program, queryKey: ["inbox"] });
 

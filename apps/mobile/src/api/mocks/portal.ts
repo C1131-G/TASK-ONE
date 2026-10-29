@@ -1,33 +1,35 @@
 import type { MockFixture } from "@/api/mock/mock-fetch";
 
-export const PORTAL_PROJECT_ID = "0b6c8a52-5f1e-4c0e-9a33-6a0f1d2c7e11";
+export const PORTAL_PROJECT_ID = "5a1d9c42-6b7e-4f30-8c2d-9e4b1a7f3c05";
+const BUG_ID = "c1d2e3f4-5a6b-4c7d-8e9f-0a1b2c3d4e5f";
+const PERSON = "9c2e4d71-8b3a-4e65-a1f0-2d7c5b9e8a30";
 
 export const PORTAL_FIXTURES: readonly MockFixture[] = [
   {
     data: {
-      items: [{ id: "proj-1", key: "WEB", name: "Website relaunch" }],
+      items: [{ id: PORTAL_PROJECT_ID, key: "WEB", name: "Website relaunch" }],
       nextCursor: null,
     },
     operationId: "listPortalProjects",
   },
+  // Live shapes, used by tests.
   {
-    // The live list is a plain array of the company's bug summaries.
     data: [
       {
-        createdAt: "2026-10-20T09:00:00.000Z",
-        id: "5d1e3f7a-2b44-4d6e-8a10-9c7b2e4f1a01",
+        createdAt: "2026-10-20T09:30:00.000Z",
+        id: BUG_ID,
         impact: "high",
         isMine: true,
-        key: "WEB-12",
+        key: "WEB-B7",
         projectId: PORTAL_PROJECT_ID,
         projectName: "Website relaunch",
-        reporterName: "Client Carl",
-        status: "in_progress",
+        reporterName: "Ada Lovelace",
+        status: "acknowledged",
         title: "Login rejects valid passwords on Android",
-        updatedAt: "2026-10-24T10:30:00.000Z",
+        updatedAt: "2026-10-21T08:00:00.000Z",
       },
     ],
     operationId: "listPortalBugs",
   },
-  { data: { id: "bug-new" }, operationId: "createPortalBug" },
+  { data: { bugId: PERSON, version: 1 }, operationId: "submitPortalBug" },
 ];
