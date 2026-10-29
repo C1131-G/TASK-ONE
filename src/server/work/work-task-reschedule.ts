@@ -53,19 +53,20 @@ export const rescheduleTask = (
             message: "Archived tasks are read only.",
           });
         }
-        if (task.version !== expectedVersion) {
-          throw new AppError({
-            code: "CONFLICT",
-            message: "The task changed. Refresh and try again.",
-          });
-        }
         const [assignments, recurrence] = await Promise.all([
           transaction.orm.public.TaskAssignee.where({ taskId })
             .select("userId")
             .all(),
           transaction.orm.public.TaskRecurrence.where({ taskId }).first(),
         ]);
+        // Who may edit comes before what the task looked like.
         assertTaskEditPermission(actor, actorId, task.createdById, assignments);
+        if (task.version !== expectedVersion) {
+          throw new AppError({
+            code: "CONFLICT",
+            message: "The task changed. Refresh and try again.",
+          });
+        }
         assertStartNotAfterDue(input.startDate, input.dueDate);
         if (recurrence && !input.dueDate) {
           throw new AppError({
