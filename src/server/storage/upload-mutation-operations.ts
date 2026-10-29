@@ -109,6 +109,19 @@ export const removeFile = (
             message: "You can remove only your own uploads.",
           });
         }
+        // An approval request lists the files the client is asked to look at.
+        // Taking one away would change what they agreed to.
+        const approvalFile =
+          await transaction.orm.public.ApprovalRequestFile.where({ fileId })
+            .select("id")
+            .first();
+        if (approvalFile) {
+          throw new AppError({
+            code: "CONFLICT",
+            message:
+              "A file on an approval request stays until the request is gone.",
+          });
+        }
         await internal.assertActiveFileLocation(
           transaction,
           actor.role,
