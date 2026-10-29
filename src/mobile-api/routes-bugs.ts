@@ -177,19 +177,6 @@ export const portalBugRoutes = {
     summary:
       "One of the company's bug reports, with only what a client may see.",
   },
-  list: {
-    data: Schema.Array(PortalBugSummary),
-    method: "get",
-    operationId: "listPortalBugs",
-    path: "/api/v1/portal/bugs",
-    query: Schema.Struct({
-      mine: Schema.optional(Flag),
-      projectId: Schema.optional(Uuid),
-      status: Schema.optional(ClientStatus),
-    }),
-    summary:
-      "Deprecated: use listPortalBugPage. The company's newest 200 bug reports, with no way to reach older ones.",
-  },
   page: {
     data: PortalBugPage,
     method: "get",
@@ -843,7 +830,6 @@ export const staffBugCommentRoute = {
 } as const satisfies RouteDefinition;
 
 export const bugRoutes = [
-  portalBugRoutes.list,
   portalBugRoutes.page,
   portalBugRoutes.submit,
   portalBugRoutes.detail,

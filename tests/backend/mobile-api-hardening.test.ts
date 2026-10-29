@@ -47,10 +47,10 @@ const getMe = async (token: string): Promise<Answer> => {
 };
 
 const portalBugs = async (token: string): Promise<Answer> => {
-  const { GET } = await import("../../app/api/v1/portal/bugs/route");
+  const { GET } = await import("../../app/api/v1/portal/bug-reports/route");
   return answerOf(
     await GET(
-      new Request("http://localhost:3000/api/v1/portal/bugs", {
+      new Request("http://localhost:3000/api/v1/portal/bug-reports", {
         headers: { authorization: `Bearer ${token}` },
       })
     )

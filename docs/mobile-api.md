@@ -72,7 +72,7 @@ On `GET /portal/notifications` a page is filled with rows the client can open no
 
 Paged today: `GET /workspace/notifications`, `GET /workspace/bugs`, `GET /portal/notifications`, `GET /portal/bug-reports`, `GET /portal/approvals` and `GET /workspace/bug-approvals`.
 
-`GET /portal/bugs` answers a bare array capped at 200, so it could not gain a cursor without breaking released apps. It stays as it is, marked deprecated in the contract, and `GET /portal/bug-reports` takes its place with the same filters (`mine`, `projectId`, `status`) and the page fields. Per the versioning rules below it is kept for at least 6 months after the first app release that stops using it. The app in this repository already reads `GET /portal/bug-reports`, so that clock starts with the first release of the app; the switch-off date is announced in that release's notes and is not before six months after it. The portal bug reports cursor is the last bug's position in time (newest first, id as the tie-breaker), and a page skips bugs whose task is archived while reading on, as the older list did.
+`GET /portal/bugs` used to answer a bare array capped at 200. It was removed on 2026-10-29, before any app release, so no released app is affected; `GET /portal/bug-reports` takes its place with the same filters (`mine`, `projectId`, `status`) and the page fields. The portal bug reports cursor is the last bug's position in time (newest first, id as the tie-breaker), and a page skips bugs whose task is archived while reading on.
 
 ### Logs
 
@@ -128,7 +128,6 @@ The Expo app in apps/mobile keeps its own pending route definitions under src/ap
 | `GET` | `/api/v1/workspace/me/timer` | admin, employee | read | The caller's running timer, or null when no timer is running. |
 | `POST` | `/api/v1/workspace/me/timer/start` | admin, employee | required | Start the caller's timer on an open task, saving the timer that was running before. |
 | `POST` | `/api/v1/workspace/me/timer/stop` | admin, employee | required | Stop the caller's timer and save its time as an entry. Answers 404 when none is running. |
-| `GET` | `/api/v1/portal/bugs` | client | read | Deprecated: use `/api/v1/portal/bug-reports`. The company's newest 200 bug reports, with no way to reach older ones. |
 | `GET` | `/api/v1/portal/bug-reports` | client | read | The company's bug reports, newest first, one page at a time, with the same filters. |
 | `POST` | `/api/v1/portal/bugs` | client | required | Report a bug for the client's company. |
 | `GET` | `/api/v1/portal/bugs/{bugId}` | client | read | One of the company's bug reports, with only what a client may see. |
@@ -233,6 +232,5 @@ A static read of the schema and services plus the tests above. "Fixed" items hav
 
 **Open: found, not changed**
 
-- `GET /portal/bugs` is still silently capped at 200 until it is switched off; it is deprecated in favour of `GET /portal/bug-reports`.
 - A file that is on an approval request can still be removed by its owner (it is hidden from the request, but the row stays until nothing references it).
 - A few web actions still check the version before the edit permission (task reschedule, client visibility, approval requests), so a person who may not edit can see a version conflict instead of a refusal. The mobile routes are consistent.

@@ -71,13 +71,7 @@ jobs:
       - run: bun run lint
       - run: bun run typecheck
       - run: bun run test:ui
-      - run: bun run test:backend
-      - name: Generate ephemeral browser credentials
-        run: |
-          echo "E2E_ADMIN_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-          echo "E2E_EMPLOYEE_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-          echo "E2E_PORTAL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-      - name: Seed browser test data
+      - name: Start object storage
         run: |
           # MinIO ships as source only, so build the server and client from the
           # same Dockerfile compose uses instead of pulling Docker Hub images.
@@ -89,6 +83,14 @@ jobs:
             sleep 2
           done
           docker run --rm --network host -e MC_HOST_local=http://metsys:local-minio-password@localhost:9000 metsys-minio-client:ci mb --ignore-existing local/metsys-private
+      - run: bun run test:backend
+      - name: Generate ephemeral browser credentials
+        run: |
+          echo "E2E_ADMIN_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "E2E_EMPLOYEE_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "E2E_PORTAL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+      - name: Seed browser test data
+        run: |
           bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-e2e-accounts.ts
           UI_FIXTURE_ADMIN_EMAIL=ui-admin@metsys.test UI_FIXTURE_EMPLOYEE_EMAIL=handler-one@metsys.test UI_FIXTURE_NOTIFIED_EMAIL=ui-employee@metsys.test UI_FIXTURE_CLIENT_EMAIL=client-one@acme.test bun --preload ./tests/backend/support/server-only-stub.ts scripts/seed-ui-fixtures.ts
       - run: bunx playwright install --with-deps chromium
@@ -106,6 +108,7 @@ jobs:
           curl --fail http://localhost:3000/api/health
           bunx playwright test --project=chromium --workers=1
 
+  # Checks the app's code only. CI never builds, signs or publishes an APK.
   mobile:
     runs-on: ubuntu-latest
     steps:

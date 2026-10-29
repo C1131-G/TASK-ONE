@@ -28,7 +28,7 @@ it("lets a client submit a bug report and records it for their company", async (
   expect(row.clientCompanyId).not.toBeNull();
 });
 
-const listRoute = () => import("../../app/api/v1/portal/bugs/route");
+const listRoute = () => import("../../app/api/v1/portal/bug-reports/route");
 const detailRoute = () => import("../../app/api/v1/portal/bugs/[bugId]/route");
 
 const submit = async (
@@ -64,7 +64,9 @@ it("lists only the signed-in client's own company reports", async () => {
 
   const reply = await send(GET, "GET", "client");
 
-  const listed = (reply.body.data as { id: string }[]).map(({ id }) => id);
+  const listed = (reply.body.data as { items: { id: string }[] }).items.map(
+    ({ id }) => id
+  );
   expect(reply.status).toBe(200);
   expect(listed).toContain(mine.bugId);
   expect(listed).not.toContain(theirs.bugId);
@@ -187,7 +189,7 @@ it("answers in exactly the shapes the route list declares", async () => {
     Schema.decodeUnknownSync(portalBugRoutes.detail.data)(detail.body.data)
   ).not.toThrow();
   expect(() =>
-    Schema.decodeUnknownSync(portalBugRoutes.list.data)(listed.body.data)
+    Schema.decodeUnknownSync(portalBugRoutes.page.data)(listed.body.data)
   ).not.toThrow();
   expect(() =>
     Schema.decodeUnknownSync(portalBugRoutes.submit.data)(mine)
