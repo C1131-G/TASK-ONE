@@ -27,8 +27,9 @@ COPY . .
 # Placeholders satisfy configuration checks during `next build`; the build never
 # connects to them and runtime values come from the container environment.
 ENV DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
-ENV BETTER_AUTH_SECRET=build-only-secret-never-used-at-runtime-000000000000
+# The auth secret is passed on the command, not as ENV, so no image layer keeps it.
 RUN --mount=type=secret,id=next_server_actions_encryption_key,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,required=true \
+    BETTER_AUTH_SECRET=build-only-secret-never-used-at-runtime-000000000000 \
     bun run build
 
 FROM base AS worker
