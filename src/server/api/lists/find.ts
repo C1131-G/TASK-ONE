@@ -98,10 +98,10 @@ export const listArchivePage = (request: Request) =>
         : []
     );
     const tasks = yield* listArchivedTasks();
-    const rows = [...archivedProjects, ...tasks].toSorted((a, b) =>
-      a.archivedAt === b.archivedAt
-        ? b.id.localeCompare(a.id)
-        : b.archivedAt.localeCompare(a.archivedAt)
+    const rows = [...archivedProjects, ...tasks].toSorted((left, right) =>
+      left.archivedAt === right.archivedAt
+        ? right.id.localeCompare(left.id)
+        : right.archivedAt.localeCompare(left.archivedAt)
     );
     return yield* pageOf(rows, ({ id, kind }) => `${kind}:${id}`, query);
   }).pipe(Effect.provide(ProjectManagementLive));
@@ -146,10 +146,10 @@ export const listFilePage = (request: Request) =>
         perProject.push({ ...file, projectName: project.name });
       }
     }
-    const rows = perProject.toSorted((a, b) =>
-      a.createdAt === b.createdAt
-        ? b.id.localeCompare(a.id)
-        : b.createdAt.localeCompare(a.createdAt)
+    const rows = perProject.toSorted((left, right) =>
+      left.createdAt === right.createdAt
+        ? right.id.localeCompare(left.id)
+        : right.createdAt.localeCompare(left.createdAt)
     );
     return yield* pageOf(rows, ({ id }) => id, query);
   }).pipe(Effect.provide(Layer.merge(ProjectManagementLive, uploadsLayer)));

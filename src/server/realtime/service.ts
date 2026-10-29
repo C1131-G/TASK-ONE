@@ -86,8 +86,8 @@ const createHub = () =>
     authorize: (viewer, event) => canViewerReceive(viewer, event, lookups),
     maxConnectionsPerUser: MAX_CONNECTIONS_PER_USER,
     openListener: openPgListener,
-    schedule: (callback, delayMs) => {
-      const timer = setTimeout(callback, delayMs);
+    schedule: (task, delayMs) => {
+      const timer = setTimeout(task, delayMs);
       return () => {
         clearTimeout(timer);
       };

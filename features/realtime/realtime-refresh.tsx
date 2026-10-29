@@ -17,8 +17,8 @@ const browserClock = {
     window.clearTimeout(id);
   },
   now: () => Date.now(),
-  setTimer: (callback: () => void, delayMs: number) =>
-    window.setTimeout(callback, delayMs),
+  setTimer: (task: () => void, delayMs: number) =>
+    window.setTimeout(task, delayMs),
 };
 
 // Subscribes this tab to server events and refreshes the current route when

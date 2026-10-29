@@ -28,8 +28,8 @@ const capsule = (x, y, ax, ay, bx, by, radius) => {
   const pay = y - ay;
   const bax = bx - ax;
   const bay = by - ay;
-  const h = clamp01((pax * bax + pay * bay) / (bax * bax + bay * bay));
-  return Math.hypot(pax - bax * h, pay - bay * h) - radius;
+  const along = clamp01((pax * bax + pay * bay) / (bax * bax + bay * bay));
+  return Math.hypot(pax - bax * along, pay - bay * along) - radius;
 };
 
 // The check mark, drawn in a 1024 space. `scale` shrinks it around the centre.
@@ -67,7 +67,8 @@ const over = (top, topAlpha, bottom, bottomAlpha) => {
   if (alpha === 0) {
     return [0, 0, 0, 0];
   }
-  const mix = (t, u) => Math.round((t * topAlpha + u * bottomAlpha * (1 - topAlpha)) / alpha);
+  const mix = (topValue, bottomValue) =>
+    Math.round((topValue * topAlpha + bottomValue * bottomAlpha * (1 - topAlpha)) / alpha);
   return [mix(top[0], bottom[0]), mix(top[1], bottom[1]), mix(top[2], bottom[2]), alpha];
 };
 

@@ -2,7 +2,7 @@
 const withTaskStatus = <Task extends { readonly id: string }>(
   tasks: readonly Task[],
   move: {
-    readonly status: Task extends { status: infer S } ? S : never;
+    readonly status: Task extends { status: infer Status } ? Status : never;
     readonly taskId: string;
   }
 ): Task[] =>
