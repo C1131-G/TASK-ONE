@@ -72,7 +72,7 @@ const TRANSPARENT: Rgba = { alpha: 0, blue: 0, green: 0, red: 0 };
 
 const expandHexPair = (pair: string): number => Number.parseInt(pair, 16);
 
-const parseColor = (value: string): Rgba | null => {
+export const parseColor = (value: string): Rgba | null => {
   if (value.trim().toLowerCase() === "transparent") {
     return TRANSPARENT;
   }
@@ -81,12 +81,13 @@ const parseColor = (value: string): Rgba | null => {
     const digits = hex.groups?.digits ?? "";
 
     if (digits.length === 3 || digits.length === 4) {
-      const [r, g, b, a = ""] = digits.split("");
+      const [red, green, blue, alpha] = digits.split("");
       return {
-        alpha: a === undefined ? 1 : expandHexPair(`${a}${a}`) / 255,
-        blue: expandHexPair(`${b}${b}`),
-        green: expandHexPair(`${g}${g}`),
-        red: expandHexPair(`${r}${r}`),
+        alpha:
+          alpha === undefined ? 1 : expandHexPair(`${alpha}${alpha}`) / 255,
+        blue: expandHexPair(`${blue}${blue}`),
+        green: expandHexPair(`${green}${green}`),
+        red: expandHexPair(`${red}${red}`),
       };
     }
     if (digits.length === 6 || digits.length === 8) {
