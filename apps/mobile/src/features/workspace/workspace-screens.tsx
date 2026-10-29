@@ -67,7 +67,7 @@ export const BugsScreen = () => {
         {(bugs.data?.bugs ?? []).map((bug) => (
           <WorkspaceListRow
             key={bug.id}
-            subtitle={`${bug.projectName} · ${bug.priority}`}
+            subtitle={`${bug.reference} · ${bug.priority}`}
             title={bug.title}
           />
         ))}

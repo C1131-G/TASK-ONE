@@ -17,16 +17,9 @@ describe("the live/pending route audit", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("documents which domains are still pending", () => {
-    const pendingDomains = new Set(
-      pendingRoutes.map((route) => route.path.split("/")[3] ?? "unknown"),
-    );
-
-    // The swap checklist: each pending domain here still needs its live
-    // route list on main before its pending file can be deleted.
-    for (const domain of pendingDomains) {
-      expect(typeof domain).toBe("string");
-    }
-    expect(pendingDomains.size).toBeGreaterThan(0);
+  it("has no pending route left: every screen reads the live server", () => {
+    // A route the server does not have yet goes into src/api/pending-routes
+    // with a fixture; this test then lists it until the server lands it.
+    expect(pendingRoutes.map((route) => route.operationId)).toEqual([]);
   });
 });

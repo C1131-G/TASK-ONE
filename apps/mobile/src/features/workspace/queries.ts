@@ -4,11 +4,11 @@ import type { AppFailure } from "@/errors";
 import type { MobileApi } from "@/services/mobile-api";
 
 export interface BugSummary {
+  readonly clientCompanyName: string | null;
   readonly id: string;
-  readonly priority: "high" | "low" | "medium" | "urgent";
-  readonly projectId: string;
-  readonly projectName: string;
-  readonly status: "confirmed" | "fixed" | "open" | "rejected";
+  readonly priority: "high" | "low" | "medium" | "none" | "urgent";
+  readonly reference: string;
+  readonly status: string;
   readonly title: string;
 }
 
@@ -23,7 +23,6 @@ export interface ProjectSummary {
 type Api = MobileApi["Service"];
 
 interface TypedClient {
-  readonly listBugs: () => Promise<{ readonly bugs: readonly BugSummary[] }>;
   readonly listProjects: () => Promise<{
     readonly items: readonly {
       readonly id: string;
@@ -36,7 +35,19 @@ interface TypedClient {
 }
 
 export const listBugs = (api: Api): Effect.Effect<{ readonly bugs: readonly BugSummary[] }, AppFailure> =>
-  api.call((client) => (client as unknown as TypedClient).listBugs());
+  api.call(async (client) => {
+    const page = await client.listWorkspaceBugs({ query: {} });
+    return {
+      bugs: page.items.map((bug) => ({
+        clientCompanyName: bug.clientCompanyName,
+        id: bug.id,
+        priority: bug.priority,
+        reference: bug.reference,
+        status: bug.status,
+        title: bug.title,
+      })),
+    };
+  });
 
 export const listProjects = (
   api: Api,
