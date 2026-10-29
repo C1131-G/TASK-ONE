@@ -52,10 +52,12 @@ export const PortalListBody = ({
 export const PortalAccountBody = ({
   email,
   name,
+  onOpenNotifications,
   onSignOut,
 }: {
   readonly email: string;
   readonly name: string;
+  readonly onOpenNotifications?: () => void;
   readonly onSignOut: () => void;
 }) => {
   const { isDark } = useTheme();
@@ -68,6 +70,15 @@ export const PortalAccountBody = ({
         {name}
       </Text>
       <Text style={{ color: palette.text3 }}>{email}</Text>
+      {onOpenNotifications === undefined ? null : (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenNotifications}
+          style={styles.signOut}
+        >
+          <Text style={{ color: palette.text }}>Notifications</Text>
+        </Pressable>
+      )}
       <Pressable
         accessibilityRole="button"
         onPress={onSignOut}

@@ -39,18 +39,17 @@ it.effect("answers a pending operation from its fixture and sends live ones to t
       liveUrls.push(input instanceof Request ? input.url : String(input));
       return Promise.resolve(new Response("{}", { status: 404 }));
     };
+    // No route is pending any more, so one is pretended to be.
     const layer = yield* Effect.map(
-      makeMockMobileApiLayer(ALL_FIXTURES, new Set(), liveFetch, pendingOperationIds),
+      makeMockMobileApiLayer(ALL_FIXTURES, new Set(), liveFetch, new Set(["listWorkspaceBugs"])),
       (inner) => Layer.provide(inner, tokenSource),
     );
     const api = yield* Effect.service(MobileApi).pipe(Effect.provide(layer));
 
-    const bugs = yield* api.call((client) =>
-      (client as unknown as { listBugs: (input: object) => Promise<{ bugs: unknown[] }> }).listBugs({}),
-    );
+    const bugs = yield* api.call((client) => client.listWorkspaceBugs({ query: {} }));
     yield* Effect.exit(api.call((client) => client.getMe()));
 
-    expect(bugs.bugs.length).toBeGreaterThan(0);
+    expect(bugs.items.length).toBeGreaterThan(0);
     expect(liveUrls).toEqual(["https://mock.metsys.invalid/api/v1/me"]);
   }),
 );
@@ -68,11 +67,7 @@ const recordFetch = (urls: string[]): void => {
 
 const listBugsOn = (layer: Layer.Layer<MobileApi>) =>
   Effect.service(MobileApi).pipe(
-    Effect.flatMap((api) =>
-      api.call((client) =>
-        (client as unknown as { listBugs: (input: object) => Promise<unknown> }).listBugs({}),
-      ),
-    ),
+    Effect.flatMap((api) => api.call((client) => client.listWorkspaceBugs({ query: {} }))),
     Effect.exit,
     Effect.provide(layer),
   );
@@ -88,7 +83,7 @@ it.effect("live mode sends even pending operations to the server", () =>
   }),
 );
 
-it.effect("hybrid mode answers pending operations itself and sends the rest to the server", () =>
+it.effect("hybrid mode has nothing pending, so it sends every call to the server", () =>
   Effect.gen(function* () {
     const urls: string[] = [];
     recordFetch(urls);
@@ -102,7 +97,10 @@ it.effect("hybrid mode answers pending operations itself and sends the rest to t
       ),
     );
 
-    expect(pending._tag).toBe("Success");
-    expect(urls).toEqual(["https://api.example.test/api/v1/me"]);
+    expect(pending._tag).toBe("Failure");
+    expect(urls).toEqual([
+      "https://api.example.test/api/v1/workspace/bugs",
+      "https://api.example.test/api/v1/me",
+    ]);
   }),
 );

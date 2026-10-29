@@ -247,3 +247,42 @@ it("does not bump the version when the dates are unchanged", async () => {
     await removeFixture(fixture);
   }
 });
+
+// Who may edit comes before what the task looked like: a person who may not
+// change the task is told so, not that their copy is out of date.
+it("tells a person who may not edit about the permission, not about a stale version", async () => {
+  const fixture = await seedFixture();
+  try {
+    const created = await createTask(fixture, {
+      dueDate: "2026-03-20",
+      startDate: null,
+    });
+    await reschedule(fixture.actorId, created.id, created.version, {
+      dueDate: "2026-03-21",
+      startDate: null,
+    });
+    const staleMove = await failureCode(
+      reschedule(fixture.outsiderId, created.id, created.version, {
+        dueDate: "2026-03-30",
+        startDate: null,
+      })
+    );
+    const staleVisibility = await failureCode(
+      runWork(
+        Effect.gen(function* show() {
+          const work = yield* WorkManagement;
+          return yield* work.setTaskClientVisibility(
+            fixture.outsiderId,
+            created.id,
+            created.version,
+            true
+          );
+        })
+      )
+    );
+
+    expect([staleMove, staleVisibility]).toEqual(["FORBIDDEN", "FORBIDDEN"]);
+  } finally {
+    await removeFixture(fixture);
+  }
+});

@@ -17,6 +17,7 @@ export default function Route() {
         <PortalAccountBody
           email={me.id}
           name={me.name}
+          onOpenNotifications={() => router.push("/portal/notification-settings")}
           onSignOut={() => {
             if (session !== null) {
               void Effect.runPromiseExit(session.signOut);

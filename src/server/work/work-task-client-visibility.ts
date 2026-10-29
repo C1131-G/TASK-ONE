@@ -45,18 +45,19 @@ export const setTaskClientVisibility = (
             message: "Archived tasks are read only.",
           });
         }
+        const assignments = await transaction.orm.public.TaskAssignee.where({
+          taskId,
+        })
+          .select("userId")
+          .all();
+        // Who may edit comes before what the task looked like.
+        assertTaskEditPermission(actor, actorId, task.createdById, assignments);
         if (task.version !== expectedVersion) {
           throw new AppError({
             code: "CONFLICT",
             message: "The task changed. Refresh and try again.",
           });
         }
-        const assignments = await transaction.orm.public.TaskAssignee.where({
-          taskId,
-        })
-          .select("userId")
-          .all();
-        assertTaskEditPermission(actor, actorId, task.createdById, assignments);
         const version = expectedVersion + 1;
         const updated = await transaction.orm.public.Task.where({
           id: taskId,

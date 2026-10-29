@@ -81,7 +81,7 @@ const apiServing = (
         catch: () => new ValidationFailed({ fieldErrors: {} }),
         try: () =>
           run({
-            listPortalBugs: () => Promise.resolve(data.bugs ?? []),
+            listPortalBugPage: () => Promise.resolve({ items: data.bugs ?? [], nextCursor: null }),
             listPortalProjects: () =>
               Promise.resolve({
                 items: (data.projects ?? []).map(({ id, key, name }) => ({ id, key, name })),

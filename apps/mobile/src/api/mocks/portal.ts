@@ -14,7 +14,8 @@ export const PORTAL_FIXTURES: readonly MockFixture[] = [
   },
   // Live shapes, used by tests.
   {
-    data: [
+    data: {
+      items: [
       {
         createdAt: "2026-10-20T09:30:00.000Z",
         id: BUG_ID,
@@ -28,8 +29,10 @@ export const PORTAL_FIXTURES: readonly MockFixture[] = [
         title: "Login rejects valid passwords on Android",
         updatedAt: "2026-10-21T08:00:00.000Z",
       },
-    ],
-    operationId: "listPortalBugs",
+      ],
+      nextCursor: null,
+    },
+    operationId: "listPortalBugPage",
   },
   { data: { bugId: PERSON, version: 1 }, operationId: "submitPortalBug" },
 ];
