@@ -55,56 +55,81 @@ it("keeps a file that an approval request lists, and still removes any other", a
   const requestId = randomUUID();
   const listedFileId = randomUUID();
   const plainFileId = randomUUID();
-  await authPool.query(
-    'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, $4, false)',
-    [adminId, "File Admin", `${adminId}@remove-test.example`, "admin"]
-  );
-  await authPool.query(
-    "INSERT INTO project (id, key, name) VALUES ($1, $2, $3)",
-    [projectId, `R${suffix.slice(0, 6)}`, "Remove project"]
-  );
-  await authPool.query(
-    'INSERT INTO task (id, "projectId", "projectTaskNumber", title, "createdById") VALUES ($1, $2, 1, $3, $4)',
-    [taskId, projectId, "Remove task", adminId]
-  );
-  await authPool.query(
-    'INSERT INTO client_company (id, name, "createdById", version) VALUES ($1, $2, $3, 1)',
-    [companyId, `Remove company ${suffix}`, adminId]
-  );
-  const insertFile = (id: string, name: string) =>
-    authPool.query(
-      `INSERT INTO file_asset (id, "projectId", "taskId", "uploadedById", "originalName", "storageKey", "contentType", "sizeBytes")
-       VALUES ($1, $2, $3, $4, $5, $6, 'application/pdf', 20)`,
-      [id, projectId, taskId, adminId, name, `files/${id}`]
+  try {
+    await authPool.query(
+      'INSERT INTO "user" (id, name, email, "emailNormalized", role, "mustChangePassword") VALUES ($1, $2, $3, $3, $4, false)',
+      [adminId, "File Admin", `${adminId}@remove-test.example`, "admin"]
     );
-  await insertFile(listedFileId, "listed.pdf");
-  await insertFile(plainFileId, "plain.pdf");
-  await authPool.query(
-    `INSERT INTO approval_request (id, "projectId", "companyId", "taskId", "subjectKey", "subjectTitle", version, message, status, "requestedById", "requestedAt")
-     VALUES ($1, $2, $3, $4, $5, 'Design', 1, 'Please review.', 'pending', $6, now())`,
-    [
+    await authPool.query(
+      "INSERT INTO project (id, key, name) VALUES ($1, $2, $3)",
+      [projectId, `R${suffix.slice(0, 6)}`, "Remove project"]
+    );
+    await authPool.query(
+      'INSERT INTO task (id, "projectId", "projectTaskNumber", title, "createdById") VALUES ($1, $2, 1, $3, $4)',
+      [taskId, projectId, "Remove task", adminId]
+    );
+    await authPool.query(
+      'INSERT INTO client_company (id, name, "createdById", version) VALUES ($1, $2, $3, 1)',
+      [companyId, `Remove company ${suffix}`, adminId]
+    );
+    const insertFile = (id: string, name: string) =>
+      authPool.query(
+        `INSERT INTO file_asset (id, "projectId", "taskId", "uploadedById", "originalName", "storageKey", "contentType", "sizeBytes")
+         VALUES ($1, $2, $3, $4, $5, $6, 'application/pdf', 20)`,
+        [id, projectId, taskId, adminId, name, `files/${id}`]
+      );
+    await insertFile(listedFileId, "listed.pdf");
+    await insertFile(plainFileId, "plain.pdf");
+    await authPool.query(
+      `INSERT INTO approval_request (id, "projectId", "companyId", "taskId", "subjectKey", "subjectTitle", version, message, status, "requestedById", "requestedAt")
+       VALUES ($1, $2, $3, $4, $5, 'Design', 1, 'Please review.', 'pending', $6, now())`,
+      [
+        requestId,
+        projectId,
+        companyId,
+        taskId,
+        `task:${taskId}:${requestId}`,
+        adminId,
+      ]
+    );
+    await authPool.query(
+      'INSERT INTO approval_request_file (id, "requestId", "fileId") VALUES ($1, $2, $3)',
+      [randomUUID(), requestId, listedFileId]
+    );
+
+    const listed = await remove(adminId, listedFileId);
+    const plain = await remove(adminId, plainFileId);
+    const after = await authPool.query(
+      'SELECT "deletedAt" FROM file_asset WHERE id = $1',
+      [listedFileId]
+    );
+    const [stillThere] = after.rows as { deletedAt: Date | null }[];
+
+    expect(refusalOf(listed)).toBe("CONFLICT");
+    expect(stillThere?.deletedAt).toBeNull();
+    expect(refusalOf(plain)).toBe("removed");
+  } finally {
+    await authPool.query(
+      'DELETE FROM approval_request_file WHERE "requestId" = $1',
+      [requestId]
+    );
+    await authPool.query("DELETE FROM approval_request WHERE id = $1", [
       requestId,
-      projectId,
-      companyId,
-      taskId,
-      `task:${taskId}:${requestId}`,
+    ]);
+    await authPool.query('DELETE FROM undo_record WHERE "actorId" = $1', [
       adminId,
-    ]
-  );
-  await authPool.query(
-    'INSERT INTO approval_request_file (id, "requestId", "fileId") VALUES ($1, $2, $3)',
-    [randomUUID(), requestId, listedFileId]
-  );
-
-  const listed = await remove(adminId, listedFileId);
-  const plain = await remove(adminId, plainFileId);
-  const after = await authPool.query(
-    'SELECT "deletedAt" FROM file_asset WHERE id = $1',
-    [listedFileId]
-  );
-  const [stillThere] = after.rows as { deletedAt: Date | null }[];
-
-  expect(refusalOf(listed)).toBe("CONFLICT");
-  expect(stillThere?.deletedAt).toBeNull();
-  expect(refusalOf(plain)).toBe("removed");
+    ]);
+    await authPool.query('DELETE FROM activity WHERE "actorId" = $1', [
+      adminId,
+    ]);
+    await authPool.query("DELETE FROM file_asset WHERE id = ANY($1::uuid[])", [
+      [listedFileId, plainFileId],
+    ]);
+    await authPool.query("DELETE FROM task WHERE id = $1", [taskId]);
+    await authPool.query("DELETE FROM client_company WHERE id = $1", [
+      companyId,
+    ]);
+    await authPool.query("DELETE FROM project WHERE id = $1", [projectId]);
+    await authPool.query('DELETE FROM "user" WHERE id = $1', [adminId]);
+  }
 });
