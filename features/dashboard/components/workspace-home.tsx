@@ -257,10 +257,10 @@ const WorkspaceHomeSkeleton = () => (
     <span aria-hidden="true" className="sk home-stats-skeleton" />
     <div className="grid2 home-columns">
       <div className="stack">
-        <PanelSkeleton label="Loading your tasks…" rows={5} title="My tasks" />
+        <PanelSkeleton label="Loading your tasks…" rows={1} title="My tasks" />
         <PanelSkeleton
           label="Loading project progress…"
-          rows={4}
+          rows={1}
           title="Projects"
         />
       </div>
@@ -272,7 +272,7 @@ const WorkspaceHomeSkeleton = () => (
         />
         <PanelSkeleton
           label="Loading activity…"
-          rows={4}
+          rows={3}
           title="Recent activity"
         />
       </div>

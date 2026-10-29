@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { withSkeleton } from "react-zero-skeleton";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -121,6 +122,8 @@ export const InboxScreen = ({ api, items, keys, onOpenTask }: InboxScreenProps) 
     </WorkspaceScreen>
   );
 };
+
+export const SkelterInboxScreen = withSkeleton(InboxScreen);
 
 const styles = StyleSheet.create({
   item: {

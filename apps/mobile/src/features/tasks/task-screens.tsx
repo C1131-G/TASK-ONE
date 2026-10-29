@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { withSkeleton } from "react-zero-skeleton";
 import { useState } from "react";
 import type { AppFailure } from "@/errors";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -97,6 +98,8 @@ export const MyTasksScreen = ({
   );
 };
 
+export const SkelterMyTasksScreen = withSkeleton(MyTasksScreen);
+
 export interface TaskDetailModel {
   readonly projectName: string;
   readonly status: TaskStatus;
@@ -176,6 +179,8 @@ export const TaskDetailScreen = ({
     </WorkspaceScreen>
   );
 };
+
+export const SkelterTaskDetailScreen = withSkeleton(TaskDetailScreen);
 const styles = StyleSheet.create({
   filters: {
     flexDirection: "row",

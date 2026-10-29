@@ -3,13 +3,22 @@ import { Effect } from "effect";
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import type { AppFailure } from "@/errors";
-import { PreferencesScreen } from "@/features/preferences/preferences-screen";
+import { SkelterPreferencesScreen } from "@/features/preferences/preferences-screen";
 import {
   getPreferences,
   type Preference,
   type PreferenceAudience,
 } from "@/features/preferences/queries";
 import { useApi, useApiQuery, useKeys } from "@/runtime/api-hooks";
+
+const SKELETON_PREFERENCES: readonly Preference[] = [
+  { channel: "in-app", enabled: true, eventType: "assignment" },
+  { channel: "email", enabled: true, eventType: "assignment" },
+  { channel: "in-app", enabled: true, eventType: "comment" },
+  { channel: "email", enabled: true, eventType: "comment" },
+  { channel: "in-app", enabled: true, eventType: "status" },
+  { channel: "email", enabled: true, eventType: "status" },
+];
 
 /** Loads the person's settings, then shows the switches. */
 export const PreferencesRoute = ({ audience }: { readonly audience: PreferenceAudience }) => {
@@ -25,7 +34,7 @@ export const PreferencesRoute = ({ audience }: { readonly audience: PreferenceAu
     queryKey: ["notification-preferences", audience],
   });
 
-  if (api === null || keys === null || loaded.isPending) {
+  if (api === null || keys === null) {
     return <WorkspaceSkeleton variant="panel" />;
   }
   if (loaded.error !== null) {
@@ -33,11 +42,13 @@ export const PreferencesRoute = ({ audience }: { readonly audience: PreferenceAu
   }
 
   return (
-    <PreferencesScreen
+    <SkelterPreferencesScreen
       api={api}
       audience={audience}
+      hasSkeleton
+      isLoading={loaded.isPending}
       keys={keys}
-      preferences={loaded.data ?? []}
+      preferences={loaded.data ?? SKELETON_PREFERENCES}
     />
   );
 };

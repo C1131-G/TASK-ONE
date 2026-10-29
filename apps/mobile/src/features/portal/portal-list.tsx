@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { useState } from "react";
+import { withSkeleton } from "react-zero-skeleton";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { WorkspaceEmptyState } from "@/components/workspace/workspace-empty-state";
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceListRow } from "@/components/workspace/workspace-list-row";
-import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import type { ListRow } from "@/features/workspace/domain-list-screen";
 import { useApi, useApiQuery } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
@@ -30,23 +30,35 @@ export const PortalListBody = ({
   });
   const rows = list.data?.rows ?? [];
 
-  if (list.isPending) {
-    return <WorkspaceSkeleton variant="panel" />;
-  }
   if (list.error !== null && list.error !== undefined) {
     return <WorkspaceErrorState failure={list.error} onRetry={() => void list.refetch()} />;
   }
-  if (rows.length === 0) {
+  const displayRows = list.isPending ? SKELETON_ROWS : rows;
+  if (!list.isPending && displayRows.length === 0) {
     return <WorkspaceEmptyState message="Nothing here yet." title={emptyTitle} />;
   }
-  return (
-    <View style={styles.list}>
-      {rows.map((row) => (
-        <WorkspaceListRow key={row.id} {...(row.subtitle === null ? {} : { subtitle: row.subtitle })} title={row.title} />
-      ))}
-    </View>
-  );
+  return <SkelterPortalRows hasSkeleton isLoading={list.isPending} rows={displayRows} />;
 };
+
+const SKELETON_ROWS: readonly ListRow[] = [
+  { id: "skeleton-portal-1", subtitle: "Project details", title: "Project name" },
+  { id: "skeleton-portal-2", subtitle: "Project details", title: "Project name" },
+  { id: "skeleton-portal-3", subtitle: "Project details", title: "Project name" },
+];
+
+const PortalRows = ({ rows }: { readonly rows: readonly ListRow[] }) => (
+  <View style={styles.list}>
+    {rows.map((row) => (
+      <WorkspaceListRow
+        key={row.id}
+        {...(row.subtitle === null ? {} : { subtitle: row.subtitle })}
+        title={row.title}
+      />
+    ))}
+  </View>
+);
+
+export const SkelterPortalRows = withSkeleton(PortalRows);
 
 /** The portal account screen: identity card and sign-out. */
 export const PortalAccountBody = ({

@@ -6,8 +6,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { WorkspaceEmptyState } from "@/components/workspace/workspace-empty-state";
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceListRow } from "@/components/workspace/workspace-list-row";
+import { SkelterWorkspaceScreen } from "@/components/workspace/skelter-workspace-screen";
 import { WorkspaceScreen } from "@/components/workspace/workspace-screen";
-import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
 import { useApi, useApiQuery } from "@/runtime/api-hooks";
 import { useTheme } from "@/theme/theme-provider";
@@ -20,6 +20,12 @@ export interface ListRow {
   readonly subtitle: string | null;
   readonly title: string;
 }
+
+const SKELETON_ROWS: readonly ListRow[] = [
+  { id: "skeleton-row-1", subtitle: "Project details", title: "Project name" },
+  { id: "skeleton-row-2", subtitle: "Project details", title: "Project name" },
+  { id: "skeleton-row-3", subtitle: "Project details", title: "Project name" },
+];
 
 /** One generic, query-backed list screen; domains pass their fetch program. */
 export const DomainListScreen = ({
@@ -44,19 +50,22 @@ export const DomainListScreen = ({
     queryKey,
   });
   const rows = list.data?.rows ?? [];
+  const displayRows = list.isPending ? SKELETON_ROWS : rows;
 
   return (
     <WorkspaceTabShell>
-      <WorkspaceScreen title={screenTitle}>
-        {list.isPending ? (
-          <WorkspaceSkeleton variant="panel" />
-        ) : list.error !== null && list.error !== undefined ? (
+      <SkelterWorkspaceScreen
+        hasSkeleton
+        isLoading={list.isPending}
+        title={screenTitle}
+      >
+        {list.error !== null && list.error !== undefined ? (
           <WorkspaceErrorState failure={list.error} onRetry={() => void list.refetch()} />
-        ) : rows.length === 0 ? (
+        ) : displayRows.length === 0 ? (
           <WorkspaceEmptyState message={emptyMessage} title={emptyTitle} />
         ) : (
           <View style={styles.list}>
-            {rows.map((row) => (
+            {displayRows.map((row) => (
               <WorkspaceListRow
                 key={row.id}
                 {...(row.subtitle === null ? {} : { subtitle: row.subtitle })}
@@ -72,7 +81,7 @@ export const DomainListScreen = ({
             ))}
           </View>
         )}
-      </WorkspaceScreen>
+      </SkelterWorkspaceScreen>
     </WorkspaceTabShell>
   );
 };

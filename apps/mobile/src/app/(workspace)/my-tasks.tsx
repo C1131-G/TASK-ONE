@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { WorkspaceErrorState } from "@/components/workspace/workspace-error-state";
 import { WorkspaceSkeleton } from "@/components/workspace/workspace-skeleton";
 import { WorkspaceTabShell } from "@/features/navigation/workspace-tabs";
-import { MyTasksScreen, type TaskRowModel } from "@/features/tasks/task-screens";
+import { SkelterMyTasksScreen, type TaskRowModel } from "@/features/tasks/task-screens";
 import { getMyWork } from "@/features/tasks/queries";
 import { useApi, useApiQuery } from "@/runtime/api-hooks";
 import type { AppFailure } from "@/errors";
@@ -37,18 +37,26 @@ export default function MyTasksRoute() {
     queryKey: ["tasks", "mine"],
   });
 
-  if (api === null || tasks.isPending) {
+  if (api === null) {
     return <WorkspaceSkeleton variant="panel" />;
   }
   if (tasks.error !== null) {
     return <WorkspaceErrorState failure={tasks.error} onRetry={() => void tasks.refetch()} />;
   }
 
+  const skeletonTasks = [
+    { dueAt: null, id: "skeleton-1", priority: "medium", projectName: "Project", status: "todo", title: "Task title" },
+    { dueAt: null, id: "skeleton-2", priority: "medium", projectName: "Project", status: "todo", title: "Task title" },
+    { dueAt: null, id: "skeleton-3", priority: "medium", projectName: "Project", status: "todo", title: "Task title" },
+  ] satisfies readonly TaskRowModel[];
+
   return (
     <WorkspaceTabShell>
-      <MyTasksScreen
+      <SkelterMyTasksScreen
+        hasSkeleton
+        isLoading={tasks.isPending}
         onOpenTask={(id) => router.push(`/tasks/${id}`)}
-        tasks={tasks.data?.tasks ?? []}
+        tasks={tasks.data?.tasks ?? skeletonTasks}
       />
     </WorkspaceTabShell>
   );

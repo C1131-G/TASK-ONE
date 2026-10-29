@@ -1,5 +1,6 @@
 import { Effect, Exit } from "effect";
 import { useState } from "react";
+import { withSkeleton } from "react-zero-skeleton";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -108,6 +109,8 @@ export const PreferencesScreen = ({ api, audience, keys, preferences }: Preferen
     </WorkspaceScreen>
   );
 };
+
+export const SkelterPreferencesScreen = withSkeleton(PreferencesScreen);
 
 const styles = StyleSheet.create({
   group: {

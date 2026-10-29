@@ -4,12 +4,15 @@ import {
   Stack,
   ThemeProvider as RouterThemeProvider,
 } from "expo-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { SessionGate } from "@/features/auth/session-gate";
 import { OfflineBanner } from "@/features/connectivity/offline-banner";
 import { appRuntime } from "@/runtime/runtime";
 import { loadAppFonts } from "@/theme/fonts";
 import { ThemeProvider, useTheme } from "@/theme/theme-provider";
+
+const queryClient = new QueryClient();
 
 // Fonts load once alongside the runtime; a failure keeps the system font.
 void appRuntime().runPromiseExit(loadAppFonts);
@@ -26,11 +29,13 @@ const RoutedStack = () => {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <SessionGate>
-        <OfflineBanner />
-        <RoutedStack />
-      </SessionGate>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <SessionGate>
+          <OfflineBanner />
+          <RoutedStack />
+        </SessionGate>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

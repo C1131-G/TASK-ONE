@@ -105,7 +105,7 @@ const WEEKDAYS = [
   "Sunday",
 ] as const;
 
-const CALENDAR_DAYS = SKELETON_KEYS.slice(0, 35);
+const CALENDAR_DAYS = SKELETON_KEYS.slice(0, 42);
 
 // Mirrors TaskCalendarGrid: toolbar, navigation and weekday names are static;
 // the month, legend and every day cell are data.
@@ -161,6 +161,29 @@ const CalendarGridSkeleton = () => (
   </section>
 );
 
+const CalendarEventsSkeleton = () => (
+  <section className="panel">
+    <div className="panel-h">
+      <h2>Events this month</h2>
+    </div>
+    <SkelterSurface label="Loading calendar events…">
+      <div className="empty-state calendar-events-skeleton">
+        <span aria-hidden="true" className="glyph">
+          <SkeletonBone shape="avatar" />
+        </span>
+        <h3 className="es-h">
+          <SkeletonBone shape="title" />
+        </h3>
+        <div className="skeleton-copy calendar-events-skeleton-copy">
+          <SkeletonBone />
+          <SkeletonBone />
+        </div>
+        <SkeletonBone shape="control" />
+      </div>
+    </SkelterSurface>
+  </section>
+);
+
 const CalendarViewSkeleton = () => (
   <>
     <div className="ph">
@@ -170,6 +193,7 @@ const CalendarViewSkeleton = () => (
       </div>
     </div>
     <CalendarGridSkeleton />
+    <CalendarEventsSkeleton />
   </>
 );
 
