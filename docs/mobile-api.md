@@ -72,7 +72,7 @@ On `GET /portal/notifications` a page is filled with rows the client can open no
 
 Paged today: `GET /workspace/notifications`, `GET /workspace/bugs`, `GET /portal/notifications`, `GET /portal/bug-reports`, `GET /portal/approvals` and `GET /workspace/bug-approvals`.
 
-`GET /portal/bugs` answers a bare array capped at 200, so it could not gain a cursor without breaking released apps. It stays as it is, marked deprecated in the contract, and `GET /portal/bug-reports` takes its place with the same filters (`mine`, `projectId`, `status`) and the page fields. Per the versioning rules below it is kept for at least 6 months after the first app release that stops using it. The portal bug reports cursor is the last bug's position in time (newest first, id as the tie-breaker), and a page skips bugs whose task is archived while reading on, as the older list did.
+`GET /portal/bugs` answers a bare array capped at 200, so it could not gain a cursor without breaking released apps. It stays as it is, marked deprecated in the contract, and `GET /portal/bug-reports` takes its place with the same filters (`mine`, `projectId`, `status`) and the page fields. Per the versioning rules below it is kept for at least 6 months after the first app release that stops using it. The app in this repository already reads `GET /portal/bug-reports`, so that clock starts with the first release of the app; the switch-off date is announced in that release's notes and is not before six months after it. The portal bug reports cursor is the last bug's position in time (newest first, id as the tie-breaker), and a page skips bugs whose task is archived while reading on, as the older list did.
 
 ### Logs
 

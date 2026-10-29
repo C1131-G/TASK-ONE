@@ -30,7 +30,11 @@ export const listPortalProjects = (
 export const listPortalBugs = (
   api: Api,
 ): Effect.Effect<readonly PortalBugRow[], AppFailure> =>
-  api.call((client) => client.listPortalBugs({ query: {} }));
+  api.call(async (client) => {
+    // The paged list replaces the old capped one; this is its newest page.
+    const page = await client.listPortalBugPage({ query: {} });
+    return page.items;
+  });
 
 export const submitPortalBug = (
   api: Api,
