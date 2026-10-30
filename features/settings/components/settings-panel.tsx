@@ -39,6 +39,52 @@ const listTimeZones = () => [
   ...new Set(["UTC", "Asia/Kolkata", ...Intl.supportedValuesOf("timeZone")]),
 ];
 
+const getIntakePanel = (
+  intakeForms: Awaited<ReturnType<typeof listIntakeForms>> | null,
+  companies: Awaited<ReturnType<typeof listAllClientCompanies>> | null,
+  projects: Awaited<ReturnType<typeof listAllProjects>> | null
+) =>
+  intakeForms?.ok && companies?.ok && projects?.ok ? (
+    <IntakeFormsPanel
+      companies={companies.data.flatMap(({ active, id, name }) =>
+        active ? [{ id, label: name }] : []
+      )}
+      forms={intakeForms.data}
+      projects={projects.data.map(({ id, key, name }) => ({
+        id,
+        label: `${key} ${name}`,
+      }))}
+    />
+  ) : (
+    <div className="panel-b muted">Intake forms could not be loaded.</div>
+  );
+
+const getNotificationPanel = (
+  notificationPrefs: Awaited<ReturnType<typeof getNotificationPreferences>>,
+  emailSettings: Awaited<ReturnType<typeof getEmailSettings>>,
+  calendarFeed: Awaited<ReturnType<typeof getCalendarFeedStatus>>
+) => (
+  <>
+    {notificationPrefs.ok ? (
+      <NotificationPreferencesForm
+        emailDigest={emailSettings.ok ? emailSettings.data.digest : false}
+        values={notificationPrefs.data}
+      />
+    ) : (
+      <div className="panel-b muted">
+        Notification preferences could not be loaded.
+      </div>
+    )}
+    {calendarFeed.ok ? (
+      <CalendarFeedCard status={calendarFeed.data} />
+    ) : (
+      <div className="panel-b muted">
+        The calendar feed could not be loaded.
+      </div>
+    )}
+  </>
+);
+
 const SettingsPanel = async ({
   initialSection,
 }: {
@@ -80,43 +126,12 @@ const SettingsPanel = async ({
     <SettingsWorkspace
       canManageWorkspace={isAdmin}
       initialSection={initialSection}
-      intake={
-        intakeForms?.ok && companies?.ok && projects?.ok ? (
-          <IntakeFormsPanel
-            companies={companies.data.flatMap(({ active, id, name }) =>
-              active ? [{ id, label: name }] : []
-            )}
-            forms={intakeForms.data}
-            projects={projects.data.map(({ id, key, name }) => ({
-              id,
-              label: `${key} ${name}`,
-            }))}
-          />
-        ) : (
-          <div className="panel-b muted">Intake forms could not be loaded.</div>
-        )
-      }
-      notificationPreferences={
-        <>
-          {notificationPrefs.ok ? (
-            <NotificationPreferencesForm
-              emailDigest={emailSettings.ok ? emailSettings.data.digest : false}
-              values={notificationPrefs.data}
-            />
-          ) : (
-            <div className="panel-b muted">
-              Notification preferences could not be loaded.
-            </div>
-          )}
-          {calendarFeed.ok ? (
-            <CalendarFeedCard status={calendarFeed.data} />
-          ) : (
-            <div className="panel-b muted">
-              The calendar feed could not be loaded.
-            </div>
-          )}
-        </>
-      }
+      intake={getIntakePanel(intakeForms, companies, projects)}
+      notificationPreferences={getNotificationPanel(
+        notificationPrefs,
+        emailSettings,
+        calendarFeed
+      )}
       preferences={
         preferences.ok ? (
           <PreferencesForm values={preferences.data} />

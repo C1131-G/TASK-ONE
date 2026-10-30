@@ -212,6 +212,30 @@ it("starts and ends a preview through its link", async () => {
   expect(exit.headers.get("set-cookie")).toContain("Max-Age=0");
 });
 
+it("redirects to the configured app origin behind a reverse proxy", async () => {
+  const previousBaseUrl = process.env["BETTER_AUTH_URL"];
+  process.env["BETTER_AUTH_URL"] = "http://localhost:3000";
+
+  try {
+    const response = await previewRoute.GET(
+      new Request(
+        `http://0.0.0.0:3000/portal/preview?as=${personaId("client")}`,
+        { headers: fromSite(personaHeaders("admin"), "same-origin") }
+      )
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "http://localhost:3000/portal"
+    );
+  } finally {
+    if (previousBaseUrl === undefined) {
+      delete process.env["BETTER_AUTH_URL"];
+    } else {
+      process.env["BETTER_AUTH_URL"] = previousBaseUrl;
+    }
+  }
+});
+
 it("refuses to start or end a preview from a cross-site request", async () => {
   const startUrl = `http://localhost:3000/portal/preview?as=${personaId("client")}`;
   const attempts = [

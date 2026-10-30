@@ -77,7 +77,7 @@ jobs:
           # same Dockerfile compose uses instead of pulling Docker Hub images.
           docker build -f docker/minio.Dockerfile --target server -t taskora-minio-server:ci .
           docker build -f docker/minio.Dockerfile --target client -t taskora-minio-client:ci .
-          docker run -d --name taskora-minio -p 9000:9000 -e MINIO_ROOT_USER=taskora -e MINIO_ROOT_PASSWORD=local-minio-password taskora-minio-server:ci server /data
+          docker run -d --name taskora-minio -p 9000:9000 -e MINIO_ROOT_USER=taskora -e MINIO_ROOT_PASSWORD=local-minio-password -e MINIO_API_CORS_ALLOW_ORIGIN=http://localhost:3000,http://localhost:3001 taskora-minio-server:ci server /data
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
             sleep 2

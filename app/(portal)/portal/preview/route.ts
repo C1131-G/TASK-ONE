@@ -27,7 +27,10 @@ const redirectTo = (
 ): Response => {
   const headers = new Headers({
     "cache-control": "no-store",
-    location: new URL(path, request.url).toString(),
+    location: new URL(
+      path,
+      process.env["BETTER_AUTH_URL"] ?? request.url
+    ).toString(),
   });
   if (cookie) {
     headers.append("set-cookie", cookie);

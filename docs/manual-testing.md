@@ -31,7 +31,7 @@ Seeding wipes the whole local database first, then refills every table. Run `bun
 ## Services and ports
 
 | Service | Address | Login |
-|---|---|---|
+| --- | --- | --- |
 | App | http://localhost:3000 | see accounts below |
 | Health check | http://localhost:3000/api/health | none |
 | PostgreSQL | `localhost:5434`, database `taskora` | user `taskora`, password `local-dev-password` |
@@ -55,18 +55,18 @@ To use another one, run `SEED_PASSWORD=YourPassword bun run seed:dev`.
 Sign in at `/login`. Staff see the workspace.
 
 | Email | Name | Role | Team | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | owner@taskora.test | Olivia Owner | admin | none | Full access. Member of every project. |
 | admin@taskora.test | Adam Admin | admin | Support | Full access. Lead of Internal Tooling. |
 | eli@taskora.test | Eli Engineer | employee | Engineering | Lead of Acme Web Platform. Has a running timer. |
 | ena@taskora.test | Ena Backend | employee | Engineering | Lead of Globex Partner API. Picks and fixes bugs. |
 | ravi@taskora.test | Ravi Frontend | employee | Engineering | Lead of Acme Mobile App. |
 | dana@taskora.test | Dana Designer | employee | Design | Lead of Globex Brand Refresh. |
-| dev@taskora.test | Dev Visual | employee | Design | |
+| dev@taskora.test | Dev Visual | employee | Design |  |
 | sia@taskora.test | Sia Support | employee | Support | Handler for Acme and Initech. |
 | sam@taskora.test | Sam Success | employee | Support | Handler for Acme, Globex, and Umbrella. |
 | mia@taskora.test | Mia Marketer | employee | Marketing | Lead of Website Content Calendar. |
-| max@taskora.test | Max Content | employee | Marketing | |
+| max@taskora.test | Max Content | employee | Marketing |  |
 | newhire@taskora.test | Nia NewHire | employee | Engineering | Must change the password at first sign-in. |
 | former@taskora.test | Finn Former | employee | Engineering | Deactivated. Sign-in must fail. |
 
@@ -75,7 +75,7 @@ Sign in at `/login`. Staff see the workspace.
 Clients sign in at the same `/login` page and land in the portal at `/portal`. Each client sees only their own company.
 
 | Email | Name | Company |
-|---|---|---|
+| --- | --- | --- |
 | casey@acme.test | Casey Client | Acme Corp |
 | corin@acme.test | Corin Buyer | Acme Corp |
 | cleo@acme.test | Cleo Ops | Acme Corp |
@@ -88,7 +88,7 @@ Clients sign in at the same `/login` page and land in the portal at `/portal`. E
 ## Client companies
 
 | Company | Projects visible in the portal | Handlers | Intake form |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Acme Corp | ACME, ACMEM | Sia, Sam | `/intake/acme-bugs` |
 | Globex Industries | GLBX, GLAPI | Sam, Eli | `/intake/globex-bugs` |
 | Initech Labs | INIT | Sia | `/intake/initech-bugs` (disabled) |
@@ -99,7 +99,7 @@ Initech was linked to the Internal Tooling project and then unlinked. Check that
 ## Projects
 
 | Key | Name | Status | Team | Lead | Client |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | ACME | Acme Web Platform | active | Engineering | Eli | Acme |
 | ACMEM | Acme Mobile App | risk | Engineering | Ravi | Acme |
 | GLBX | Globex Brand Refresh | active | Design | Dana | Globex |
