@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Board layout uses app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Board layout uses apps/web/app/workspace-styles. */
 
 "use client";
 
@@ -59,4 +59,4 @@ export const BugBoard = ({ bugs }: { readonly bugs: readonly BugItem[] }) => (
     })}
   </div>
 );
-/* eslint-disable shadcn/no-unknown-classes -- Board layout uses app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Board layout uses apps/web/app/workspace-styles. */

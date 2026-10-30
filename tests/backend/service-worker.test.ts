@@ -28,7 +28,7 @@ const loadWorker = (clients: readonly unknown[] = []) => {
       },
     },
   };
-  runInNewContext(readFileSync("public/sw.js", "utf-8"), {
+  runInNewContext(readFileSync("apps/web/public/sw.js", "utf-8"), {
     URL,
     self: scope,
   });

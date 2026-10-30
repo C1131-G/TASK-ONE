@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ViewTransition } from "react";
 
-// Transition types a navigation can carry. Classes are in app/view-transitions.css.
+// Transition types a navigation can carry. Classes are in apps/web/app/view-transitions.css.
 export type NavigationTransitionType = "nav-back" | "nav-fade" | "nav-forward";
 
 const PAGE_TRANSITION_CLASSES = {

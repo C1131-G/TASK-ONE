@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in apps/web/app/workspace-styles. */
 
 // Holds the space of an admin-only header button while its role loads, so the
 // heading row does not shift when the button appears.

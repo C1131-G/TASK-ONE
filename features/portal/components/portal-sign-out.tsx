@@ -1,11 +1,14 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { SignOut } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { authClient } from "@/src/client/auth-client";
 
 const PortalSignOut = () => {
@@ -34,7 +37,7 @@ const PortalSignOut = () => {
   return (
     <div className="portal-stack">
       <div>
-        <button
+        <WorkspaceButton
           aria-busy={pending}
           className="btn btn-secondary"
           disabled={pending}
@@ -43,7 +46,7 @@ const PortalSignOut = () => {
         >
           <SignOut aria-hidden="true" size={14} />
           {pending ? "Signing out…" : "Sign out"}
-        </button>
+        </WorkspaceButton>
       </div>
       {error ? (
         <p className="err" role="alert">

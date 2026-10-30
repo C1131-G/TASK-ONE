@@ -26,7 +26,7 @@ const slow = () => Bun.sleep(SLOW_PROBE_MS);
 const SECRET_DETAIL = "password authentication failed for user taskora";
 
 it("reports liveness without touching any dependency", async () => {
-  const { GET } = await import("../../app/api/health/live/route");
+  const { GET } = await import("../../apps/web/app/api/health/live/route");
   const response = await GET();
 
   expect(response.status).toBe(200);
@@ -35,8 +35,8 @@ it("reports liveness without touching any dependency", async () => {
 });
 
 it("keeps /api/health as the readiness check for the container", async () => {
-  const { GET } = await import("../../app/api/health/route");
-  const ready = await import("../../app/api/health/ready/route");
+  const { GET } = await import("../../apps/web/app/api/health/route");
+  const ready = await import("../../apps/web/app/api/health/ready/route");
   expect(ready.GET).toBe(GET);
   const response = await GET();
 
@@ -151,7 +151,7 @@ it("probes dependencies concurrently so slow checks do not stack", async () => {
 });
 
 it("keeps liveness answering 200 on repeated calls", async () => {
-  const { GET } = await import("../../app/api/health/live/route");
+  const { GET } = await import("../../apps/web/app/api/health/live/route");
   const responses = await Promise.all([GET(), GET(), GET()]);
 
   expect(responses.map(({ status }) => status)).toEqual([200, 200, 200]);

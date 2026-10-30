@@ -39,14 +39,10 @@ const PortalBugItems = ({
         </h2>
         <p>
           {filtered
-            ? "Try clearing a filter to see more of your company's bugs."
+            ? "Change a status, project, or reporter filter to see more bugs."
             : "When you or your colleagues report a bug, it shows up here so everyone can follow it."}
         </p>
-        {filtered ? (
-          <Link className="btn btn-secondary" href="/portal">
-            Clear filters
-          </Link>
-        ) : (
+        {filtered ? null : (
           <Link className="btn btn-primary" href="/portal/new">
             Report a bug
           </Link>

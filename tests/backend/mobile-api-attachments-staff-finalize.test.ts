@@ -34,9 +34,9 @@ afterAll(async () => {
 });
 
 const uploadsRoute = () =>
-  import("../../app/api/v1/workspace/attachments/uploads/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/uploads/route");
 const finalizeRoute = () =>
-  import("../../app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
 
 const requestTicket = async (
   name = "crash.png"

@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 const Page = ({ searchParams }: PageProps<"/portal/new">) => (
   <PageTransition>
-    <div className="page portal-narrow">
-      <div className="ph">
+    <div className="page portal-report-page">
+      <div className="ph portal-report-heading">
         <div>
           <h1>Report a bug</h1>
           <p>

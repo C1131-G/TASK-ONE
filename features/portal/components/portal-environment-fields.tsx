@@ -1,7 +1,10 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
+import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { LIMITS } from "@/features/portal/components/portal-bug-form-model";
 import type {
   Errors,
@@ -35,7 +38,7 @@ const PageUrlField = ({
     <label className="label" htmlFor="portal-page-url">
       Page URL
     </label>
-    <input
+    <WorkspaceInput
       aria-describedby={describedBy(errors, "pageUrl", "portal-url-hint")}
       aria-invalid={errors.pageUrl ? true : undefined}
       autoComplete="off"
@@ -85,7 +88,7 @@ const ImpactField = ({
           htmlFor={`portal-impact-${impact}`}
           key={impact}
         >
-          <input
+          <WorkspaceInput
             checked={value === impact}
             data-field={index === 0 ? "impact" : undefined}
             id={`portal-impact-${impact}`}

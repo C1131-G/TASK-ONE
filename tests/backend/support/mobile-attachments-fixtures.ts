@@ -189,7 +189,8 @@ export const submitBug = async (
   persona: Persona,
   title: string
 ): Promise<{ bugId: string; taskId: string }> => {
-  const { POST } = await import("../../../app/api/v1/portal/bugs/route");
+  const { POST } =
+    await import("../../../apps/web/app/api/v1/portal/bugs/route");
   const reply = await send(POST, "POST", persona, { body: reportBody(title) });
   const bugId = reply.body.data.bugId as string;
   const row = await authPool.query<{ taskId: string }>(

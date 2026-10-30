@@ -22,9 +22,9 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const inboxRoute = () =>
-  import("../../app/api/v1/workspace/bug-approvals/route");
+  import("../../apps/web/app/api/v1/workspace/bug-approvals/route");
 
 const submit = async (title: string): Promise<string> => {
   const { POST } = await submitRoute();

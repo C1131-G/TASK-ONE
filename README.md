@@ -273,12 +273,13 @@ The web application uses Next.js App Router. Product pages, queries, Server Acti
 
 | Path | Contents |
 | --- | --- |
-| `app/` | Next.js routes, layouts, API routes, and global styles. |
+| `apps/web/app/` | Next.js routes, layouts, API routes, and global styles. |
 | `features/` | Web product features, UI, queries, and Server Actions. |
 | `src/server/` | Domain services for auth, work, storage, jobs, notifications, integrations, and more. |
 | `src/prisma/` | Prisma schema and generated database contract sources. |
 | `migrations/` | Versioned PostgreSQL schema migrations. |
 | `apps/mobile/` | Expo and React Native mobile client. |
+| `apps/web/` | Next.js web application and its project configuration. |
 | `components/`, `hooks/`, `lib/` | Shared interface components and utilities. |
 | `tests/` | Web backend, UI, and end-to-end tests. |
 | `scripts/` | Database, test, bootstrap, worker, and API contract scripts. |

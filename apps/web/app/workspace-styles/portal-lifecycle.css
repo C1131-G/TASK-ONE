@@ -50,6 +50,51 @@
 }
 .portal-app .portal-account {
   display: grid;
+  align-items: start;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.portal-app .portal-account > .portal-panel {
+  min-width: 0;
+  margin: 0;
+}
+.portal-app .portal-account-profile,
+.portal-app .portal-account-password,
+.portal-app .portal-account-sessions,
+.portal-app .portal-account-signout,
+.portal-app .portal-account-preview {
+  grid-column: 1 / -1;
+}
+.portal-app .portal-account-profile .portal-facts {
+  gap: 12px 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.portal-app .portal-account-password > .portal-form {
+  align-items: start;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.portal-app .portal-account-password > .portal-form > output,
+.portal-app .portal-account-password > .portal-form > .portal-form-error,
+.portal-app .portal-account-password > .portal-form > div:last-child {
+  grid-column: 1 / -1;
+}
+.portal-app .portal-account-password > .portal-form > .field {
+  min-width: 0;
+}
+.portal-app .portal-account-signout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+@media (max-width: 920px) {
+  .portal-app .portal-account {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portal-app .portal-account-password > .portal-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 /* Signed-in devices: let a row wrap so a long network name or the sign-out
    button never pushes the page sideways on a narrow phone. */

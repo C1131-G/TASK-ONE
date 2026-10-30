@@ -34,14 +34,15 @@ afterAll(async () => {
 });
 
 const uploadsRoute = () =>
-  import("../../app/api/v1/workspace/attachments/uploads/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/uploads/route");
 const finalizeRoute = () =>
-  import("../../app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
-const listRoute = () => import("../../app/api/v1/workspace/attachments/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/workspace/attachments/route");
 const downloadRoute = () =>
-  import("../../app/api/v1/workspace/attachments/[fileId]/download/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/[fileId]/download/route");
 const previewRoute = () =>
-  import("../../app/api/v1/workspace/attachments/[fileId]/preview/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/[fileId]/preview/route");
 
 // Uploads a real PNG through the routes and returns the finished file's id.
 const uploadPng = async (name: string): Promise<string> => {

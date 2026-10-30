@@ -7,7 +7,7 @@ process.env["BETTER_AUTH_SECRET"] ??=
 process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";
 
 it("rejects public account registration", async () => {
-  const { POST } = await import("../../app/api/auth/[...all]/route");
+  const { POST } = await import("../../apps/web/app/api/auth/[...all]/route");
   const response = await POST(
     new Request("http://localhost:3000/api/auth/sign-up/email", {
       body: JSON.stringify({
@@ -24,7 +24,7 @@ it("rejects public account registration", async () => {
 });
 
 it("does not expose Better Auth profile, session-management, or admin endpoints", async () => {
-  const { POST } = await import("../../app/api/auth/[...all]/route");
+  const { POST } = await import("../../apps/web/app/api/auth/[...all]/route");
   const blockedPaths = [
     "/api/auth/update-user",
     "/api/auth/list-sessions",
@@ -47,7 +47,7 @@ it("does not expose Better Auth profile, session-management, or admin endpoints"
 });
 
 it("requires the scheduler token before running any durable jobs", async () => {
-  const { POST } = await import("../../app/api/internal/jobs/route");
+  const { POST } = await import("../../apps/web/app/api/internal/jobs/route");
   const response = await POST(
     new Request("http://localhost:3000/api/internal/jobs", {
       body: JSON.stringify({ limit: 1 }),

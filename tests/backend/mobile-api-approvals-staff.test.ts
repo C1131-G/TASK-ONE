@@ -64,7 +64,7 @@ beforeEach(async () => {
 afterAll(teardownHarness);
 
 const approvalsRoute = () =>
-  import("../../app/api/v1/workspace/approvals/route");
+  import("../../apps/web/app/api/v1/workspace/approvals/route");
 
 const requestBody = (overrides: Record<string, unknown> = {}) => ({
   companyId: ids.clientCompanyId,

@@ -1,10 +1,14 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 import {
   confirmClientFixAction,
   reopenClientFixAction,
@@ -56,7 +60,7 @@ export const ConfirmForm = ({ bug }: { readonly bug: PortalBugDetail }) => {
         <label className="label" htmlFor={`${id}-comment`}>
           Comment <span className="faint">(optional)</span>
         </label>
-        <textarea
+        <WorkspaceTextarea
           aria-describedby={action.error ? `${id}-err` : undefined}
           className="textarea"
           disabled={action.pending}
@@ -72,13 +76,13 @@ export const ConfirmForm = ({ bug }: { readonly bug: PortalBugDetail }) => {
         <FieldError id={`${id}-err`} message={action.error} />
       </div>
       <div>
-        <button
+        <WorkspaceButton
           className="btn btn-primary btn-sm"
           disabled={action.pending}
           type="submit"
         >
           {action.pending ? "Confirming…" : "Confirm it works"}
-        </button>
+        </WorkspaceButton>
       </div>
     </form>
   );
@@ -133,7 +137,7 @@ export const ReopenForm = ({
         <label className="label" htmlFor={`${id}-reason`}>
           What is still broken?
         </label>
-        <textarea
+        <WorkspaceTextarea
           aria-describedby={action.error ? `${id}-err` : undefined}
           aria-invalid={action.error ? true : undefined}
           aria-required="true"
@@ -157,21 +161,21 @@ export const ReopenForm = ({
         <FieldError id={`${id}-err`} message={action.error} />
       </div>
       <div className="portal-form-acts">
-        <button
+        <WorkspaceButton
           className="btn btn-primary btn-sm"
           disabled={action.pending}
           type="submit"
         >
           {action.pending ? "Sending…" : "Send back to the team"}
-        </button>
-        <button
+        </WorkspaceButton>
+        <WorkspaceButton
           className="btn btn-ghost btn-sm"
           disabled={action.pending}
           onClick={onCancel}
           type="button"
         >
           Cancel
-        </button>
+        </WorkspaceButton>
       </div>
     </form>
   );

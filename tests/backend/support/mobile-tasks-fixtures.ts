@@ -17,47 +17,50 @@ const ROUTES: readonly {
   readonly path: string;
 }[] = [
   {
-    load: () => import("../../../app/api/v1/workspace/me/work/route"),
+    load: () => import("../../../apps/web/app/api/v1/workspace/me/work/route"),
     path: "/api/v1/workspace/me/work",
   },
   {
-    load: () => import("../../../app/api/v1/workspace/me/timer/route"),
+    load: () => import("../../../apps/web/app/api/v1/workspace/me/timer/route"),
     path: "/api/v1/workspace/me/timer",
   },
   {
-    load: () => import("../../../app/api/v1/workspace/me/timer/start/route"),
+    load: () =>
+      import("../../../apps/web/app/api/v1/workspace/me/timer/start/route"),
     path: "/api/v1/workspace/me/timer/start",
   },
   {
-    load: () => import("../../../app/api/v1/workspace/me/timer/stop/route"),
+    load: () =>
+      import("../../../apps/web/app/api/v1/workspace/me/timer/stop/route"),
     path: "/api/v1/workspace/me/timer/stop",
   },
   {
-    load: () => import("../../../app/api/v1/workspace/tasks/route"),
+    load: () => import("../../../apps/web/app/api/v1/workspace/tasks/route"),
     path: "/api/v1/workspace/tasks",
   },
   {
     load: () =>
-      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/route"),
+      import("../../../apps/web/app/api/v1/workspace/tasks/[taskId]/subtasks/route"),
     path: "/api/v1/workspace/tasks/:taskId/subtasks",
   },
   {
     load: () =>
-      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/route"),
+      import("../../../apps/web/app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId",
   },
   {
     load: () =>
-      import("../../../app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/status/route"),
+      import("../../../apps/web/app/api/v1/workspace/tasks/[taskId]/subtasks/[subtaskId]/status/route"),
     path: "/api/v1/workspace/tasks/:taskId/subtasks/:subtaskId/status",
   },
   {
     load: () =>
-      import("../../../app/api/v1/workspace/tasks/[taskId]/comments/route"),
+      import("../../../apps/web/app/api/v1/workspace/tasks/[taskId]/comments/route"),
     path: "/api/v1/workspace/tasks/:taskId/comments",
   },
   {
-    load: () => import("../../../app/api/v1/workspace/tasks/[taskId]/route"),
+    load: () =>
+      import("../../../apps/web/app/api/v1/workspace/tasks/[taskId]/route"),
     path: "/api/v1/workspace/tasks/:taskId",
   },
 ];
@@ -83,9 +86,9 @@ const matchRoute = (
       return { load: route.load, params };
     }
   }
-  // A path with no parameters is the folder under app/ that holds its route.
+  // A path with no parameters is the folder under apps/web/app/ that holds its route.
   return {
-    load: () => import(`../../../${`app${pathname}`}/route`),
+    load: () => import(`../../../${`apps/web/app${pathname}`}/route`),
     params: {},
   };
 };

@@ -1,10 +1,13 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { Paperclip } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { PortalFilePicker } from "@/features/portal/components/portal-file-picker";
 import {
   clearFailedUpload,
@@ -65,23 +68,23 @@ const FailedUploads = ({
               <span>{entry.message}</span>
             </span>
             {canAttach ? (
-              <button
+              <WorkspaceButton
                 className="btn btn-secondary btn-sm"
                 disabled={retrying !== undefined}
                 onClick={() => retry(entry.id)}
                 type="button"
               >
                 {retrying === entry.id ? "Retrying…" : "Retry"}
-              </button>
+              </WorkspaceButton>
             ) : null}
-            <button
+            <WorkspaceButton
               className="btn btn-ghost btn-sm"
               disabled={retrying === entry.id}
               onClick={() => clearFailedUpload(bugId, entry.id)}
               type="button"
             >
               Dismiss
-            </button>
+            </WorkspaceButton>
           </li>
         ))}
       </ul>
@@ -118,7 +121,7 @@ const AddAttachments = ({
   if (!open) {
     return (
       <div>
-        <button
+        <WorkspaceButton
           className="btn btn-secondary btn-sm"
           disabled={slots <= 0}
           onClick={() => setOpen(true)}
@@ -126,7 +129,7 @@ const AddAttachments = ({
         >
           <Paperclip aria-hidden="true" size={14} />
           Add attachment
-        </button>
+        </WorkspaceButton>
         {slots <= 0 ? (
           <p className="hint">
             This bug has reached the limit of {PORTAL_MAX_FILES_PER_BUG}{" "}
@@ -151,15 +154,15 @@ const AddAttachments = ({
         {status}
       </output>
       <div className="portal-form-acts">
-        <button
+        <WorkspaceButton
           className="btn btn-primary btn-sm"
           disabled={pending || files.length === 0}
           onClick={upload}
           type="button"
         >
           {pending ? "Uploading…" : "Upload"}
-        </button>
-        <button
+        </WorkspaceButton>
+        <WorkspaceButton
           className="btn btn-ghost btn-sm"
           disabled={pending}
           onClick={() => {
@@ -169,7 +172,7 @@ const AddAttachments = ({
           type="button"
         >
           Cancel
-        </button>
+        </WorkspaceButton>
       </div>
     </div>
   );

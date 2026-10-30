@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- These workspace classes are authored in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- These workspace classes are authored in apps/web/app/workspace-styles. */
 
 import { ArrowSquareOut } from "@phosphor-icons/react";
 

@@ -30,6 +30,6 @@ export default defineConfig({
   ],
   sortTailwindcss: {
     ...tailwindSortConfig,
-    stylesheet: "./app/globals.css",
+    stylesheet: "./apps/web/app/globals.css",
   },
 });

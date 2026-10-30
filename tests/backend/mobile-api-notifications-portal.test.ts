@@ -175,7 +175,8 @@ const clearNotifications = async (): Promise<void> => {
 };
 
 const inbox = async (token: string = personaBearerToken("client")) => {
-  const { GET } = await import("../../app/api/v1/portal/notifications/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/portal/notifications/route");
   return callRoute<PortalInbox>(GET, "GET", "/api/v1/portal/notifications", {
     token,
   });
@@ -187,7 +188,7 @@ const markRead = async (
   key: string | null = `portal-read-${randomUUID()}`
 ) => {
   const { POST } =
-    await import("../../app/api/v1/portal/notifications/[id]/read/route");
+    await import("../../apps/web/app/api/v1/portal/notifications/[id]/read/route");
   return callRoute<{ done: true }>(
     POST,
     "POST",
@@ -201,7 +202,7 @@ const markAllRead = async (
   key: string | null = `portal-all-${randomUUID()}`
 ) => {
   const { POST } =
-    await import("../../app/api/v1/portal/notifications/read-all/route");
+    await import("../../apps/web/app/api/v1/portal/notifications/read-all/route");
   return callRoute<{ count: number }>(
     POST,
     "POST",
@@ -212,7 +213,7 @@ const markAllRead = async (
 
 const workspaceInbox = async (token: string) => {
   const { GET } =
-    await import("../../app/api/v1/workspace/notifications/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/route");
   return callRoute(GET, "GET", "/api/v1/workspace/notifications", { token });
 };
 

@@ -1,6 +1,8 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal-screenshot.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal-screenshot.css. */
 
 import { Camera } from "@phosphor-icons/react";
 import {
@@ -10,6 +12,7 @@ import {
   useTransition,
 } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { noSubscription } from "@/features/portal/components/portal-bug-form-mode";
 import { PortalScreenshotEditor } from "@/features/portal/components/portal-screenshot-editor";
 import { NoFrameError, grabFrame } from "@/features/portal/portal-frame-grab";
@@ -121,7 +124,7 @@ const PortalScreenshotCapture = ({
   return (
     <div className="portal-shot">
       <div className="portal-shot-acts">
-        <button
+        <WorkspaceButton
           aria-busy={capturing}
           className="btn btn-secondary btn-sm"
           disabled={disabled || capturing}
@@ -130,7 +133,7 @@ const PortalScreenshotCapture = ({
         >
           <Camera aria-hidden="true" size={16} />
           {captured ? "Retake screenshot" : "Capture screenshot"}
-        </button>
+        </WorkspaceButton>
         <span className="hint">
           Your browser will ask which tab or window to share. Only one picture
           is taken, then sharing stops.
@@ -151,7 +154,7 @@ const PortalScreenshotCapture = ({
                 {formatFileSize(captured.file.size)}
               </span>
             </span>
-            <button
+            <WorkspaceButton
               aria-label="Remove captured screenshot"
               className="btn btn-ghost btn-sm"
               disabled={disabled}
@@ -159,7 +162,7 @@ const PortalScreenshotCapture = ({
               type="button"
             >
               Remove
-            </button>
+            </WorkspaceButton>
           </li>
         </ul>
       ) : null}

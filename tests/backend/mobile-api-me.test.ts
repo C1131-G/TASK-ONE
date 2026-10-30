@@ -13,7 +13,7 @@ beforeAll(setupHarness);
 afterAll(teardownHarness);
 
 const getMe = async (token?: string): Promise<Response> => {
-  const { GET } = await import("../../app/api/v1/me/route");
+  const { GET } = await import("../../apps/web/app/api/v1/me/route");
   return GET(
     new Request("http://localhost:3000/api/v1/me", {
       headers: token ? { authorization: `Bearer ${token}` } : {},

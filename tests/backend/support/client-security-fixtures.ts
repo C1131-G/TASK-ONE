@@ -29,7 +29,7 @@ export const clients =
   await import("../../../features/clients/clients-actions");
 export const people = await import("../../../features/people/people-actions");
 export const previewRoute =
-  await import("../../../app/(portal)/portal/preview/route");
+  await import("../../../apps/web/app/(portal)/portal/preview/route");
 
 let addressCounter = Number.parseInt(randomUUID().slice(0, 4), 16);
 export const nextAddress = (): string => {

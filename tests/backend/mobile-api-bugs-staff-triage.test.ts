@@ -29,19 +29,19 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const triageRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/triage/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/triage/route");
 const reassignRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/reassign/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/reassign/route");
 const requestInfoRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/request-info/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/request-info/route");
 const pickRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/pick/route");
 const portalDetailRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/route");
 const portalCommentRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/comments/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/comments/route");
 
 const submit = async (title: string): Promise<string> => {
   const { POST } = await submitRoute();

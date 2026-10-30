@@ -1,9 +1,12 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   registerPortalPushAction,
   removePortalPushAction,
@@ -158,7 +161,7 @@ const PortalPushControl = ({ publicKey }: { readonly publicKey: string }) => {
         one of your bugs changes.
       </p>
       <div>
-        <button
+        <WorkspaceButton
           aria-pressed={subscribed === true}
           className="btn btn-secondary"
           disabled={pending || subscribed === undefined}
@@ -168,7 +171,7 @@ const PortalPushControl = ({ publicKey }: { readonly publicKey: string }) => {
           {subscribed
             ? "Turn off push notifications"
             : "Turn on push notifications"}
-        </button>
+        </WorkspaceButton>
       </div>
       <output aria-live="polite" className="hint">
         {message}

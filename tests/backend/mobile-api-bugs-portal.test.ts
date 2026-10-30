@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 
 it("lets a client submit a bug report and records it for their company", async () => {
   const { POST } = await submitRoute();
@@ -28,8 +28,10 @@ it("lets a client submit a bug report and records it for their company", async (
   expect(row.clientCompanyId).not.toBeNull();
 });
 
-const listRoute = () => import("../../app/api/v1/portal/bug-reports/route");
-const detailRoute = () => import("../../app/api/v1/portal/bugs/[bugId]/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/portal/bug-reports/route");
+const detailRoute = () =>
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/route");
 
 const submit = async (
   persona: "client" | "otherClient" = "client",

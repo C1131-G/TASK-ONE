@@ -89,4 +89,4 @@ Product API operations below require an authenticated bearer token. Paths use br
 
 ## OpenAPI schema
 
-The public endpoint is implemented in [`app/api/v1/openapi.json/route.ts`](../app/api/v1/openapi.json/route.ts) and returns the document built by [`buildOpenApiDocument`](../src/server/api/contract.ts). The checked-in [generated JSON](mobile-openapi.json) is produced with `bun run openapi:write`; this reference links to the schema instead of duplicating it.
+The public endpoint is implemented in [`apps/web/app/api/v1/openapi.json/route.ts`](../apps/web/app/api/v1/openapi.json/route.ts) and returns the document built by [`buildOpenApiDocument`](../src/server/api/contract.ts). The checked-in [generated JSON](mobile-openapi.json) is produced with `bun run openapi:write`; this reference links to the schema instead of duplicating it.

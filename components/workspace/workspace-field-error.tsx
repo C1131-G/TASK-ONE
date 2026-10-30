@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in apps/web/app/workspace-styles. */
 
 import { fieldErrorId } from "@/lib/field-errors";
 import type { FormErrors } from "@/lib/field-errors";

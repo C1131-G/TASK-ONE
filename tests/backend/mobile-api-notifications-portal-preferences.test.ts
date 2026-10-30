@@ -25,13 +25,13 @@ const PATH = "/api/v1/portal/notifications/preferences";
 
 const read = async (token: string) => {
   const { GET } =
-    await import("../../app/api/v1/portal/notifications/preferences/route");
+    await import("../../apps/web/app/api/v1/portal/notifications/preferences/route");
   return callRoute<{ preferences: Preference[] }>(GET, "GET", PATH, { token });
 };
 
 const update = async (token: string, body: unknown, key?: string | null) => {
   const { PATCH } =
-    await import("../../app/api/v1/portal/notifications/preferences/route");
+    await import("../../apps/web/app/api/v1/portal/notifications/preferences/route");
   return callRoute<{ done: true }>(PATCH, "PATCH", PATH, {
     body,
     ...(key === undefined ? {} : { key }),

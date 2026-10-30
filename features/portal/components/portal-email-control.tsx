@@ -1,9 +1,12 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useOptimistic, useState, useTransition } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { setPortalEmailUpdatesAction } from "@/features/portal/portal-notification-actions";
 
 const PortalEmailControl = ({ enabled }: { readonly enabled: boolean }) => {
@@ -38,7 +41,7 @@ const PortalEmailControl = ({ enabled }: { readonly enabled: boolean }) => {
         has an unsubscribe link.
       </p>
       <div>
-        <button
+        <WorkspaceButton
           aria-pressed={on}
           className="btn btn-secondary"
           disabled={pending}
@@ -46,7 +49,7 @@ const PortalEmailControl = ({ enabled }: { readonly enabled: boolean }) => {
           type="button"
         >
           {on ? "Turn off email updates" : "Turn on email updates"}
-        </button>
+        </WorkspaceButton>
       </div>
       <output aria-live="polite" className="hint">
         {message}

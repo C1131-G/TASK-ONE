@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from app/workspace-styles. */
+/* eslint-disable shadcn/no-restyle, shadcn/no-unknown-classes -- Bug screens use reference workspace styles from apps/web/app/workspace-styles. */
 
 import Link from "next/link";
 

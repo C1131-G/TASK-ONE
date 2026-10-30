@@ -1,11 +1,14 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
 /* eslint-disable shadcn/no-unknown-classes, shadcn/no-restyle -- Portal pages reuse the workspace stylesheet classes. */
 
 import { PencilSimple, ArrowUUpLeft } from "@phosphor-icons/react";
 import { useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { WorkspaceConfirmDialog } from "@/components/workspace/workspace-confirm-dialog";
 import { PortalBugForm } from "@/features/portal/components/portal-bug-form";
 import { withdrawClientBugAction } from "@/features/portal/portal-bug-actions";
@@ -51,7 +54,7 @@ const PortalBugManage = ({
       {bug.canEdit || bug.canWithdraw ? (
         <div className="portal-manage">
           {bug.canEdit && !editing ? (
-            <button
+            <WorkspaceButton
               className="btn btn-secondary btn-sm"
               disabled={pending}
               onClick={() => setEditing(true)}
@@ -59,7 +62,7 @@ const PortalBugManage = ({
             >
               <PencilSimple aria-hidden="true" size={14} />
               Edit
-            </button>
+            </WorkspaceButton>
           ) : null}
           {bug.canWithdraw ? (
             <WorkspaceConfirmDialog
@@ -68,7 +71,7 @@ const PortalBugManage = ({
               onConfirm={withdraw}
               title="Withdraw this bug?"
             >
-              <button
+              <WorkspaceButton
                 aria-busy={pending}
                 className="btn btn-ghost btn-sm"
                 disabled={pending}
@@ -76,7 +79,7 @@ const PortalBugManage = ({
               >
                 <ArrowUUpLeft aria-hidden="true" size={14} />
                 {pending ? "Withdrawing…" : "Withdraw"}
-              </button>
+              </WorkspaceButton>
             </WorkspaceConfirmDialog>
           ) : null}
         </div>

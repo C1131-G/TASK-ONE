@@ -37,10 +37,11 @@ afterAll(async () => {
 });
 
 const uploadsRoute = () =>
-  import("../../app/api/v1/portal/attachments/uploads/route");
+  import("../../apps/web/app/api/v1/portal/attachments/uploads/route");
 const finalizeRoute = () =>
-  import("../../app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
-const listRoute = () => import("../../app/api/v1/portal/attachments/route");
+  import("../../apps/web/app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/portal/attachments/route");
 
 it("lets a client attach a screenshot to its own bug after reporting it", async () => {
   const { bugId, taskId } = await submitBug("client", "Screenshot bug");

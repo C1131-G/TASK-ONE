@@ -27,17 +27,17 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const triageRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/triage/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/triage/route");
 const fixAttemptRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/fix-attempts/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/fix-attempts/route");
 const verificationRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/verifications/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/verifications/route");
 const approvalRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/approval/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/approval/route");
 const decisionRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/approval/decision/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/approval/decision/route");
 
 interface ApprovalRow {
   readonly comment: string | null;

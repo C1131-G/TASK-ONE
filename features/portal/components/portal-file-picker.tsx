@@ -1,11 +1,14 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { FilePdf, FileVideo, UploadSimple, X } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { DragEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   PORTAL_FILE_ACCEPT,
   acceptFiles,
@@ -96,7 +99,7 @@ const PortalFilePicker = ({
       >
         <UploadSimple aria-hidden="true" size={20} />
         <p>Drag files here, or</p>
-        <button
+        <WorkspaceButton
           aria-describedby={hintId}
           className="btn btn-secondary btn-sm"
           disabled={disabled || files.length >= slots}
@@ -104,7 +107,7 @@ const PortalFilePicker = ({
           type="button"
         >
           Choose files
-        </button>
+        </WorkspaceButton>
         <input
           accept={PORTAL_FILE_ACCEPT}
           aria-label="Attach files"
@@ -139,7 +142,7 @@ const PortalFilePicker = ({
                 <strong>{file.name}</strong>
                 <span className="faint">{formatFileSize(file.size)}</span>
               </span>
-              <button
+              <WorkspaceButton
                 aria-label={`Remove ${file.name}`}
                 className="btn btn-ghost btn-sm"
                 disabled={disabled}
@@ -147,7 +150,7 @@ const PortalFilePicker = ({
                 type="button"
               >
                 <X aria-hidden="true" size={14} />
-              </button>
+              </WorkspaceButton>
             </li>
           ))}
         </ul>

@@ -1182,7 +1182,7 @@ const addBug = async (project: Project, title: string, options: BugOptions) => {
       fixSummary: "Guarded the null value.",
       fixedVersion: "1.4.1",
       id: attemptId,
-      pullRequestUrl: "https://github.com/example/app/pull/42",
+      pullRequestUrl: "https://github.com/example/apps/web/app/pull/42",
       rootCause: "A missing null check.",
       testedEnvironment: verified ? "staging" : null,
       testedVersion: verified ? "1.4.1" : null,

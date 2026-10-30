@@ -46,7 +46,7 @@ export const callRoute = async (
     })
     .join("/");
   const routeModule = (await import(
-    `../../../app/api/v1/${folder}/route`
+    `../../../apps/web/app/api/v1/${folder}/route`
   )) as RouteModule;
   const handler = routeModule[route.method.toUpperCase()];
   if (!handler) {

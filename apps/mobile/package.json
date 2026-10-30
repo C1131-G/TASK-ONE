@@ -54,8 +54,8 @@
     "typecheck": "tsc --noEmit",
     "test:effect": "vitest run",
     "test:ui": "jest",
-    "lint": "oxlint --config oxlint.config.ts",
-    "fix": "oxlint --config oxlint.config.ts --fix",
+    "lint": "oxlint --config oxlint.config.mjs",
+    "fix": "oxlint --config oxlint.config.mjs --fix",
     "test:e2e": "maestro test e2e"
   }
 }

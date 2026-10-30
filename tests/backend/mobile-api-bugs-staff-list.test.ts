@@ -24,10 +24,11 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
-const listRoute = () => import("../../app/api/v1/workspace/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/workspace/bugs/route");
 const triageRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/triage/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/triage/route");
 
 const submit = async (
   persona: "client" | "otherClient",
@@ -231,7 +232,7 @@ it("tells each caller what they may do with a bug, as the services will accept i
   expect(adminBefore?.permittedActions).toEqual(["comment", "reply_to_client"]);
 
   const { POST: pick } =
-    await import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+    await import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/pick/route");
   const picked = await send(pick, "POST", "owner", {
     body: { expectedVersion: 1, priority: "high", severity: "major" },
     params: { bugId },

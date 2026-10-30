@@ -13,7 +13,7 @@ import { createFeedRateLimiter } from "../../src/server/calendar/feed-rate-limit
 // `connection()` only opts the route out of prerendering.
 mock.module("next/server", () => ({ connection: () => Promise.resolve() }));
 
-const { GET } = await import("../../app/api/calendar/[token]/route");
+const { GET } = await import("../../apps/web/app/api/calendar/[token]/route");
 
 const call = (token: string, ip: string) =>
   GET(

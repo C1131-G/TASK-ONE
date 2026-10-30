@@ -91,16 +91,20 @@ const PortalProjectView = async ({
             {project.tasks.length === 0 ? (
               <p className="faint">The team has not shared any tasks yet.</p>
             ) : (
-              <ul aria-label="Shared tasks" className="portal-stack">
+              <ul aria-label="Shared tasks" className="portal-project-tasks">
                 {project.tasks.map((task) => (
-                  <li className="row" key={task.id}>
-                    <strong>{task.title}</strong>
-                    <span className={`badge ${taskStatusTone[task.status]}`}>
+                  <li className="portal-project-task" key={task.id}>
+                    <strong className="portal-project-task-title">
+                      {task.title}
+                    </strong>
+                    <span
+                      className={`badge portal-project-task-status ${taskStatusTone[task.status]}`}
+                    >
                       <span aria-hidden="true" className="dot" />
                       {taskStatusText[task.status]}
                     </span>
                     {task.dueDate ? (
-                      <span className="faint">
+                      <span className="faint portal-project-task-due">
                         Due <PortalTime iso={task.dueDate} variant="date" />
                       </span>
                     ) : null}

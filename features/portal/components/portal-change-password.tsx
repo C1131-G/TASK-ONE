@@ -1,11 +1,15 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { CheckCircle } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { changeOwnPasswordAction } from "@/features/user/user-actions";
 
 const MIN_LENGTH = 12;
@@ -102,7 +106,7 @@ const PortalChangePassword = () => {
         <label className="label" htmlFor="portal-current-password">
           Current password
         </label>
-        <input
+        <WorkspaceInput
           aria-describedby={describedBy("portal-current-password")}
           aria-invalid={invalid("portal-current-password")}
           autoComplete="current-password"
@@ -122,7 +126,7 @@ const PortalChangePassword = () => {
         <label className="label" htmlFor="portal-new-password">
           New password
         </label>
-        <input
+        <WorkspaceInput
           aria-describedby={describedBy("portal-new-password")}
           aria-invalid={invalid("portal-new-password")}
           autoComplete="new-password"
@@ -144,7 +148,7 @@ const PortalChangePassword = () => {
         <label className="label" htmlFor="portal-confirm-password">
           Confirm new password
         </label>
-        <input
+        <WorkspaceInput
           aria-describedby={describedBy("portal-confirm-password")}
           aria-invalid={invalid("portal-confirm-password")}
           autoComplete="new-password"
@@ -161,9 +165,13 @@ const PortalChangePassword = () => {
         />
       </div>
       <div>
-        <button className="btn btn-primary" disabled={pending} type="submit">
+        <WorkspaceButton
+          className="btn btn-primary"
+          disabled={pending}
+          type="submit"
+        >
           {pending ? "Updating password…" : "Change password"}
-        </button>
+        </WorkspaceButton>
       </div>
     </form>
   );

@@ -48,7 +48,8 @@ beforeEach(async () => {
 });
 
 const read = async (query: Record<string, string> = {}) => {
-  const { GET } = await import("../../app/api/v1/portal/notifications/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/portal/notifications/route");
   return callRoute<Inbox>(GET, "GET", "/api/v1/portal/notifications", {
     query,
     token: personaBearerToken("client"),

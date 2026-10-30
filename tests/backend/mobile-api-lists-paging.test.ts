@@ -87,11 +87,11 @@ it("refuses a cursor that does not name a row of this list", async () => {
 
 // --- the routes ---
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const inboxRoute = () =>
-  import("../../app/api/v1/workspace/bug-approvals/route");
+  import("../../apps/web/app/api/v1/workspace/bug-approvals/route");
 const portalApprovalsRoute = () =>
-  import("../../app/api/v1/portal/approvals/route");
+  import("../../apps/web/app/api/v1/portal/approvals/route");
 
 const seedBugApproval = async (
   title: string,

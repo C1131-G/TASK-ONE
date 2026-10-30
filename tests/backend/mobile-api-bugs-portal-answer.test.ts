@@ -24,13 +24,13 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const pickRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/pick/route");
 const askRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/request-info/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/request-info/route");
 const answerRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/comments/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/comments/route");
 
 // A picked bug on which the handler has asked the client a question, through
 // the mobile routes.

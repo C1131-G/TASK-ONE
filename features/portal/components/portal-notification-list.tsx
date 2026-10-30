@@ -1,10 +1,13 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import Link from "next/link";
 import { useState } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { PortalTime } from "@/features/portal/components/portal-time";
 import {
   markAllPortalNotificationsReadAction,
@@ -74,7 +77,7 @@ const PortalNotificationList = ({
           {remaining > 0 ? `${remaining || unreadCount} unread` : "All read"}
         </h2>
         <div className="acts">
-          <button
+          <WorkspaceButton
             className="btn btn-secondary btn-sm"
             disabled={isPreview || busy || remaining === 0}
             onClick={markAll}
@@ -82,7 +85,7 @@ const PortalNotificationList = ({
             type="button"
           >
             {busy ? "Marking…" : "Mark all as read"}
-          </button>
+          </WorkspaceButton>
         </div>
       </div>
       {error ? (
@@ -136,13 +139,13 @@ const PortalNotificationList = ({
                 <div className="portal-notif-main">{body}</div>
               )}
               {unread && !isPreview ? (
-                <button
+                <WorkspaceButton
                   className="btn btn-ghost btn-sm"
                   onClick={() => markOne(item.id)}
                   type="button"
                 >
                   Mark read
-                </button>
+                </WorkspaceButton>
               ) : null}
             </li>
           );

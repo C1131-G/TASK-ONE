@@ -1,14 +1,16 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import {
   BehaviorFields,
-  ProjectField,
   StepsField,
   SummaryFields,
 } from "@/features/portal/components/portal-bug-fields";
@@ -23,13 +25,16 @@ import type {
   FieldKey,
   Values,
 } from "@/features/portal/components/portal-bug-form-model";
-import { PortalContextDisclosure } from "@/features/portal/components/portal-context-disclosure";
 import {
   EnvironmentFields,
   ImpactField,
   PageUrlField,
 } from "@/features/portal/components/portal-environment-fields";
-import { PortalReportAttachments } from "@/features/portal/components/portal-report-attachments";
+import {
+  PortalReportWizardActions,
+  PortalReportWizardNavigation,
+  PortalReportWizardStage,
+} from "@/features/portal/components/portal-report-wizard-stage";
 import type { CapturedScreenshot } from "@/features/portal/components/portal-screenshot-capture";
 import {
   editClientBugAction,
@@ -54,9 +59,78 @@ import {
   conflictMessage,
   initialValues,
   noSubscription,
+  PORTAL_REPORT_STEPS,
   submitLabel,
 } from "./portal-bug-form-mode";
 import type { Mode } from "./portal-bug-form-mode";
+
+const REQUIRED_REPORT_FIELDS = [
+  ["projectId", "title"],
+  ["steps", "expected", "actual"],
+  ["pageUrl", "impact"],
+] as const satisfies readonly (readonly FieldKey[])[];
+
+const PortalBugEditFields = ({
+  detected,
+  errors,
+  onAddStep,
+  onPatch,
+  onRemoveStep,
+  onStepChange,
+  pending,
+  values,
+}: {
+  readonly detected: ReturnType<typeof parseEnvironment>;
+  readonly errors: Errors;
+  readonly onAddStep: () => void;
+  readonly onPatch: (patch: Partial<Values>) => void;
+  readonly onRemoveStep: (id: string) => void;
+  readonly onStepChange: (id: string, text: string) => void;
+  readonly pending: boolean;
+  readonly values: Values;
+}) => (
+  <>
+    <SummaryFields
+      errors={errors}
+      onPatch={onPatch}
+      pending={pending}
+      values={values}
+    />
+    <StepsField
+      errors={errors}
+      onAdd={onAddStep}
+      onRemove={onRemoveStep}
+      onStepChange={onStepChange}
+      pending={pending}
+      steps={values.steps}
+    />
+    <BehaviorFields
+      errors={errors}
+      onPatch={onPatch}
+      pending={pending}
+      values={values}
+    />
+    <PageUrlField
+      errors={errors}
+      onPatch={onPatch}
+      pending={pending}
+      value={values.pageUrl}
+    />
+    <ImpactField
+      errors={errors}
+      onPatch={onPatch}
+      pending={pending}
+      value={values.impact}
+    />
+    <EnvironmentFields
+      detected={detected}
+      isCreate={false}
+      onPatch={onPatch}
+      pending={pending}
+      values={values}
+    />
+  </>
+);
 
 // The report form and the edit form share every field. Reporting also takes
 // screenshots, uploaded once the bug exists.
@@ -70,6 +144,7 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [captured, setCaptured] = useState<CapturedScreenshot | null>(null);
   const [sendContext, setSendContext] = useState(true);
+  const [activeStep, setActiveStep] = useState(0);
   const context = parseContext(
     useSyncExternalStore(
       subscribeToContext,
@@ -80,6 +155,8 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
   const stepCounter = useRef(values.steps.length);
   const keyRef = useRef<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
+  const previousStepRef = useRef(activeStep);
   const isCreate = mode.kind === "create";
   const detected = parseEnvironment(
     useSyncExternalStore(
@@ -88,6 +165,12 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       environmentServerSnapshot
     )
   );
+  useEffect(() => {
+    if (activeStep !== previousStepRef.current) {
+      stepHeadingRef.current?.focus();
+      previousStepRef.current = activeStep;
+    }
+  }, [activeStep]);
 
   // Changing anything starts a new attempt, so an old idempotency key is never
   // reused with different input.
@@ -139,6 +222,25 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
         ?.querySelector<HTMLElement>(`[data-field="${first}"]`)
         ?.focus();
     }
+  };
+
+  const continueToNextStep = () => {
+    const allErrors = validate(values, isCreate);
+    const fields = REQUIRED_REPORT_FIELDS[activeStep] ?? [];
+    const stepErrors: Errors = {};
+    for (const field of fields) {
+      if (allErrors[field]) {
+        stepErrors[field] = allErrors[field];
+      }
+    }
+    setErrors(stepErrors);
+    if (Object.keys(stepErrors).length > 0) {
+      focusFirstError(stepErrors);
+      return;
+    }
+    setActiveStep((current) =>
+      Math.min(current + 1, PORTAL_REPORT_STEPS.length - 1)
+    );
   };
 
   const createBug = async (idempotencyKey: string) => {
@@ -227,83 +329,54 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
   return (
     <form
       aria-busy={pending}
-      className="portal-form"
+      className={`portal-form${isCreate ? " portal-wizard" : ""}`}
       noValidate
       onSubmit={submit}
       ref={formRef}
     >
-      {mode.kind === "create" ? (
-        <ProjectField
-          errors={errors}
-          onPatch={patch}
-          pending={pending}
-          projects={mode.projects}
-          value={values.projectId}
-        />
-      ) : null}
-      <SummaryFields
-        errors={errors}
-        onPatch={patch}
-        pending={pending}
-        values={values}
-      />
-      <StepsField
-        errors={errors}
-        onAdd={addStep}
-        onRemove={removeStep}
-        onStepChange={changeStep}
-        pending={pending}
-        steps={values.steps}
-      />
-      <BehaviorFields
-        errors={errors}
-        onPatch={patch}
-        pending={pending}
-        values={values}
-      />
-      <PageUrlField
-        errors={errors}
-        onPatch={patch}
-        pending={pending}
-        value={values.pageUrl}
-      />
-      <ImpactField
-        errors={errors}
-        onPatch={patch}
-        pending={pending}
-        responseTimes={mode.kind === "create" ? mode.responseTimes : null}
-        value={values.impact}
-      />
-      <EnvironmentFields
-        detected={detected}
-        isCreate={isCreate}
-        onPatch={patch}
-        pending={pending}
-        values={values}
-      />
       {isCreate ? (
-        <PortalReportAttachments
-          captured={captured}
-          disabled={pending}
-          files={files}
-          onCaptured={(next) => {
-            keyRef.current = null;
-            setCaptured(next);
-          }}
-          onFiles={setFiles}
+        <>
+          <PortalReportWizardNavigation activeStep={activeStep} />
+          <PortalReportWizardStage
+            activeStep={activeStep}
+            captured={captured}
+            context={context}
+            detected={detected}
+            errors={errors}
+            files={files}
+            onAddStep={addStep}
+            onCaptured={(next) => {
+              keyRef.current = null;
+              setCaptured(next);
+            }}
+            onFiles={setFiles}
+            onPatch={patch}
+            onRemoveStep={removeStep}
+            onStepChange={changeStep}
+            onToggleContext={(send) => {
+              keyRef.current = null;
+              setSendContext(send);
+            }}
+            pending={pending}
+            projects={mode.projects}
+            responseTimes={mode.responseTimes ?? null}
+            sendContext={sendContext}
+            stepHeadingRef={stepHeadingRef}
+            values={values}
+          />
+        </>
+      ) : (
+        <PortalBugEditFields
+          detected={detected}
+          errors={errors}
+          onAddStep={addStep}
+          onPatch={patch}
+          onRemoveStep={removeStep}
+          onStepChange={changeStep}
+          pending={pending}
+          values={values}
         />
-      ) : null}
-      {isCreate && context ? (
-        <PortalContextDisclosure
-          context={context}
-          disabled={pending}
-          onToggle={(send) => {
-            keyRef.current = null;
-            setSendContext(send);
-          }}
-          sendContext={sendContext}
-        />
-      ) : null}
+      )}
       {formError ? (
         <p className="portal-form-error" role="alert">
           {formError}
@@ -312,21 +385,34 @@ const PortalBugForm = ({ mode }: { readonly mode: Mode }) => {
       <output aria-live="polite" className="muted">
         {progress}
       </output>
-      <div className="portal-form-acts">
-        <button className="btn btn-primary" disabled={pending} type="submit">
-          {submitLabel(mode, pending)}
-        </button>
-        {mode.kind === "edit" ? (
-          <button
+      {isCreate ? (
+        <PortalReportWizardActions
+          activeStep={activeStep}
+          onBack={() => setActiveStep((current) => Math.max(current - 1, 0))}
+          onContinue={continueToNextStep}
+          pending={pending}
+          submitText={submitLabel(mode, pending)}
+        />
+      ) : null}
+      {mode.kind === "edit" ? (
+        <div className="portal-form-acts">
+          <WorkspaceButton
+            className="btn btn-primary"
+            disabled={pending}
+            type="submit"
+          >
+            {submitLabel(mode, pending)}
+          </WorkspaceButton>
+          <WorkspaceButton
             className="btn btn-ghost"
             disabled={pending}
             onClick={handleCancel}
             type="button"
           >
             Cancel
-          </button>
-        ) : null}
-      </div>
+          </WorkspaceButton>
+        </div>
+      ) : null}
     </form>
   );
 };

@@ -23,9 +23,9 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const pickRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/pick/route");
 
 const submit = async (
   title: string,

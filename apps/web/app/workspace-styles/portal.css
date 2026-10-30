@@ -1,13 +1,23 @@
 /* client portal: own frame, shared workspace tokens and controls */
 .workspace-app.portal-app {
-  display: flex;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100dvh;
-  height: auto;
-  flex-direction: column;
-  overflow: visible;
+  height: 100dvh;
+  overflow: hidden;
 }
-.portal-app .portal-preview-slot {
-  min-height: 3.5rem;
+.portal-app .portal-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  min-height: 0;
+  height: 100dvh;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-inline-end: 1px solid var(--border);
+  background: var(--bg-side);
 }
 .portal-app .portal-skip {
   position: absolute;
@@ -36,31 +46,63 @@
 .portal-app .portal-main {
   flex: 1;
   min-width: 0;
+  background: var(--bg);
+}
+.portal-app .portal-content {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+.portal-app .page {
+  width: 100%;
+  max-width: none;
+  padding: 24px clamp(20px, 2.5vw, 40px) 48px;
+}
+.portal-app .page.portal-report-page {
+  display: flex;
+  height: calc(100dvh - 3.5rem);
+  flex-direction: column;
+  gap: 10px;
+  padding-block: 8px 12px;
+}
+.portal-app .portal-report-heading {
+  display: flex;
+  min-height: 32px;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+}
+.portal-app .portal-report-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.portal-app .portal-report-heading p {
+  margin: 0;
+}
+.portal-app .portal-report-panel {
+  flex: 1;
+  min-height: 0;
+  align-content: stretch;
+  padding: 10px 12px;
+}
+.portal-app .portal-preview-slot {
+  min-height: 3.5rem;
 }
 .portal-app .portal-main:focus {
   outline: none;
 }
 
-/* header + nav */
-.portal-app .portal-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-}
-.portal-app .portal-header-in {
-  display: flex;
-  max-width: 1160px;
-  align-items: center;
-  gap: 16px;
-  margin: 0 auto;
-  padding: 10px var(--gutter);
-}
+/* Sidebar brand, company, and navigation */
 .portal-app .portal-brand {
   display: inline-flex;
+  min-height: 40px;
   align-items: center;
   gap: 8px;
+  padding: 0 8px 12px;
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -76,50 +118,49 @@
   font-weight: 700;
 }
 .portal-app .portal-company {
-  display: flex;
+  display: grid;
   min-width: 0;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  overflow: hidden;
+  gap: 4px;
+  margin: 0 8px;
   color: var(--text-3);
   font-size: var(--fs-sm);
-  white-space: nowrap;
 }
 .portal-app .portal-company-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
-/* A fixed height keeps the header steady; wide logos shrink to fit. */
 .portal-app .portal-company-logo {
-  flex: none;
+  display: block;
   width: auto;
   max-width: 96px;
   height: 24px;
   object-fit: contain;
 }
 .portal-app .portal-nav {
-  margin-left: auto;
+  min-height: 0;
+  margin-top: 4px;
+  overflow-y: auto;
 }
 .portal-app .portal-nav ul {
-  display: flex;
-  gap: 4px;
+  display: grid;
+  gap: 3px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .portal-app .portal-nav-link {
   position: relative;
-  display: inline-flex;
-  min-height: var(--h-lg);
+  display: flex;
+  width: 100%;
+  min-height: 40px;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   padding: 0 10px;
   border-radius: var(--r-sm);
   color: var(--text-2);
   font-size: var(--fs);
-  white-space: nowrap;
 }
 .portal-app .portal-nav-link:hover {
   background: var(--surface-3);
@@ -143,12 +184,53 @@
   font-weight: 600;
   line-height: 1;
 }
+.portal-app .portal-nav-link .portal-nav-badge {
+  margin-left: auto;
+}
 @media (max-width: 720px) {
-  .portal-app .portal-header-in {
-    padding-inline: 16px;
+  .workspace-app.portal-app {
+    display: flex;
+    height: auto;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .portal-app .portal-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    height: auto;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .portal-app .portal-brand {
+    min-height: 24px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+  }
+  .portal-app .portal-mark {
+    width: 24px;
+    height: 24px;
+  }
+  .portal-app .portal-company {
+    display: block;
+    margin-left: auto;
+    overflow: hidden;
+    text-align: right;
+    white-space: nowrap;
   }
   .portal-app .portal-company-logo {
     max-width: 64px;
+  }
+  .portal-app .portal-content {
+    min-height: calc(100dvh - 44px);
+    overflow: visible;
   }
   .portal-app .portal-nav {
     position: fixed;
@@ -186,6 +268,27 @@
     padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
   .portal-app .page {
-    padding-inline: 16px;
+    padding: 20px 16px 96px;
+  }
+  .portal-app .page.portal-report-page {
+    height: auto;
+    min-height: 0;
+    padding-block: 16px 24px;
+    gap: 12px;
+  }
+  .portal-app .portal-report-panel {
+    flex: initial;
+  }
+  .portal-app .portal-wizard {
+    height: auto;
+  }
+  .portal-app .portal-report-heading {
+    display: block;
+  }
+  .portal-app .portal-report-heading > div {
+    display: block;
+  }
+  .portal-app .portal-report-heading p {
+    margin-top: 4px;
   }
 }

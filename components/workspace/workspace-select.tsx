@@ -15,10 +15,12 @@ const EMPTY_VALUE = "__taskora_empty_select_value__";
 
 const WorkspaceSelect = ({
   ariaInvalid,
+  ariaDescribedby,
   ariaLabel,
   children,
   className,
   defaultValue,
+  dataField,
   disabled,
   displayValue,
   id,
@@ -29,10 +31,12 @@ const WorkspaceSelect = ({
   value,
 }: {
   readonly ariaInvalid?: boolean | "false" | "grammar" | "spelling" | "true";
+  readonly ariaDescribedby?: string;
   readonly ariaLabel?: string;
   readonly children: ReactNode;
   readonly className?: string;
   readonly defaultValue?: string;
+  readonly dataField?: string;
   readonly disabled?: boolean;
   readonly displayValue?: string;
   readonly id?: string;
@@ -74,10 +78,12 @@ const WorkspaceSelect = ({
         value={currentValue}
       >
         <SelectTrigger
+          aria-describedby={ariaDescribedby}
           aria-label={ariaLabel}
           aria-invalid={ariaInvalid}
           aria-required={required || undefined}
           className={className}
+          data-field={dataField}
           data-status={status}
           id={id}
         >

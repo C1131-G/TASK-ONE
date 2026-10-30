@@ -47,14 +47,15 @@ afterAll(async () => {
 });
 
 const uploadsRoute = () =>
-  import("../../app/api/v1/portal/attachments/uploads/route");
+  import("../../apps/web/app/api/v1/portal/attachments/uploads/route");
 const finalizeRoute = () =>
-  import("../../app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
-const listRoute = () => import("../../app/api/v1/portal/attachments/route");
+  import("../../apps/web/app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/portal/attachments/route");
 const downloadRoute = () =>
-  import("../../app/api/v1/portal/attachments/[fileId]/download/route");
+  import("../../apps/web/app/api/v1/portal/attachments/[fileId]/download/route");
 const previewRoute = () =>
-  import("../../app/api/v1/portal/attachments/[fileId]/preview/route");
+  import("../../apps/web/app/api/v1/portal/attachments/[fileId]/preview/route");
 
 const evidenceCount = (bugId: string) =>
   countRows("bug_evidence", '"bugReportId" = $1', [bugId]);

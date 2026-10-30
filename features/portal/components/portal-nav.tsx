@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import {
   Bell,
@@ -82,6 +82,7 @@ const PortalNavLinks = ({
               className="portal-nav-link"
               href={item.href}
               isActive={item.match}
+              showPendingIndicator={false}
             >
               {(active) => (
                 <>

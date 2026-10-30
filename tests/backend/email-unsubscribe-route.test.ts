@@ -47,7 +47,8 @@ const cleanUp = async (userId: string) => {
 it("shows a confirmation page on GET without changing anything", async () => {
   const userId = await createSubscribedUser();
   try {
-    const { GET } = await import("../../app/api/email/unsubscribe/route");
+    const { GET } =
+      await import("../../apps/web/app/api/email/unsubscribe/route");
     const response = await GET(
       new Request(urlFor(signUnsubscribeToken(userId, secret ?? "")))
     );
@@ -65,7 +66,8 @@ it("shows a confirmation page on GET without changing anything", async () => {
 it("turns off every email on POST, including the one-click mail client form", async () => {
   const userId = await createSubscribedUser();
   try {
-    const { POST } = await import("../../app/api/email/unsubscribe/route");
+    const { POST } =
+      await import("../../apps/web/app/api/email/unsubscribe/route");
     const response = await POST(
       new Request(urlFor(signUnsubscribeToken(userId, secret ?? "")), {
         body: "List-Unsubscribe=One-Click",
@@ -84,7 +86,8 @@ it("turns off every email on POST, including the one-click mail client form", as
 it("rejects a forged or missing token without changing anything", async () => {
   const userId = await createSubscribedUser();
   try {
-    const { GET, POST } = await import("../../app/api/email/unsubscribe/route");
+    const { GET, POST } =
+      await import("../../apps/web/app/api/email/unsubscribe/route");
     const forged = signUnsubscribeToken(
       userId,
       "another-secret-entirely-different"

@@ -7,7 +7,9 @@ process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";
 
-const apiRoot = fileURLToPath(new URL("../../app/api/v1", import.meta.url));
+const apiRoot = fileURLToPath(
+  new URL("../../apps/web/app/api/v1", import.meta.url)
+);
 const SPEC_ROUTE = "openapi.json";
 
 // "me/route.ts" becomes "/api/v1/me"; "tasks/[taskId]/route.ts" becomes
@@ -44,7 +46,7 @@ const loadSpec = async (): Promise<{
   readonly openapi: string;
   readonly paths: Record<string, Record<string, Record<string, unknown>>>;
 }> => {
-  const { GET } = await import("../../app/api/v1/openapi.json/route");
+  const { GET } = await import("../../apps/web/app/api/v1/openapi.json/route");
   const response = await GET();
   expect(response.status).toBe(200);
   return (await response.json()) as Awaited<ReturnType<typeof loadSpec>>;

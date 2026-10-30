@@ -2,7 +2,7 @@ import { Schema } from "effect";
 
 export type HttpMethod = "get" | "post" | "patch" | "delete";
 
-// One entry per route file under app/api/v1. The OpenAPI document and the
+// One entry per route file under apps/web/app/api/v1. The OpenAPI document and the
 // typed client are both read from the route list, and a test fails when a
 // route file and its entry drift apart.
 export interface RouteDefinition {

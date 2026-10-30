@@ -23,7 +23,7 @@ const PATH = "/api/v1/workspace/notifications/preferences";
 
 const read = async (persona: "owner" | "outsider" | "client") => {
   const { GET } =
-    await import("../../app/api/v1/workspace/notifications/preferences/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/preferences/route");
   return callRoute<{ preferences: Preference[] }>(GET, "GET", PATH, {
     token: personaBearerToken(persona),
   });
@@ -35,7 +35,7 @@ const update = async (
   key?: string
 ) => {
   const { PATCH } =
-    await import("../../app/api/v1/workspace/notifications/preferences/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/preferences/route");
   return callRoute<{ done: true }>(PATCH, "PATCH", PATH, {
     body,
     ...(key ? { key } : {}),
@@ -88,7 +88,7 @@ it("refuses an unknown channel or kind, and a write without a key", async () => 
   });
   const noKey = await (async () => {
     const { PATCH } =
-      await import("../../app/api/v1/workspace/notifications/preferences/route");
+      await import("../../apps/web/app/api/v1/workspace/notifications/preferences/route");
     return callRoute(PATCH, "PATCH", PATH, {
       body: { channel: "in-app", enabled: false, eventType: "due" },
       key: null,

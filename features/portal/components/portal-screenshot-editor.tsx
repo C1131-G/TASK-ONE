@@ -1,11 +1,15 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal-screenshot.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal-screenshot.css. */
 
 import { ArrowUpRight, Rectangle, PencilSimple } from "@phosphor-icons/react";
 import { useId, useRef, useState, useTransition } from "react";
 import type { ReactNode } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceInput } from "@/components/workspace/workspace-controls";
 import { useScreenshotMarks } from "@/features/portal/hooks/use-screenshot-marks";
 import { drawAnnotation } from "@/features/portal/portal-screenshot-annotations";
 import type {
@@ -115,7 +119,7 @@ const PortalScreenshotEditor = ({
         role="toolbar"
       >
         {TOOLS.map((entry) => (
-          <button
+          <WorkspaceButton
             aria-pressed={tool === entry.tool}
             className="btn btn-secondary btn-sm"
             key={entry.tool}
@@ -124,24 +128,24 @@ const PortalScreenshotEditor = ({
           >
             {entry.icon}
             {entry.label}
-          </button>
+          </WorkspaceButton>
         ))}
-        <button
+        <WorkspaceButton
           className="btn btn-ghost btn-sm"
           disabled={marks.length === 0}
           onClick={undo}
           type="button"
         >
           Undo
-        </button>
-        <button
+        </WorkspaceButton>
+        <WorkspaceButton
           className="btn btn-ghost btn-sm"
           disabled={marks.length === 0}
           onClick={clear}
           type="button"
         >
           Clear
-        </button>
+        </WorkspaceButton>
       </div>
       {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/prefer-tag-over-role -- A canvas cannot be an img element; the canvas is the drawing surface; it needs focus and key handlers for the keyboard path described in the help text. */}
       <canvas
@@ -173,7 +177,7 @@ const PortalScreenshotEditor = ({
         <label className="label" htmlFor={descriptionId}>
           Describe the screenshot <span className="faint">(optional)</span>
         </label>
-        <input
+        <WorkspaceInput
           autoComplete="off"
           className="input"
           id={descriptionId}
@@ -192,7 +196,7 @@ const PortalScreenshotEditor = ({
         </p>
       ) : null}
       <div className="portal-form-acts">
-        <button
+        <WorkspaceButton
           aria-busy={exporting}
           className="btn btn-primary btn-sm"
           disabled={exporting}
@@ -200,15 +204,15 @@ const PortalScreenshotEditor = ({
           type="button"
         >
           {exporting ? "Preparing…" : "Use screenshot"}
-        </button>
-        <button
+        </WorkspaceButton>
+        <WorkspaceButton
           className="btn btn-ghost btn-sm"
           disabled={exporting}
           onClick={onDiscard}
           type="button"
         >
           Discard
-        </button>
+        </WorkspaceButton>
       </div>
     </section>
   );

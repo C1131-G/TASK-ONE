@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import Image from "next/image";
 import Link from "next/link";
@@ -99,39 +99,38 @@ const unreadBadge = (
   </Suspense>
 );
 
-// The portal has its own frame: no workspace sidebar, only the client's
-// company, a few links and the page. `workspace-app` supplies the design
-// tokens the shared classes rely on.
+// The portal has a compact client sidebar. `workspace-app` supplies the
+// design tokens the shared classes rely on.
 const PortalShell = ({ children }: { readonly children: ReactNode }) => (
   <div className="workspace-app portal-app">
     <a className="portal-skip" href="#portal-main">
       Skip to main content
     </a>
-    <header className="portal-header">
-      <div className="portal-header-in">
-        <Link className="portal-brand" href="/portal">
-          <span aria-hidden="true" className="portal-mark">
-            M
-          </span>
-          <span>Taskora</span>
-        </Link>
-        <Suspense fallback={<p className="portal-company" />}>
-          <PortalCompanyName />
-        </Suspense>
-        <PortalNavLinks
-          approvalBadge={approvalBadge}
-          notificationBadge={unreadBadge}
-        />
-      </div>
-    </header>
-    <Suspense
-      fallback={<div aria-hidden="true" className="portal-preview-slot" />}
-    >
-      <PortalPreviewBanner />
-    </Suspense>
-    <main className="portal-main" id="portal-main" tabIndex={-1}>
-      {children}
-    </main>
+    <aside aria-label="Client portal sidebar" className="portal-sidebar">
+      <Link className="portal-brand" href="/portal">
+        <span aria-hidden="true" className="portal-mark">
+          M
+        </span>
+        <span>Taskora</span>
+      </Link>
+      <Suspense fallback={<p className="portal-company" />}>
+        <PortalCompanyName />
+      </Suspense>
+      <PortalNavLinks
+        approvalBadge={approvalBadge}
+        notificationBadge={unreadBadge}
+      />
+    </aside>
+    <div className="portal-content">
+      <Suspense
+        fallback={<div aria-hidden="true" className="portal-preview-slot" />}
+      >
+        <PortalPreviewBanner />
+      </Suspense>
+      <main className="portal-main" id="portal-main" tabIndex={-1}>
+        {children}
+      </main>
+    </div>
   </div>
 );
 

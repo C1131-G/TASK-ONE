@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Bug list styles are defined in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Bug list styles are defined in apps/web/app/workspace-styles. */
 
 import { slaChipModel } from "@/features/bugs/bug-sla-format";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";

@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace page classes are authored in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace page classes are authored in apps/web/app/workspace-styles. */
 
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";

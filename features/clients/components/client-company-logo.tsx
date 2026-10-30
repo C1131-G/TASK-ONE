@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Client classes are authored in app/workspace-styles/clients.css. */
+/* eslint-disable shadcn/no-unknown-classes -- Client classes are authored in apps/web/app/workspace-styles/clients.css. */
 
 "use client";
 

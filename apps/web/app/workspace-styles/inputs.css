@@ -91,6 +91,10 @@
   background-position: right 9px center;
   cursor: pointer;
 }
+.workspace-app .select[data-slot="select-trigger"] {
+  padding-inline-end: 36px;
+  background-image: none;
+}
 .workspace-app .inwrap {
   position: relative;
   display: flex;

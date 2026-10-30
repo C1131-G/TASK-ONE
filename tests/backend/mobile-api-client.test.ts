@@ -19,7 +19,7 @@ const routeFetch = async (
   const request = new Request(input, init);
   const { pathname } = new URL(request.url);
   if (pathname === "/api/v1/me") {
-    const { GET } = await import("../../app/api/v1/me/route");
+    const { GET } = await import("../../apps/web/app/api/v1/me/route");
     return GET(request);
   }
   return new Response(null, { status: 404 });

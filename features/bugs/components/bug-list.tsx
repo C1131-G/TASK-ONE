@@ -9,7 +9,7 @@ import { BugSlaChip } from "@/features/bugs/components/bug-sla-chip";
 import { useTaskDrawer } from "@/features/tasks/components/task-drawer";
 import type { BugListItemSchema } from "@/src/server/work/bug-management";
 
-/* eslint-disable shadcn/no-unknown-classes -- Bug list styles are defined in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Bug list styles are defined in apps/web/app/workspace-styles. */
 /* eslint-disable shadcn/no-restyle -- Drawer action follows existing workspace button styling. */
 
 type BugListItem = typeof BugListItemSchema.Type;

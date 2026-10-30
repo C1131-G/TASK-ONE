@@ -26,7 +26,7 @@ const inbox = async (
   query: Record<string, string> = {}
 ) => {
   const { GET } =
-    await import("../../app/api/v1/workspace/notifications/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/route");
   return callRoute<InboxData>(GET, "GET", "/api/v1/workspace/notifications", {
     query,
     token: personaBearerToken(persona),
@@ -118,7 +118,7 @@ it("refuses a page size outside 1 to 100 and a cursor it did not issue", async (
 
 it("refuses a missing token, and a client token on the workspace route", async () => {
   const { GET } =
-    await import("../../app/api/v1/workspace/notifications/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/route");
   const anonymous = await callRoute(
     GET,
     "GET",

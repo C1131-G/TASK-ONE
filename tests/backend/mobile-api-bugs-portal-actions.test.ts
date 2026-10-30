@@ -21,13 +21,13 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const commentsRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/comments/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/comments/route");
 const confirmRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/confirm/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/confirm/route");
 const reopenRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/reopen/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/reopen/route");
 
 const submit = async (
   persona: "client" | "otherClient" = "client",

@@ -11,6 +11,7 @@ import { NavigationPendingIndicator } from "@/components/workspace/navigation-pe
 interface NavLinkProps {
   readonly href: Route;
   readonly className: string;
+  readonly showPendingIndicator?: boolean;
   // Added to className while the link names the current page.
   readonly activeClassName?: string;
   readonly isActive?: (pathname: string) => boolean;
@@ -26,6 +27,7 @@ const NavLinkView = ({
   children,
   className,
   href,
+  showPendingIndicator = true,
   transitionTypes,
 }: Omit<NavLinkProps, "isActive" | "transitionTypes"> & {
   readonly active: boolean;
@@ -40,7 +42,7 @@ const NavLinkView = ({
     transitionTypes={transitionTypes}
   >
     {typeof children === "function" ? children(active) : children}
-    <NavigationPendingIndicator />
+    {showPendingIndicator ? <NavigationPendingIndicator /> : null}
   </Link>
 );
 

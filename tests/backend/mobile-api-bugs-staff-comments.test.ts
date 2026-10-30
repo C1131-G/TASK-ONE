@@ -24,15 +24,15 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const pickRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/pick/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/pick/route");
 const commentsRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/comments/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/comments/route");
 const portalDetailRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/route");
 const portalCommentsRoute = () =>
-  import("../../app/api/v1/portal/bugs/[bugId]/comments/route");
+  import("../../apps/web/app/api/v1/portal/bugs/[bugId]/comments/route");
 
 // A client report that the company's handler has picked up, so the handler is
 // the bug's assignee.
@@ -148,7 +148,7 @@ it("keeps an internal note out of every portal read and notice", async () => {
 
   const detail = await portalDetail(bugId);
   const { GET: list } =
-    await import("../../app/api/v1/portal/bug-reports/route");
+    await import("../../apps/web/app/api/v1/portal/bug-reports/route");
   const listed = await send(list, "GET", "client");
   const notices = await authPool.query(
     'SELECT 1 FROM notification WHERE "userId" = $1 AND snippet LIKE $2',

@@ -1,9 +1,20 @@
 "use client";
 
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
 import { Plus, Trash } from "@phosphor-icons/react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import {
+  WorkspaceInput,
+  WorkspaceTextarea,
+} from "@/components/workspace/workspace-controls";
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 import { LIMITS } from "@/features/portal/components/portal-bug-form-model";
 import type {
   Errors,
@@ -28,32 +39,38 @@ const ProjectField = ({
   readonly pending: boolean;
   readonly projects: readonly PortalProject[];
   readonly value: string;
-}) => (
-  <div className="field">
-    <label className="label" htmlFor="portal-project">
-      Project
-    </label>
-    <select
-      aria-describedby={describedBy(errors, "projectId")}
-      aria-invalid={errors.projectId ? true : undefined}
-      className="select"
-      data-field="projectId"
-      disabled={pending}
-      id="portal-project"
-      onChange={(event) => onPatch({ projectId: event.target.value })}
-      required
-      value={value}
-    >
-      <option value="">Choose a project</option>
-      {projects.map((project) => (
-        <option key={project.id} value={project.id}>
-          {project.name}
-        </option>
-      ))}
-    </select>
-    <FieldError errors={errors} field="projectId" />
-  </div>
-);
+}) => {
+  const projectDescription = describedBy(errors, "projectId");
+
+  return (
+    <div className="field">
+      <label className="label" htmlFor="portal-project">
+        Project
+      </label>
+      <WorkspaceSelect
+        {...(projectDescription === undefined
+          ? {}
+          : { ariaDescribedby: projectDescription })}
+        {...(errors.projectId ? { ariaInvalid: true } : {})}
+        className="select"
+        dataField="projectId"
+        disabled={pending}
+        id="portal-project"
+        onValueChange={(projectId) => onPatch({ projectId })}
+        required
+        value={value}
+      >
+        <WorkspaceSelectItem value="">Choose a project</WorkspaceSelectItem>
+        {projects.map((project) => (
+          <WorkspaceSelectItem key={project.id} value={project.id}>
+            {project.name}
+          </WorkspaceSelectItem>
+        ))}
+      </WorkspaceSelect>
+      <FieldError errors={errors} field="projectId" />
+    </div>
+  );
+};
 
 const SummaryFields = ({
   errors,
@@ -71,7 +88,7 @@ const SummaryFields = ({
       <label className="label" htmlFor="portal-title">
         Title
       </label>
-      <input
+      <WorkspaceInput
         aria-describedby={describedBy(errors, "title", "portal-title-hint")}
         aria-invalid={errors.title ? true : undefined}
         className="input"
@@ -93,7 +110,7 @@ const SummaryFields = ({
       <label className="label" htmlFor="portal-description">
         Description <span className="faint">(optional)</span>
       </label>
-      <textarea
+      <WorkspaceTextarea
         className="textarea"
         disabled={pending}
         id="portal-description"
@@ -126,7 +143,7 @@ const StepsField = ({
     <ol className="portal-steps">
       {steps.map((step, index) => (
         <li key={step.id}>
-          <input
+          <WorkspaceInput
             aria-describedby={describedBy(errors, "steps", "portal-steps-hint")}
             aria-invalid={errors.steps ? true : undefined}
             aria-label={`Step ${index + 1}`}
@@ -138,7 +155,7 @@ const StepsField = ({
             placeholder={index === 0 ? "e.g. Open the Invoices page" : ""}
             value={step.text}
           />
-          <button
+          <WorkspaceButton
             aria-label={`Remove step ${index + 1}`}
             className="btn btn-ghost btn-sm"
             disabled={steps.length <= 1}
@@ -146,7 +163,7 @@ const StepsField = ({
             type="button"
           >
             <Trash aria-hidden="true" size={14} />
-          </button>
+          </WorkspaceButton>
         </li>
       ))}
     </ol>
@@ -155,7 +172,7 @@ const StepsField = ({
     </p>
     <FieldError errors={errors} field="steps" />
     <div>
-      <button
+      <WorkspaceButton
         className="btn btn-secondary btn-sm"
         disabled={steps.length >= LIMITS.steps}
         onClick={onAdd}
@@ -163,7 +180,7 @@ const StepsField = ({
       >
         <Plus aria-hidden="true" size={14} />
         Add step
-      </button>
+      </WorkspaceButton>
     </div>
   </fieldset>
 );
@@ -184,7 +201,7 @@ const BehaviorFields = ({
       <label className="label" htmlFor="portal-expected">
         Expected behavior
       </label>
-      <textarea
+      <WorkspaceTextarea
         aria-describedby={describedBy(errors, "expected")}
         aria-invalid={errors.expected ? true : undefined}
         className="textarea"
@@ -203,7 +220,7 @@ const BehaviorFields = ({
       <label className="label" htmlFor="portal-actual">
         Actual behavior
       </label>
-      <textarea
+      <WorkspaceTextarea
         aria-describedby={describedBy(errors, "actual")}
         aria-invalid={errors.actual ? true : undefined}
         className="textarea"

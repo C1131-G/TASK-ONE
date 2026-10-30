@@ -12,7 +12,7 @@ The web app uses Next.js routes and feature adapters. The mobile app calls the w
 flowchart LR
     web[Next.js web app] --> features[features]
     features --> server[src/server services]
-    mobile[Expo mobile app] --> api[app/api/v1 routes]
+    mobile[Expo mobile app] --> api[apps/web/app/api/v1 routes]
     api --> server
     server --> database[src/prisma and PostgreSQL]
     server --> storage[S3-compatible storage]
@@ -25,10 +25,10 @@ flowchart LR
 
 | Component | Path | Responsibility |
 | --- | --- | --- |
-| Web routes and layouts | `app/` | Next.js pages, layouts, API route handlers, and application styles. |
+| Web routes and layouts | `apps/web/app/` | Next.js pages, layouts, API route handlers, and application styles. |
 | Web feature adapters | `features/` | Feature-specific UI, queries, Server Actions, and view models. |
 | Domain services | `src/server/` | Authorization, validation, domain operations, and server integrations. |
-| Mobile HTTP routes | `app/api/v1/` | Versioned request handlers that parse route inputs and provide server services. |
+| Mobile HTTP routes | `apps/web/app/api/v1/` | Versioned request handlers that parse route inputs and provide server services. |
 | Mobile route definitions | `src/mobile-api/` | Shared route schemas used by the typed client and generated OpenAPI document. |
 | Mobile client | `apps/mobile/` | Expo Router screens and the client-side API, session, and fixture layers. |
 | Persistence | `src/prisma/`, `migrations/` | Prisma contract/schema sources and versioned PostgreSQL migrations. |
@@ -41,7 +41,7 @@ The following example traces a mobile task-list request through the concrete rou
 ```mermaid
 sequenceDiagram
     participant App as apps/mobile API client
-    participant Route as app/api/v1/workspace/tasks/route.ts
+    participant Route as apps/web/app/api/v1/workspace/tasks/route.ts
     participant Access as src/server/api/tasks/task-list.ts
     participant Query as src/server/work/work-task-list.ts
     participant DB as src/prisma/db.ts
@@ -65,7 +65,7 @@ sequenceDiagram
 
 ## Where to start
 
-1. `app/api/v1/workspace/tasks/route.ts` — a representative mobile API handler.
+1. `apps/web/app/api/v1/workspace/tasks/route.ts` — a representative mobile API handler.
 2. `src/server/api/tasks/task-list.ts` — request authorization and handoff to domain logic.
 3. `src/server/work/work-task-list.ts` — a domain query using the Prisma contract.
 4. `apps/mobile/src/api/api-mode.ts` — live versus hybrid client behavior.

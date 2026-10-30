@@ -1,10 +1,13 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { DownloadSimple, FilePdf, FileVideo } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { getPortalFileUrlAction } from "@/features/portal/portal-upload-actions";
 import { formatFileSize } from "@/features/portal/portal-upload-rules";
 import type { PortalBugDetail } from "@/src/server/portal/portal-contracts";
@@ -67,7 +70,7 @@ const DownloadButton = ({
   };
   return (
     <>
-      <button
+      <WorkspaceButton
         className="btn btn-secondary btn-sm"
         disabled={pending}
         onClick={download}
@@ -75,7 +78,7 @@ const DownloadButton = ({
       >
         <DownloadSimple aria-hidden="true" size={14} />
         {pending ? "Preparing…" : "Download"}
-      </button>
+      </WorkspaceButton>
       {error ? (
         <p className="err" role="alert">
           {error}

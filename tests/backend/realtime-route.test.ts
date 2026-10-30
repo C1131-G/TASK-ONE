@@ -17,7 +17,7 @@ import type { Persona } from "./support/action-harness";
 // `connection()` only opts the route out of prerendering.
 mock.module("next/server", () => ({ connection: () => Promise.resolve() }));
 
-const { GET } = await import("../../app/api/events/route");
+const { GET } = await import("../../apps/web/app/api/events/route");
 const { createComment } =
   await import("../../src/server/collaboration/create-comment");
 const { db } = await import("../../src/prisma/db");

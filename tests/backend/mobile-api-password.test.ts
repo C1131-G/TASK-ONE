@@ -63,7 +63,7 @@ const changePassword = async (
   token: string,
   body: unknown
 ): Promise<Response> => {
-  const { POST } = await import("../../app/api/v1/me/password/route");
+  const { POST } = await import("../../apps/web/app/api/v1/me/password/route");
   return POST(
     new Request("http://localhost:3000/api/v1/me/password", {
       body: JSON.stringify(body),
@@ -77,7 +77,8 @@ const changePassword = async (
 };
 
 const workWith = async (token: string): Promise<Response> => {
-  const { GET } = await import("../../app/api/v1/workspace/me/work/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/workspace/me/work/route");
   return GET(
     new Request("http://localhost:3000/api/v1/workspace/me/work", {
       headers: { authorization: `Bearer ${token}` },
@@ -177,7 +178,7 @@ it("signs the account's other devices out and keeps this one", async () => {
     currentPassword: CURRENT,
     newPassword: NEXT,
   });
-  const { GET } = await import("../../app/api/v1/me/route");
+  const { GET } = await import("../../apps/web/app/api/v1/me/route");
   const meWith = (token: string) =>
     GET(
       new Request("http://localhost:3000/api/v1/me", {

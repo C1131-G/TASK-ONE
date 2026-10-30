@@ -39,7 +39,7 @@ interface Opened {
 
 const open = async (token: string, id: string) => {
   const { GET } =
-    await import("../../app/api/v1/workspace/notifications/[id]/target/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/[id]/target/route");
   return callRoute<Opened>(
     GET,
     "GET",

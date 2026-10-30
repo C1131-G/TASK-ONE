@@ -36,7 +36,7 @@ const answerOf = async (response: Response): Promise<Answer> => ({
 });
 
 const getMe = async (token: string): Promise<Answer> => {
-  const { GET } = await import("../../app/api/v1/me/route");
+  const { GET } = await import("../../apps/web/app/api/v1/me/route");
   return answerOf(
     await GET(
       new Request("http://localhost:3000/api/v1/me", {
@@ -47,7 +47,8 @@ const getMe = async (token: string): Promise<Answer> => {
 };
 
 const portalBugs = async (token: string): Promise<Answer> => {
-  const { GET } = await import("../../app/api/v1/portal/bug-reports/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/portal/bug-reports/route");
   return answerOf(
     await GET(
       new Request("http://localhost:3000/api/v1/portal/bug-reports", {
@@ -58,7 +59,7 @@ const portalBugs = async (token: string): Promise<Answer> => {
 };
 
 const postPassword = async (token: string, body: string): Promise<Answer> => {
-  const { POST } = await import("../../app/api/v1/me/password/route");
+  const { POST } = await import("../../apps/web/app/api/v1/me/password/route");
   return answerOf(
     await POST(
       new Request("http://localhost:3000/api/v1/me/password", {

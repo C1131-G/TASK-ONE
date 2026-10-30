@@ -9,7 +9,7 @@ process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 process.env["BETTER_AUTH_URL"] ??= "http://localhost:3000";
 
-const appRoot = fileURLToPath(new URL("../../app", import.meta.url));
+const appRoot = fileURLToPath(new URL("../../apps/web/app", import.meta.url));
 const BRACED = /\{[^}]+\}/gu;
 
 const braced = (route: string): string[] =>
@@ -29,7 +29,7 @@ it("names every task route parameter the way its route folder does", () => {
 });
 
 it("publishes the task routes in the OpenAPI document with the folder parameter names", async () => {
-  const { GET } = await import("../../app/api/v1/openapi.json/route");
+  const { GET } = await import("../../apps/web/app/api/v1/openapi.json/route");
   const response = await GET();
   const spec = (await response.json()) as {
     readonly paths: Record<

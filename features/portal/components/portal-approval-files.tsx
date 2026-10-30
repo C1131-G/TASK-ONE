@@ -1,10 +1,13 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { DownloadSimple, Eye } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 import { getPortalFileUrlAction } from "@/features/portal/portal-upload-actions";
 import { formatFileSize } from "@/features/portal/portal-upload-rules";
 import type { PortalApprovalDetail } from "@/src/server/approvals/approval-contracts";
@@ -39,7 +42,7 @@ const FileActions = ({ file }: { readonly file: ApprovalFile }) => {
   return (
     <>
       {file.previewable ? (
-        <button
+        <WorkspaceButton
           className="btn btn-secondary btn-sm"
           disabled={busy !== null}
           onClick={() => open("preview")}
@@ -47,9 +50,9 @@ const FileActions = ({ file }: { readonly file: ApprovalFile }) => {
         >
           <Eye aria-hidden="true" size={14} />
           {busy === "preview" ? "Opening…" : "Preview"}
-        </button>
+        </WorkspaceButton>
       ) : null}
-      <button
+      <WorkspaceButton
         className="btn btn-secondary btn-sm"
         disabled={busy !== null}
         onClick={() => open("download")}
@@ -57,7 +60,7 @@ const FileActions = ({ file }: { readonly file: ApprovalFile }) => {
       >
         <DownloadSimple aria-hidden="true" size={14} />
         {busy === "download" ? "Preparing…" : "Download"}
-      </button>
+      </WorkspaceButton>
       {error ? (
         <p className="err" role="alert">
           {error}

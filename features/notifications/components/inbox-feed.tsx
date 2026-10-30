@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in app/workspace-styles. */
+/* eslint-disable shadcn/no-unknown-classes -- Workspace classes are defined in apps/web/app/workspace-styles. */
 
 import { InboxWorkspace } from "@/features/notifications/components/inbox-workspace";
 import { listNotificationInbox } from "@/features/notifications/notifications-queries";

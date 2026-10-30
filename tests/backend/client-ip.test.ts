@@ -103,7 +103,7 @@ describe("withResolvedClientIp", () => {
 });
 
 it("keeps rate limiting sign-in when the left-most X-Forwarded-For rotates", async () => {
-  const { POST } = await import("../../app/api/auth/[...all]/route");
+  const { POST } = await import("../../apps/web/app/api/auth/[...all]/route");
   const { authPool } = await import("../../src/server/auth/database");
   const clientIp = `100.64.${randomInt(256)}.${randomInt(1, 255)}`;
   const email = `nobody-${clientIp}@example.test`;

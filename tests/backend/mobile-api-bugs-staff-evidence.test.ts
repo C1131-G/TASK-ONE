@@ -24,9 +24,9 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const submitRoute = () => import("../../app/api/v1/portal/bugs/route");
+const submitRoute = () => import("../../apps/web/app/api/v1/portal/bugs/route");
 const detailRoute = () =>
-  import("../../app/api/v1/workspace/bugs/[bugId]/route");
+  import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/route");
 
 const SCREENSHOT_BYTES = 2048;
 
@@ -97,7 +97,8 @@ it("keeps the evidence out of the client's portal read", async () => {
   });
   const bugId = submitted.body.data.bugId as string;
   await addEvidence(bugId);
-  const detail = await import("../../app/api/v1/portal/bugs/[bugId]/route");
+  const detail =
+    await import("../../apps/web/app/api/v1/portal/bugs/[bugId]/route");
 
   const reply = await send(detail.GET, "GET", "client", { params: { bugId } });
 

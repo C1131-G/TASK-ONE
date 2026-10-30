@@ -1,10 +1,14 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 import {
   addClientCommentAction,
   rateClientBugAction,
@@ -50,7 +54,7 @@ const ReplyBox = ({ bugId }: { readonly bugId: string }) => {
         <label className="label" htmlFor={`${id}-reply`}>
           Your reply
         </label>
-        <textarea
+        <WorkspaceTextarea
           aria-describedby={action.error ? `${id}-err` : undefined}
           aria-invalid={action.error ? true : undefined}
           className="textarea"
@@ -68,13 +72,13 @@ const ReplyBox = ({ bugId }: { readonly bugId: string }) => {
         <FieldError id={`${id}-err`} message={action.error} />
       </div>
       <div className="portal-form-acts">
-        <button
+        <WorkspaceButton
           className="btn btn-primary btn-sm"
           disabled={action.pending}
           type="submit"
         >
           {action.pending ? "Sending…" : "Send reply"}
-        </button>
+        </WorkspaceButton>
       </div>
       {sent ? <output className="hint">Reply sent. Thank you.</output> : null}
     </form>
@@ -99,14 +103,14 @@ const VerifyActions = ({ bug }: { readonly bug: PortalBugDetail }) => {
           {reopening ? (
             <ReopenForm bug={bug} onCancel={cancel} />
           ) : (
-            <button
+            <WorkspaceButton
               className="btn btn-secondary btn-sm"
               onClick={() => setReopening(true)}
               ref={triggerRef}
               type="button"
             >
               Still broken
-            </button>
+            </WorkspaceButton>
           )}
         </div>
       ) : (
@@ -167,7 +171,7 @@ const RatingCard = ({ bugId }: { readonly bugId: string }) => {
         <label className="label" htmlFor={`${id}-comment`}>
           Comment <span className="faint">(optional)</span>
         </label>
-        <textarea
+        <WorkspaceTextarea
           aria-describedby={action.error ? `${id}-err` : undefined}
           className="textarea"
           disabled={action.pending}
@@ -183,13 +187,13 @@ const RatingCard = ({ bugId }: { readonly bugId: string }) => {
         <FieldError id={`${id}-err`} message={action.error} />
       </div>
       <div>
-        <button
+        <WorkspaceButton
           className="btn btn-primary btn-sm"
           disabled={action.pending}
           type="submit"
         >
           {action.pending ? "Saving…" : "Send rating"}
-        </button>
+        </WorkspaceButton>
       </div>
     </form>
   );

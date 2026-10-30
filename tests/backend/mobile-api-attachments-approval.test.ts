@@ -42,9 +42,9 @@ afterAll(async () => {
 });
 
 const downloadRoute = () =>
-  import("../../app/api/v1/portal/attachments/[fileId]/download/route");
+  import("../../apps/web/app/api/v1/portal/attachments/[fileId]/download/route");
 const staffDownloadRoute = () =>
-  import("../../app/api/v1/workspace/attachments/[fileId]/download/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/[fileId]/download/route");
 
 const seedApproval = async (
   fileId: string,
@@ -117,9 +117,9 @@ it("gives staff the evidence file id that the download route accepts", async () 
   const { bugId, taskId } = await submitBug("client", "Evidence ids");
   touchedTasks.push(taskId);
   const { POST: request } =
-    await import("../../app/api/v1/portal/attachments/uploads/route");
+    await import("../../apps/web/app/api/v1/portal/attachments/uploads/route");
   const { POST: finalize } =
-    await import("../../app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
+    await import("../../apps/web/app/api/v1/portal/attachments/uploads/[uploadIntentId]/finalize/route");
   const ticketReply = await send(request, "POST", "client", {
     body: {
       bugId,
@@ -136,7 +136,7 @@ it("gives staff the evidence file id that the download route accepts", async () 
     params: { uploadIntentId: ticket.uploadIntentId },
   });
   const { GET: context } =
-    await import("../../app/api/v1/workspace/bugs/[bugId]/route");
+    await import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/route");
   const { GET: download } = await staffDownloadRoute();
 
   const detail = await send(context, "GET", "admin", { params: { bugId } });

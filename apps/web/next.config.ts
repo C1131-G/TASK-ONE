@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
+
+const monorepoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 const exposeTestingApi = process.env["EXPOSE_TESTING_API"] === "1";
 
@@ -24,8 +27,12 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true,
   },
   output: "standalone",
+  outputFileTracingRoot: monorepoRoot,
   partialPrefetching: true,
   reactCompiler: true,
+  turbopack: {
+    root: monorepoRoot,
+  },
   typedRoutes: true,
 };
 

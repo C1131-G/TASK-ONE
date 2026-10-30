@@ -27,7 +27,7 @@ afterAll(async () => {
 });
 
 const uploadsRoute = () =>
-  import("../../app/api/v1/workspace/attachments/uploads/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/uploads/route");
 
 const pngRequest = (taskId: string) => ({
   contentType: "image/png",

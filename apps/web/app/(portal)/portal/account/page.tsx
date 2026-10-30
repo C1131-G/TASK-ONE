@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Account | Taskora" };
 
 const Page = () => (
   <PageTransition>
-    <div className="page portal-narrow">
+    <div className="page portal-account-page">
       <div className="ph">
         <div>
           <h1>Account</h1>

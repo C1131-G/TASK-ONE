@@ -1,4 +1,4 @@
-/* eslint-disable shadcn/no-unknown-classes -- The underline is styled in app/workspace-styles/inputs.css. */
+/* eslint-disable shadcn/no-unknown-classes -- The underline is styled in apps/web/app/workspace-styles/inputs.css. */
 
 import { ViewTransition } from "react";
 

@@ -46,7 +46,8 @@ const seedBug = async (
 };
 
 const page = async (query: Record<string, string>) => {
-  const { GET } = await import("../../app/api/v1/portal/bug-reports/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/portal/bug-reports/route");
   return callRoute<Page>(GET, "GET", "/api/v1/portal/bug-reports", {
     query,
     token: personaBearerToken("client"),

@@ -29,14 +29,14 @@ afterAll(async () => {
 });
 
 const evidenceRoute = () =>
-  import("../../app/api/v1/workspace/attachments/bug-evidence/route");
+  import("../../apps/web/app/api/v1/workspace/attachments/bug-evidence/route");
 
 // Staff upload to the bug's task first, exactly as the web does.
 const uploadToBugTask = async (taskId: string): Promise<string> => {
   const { POST: request } =
-    await import("../../app/api/v1/workspace/attachments/uploads/route");
+    await import("../../apps/web/app/api/v1/workspace/attachments/uploads/route");
   const { POST: finalize } =
-    await import("../../app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
+    await import("../../apps/web/app/api/v1/workspace/attachments/uploads/[uploadIntentId]/finalize/route");
   const ticketReply = await send(request, "POST", "admin", {
     body: {
       contentType: "image/png",
@@ -81,7 +81,8 @@ it("links an uploaded file to a bug as evidence the staff context lists", async 
   expect(reply.status).toBe(200);
   expect(reply.body.data).toMatchObject({ bugId, version: version + 1 });
   expect(await evidenceCount(bugId)).toBe(1);
-  const { GET } = await import("../../app/api/v1/workspace/bugs/[bugId]/route");
+  const { GET } =
+    await import("../../apps/web/app/api/v1/workspace/bugs/[bugId]/route");
   const detail = await send(GET, "GET", "admin", { params: { bugId } });
   expect(detail.body.data.evidence[0].file.id).toBe(fileId);
 });

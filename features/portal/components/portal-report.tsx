@@ -75,7 +75,10 @@ const PortalReportBody = ({
           {recurrenceOf.title}
         </output>
       ) : null}
-      <section aria-label="Bug report" className="panel portal-panel">
+      <section
+        aria-label="Bug report"
+        className="panel portal-panel portal-report-panel"
+      >
         <PortalBugForm
           mode={{
             kind: "create",
@@ -131,16 +134,21 @@ const PortalFormSkeleton = ({
   readonly label?: string;
 }) => (
   <SkelterSurface label={label}>
-    <div className="panel portal-panel">
-      <div className="portal-form">
-        {SKELETON_KEYS.slice(0, 7).map((key) => (
-          <div className="field skeleton-copy" key={key}>
-            <SkeletonBone shape="short" />
-            <SkeletonBone
-              shape={key === "bone-2" || key === "bone-4" ? "block" : "control"}
-            />
-          </div>
-        ))}
+    <div className="panel portal-panel portal-report-panel">
+      <div className="portal-form portal-wizard">
+        <div aria-hidden="true" className="portal-wizard-progress">
+          {SKELETON_KEYS.slice(0, 4).map((key) => (
+            <SkeletonBone key={key} shape="short" />
+          ))}
+        </div>
+        <div className="portal-wizard-summary skeleton-copy">
+          {SKELETON_KEYS.slice(0, 3).map((key, index) => (
+            <div className="field" key={key}>
+              <SkeletonBone shape="short" />
+              <SkeletonBone shape={index === 2 ? "block" : "control"} />
+            </div>
+          ))}
+        </div>
         <SkeletonBone shape="control" />
       </div>
     </div>

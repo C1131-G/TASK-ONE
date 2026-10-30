@@ -6,7 +6,7 @@ export const register = async (): Promise<void> => {
   if (!isNodeRuntime()) {
     return;
   }
-  const { parseServerEnv } = await import("./src/server/core/env");
+  const { parseServerEnv } = await import("../../src/server/core/env");
   // Throws before the server accepts requests when configuration is invalid.
   parseServerEnv();
 
@@ -27,7 +27,7 @@ export const onRequestError: Instrumentation.onRequestError = async (
   if (!isNodeRuntime()) {
     return;
   }
-  const { logger } = await import("./src/server/core/logger");
+  const { logger } = await import("../../src/server/core/logger");
   const digest = readDigest(error);
   logger.error("Unhandled error while serving a request.", {
     error,

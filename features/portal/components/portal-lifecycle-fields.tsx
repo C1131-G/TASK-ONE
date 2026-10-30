@@ -1,8 +1,12 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { ThumbsDown, ThumbsUp } from "@phosphor-icons/react";
+
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
 
 import type { Satisfaction } from "./portal-lifecycle-support";
 
@@ -33,7 +37,7 @@ export const SatisfactionPicker = ({
   <fieldset className="portal-rate-set">
     <legend className="label">{legend}</legend>
     <div className="portal-rate-btns">
-      <button
+      <WorkspaceButton
         aria-label="Good, thumbs up"
         aria-pressed={value === "up"}
         className="btn btn-secondary btn-sm"
@@ -47,8 +51,8 @@ export const SatisfactionPicker = ({
           weight={value === "up" ? "fill" : "regular"}
         />
         <span aria-hidden="true">👍</span>
-      </button>
-      <button
+      </WorkspaceButton>
+      <WorkspaceButton
         aria-label="Not good, thumbs down"
         aria-pressed={value === "down"}
         className="btn btn-secondary btn-sm"
@@ -62,7 +66,7 @@ export const SatisfactionPicker = ({
           weight={value === "down" ? "fill" : "regular"}
         />
         <span aria-hidden="true">👎</span>
-      </button>
+      </WorkspaceButton>
     </div>
   </fieldset>
 );

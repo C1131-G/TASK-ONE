@@ -20,7 +20,8 @@ import {
 process.env["BETTER_AUTH_SECRET"] ??=
   "test-only-secret-that-is-at-least-thirty-two-characters";
 
-const { POST } = await import("../../app/api/integrations/github/route");
+const { POST } =
+  await import("../../apps/web/app/api/integrations/github/route");
 
 const URL_PATH = "http://localhost/api/integrations/github";
 const MAX_BODY_BYTES = 512 * 1024;

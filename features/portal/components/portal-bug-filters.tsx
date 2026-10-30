@@ -1,15 +1,22 @@
+"use client";
+
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
 /* eslint-disable shadcn/no-unknown-classes -- Portal pages reuse the workspace stylesheet classes. */
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
+import {
+  WorkspaceSelect,
+  WorkspaceSelectItem,
+} from "@/components/workspace/workspace-select";
 import type { ClientStatusLabel } from "@/features/portal/client-status";
 import {
   clientStatusLabels,
   clientStatusText,
 } from "@/features/portal/client-status";
 
-// A plain GET form: filters live in the URL, so they work without scripts and
-// can be shared or bookmarked.
+// A GET form keeps each applied filter shareable and bookmarkable.
 const PortalBugFilters = ({
   mine,
   projectId,
@@ -20,63 +27,74 @@ const PortalBugFilters = ({
   readonly projectId: string | undefined;
   readonly projects: readonly { readonly id: string; readonly name: string }[];
   readonly status: ClientStatusLabel | undefined;
-}) => (
-  <form action="/portal" className="panel portal-filters" method="get">
-    <div className="field">
-      <label className="label" htmlFor="portal-filter-status">
-        Status
+}) => {
+  const router = useRouter();
+  const updateFilter = (key: "mine" | "project" | "status", value: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    const query = params.toString();
+    router.replace(query ? `/portal?${query}` : "/portal", {
+      scroll: false,
+    });
+  };
+
+  return (
+    <fieldset className="panel portal-filters">
+      <legend className="sr-only">Filter company bugs</legend>
+      <div className="field">
+        <label className="label" htmlFor="portal-filter-status">
+          Status
+        </label>
+        <WorkspaceSelect
+          className="select"
+          id="portal-filter-status"
+          onValueChange={(value) => updateFilter("status", value)}
+          value={status ?? ""}
+        >
+          <WorkspaceSelectItem value="">All statuses</WorkspaceSelectItem>
+          {clientStatusLabels.map((label) => (
+            <WorkspaceSelectItem key={label} value={label}>
+              {clientStatusText[label]}
+            </WorkspaceSelectItem>
+          ))}
+        </WorkspaceSelect>
+      </div>
+      <div className="field">
+        <label className="label" htmlFor="portal-filter-project">
+          Project
+        </label>
+        <WorkspaceSelect
+          className="select"
+          id="portal-filter-project"
+          onValueChange={(value) => updateFilter("project", value)}
+          value={projectId ?? ""}
+        >
+          <WorkspaceSelectItem value="">All projects</WorkspaceSelectItem>
+          {projects.map((project) => (
+            <WorkspaceSelectItem key={project.id} value={project.id}>
+              {project.name}
+            </WorkspaceSelectItem>
+          ))}
+        </WorkspaceSelect>
+      </div>
+      <label className="portal-check" htmlFor="portal-filter-mine">
+        <input
+          checked={mine}
+          id="portal-filter-mine"
+          onChange={(event) =>
+            updateFilter("mine", event.currentTarget.checked ? "1" : "")
+          }
+          type="checkbox"
+          value="1"
+        />
+        <span>Only my reports</span>
       </label>
-      <select
-        className="select"
-        defaultValue={status ?? ""}
-        id="portal-filter-status"
-        name="status"
-      >
-        <option value="">All statuses</option>
-        {clientStatusLabels.map((label) => (
-          <option key={label} value={label}>
-            {clientStatusText[label]}
-          </option>
-        ))}
-      </select>
-    </div>
-    <div className="field">
-      <label className="label" htmlFor="portal-filter-project">
-        Project
-      </label>
-      <select
-        className="select"
-        defaultValue={projectId ?? ""}
-        id="portal-filter-project"
-        name="project"
-      >
-        <option value="">All projects</option>
-        {projects.map((project) => (
-          <option key={project.id} value={project.id}>
-            {project.name}
-          </option>
-        ))}
-      </select>
-    </div>
-    <label className="portal-check" htmlFor="portal-filter-mine">
-      <input
-        defaultChecked={mine}
-        id="portal-filter-mine"
-        name="mine"
-        type="checkbox"
-        value="1"
-      />
-      <span>Reported by me</span>
-    </label>
-    <div className="portal-filter-acts">
-      <button className="btn btn-secondary" type="submit">
-        Apply filters
-      </button>
-      <Link className="btn btn-ghost" href="/portal">
-        Clear
-      </Link>
-    </div>
-  </form>
-);
+    </fieldset>
+  );
+};
 
 export { PortalBugFilters };

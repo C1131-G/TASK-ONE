@@ -1,10 +1,14 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 import { PortalTime } from "@/features/portal/components/portal-time";
 import { addClientCommentAction } from "@/features/portal/portal-bug-actions";
 import { LONG_TEXT_MAX_LENGTH } from "@/src/server/core/text-limits";
@@ -98,7 +102,7 @@ const PortalComments = ({
             <label className="label" htmlFor="portal-comment-body">
               Add a comment
             </label>
-            <textarea
+            <WorkspaceTextarea
               aria-describedby={error ? "portal-comment-error" : undefined}
               aria-invalid={error ? true : undefined}
               className="textarea"
@@ -120,13 +124,13 @@ const PortalComments = ({
             ) : null}
           </div>
           <div>
-            <button
+            <WorkspaceButton
               className="btn btn-primary btn-sm"
               disabled={pending}
               type="submit"
             >
               {pending ? "Sending…" : "Send comment"}
-            </button>
+            </WorkspaceButton>
           </div>
         </form>
       ) : (

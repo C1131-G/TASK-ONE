@@ -24,6 +24,13 @@ export type Mode =
       readonly onDone: () => void;
     };
 
+export const PORTAL_REPORT_STEPS = [
+  "Summary",
+  "Reproduction",
+  "Impact and location",
+  "Environment and evidence",
+] as const;
+
 const unsubscribe = () => {
   // The browser's environment does not change while the form is open.
 };

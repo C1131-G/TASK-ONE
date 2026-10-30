@@ -31,11 +31,12 @@ beforeAll(async () => {
 });
 afterAll(teardownHarness);
 
-const listRoute = () => import("../../app/api/v1/portal/approvals/route");
+const listRoute = () =>
+  import("../../apps/web/app/api/v1/portal/approvals/route");
 const detailRoute = () =>
-  import("../../app/api/v1/portal/approvals/[requestId]/route");
+  import("../../apps/web/app/api/v1/portal/approvals/[requestId]/route");
 const decideRoute = () =>
-  import("../../app/api/v1/portal/approvals/decide/route");
+  import("../../apps/web/app/api/v1/portal/approvals/decide/route");
 
 const seedTask = async (title: string): Promise<string> => {
   const taskId = randomUUID();

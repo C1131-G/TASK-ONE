@@ -1,9 +1,13 @@
 "use client";
 
-/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in app/workspace-styles/portal.css. */
+/* eslint-disable shadcn/no-restyle -- Preserve established portal classes on shared controls. */
+
+/* eslint-disable shadcn/no-unknown-classes -- Portal classes are authored in apps/web/app/workspace-styles/portal.css. */
 
 import { useId, useState, useTransition } from "react";
 
+import { WorkspaceButton } from "@/components/workspace/workspace-button";
+import { WorkspaceTextarea } from "@/components/workspace/workspace-controls";
 import { decideApprovalAction } from "@/features/portal/portal-approval-actions";
 import { MAX_APPROVAL_TEXT } from "@/src/server/approvals/approval-contracts";
 import type { ApprovalDecision } from "@/src/server/approvals/approval-contracts";
@@ -47,7 +51,7 @@ export const PortalApprovalDecision = ({
         <label className="label" htmlFor={commentId}>
           Comment (required to request changes)
         </label>
-        <textarea
+        <WorkspaceTextarea
           aria-describedby={error ? errorId : undefined}
           aria-invalid={error ? true : undefined}
           className="textarea"
@@ -65,7 +69,7 @@ export const PortalApprovalDecision = ({
         </p>
       ) : null}
       <div className="row">
-        <button
+        <WorkspaceButton
           aria-busy={pending || undefined}
           className="btn btn-primary"
           disabled={pending}
@@ -73,8 +77,8 @@ export const PortalApprovalDecision = ({
           type="button"
         >
           Approve
-        </button>
-        <button
+        </WorkspaceButton>
+        <WorkspaceButton
           aria-busy={pending || undefined}
           className="btn btn-secondary"
           disabled={pending}
@@ -82,7 +86,7 @@ export const PortalApprovalDecision = ({
           type="button"
         >
           Request changes
-        </button>
+        </WorkspaceButton>
       </div>
     </section>
   );

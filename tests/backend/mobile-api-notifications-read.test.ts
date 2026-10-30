@@ -23,7 +23,7 @@ const markRead = async (
   key?: string | null
 ) => {
   const { POST } =
-    await import("../../app/api/v1/workspace/notifications/[id]/read/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/[id]/read/route");
   return callRoute<{ done: true }>(
     POST,
     "POST",
@@ -41,7 +41,7 @@ const markAllRead = async (
   key?: string
 ) => {
   const { POST } =
-    await import("../../app/api/v1/workspace/notifications/read-all/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/read-all/route");
   return callRoute<{ count: number }>(
     POST,
     "POST",
@@ -120,7 +120,7 @@ it("marks every notification of the caller read and leaves other people's alone"
 it("answers 401 without a usable token and 403 for a client token", async () => {
   const id = await seedNotification({ userId: personaId("owner") });
   const { POST } =
-    await import("../../app/api/v1/workspace/notifications/[id]/read/route");
+    await import("../../apps/web/app/api/v1/workspace/notifications/[id]/read/route");
   const anonymous = await callRoute(
     POST,
     "POST",

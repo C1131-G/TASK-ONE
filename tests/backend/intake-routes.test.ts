@@ -17,8 +17,10 @@ import {
 const SECRET = "inbound-secret-for-intake-route-tests-0123456789";
 process.env["INTAKE_EMAIL_SECRET"] = SECRET;
 
-const { POST: postEmail } = await import("../../app/api/intake/email/route");
-const { POST: postWeb } = await import("../../app/api/intake/[slug]/route");
+const { POST: postEmail } =
+  await import("../../apps/web/app/api/intake/email/route");
+const { POST: postWeb } =
+  await import("../../apps/web/app/api/intake/[slug]/route");
 
 let slug = "";
 let disabledSlug = "";

@@ -21,10 +21,12 @@ const PortalAccount = async () => {
         readOrThrow(await listMySessions({}), "Sessions"),
       ];
   return (
-    <div className="portal-account">
+    <div
+      className={`portal-account${company?.preview ? " portal-account-preview-mode" : ""}`}
+    >
       <section
         aria-labelledby="portal-profile-h"
-        className="panel portal-panel"
+        className="panel portal-panel portal-account-profile"
       >
         <h2 className="sec" id="portal-profile-h">
           Profile
@@ -41,7 +43,7 @@ const PortalAccount = async () => {
         </dl>
       </section>
       {company?.preview ? (
-        <p className="portal-banner" role="note">
+        <p className="portal-banner portal-account-preview" role="note">
           Password, push notification, device and sign-out controls are not
           available while previewing a client. Use Exit preview above to return.
         </p>
@@ -49,7 +51,7 @@ const PortalAccount = async () => {
         <>
           <section
             aria-labelledby="portal-password-h"
-            className="panel portal-panel"
+            className="panel portal-panel portal-account-password"
           >
             <h2 className="sec" id="portal-password-h">
               Change password
@@ -58,7 +60,7 @@ const PortalAccount = async () => {
           </section>
           <section
             aria-labelledby="portal-push-h"
-            className="panel portal-panel"
+            className="panel portal-panel portal-account-push"
           >
             <h2 className="sec" id="portal-push-h">
               Push notifications
@@ -69,7 +71,7 @@ const PortalAccount = async () => {
           </section>
           <section
             aria-labelledby="portal-email-h"
-            className="panel portal-panel"
+            className="panel portal-panel portal-account-email"
           >
             <h2 className="sec" id="portal-email-h">
               Email updates
@@ -78,7 +80,7 @@ const PortalAccount = async () => {
           </section>
           <section
             aria-labelledby="portal-sessions-h"
-            className="panel portal-panel"
+            className="panel portal-panel portal-account-sessions"
           >
             <h2 className="sec" id="portal-sessions-h">
               Signed-in devices
@@ -87,7 +89,7 @@ const PortalAccount = async () => {
           </section>
           <section
             aria-labelledby="portal-out-h"
-            className="panel portal-panel"
+            className="panel portal-panel portal-account-signout"
           >
             <h2 className="sec" id="portal-out-h">
               Sign out
@@ -104,16 +106,16 @@ const PortalAccountSkeleton = () => (
   <SkelterSurface label="Loading account">
     <div className="portal-account">
       {[
-        "Profile",
-        "Change password",
-        "Push notifications",
-        "Email updates",
-        "Signed-in devices",
-        "Sign out",
+        ["Profile", "portal-account-profile"],
+        ["Change password", "portal-account-password"],
+        ["Push notifications", "portal-account-push"],
+        ["Email updates", "portal-account-email"],
+        ["Signed-in devices", "portal-account-sessions"],
+        ["Sign out", "portal-account-signout"],
       ].map((title) => (
-        <div className="panel portal-panel" key={title}>
-          <h2 className="sec">{title}</h2>
-          <SkeletonRows rows={title === "Change password" ? 3 : 1} />
+        <div className={`panel portal-panel ${title[1]}`} key={title[1]}>
+          <h2 className="sec">{title[0]}</h2>
+          <SkeletonRows rows={title[0] === "Change password" ? 3 : 1} />
         </div>
       ))}
     </div>
