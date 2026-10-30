@@ -1,6 +1,6 @@
 # Documentation
 
-> Type: overview · Status: current · Updated: 2026-10-29
+> Type: overview · Status: current · Updated: 2026-10-30
 
 This index points contributors to Taskora's setup, architecture, and API documentation.
 
@@ -8,6 +8,7 @@ This index points contributors to Taskora's setup, architecture, and API documen
 
 - [Agent guidance](../CLAUDE.md) — points coding agents to tracked repository conventions.
 - [Instant navigation runbook](../instant-nav.rig.md) — Playwright workflow for checking route shells and loading skeletons.
+- [Manual testing guide](manual-testing.md): seeded logins, companies, projects, and a test checklist.
 
 ## Getting started
 
