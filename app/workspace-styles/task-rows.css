@@ -268,3 +268,16 @@
 .workspace-app .list-wrap {
   padding: 0 var(--gutter) 90px calc(var(--gutter) - 26px);
 }
+
+/* Keep long project names from pushing task titles and dates out of line. */
+.workspace-app .home-task-row .muted {
+  min-width: 0;
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-app .home-task-row .num {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

@@ -99,6 +99,9 @@
 .workspace-app .sgroup {
   margin-top: 14px;
 }
+.workspace-app .side-scroll > .sgroup:first-child {
+  margin-top: 0;
+}
 .workspace-app .sgroup-h {
   display: flex;
   align-items: center;
@@ -278,4 +281,75 @@
 .workspace-app .collapsed .ws {
   justify-content: center;
   padding: 5px 0;
+}
+
+/* Keep navigation icons aligned with the workspace mark at both widths. */
+.workspace-app .side-top {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.workspace-app .side-top .ws {
+  min-width: 0;
+}
+.workspace-app .sidebar-collapse {
+  flex: none;
+}
+@media (min-width: 901px) {
+  .workspace-app .shell:has(.sidebar-collapse[aria-pressed="true"]) {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+  .workspace-app .side:has(.sidebar-collapse[aria-pressed="true"]) .side-top {
+    flex-direction: column;
+  }
+  .workspace-app .side:has(.sidebar-collapse[aria-pressed="true"]) .ws {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .workspace-app
+    .side:has(.sidebar-collapse[aria-pressed="true"])
+    .side-scroll {
+    padding-inline: 9px;
+  }
+  .workspace-app .side:has(.sidebar-collapse[aria-pressed="true"]) .sitem {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .workspace-app
+    .side:has(.sidebar-collapse[aria-pressed="true"])
+    :is(
+      .ws-name,
+      .sitem > span,
+      .sgroup-h,
+      [data-workspace-account-name],
+      [data-workspace-account] > svg
+    ) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .workspace-app
+    .side:has(.sidebar-collapse[aria-pressed="true"])
+    .sitem
+    > .pico {
+    position: static;
+    width: 18px;
+    height: 18px;
+    overflow: visible;
+    clip-path: none;
+  }
+  .workspace-app .side:has(.sidebar-collapse[aria-pressed="true"]) .sgroup {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .workspace-app
+    .side:has(.sidebar-collapse[aria-pressed="true"])
+    [data-workspace-account] {
+    justify-content: center;
+    padding: 0;
+  }
 }

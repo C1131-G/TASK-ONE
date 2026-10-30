@@ -3,6 +3,7 @@
 
 "use client";
 
+import { Desktop, Moon, Sun } from "@phosphor-icons/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -42,35 +43,18 @@ const resolveSection = (
 };
 
 const ThemeChoice = ({
-  description,
   id,
   label,
+  Icon,
 }: {
-  readonly description: string;
   readonly id: string;
   readonly label: string;
+  readonly Icon: typeof Sun;
 }) => (
   <label className="settings-theme-choice" htmlFor={id}>
-    <span
-      aria-hidden="true"
-      className="settings-theme-preview"
-      data-theme-preview={id}
-    >
-      <span className="settings-preview-sidebar" />
-      <span className="settings-preview-main">
-        <i />
-        <i />
-        <i />
-        <b />
-      </span>
-    </span>
-    <span className="settings-theme-choice-caption">
-      <RadioGroupItem id={id} value={id} />
-      <span>
-        <strong>{label}</strong>
-        <span>{description}</span>
-      </span>
-    </span>
+    <RadioGroupItem id={id} value={id} />
+    <Icon aria-hidden="true" size={16} />
+    <span>{label}</span>
   </label>
 );
 
@@ -148,21 +132,9 @@ const SettingsWorkspace = ({
                 onValueChange={setTheme}
                 value={themeHydrated ? (theme ?? "system") : "system"}
               >
-                <ThemeChoice
-                  description="Use your device appearance setting."
-                  id="system"
-                  label="System"
-                />
-                <ThemeChoice
-                  description="Use a light workspace."
-                  id="light"
-                  label="Light"
-                />
-                <ThemeChoice
-                  description="Use a dark workspace."
-                  id="dark"
-                  label="Dark"
-                />
+                <ThemeChoice Icon={Desktop} id="system" label="System" />
+                <ThemeChoice Icon={Sun} id="light" label="Light" />
+                <ThemeChoice Icon={Moon} id="dark" label="Dark" />
               </RadioGroup>
             </div>
           </section>

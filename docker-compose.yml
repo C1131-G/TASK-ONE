@@ -5,9 +5,12 @@
 name: taskora
 
 services:
+  # The one PostgreSQL instance for Taskora. `restart: always` brings it back
+  # whenever Docker Desktop starts, so there is never a second copy to manage.
   postgres:
     image: postgres:18-alpine
-    restart: unless-stopped
+    container_name: taskora-postgres
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-taskora}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dev-password}
@@ -29,7 +32,8 @@ services:
       context: .
       dockerfile: docker/minio.Dockerfile
       target: server
-    restart: unless-stopped
+    container_name: taskora-minio
+    restart: always
     command: ["server", "--console-address", ":9001", "/data"]
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-taskora}

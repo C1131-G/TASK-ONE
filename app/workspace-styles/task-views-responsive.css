@@ -187,3 +187,23 @@
   font-size: var(--fs-xs);
   font-weight: 500;
 }
+
+@media (max-width: 480px) {
+  .workspace-app .home-tasks-header .acts {
+    width: 100%;
+    min-width: 0;
+  }
+  .workspace-app .home-tasks-header .seg {
+    min-width: 0;
+    flex: 1;
+  }
+  .workspace-app .home-tasks-header .seg a {
+    flex: 1;
+    justify-content: center;
+    gap: 2px;
+    padding-inline: 4px;
+  }
+  .workspace-app .home-tasks-header .seg a .faint {
+    margin-inline-start: 0;
+  }
+}

@@ -76,9 +76,11 @@ bun run db:verify
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The development Docker Compose override publishes PostgreSQL on port `5433`. The default `.env.example` database URLs match this local setup.
+Open [http://localhost:3000](http://localhost:3000). The development Docker Compose override publishes PostgreSQL on port `5434` and MinIO on `9000`/`9001`. `bun run db:up` (also run by `bun run dev`) starts Docker Desktop if it is not running, then starts the single `taskora-postgres` and `taskora-minio` containers, which use `restart: always`. The default `.env.example` database URLs match this local setup.
 
 Migrations are checked into [`migrations/`](migrations/). Apply them with `bun run db:migrate` whenever you set up a fresh database or pull changes that include migrations. `bun run db:verify` checks that the database matches the generated Prisma contract.
+
+For a full multi-company test data set (every table, 2 admins, 11 employees, 4 client companies with portal logins), run `bun run seed:dev`. It wipes the local database first and prints every login; all share one password (`SEED_PASSWORD`, default `Taskora#Dev2026`). `bun run setup:dev` runs infra, migrations and the seed in one go.
 
 To stop local services:
 

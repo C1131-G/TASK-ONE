@@ -21,23 +21,9 @@
   .workspace-app .shell.collapsed {
     grid-template-columns: minmax(0, 1fr);
   }
-  .workspace-app .side {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 280px;
-    z-index: 70;
-    transform: translateX(-100%);
-    transition: transform 0.22s var(--ease);
-    box-shadow: var(--shadow-pop);
-  }
-  .workspace-app .shell.mnav .side {
-    transform: none;
-  }
-  .workspace-app .shell.collapsed .side .sitem {
-    justify-content: flex-start;
-    padding: 0 8px;
+  /* Mobile navigation uses the sheet; keep the desktop links out of tab order. */
+  .workspace-app .shell > .side {
+    display: none;
   }
   .workspace-app .side-scrim {
     display: block;

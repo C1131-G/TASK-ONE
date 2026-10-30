@@ -3,10 +3,10 @@
 
 "use client";
 
-import { Bell, List } from "@phosphor-icons/react";
+import { Bell, GearSix, List, SidebarSimple } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { use } from "react";
+import { use, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import {
 import { WorkspaceAccountMenu } from "@/components/workspace/workspace-account-menu";
 import { WorkspaceBottomNavigation } from "@/components/workspace/workspace-bottom-navigation";
 import { WorkspaceCreateMenu } from "@/components/workspace/workspace-create-menu";
+import { WorkspaceLink } from "@/components/workspace/workspace-navigation";
 import {
   getNavigationTransitionType,
   isNavigationItemActive,
@@ -96,6 +97,7 @@ const MobileNavigation = ({ data }: { readonly data: WorkspaceFrameData }) => (
 export const WorkspaceSidebar = ({ framePromise }: SectionProps) => {
   const data = use(framePromise);
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
   if (!data) {
     return <WorkspaceSidebarFallback />;
   }
@@ -111,6 +113,17 @@ export const WorkspaceSidebar = ({ framePromise }: SectionProps) => {
           <span aria-hidden="true" className="ws-logo" data-initial="M" />
           <span className="ws-name trunc">Taskora</span>
         </Link>
+        <Button
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-pressed={collapsed}
+          className="sidebar-collapse"
+          onClick={() => setCollapsed(!collapsed)}
+          size="icon-sm"
+          type="button"
+          variant="ghost"
+        >
+          <SidebarSimple aria-hidden="true" size={16} />
+        </Button>
       </div>
       <div className="side-scroll">
         <WorkspaceNavigationGroups
@@ -121,6 +134,17 @@ export const WorkspaceSidebar = ({ framePromise }: SectionProps) => {
         />
       </div>
       <div className="side-bot">
+        <WorkspaceLink
+          href="/settings"
+          Icon={GearSix}
+          isActive={(currentPath) =>
+            isNavigationItemActive(currentPath, "/settings")
+          }
+          label="Settings"
+          transitionTypes={(currentPath) => [
+            getNavigationTransitionType(currentPath, "/settings"),
+          ]}
+        />
         <WorkspaceAccountMenu name={data.name} role={data.role} />
       </div>
     </>
@@ -229,15 +253,12 @@ export const WorkspaceBottomChrome = ({ framePromise }: SectionProps) => {
     return null;
   }
   return (
-    <>
-      <WorkspaceBottomNavigation
-        mobileNavigation={<MobileNavigation data={data} />}
-        name={data.name}
-        pathname={pathname}
-        role={data.role}
-        unreadInboxCount={data.unreadInboxCount}
-      />
-      <span className="sr-only">Signed in as {data.name}</span>
-    </>
+    <WorkspaceBottomNavigation
+      mobileNavigation={<MobileNavigation data={data} />}
+      name={data.name}
+      pathname={pathname}
+      role={data.role}
+      unreadInboxCount={data.unreadInboxCount}
+    />
   );
 };

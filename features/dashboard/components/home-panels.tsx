@@ -95,7 +95,7 @@ export const MyTasksPanel = ({
   const visible = taskViews[taskView].slice(0, 7);
   return (
     <section className="panel">
-      <div className="panel-h">
+      <div className="panel-h home-tasks-header">
         <h2>My tasks</h2>
         <div className="acts">
           <nav aria-label="My task status" className="seg">

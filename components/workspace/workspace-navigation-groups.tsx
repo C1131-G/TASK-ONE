@@ -57,7 +57,10 @@ export const WorkspaceNavigationGroups = ({
             <div className="sgroup-h">{section.label}</div>
           ) : null}
           {section.items.flatMap(({ adminOnly, href, label, Icon }) => {
-            if (adminOnly && role !== "admin") {
+            if (
+              (adminOnly && role !== "admin") ||
+              (!closeOnNavigate && href === "/settings")
+            ) {
               return [];
             }
             return [

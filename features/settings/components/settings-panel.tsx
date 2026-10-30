@@ -170,15 +170,7 @@ const SettingsPanel = async ({
   );
 };
 
-const THEMES = [
-  {
-    description: "Use your device appearance setting.",
-    id: "system",
-    label: "System",
-  },
-  { description: "Use a light workspace.", id: "light", label: "Light" },
-  { description: "Use a dark workspace.", id: "dark", label: "Dark" },
-] as const;
+const THEMES = ["System", "Light", "Dark"] as const;
 
 // Mirrors SettingsWorkspace's Appearance tab: it needs no data, so the first
 // section is the real static markup, not placeholder bones.
@@ -205,29 +197,10 @@ const SettingsPanelSkeleton = () => (
             </p>
           </div>
           <div className="settings-theme-options skeleton-theme-options">
-            {THEMES.map(({ description, id, label }) => (
-              <div className="settings-theme-choice" key={id}>
-                <span
-                  aria-hidden="true"
-                  className="settings-theme-preview"
-                  data-theme-preview={id}
-                >
-                  <span className="settings-preview-sidebar" />
-                  <span className="settings-preview-main">
-                    <i />
-                    <i />
-                    <i />
-                    <b />
-                  </span>
-                </span>
-                <span className="settings-theme-choice-caption">
-                  <span aria-hidden="true" className="skeleton-radio" />
-                  <span>
-                    <strong>{label}</strong>
-                    <span>{description}</span>
-                  </span>
-                </span>
-              </div>
+            {THEMES.map((label) => (
+              <span className="settings-theme-choice" key={label}>
+                {label}
+              </span>
             ))}
           </div>
         </div>

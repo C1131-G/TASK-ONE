@@ -46,127 +46,51 @@
   flex-direction: column;
   gap: 4px;
 }
-.workspace-app .settings-theme-choice:has([data-state="checked"]) {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
-}
 .workspace-app .settings-section-title {
   margin: 0 0 5px;
   color: var(--text);
   font-size: var(--fs-sm);
 }
 .workspace-app .settings-theme-options {
-  max-width: 560px;
-}
-.workspace-app .settings-theme-choice {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 4px;
   border: 1px solid var(--border);
   border-radius: var(--r);
-  background: var(--surface);
-  padding: 12px 14px;
+  background: var(--surface-2);
+  padding: 4px;
+}
+.workspace-app .settings-theme-options .settings-theme-choice {
+  position: relative;
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  padding: 0 12px;
+  color: var(--text-2);
   cursor: pointer;
 }
-.workspace-app .settings-theme-preview {
-  display: grid;
-  height: 84px;
-  grid-template-columns: 30% minmax(0, 1fr);
-  gap: 10px;
-  overflow: hidden;
-  border: 1px solid #e5e3df;
-  border-radius: var(--r-sm);
-  background: #fff;
-  padding: 8px;
-}
-.workspace-app .settings-preview-sidebar {
-  border-radius: 3px;
-  background: #f0efeb;
-}
-.workspace-app .settings-preview-main {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 4px 2px;
-}
-.workspace-app .settings-preview-main i,
-.workspace-app .settings-preview-main b {
-  display: block;
-  height: 6px;
-  border-radius: 99px;
-  background: #e6e4df;
-}
-.workspace-app .settings-preview-main i:first-child {
-  width: 42%;
-  height: 8px;
-  background: #343331;
-}
-.workspace-app .settings-preview-main i:nth-child(2) {
-  width: 86%;
-}
-.workspace-app .settings-preview-main i:nth-child(3) {
-  width: 68%;
-}
-.workspace-app .settings-preview-main b {
-  width: 22%;
-  height: 9px;
-  background: var(--accent);
-}
-.workspace-app .settings-theme-preview[data-theme-preview="dark"] {
-  border-color: #353535;
-  background: #1c1c1b;
-}
-.workspace-app
-  .settings-theme-preview[data-theme-preview="dark"]
-  .settings-preview-sidebar {
-  background: #101010;
-}
-.workspace-app
-  .settings-theme-preview[data-theme-preview="dark"]
-  .settings-preview-main
-  i,
-.workspace-app
-  .settings-theme-preview[data-theme-preview="dark"]
-  .settings-preview-main
-  b {
-  background: #454442;
-}
-.workspace-app
-  .settings-theme-preview[data-theme-preview="dark"]
-  .settings-preview-main
-  i:first-child {
-  background: #f4f3ef;
-}
-.workspace-app
-  .settings-theme-preview[data-theme-preview="dark"]
-  .settings-preview-main
-  b {
-  background: #979cf1;
-}
-.workspace-app .settings-theme-preview[data-theme-preview="system"] {
-  background: linear-gradient(90deg, #1c1c1b 0 50%, #fff 50%);
-}
-.workspace-app
-  .settings-theme-preview[data-theme-preview="system"]
-  .settings-preview-sidebar {
-  background: linear-gradient(90deg, #101010 0 50%, #f0efeb 50%);
-}
-.workspace-app .settings-theme-choice-caption {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.workspace-app .settings-theme-choice-caption > span {
-  display: grid;
-  gap: 3px;
-}
-.workspace-app .settings-theme-choice strong {
+.workspace-app .settings-theme-choice:has([data-state="checked"]) {
+  border-color: var(--border);
+  background: var(--surface);
   color: var(--text);
-  font-size: var(--fs-sm);
-  font-weight: 550;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
-.workspace-app .settings-theme-choice-caption > span > span {
-  color: var(--text-3);
-  font-size: var(--fs-xs);
+.workspace-app .settings-theme-choice:has(:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.workspace-app .settings-theme-choice [data-slot="radio-group-item"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 .workspace-app .settings-password-link {
   border-top: 1px solid var(--divider);
@@ -210,5 +134,19 @@
   .workspace-app .settings-content .panel {
     width: 100%;
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .workspace-app .settings-theme-options {
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+  .workspace-app .settings-theme-options .settings-theme-choice {
+    min-width: 0;
+    flex: 1;
+    justify-content: center;
+    gap: 4px;
+    padding-inline: 4px;
   }
 }

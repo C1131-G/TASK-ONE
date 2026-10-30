@@ -290,10 +290,6 @@
   width: 72px;
   height: 72px;
 }
-.workspace-app .skeleton-theme-options {
-  display: grid;
-  gap: 12px;
-}
 .workspace-app .mini .skeleton-text {
   flex: 1;
   min-width: 0;
